@@ -2,6 +2,7 @@
 
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app). Me coding login.
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app). Me coding logout.
 
 ## Available Scripts
 
