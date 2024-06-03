@@ -1,6 +1,7 @@
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app). Me coding refresh-token.
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app). Me coding signup.
 
 ## Available Scripts
 
