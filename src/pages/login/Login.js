@@ -3,7 +3,7 @@ import { json, useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 const Login = () => {
-  const apiLogin = process.env.REACT_APP_API_URL;
+  const apiLogin = "http://localhost:8080/api/auth/signin";
   const containerClasses =
     "flex items-center justify-center min-h-screen bg-gray-100 light:bg-zinc-900";
   const contentClasses =
@@ -24,7 +24,6 @@ const Login = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
 
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCredentials((prevCredentials) => ({
@@ -36,7 +35,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(apiLogin + "signin", {
+      const response = await fetch(apiLogin, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(credentials),
@@ -58,10 +57,10 @@ const Login = () => {
       } else {
         if (response.status === 401) {
           setError("Please check your username and password.");
-        } else if(response.status == 403){
+        } else if (response.status == 403) {
           setIsLocked(true);
-          setError("Your account has been locked")
-        }else {
+          setError("Your account has been locked");
+        } else {
           const errorMessage = await response.text();
           setError(errorMessage || "Something went wrong");
         }

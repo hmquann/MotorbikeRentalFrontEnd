@@ -11,11 +11,13 @@ import Register from "./pages/register/Register";
 import Homepage from "./pages/hompage/Homepage";
 import { useState } from "react";
 import Privacy from "./pages/privacy/Privacy";
-import PrivacyList from "./pages/privacy/PrivacyList"
+import PrivacyList from "./pages/privacy/PrivacyList";
 import UserInformation from "./pages/dashboard/UserInformation";
 import UserData from "./pages/dashboard/UserData";
-import EmailVerify from "./pages/register/EmailVerify";
+
 import RegisterMotorbikeStep1 from "./pages/registerMotorbike/RegisterMotorbikeStep1";
+import RegisterSuccess from "./pages/register/RegisterSuccess";
+import ResetNewPassword from "./pages/forgotpassword/ResetNewPassword";
 
 function App() {
   return (
@@ -27,9 +29,17 @@ function App() {
         <Route path="/employee/:id" element={<UpdateUser />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgotpassword" element={<Forgotpassword />} />
-        <Route path="/register/form" element={<Register />} />
-        <Route path="/register/emailverify"element={<EmailVerify/>}/>
-        <Route path="/registermotorbike/step1"element={<RegisterMotorbikeStep1/>}/>
+        <Route
+          path="password/resetnewpassword/:token"
+          element={<ResetNewPassword />}
+        />
+        <Route path="/register" element={<Register />} />
+
+        <Route path="/verify/:token" element={<RegisterSuccess />} />
+        <Route
+          path="/registermotorbike/step1"
+          element={<RegisterMotorbikeStep1 />}
+        />
         <Route path="/" element={<Navigate to="/homepage" />} />
         <Route path="/homepage" element={<Homepage />} />
         <Route path="/privacy" element={<Privacy />} />
