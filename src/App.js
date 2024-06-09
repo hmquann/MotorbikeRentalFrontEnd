@@ -11,9 +11,13 @@ import Register from "./pages/register/Register";
 import Homepage from "./pages/hompage/Homepage";
 import { useState } from "react";
 import Privacy from "./pages/privacy/Privacy";
-import PrivacyList from "./pages/privacy/PrivacyList"
+import PrivacyList from "./pages/privacy/PrivacyList";
 import UserInformation from "./pages/dashboard/UserInformation";
 import UserData from "./pages/dashboard/UserData";
+import UserWallet from "./pages/wallet/UserWallet";
+import PaymentSuccess from "./pages/wallet/PaymentSuccess";
+import PaymentFailed from "./pages/wallet/PaymentFailed";
+
 
 function App() {
   return (
@@ -32,7 +36,9 @@ function App() {
         <Route path="/privacyList" element={<PrivacyList />} />
         <Route path="/userInformation" element={<UserInformation />} />
         <Route path="/userData" element={<UserData />} />
-
+        <Route path="/wallet" element={<UserWallet />} />
+        <Route path="/payment-success" element={<PaymentSuccess />} />
+        <Route path="/payment-failed" element={<PaymentFailed />} />
         <Route path="*" element={<NoMatch />} />
       </Routes>
     </>

@@ -19,7 +19,8 @@ const Header = () => {
   };
 
   const handleConfirmLogout = () => {
-    localStorage.removeItem("token");
+    // localStorage.removeItem("token");
+    localStorage.clear();
     setIsLoggedIn(false);
     navigate("");
     setShowLogoutModal(false);
@@ -41,9 +42,6 @@ const Header = () => {
           <Nav className="ml-auto">
             <Nav.Link as={Link} to="" className="nav-link">
               About MiMOTORBIKE
-            </Nav.Link>
-            <Nav.Link as={Link} to="/privacy" className="nav-link">
-              Privacy
             </Nav.Link>
             <Nav.Link as={Link} to="" className="nav-link">
               Become Lessor
