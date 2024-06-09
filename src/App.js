@@ -19,6 +19,10 @@ import PaymentSuccess from "./pages/wallet/PaymentSuccess";
 import PaymentFailed from "./pages/wallet/PaymentFailed";
 
 
+import RegisterMotorbikeStep1 from "./pages/registerMotorbike/RegisterMotorbikeStep1";
+import RegisterSuccess from "./pages/register/RegisterSuccess";
+import ResetNewPassword from "./pages/forgotpassword/ResetNewPassword";
+
 function App() {
   return (
     <>
@@ -29,7 +33,17 @@ function App() {
         <Route path="/employee/:id" element={<UpdateUser />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgotpassword" element={<Forgotpassword />} />
+        <Route
+          path="password/resetnewpassword/:token"
+          element={<ResetNewPassword />}
+        />
         <Route path="/register" element={<Register />} />
+
+        <Route path="/verify/:token" element={<RegisterSuccess />} />
+        <Route
+          path="/registermotorbike/step1"
+          element={<RegisterMotorbikeStep1 />}
+        />
         <Route path="/" element={<Navigate to="/homepage" />} />
         <Route path="/homepage" element={<Homepage />} />
         <Route path="/privacy" element={<Privacy />} />

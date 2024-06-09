@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 
 const Login = () => {
-  const apiLogin = process.env.REACT_APP_API_URL;
+  const apiLogin = "http://localhost:8080/api/auth/signin";
   const containerClasses =
     "flex items-center justify-center min-h-screen bg-gray-100 light:bg-zinc-900";
   const contentClasses =
@@ -36,6 +36,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+
       const response = await axios.post(apiLogin + "signin", credentials, {
         headers: { "Content-Type": "application/json" },
       });
@@ -59,11 +60,13 @@ const Login = () => {
         const { status, data } = error.response;
         if (status === 401) {
           setError("Please check your username and password.");
+
         } else if (status === 403) {
           setIsLocked(true);
           setError("Your account has been locked");
         } else {
           setError(data.message || "Something went wrong");
+
         }
       } else if (error.request) {
         // Request was made but no response received

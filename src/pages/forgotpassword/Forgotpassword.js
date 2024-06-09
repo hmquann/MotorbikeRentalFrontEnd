@@ -1,6 +1,8 @@
+import axios from "axios";
 import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Popup from "./PopUpSuccess";
 
 const modalOverlayClasses =
   "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50";
@@ -16,9 +18,53 @@ const submitButtonClasses =
 const Forgotpassword = () => {
   const [isOpen, setIsOpen] = useState(true);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
+
   const handleClose = () => {
     setIsOpen(false);
     navigate("/login"); // Điều hướng đến trang chủ hoặc trang bạn muốn sau khi đóng modal
+  };
+
+  const handleChange = (event) => {
+    setEmail(event.target.value);
+  };
+
+  const handleSubmit = (e) => {
+    if (!email.trim()) {
+      setError("Email cannot be empty.");
+      setLoading(false);
+      return;
+    }
+    e.preventDefault();
+    setLoading(true);
+
+    axios
+      .post("http://localhost:8080/password/forgot", null, {
+        params: { email: email },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((response) => {
+        console.log(response.data);
+        setShowPopup(true); // Hiển thị popup khi thành công
+        setTimeout(() => {
+          setShowPopup(false); // Ẩn popup sau 3 giây
+          navigate("/login"); //chuyển sang trang login sau khi thông báo
+        }, 3000);
+        // Xử lý phản hồi thành công
+      })
+      .catch((error) => {
+        console.error(error);
+        setError(error.response.data);
+        // Xử lý lỗi
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   if (!isOpen) return null;
@@ -37,12 +83,24 @@ const Forgotpassword = () => {
             &times;
           </button>
         </div>
-        <input
-          type="text"
-          placeholder="Enter your email"
-          className={inputClasses}
-        />
-        <button className={submitButtonClasses}>Submit</button>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="email"
+            onChange={handleChange}
+            placeholder="Enter your email"
+            className={inputClasses}
+          />
+
+          <button type="submit" className={submitButtonClasses}>
+            {loading ? "Submitting..." : "Submit"}
+          </button>
+          {error && (
+            <div className="text-red-500 text-center mt-4">{error}</div>
+          )}
+        </form>
+        {showPopup && (
+          <Popup message="Your request sent successfully! Please check your email!" />
+        )}
       </div>
     </div>
   );
