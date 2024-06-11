@@ -22,6 +22,7 @@ import PaymentFailed from "./pages/wallet/PaymentFailed";
 import RegisterMotorbikeStep1 from "./pages/registerMotorbike/RegisterMotorbikeStep1";
 import RegisterSuccess from "./pages/register/RegisterSuccess";
 import ResetNewPassword from "./pages/forgotpassword/ResetNewPassword";
+import BrandList from "./pages/brand/BrandList";
 
 function App() {
   return (
@@ -53,6 +54,7 @@ function App() {
         <Route path="/wallet" element={<UserWallet />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/payment-failed" element={<PaymentFailed />} />
+        <Route path="/brand" element={<BrandList />} />
         <Route path="*" element={<NoMatch />} />
       </Routes>
     </>
