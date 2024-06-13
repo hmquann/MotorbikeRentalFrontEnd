@@ -137,7 +137,7 @@ const Register = () => {
     }
     setFormData(formData);
     axios
-      .post("http://localhost:8080/api/auth/signup", formData, {
+      .post("https://java-app-d52f5a1a8410.herokuapp.com/api/auth/signup", formData, {
         headers: {
           "Content-Type": "application/json",
         },
