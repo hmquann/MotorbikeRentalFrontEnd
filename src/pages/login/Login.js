@@ -45,6 +45,7 @@ const Login = () => {
         localStorage.setItem("token", data.token);
         if (data.roles.length > 0) {
           localStorage.setItem("roles", JSON.stringify(data.roles));
+          localStorage.setItem("user", JSON.stringify(data.user));
         } else {
           console.error("No roles found in the response:", data.roles);
         }

@@ -2,24 +2,39 @@ import React, { useState, useEffect } from "react";
 import { Nav } from "react-bootstrap";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import "./Header.css";
+import Avatar from "./Avatar";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCaretDown, faUser } from "@fortawesome/free-solid-svg-icons";
 
 const Header = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const [username, setUsername] = useState(""); // Khai báo state cho username
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    const userDataString = localStorage.getItem("user");
+
+    // Chuyển đổi chuỗi JSON thành đối tượng JavaScript
+    const userData = JSON.parse(userDataString);
+
+    // Lấy ra username từ đối tượng userData
+    userData ? setUsername("Hi, " + userData.firstName) : setUsername("");
     setIsLoggedIn(!!token);
   }, [location]);
 
-  const handleLogout = () => {
-    setShowLogoutModal(true);
+  // const handleLogout = () => {
+  //   setShowLogoutModal(true);
+  // };
+  const handleAccount = () => {
+    navigate("/menu");
   };
 
   const handleConfirmLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setIsLoggedIn(false);
     navigate("");
     setShowLogoutModal(false);
@@ -49,9 +64,24 @@ const Header = () => {
               Become Lessor
             </Nav.Link>
             {isLoggedIn ? (
-              <Nav.Link onClick={handleLogout} className="nav-link">
-                Logout
-              </Nav.Link>
+              // <Nav.Link onClick={handleLogout} className="nav-link">
+              //   Logout
+              // </Nav.Link>
+              <div
+                className="flex items-center cursor-pointer"
+                onClick={handleAccount}
+              >
+                <FontAwesomeIcon
+                  icon={faUser}
+                  className="text-green-500 mr-2"
+                  size="2x"
+                />
+                <span className="text-green-500 mr-2">{username}</span>
+                <FontAwesomeIcon
+                  icon={faCaretDown}
+                  className="text-green-500 ml-1"
+                />
+              </div>
             ) : (
               <>
                 <Nav.Link as={Link} to="/register" className="nav-link">
@@ -65,29 +95,7 @@ const Header = () => {
           </Nav>
         </nav>
       </header>
-      {showLogoutModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white  dark:bg-zinc-800 rounded-lg p-4 shadow-md">
-            <p className="text-lg text-zinc-800 light:text-zinc-200">
-              Are you sure you want to log out?
-            </p>
-            <div className="mt-4 flex justify-end">
-              <button
-                onClick={handleConfirmLogout}
-                className="bg-green-500 hover:bg-green-600 text-white mr-2 px-4 py-2 rounded-lg "
-              >
-                Yes
-              </button>
-              <button
-                onClick={handleCancelLogout}
-                className="bg-zinc-500 hover:bg-zinc-600 dark:bg-zinc-700 dark:text-zinc-200 px-4 py-2 rounded-lg"
-              >
-                No
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      
     </>
   );
 };
