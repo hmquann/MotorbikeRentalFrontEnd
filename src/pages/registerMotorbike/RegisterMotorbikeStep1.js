@@ -1,4 +1,8 @@
-import React from 'react';
+import React, { useState } from "react";
+import axios from "axios";
+import { useEffect } from "react";
+import Homepage from "../hompage/Homepage";
+import { useNavigate } from "react-router-dom";
 
 const sharedClasses = {
   bgGreen: 'bg-green-500',
@@ -61,15 +65,35 @@ const StepIndicator = ({ stepNumber, stepText }) => {
   );
 };
 
-const FormInput = ({ label, placeholder }) => {
+const FormInput = ({ label, placeholder,name,value }) => {
   return (
     <div className={sharedClasses.mb4}>
       <h2 className={`${sharedClasses.textLg} ${sharedClasses.fontSemibold}`}>{label}</h2>
-      <input type="text" className={`${sharedClasses.wFull} mt-2 p-2 ${sharedClasses.border} ${sharedClasses.borderZinc300} ${sharedClasses.roundedLG}`} placeholder={placeholder} />
+      <input type="text"name={name} value={value} className={`${sharedClasses.wFull} mt-2 p-2 ${sharedClasses.border} ${sharedClasses.borderZinc300} ${sharedClasses.roundedLG}`} placeholder={placeholder} />
     </div>
   );
 };
 
+const FormSelect = ({ label,value, onChange, name, options = [] , keyName,keyId,disableCondition}) => {
+  return (
+    <div className="mb-4">
+      <h2 className="text-lg font-semibold">{label}</h2>
+      <select
+        className="w-full mt-2 p-2 border border-zinc-300 rounded-lg"
+        value={value}
+        onChange={onChange}
+        name={name}
+      >
+        <option value="" disabled={disableCondition}>-- Select --</option>
+        {options.map((option) => (
+          <option key={option.keyId} value={option.keyId}>
+            {option[keyName]}    
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+};
 const TextAreaInput = ({ label, placeholder }) => {
   return (
     <div className={sharedClasses.mb4}>
@@ -112,7 +136,145 @@ const Footer = () => {
 };
 
 const RegisterMotorbikeStep1 = () => {
-  return (
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    motorbikePlate: "",
+    brand:{ brandId: "",brandName:"",origin:"",modelSet:[{}]},
+    model: {id: "",modelName:"",cylinderCapacity:"",fuelType:"",fuelConsumption:"",modelType:"",motorbikeSet:[{}]},
+    yearOfManuFacture: "",
+    description: "",
+    constraintMotorbike: "",
+    price:"",
+    overtimeFee:"",
+    overtimeLimit:"",
+    delivery:"",
+    freeshipDistance:"",
+    deliveryFeePerKilometer:"",
+    province:"",
+    district:"",
+    ward:"",
+    addressDetail:""
+  });
+  const [models, setModels] = useState([]);
+  const [newModels,setNewModels]=useState([]);
+  const [brands, setBrands] = useState([]);
+  const[error,setError]=useState(null);
+  const[loading,setLoading]=useState(false);
+  const [selectedBrand, setSelectedBrand] = useState([]);
+  const [selectedModel, setSelectedModel] = useState();
+  const[motorbikePlateError,setMotorbikePlateError]=useState([]);
+  const[motorbikeBrandError,setMotorbikeBrandError]=useState([]);
+  const[motorbikeModelError,setMotorbikeModelError]=useState([]);
+  const[manufactureYearError,setManufactureYearError]=useState([]);
+  useEffect(() => {
+      axios.get('http://localhost:8080/motorbike/modelList')
+          .then(response => setModels(response.data))
+          .catch(error => console.error('Error fetching models:', error));
+
+      axios.get('http://localhost:8080/motorbike/brandList')
+          .then(response => setBrands(response.data))
+          .catch(error => console.error('Error fetching other entities 1:', error));
+  }, []);
+  console.log(brands);
+  console.log(models)
+  const checkPlate=(plateNumber)=>{
+    const regex = /^\d{2}-[A-Z0-9]{2}-\d{5}$/;
+  return regex.test(plateNumber);
+  }
+  const checkManufactureYear=(manufacture)=>{
+    const regex=/^\d{4}$/;
+    return (regex.test(manufacture)&&manufacture>2000&&manufacture<2030)
+  }
+  useEffect(() => {  
+    if (selectedBrand && selectedBrand.brandId) {
+      setNewModels(selectedBrand.modelSet) 
+    }
+  }, [selectedBrand]);
+  const handleBrandsChange=(e)=>{
+    const {name,value}=e.target
+    setSelectedBrand(brands.find((brand) => brand.brandName == e.target.value)); 
+    if(value==""){
+      setMotorbikeBrandError("Not be empty")
+    }else{
+      setMotorbikeBrandError("")
+    }
+   }
+ 
+useEffect(() => {
+    
+  if (selectedModel && selectedModel.id) {
+    setFormData(prevFormData => ({
+      ...prevFormData,
+    
+        brand: {
+          brandId: selectedBrand.brandId,
+          brandName: selectedBrand.brandName,
+          origin: selectedBrand.origin,
+          modelSet: selectedBrand.modelSet
+        },
+      model: {
+        id: selectedModel.id,
+        modelName:selectedModel.modelName,
+        cylinderCapacity:selectedModel.cylinderCapacity,
+        fuelType:selectedModel.fuelType,
+        fuelConsumption:selectedModel.fuelConsumption,
+        modelType:selectedModel.modelType,
+        motorbikeSet:selectedModel.motorbikeSet
+      }
+    }));
+  }
+}, [selectedModel]);
+ const handleModelChange=(e)=>{
+  setSelectedModel(newModels.find((model) => model.modelName == e.target.value));  
+  if(e.target.value==""){
+    setMotorbikeModelError("Not be empty")
+  }else{
+    setMotorbikeModelError("")
+  }
+ }
+const handleChange=(e)=>{
+  const {name,value}=e.target;
+  let errorMsg = "";
+  if (name === "motorbikePlate") {
+    if (!value) {
+      setMotorbikePlateError( "Plate number cannot be empty.");
+    } else if (checkPlate(value)==false) {
+      setMotorbikePlateError("Invalid plate format. Example: 11-A1-11111");
+    }else{
+      setMotorbikePlateError("");
+    }
+  }
+
+  if (name === "yearOfManuFacture") {
+    if (!value) {
+      setManufactureYearError( "Manufacture cannot be empty.");
+    }else if(checkManufactureYear(value)==false){
+      setManufactureYearError("Invalid year")
+    }
+    else{
+      setManufactureYearError("");
+    }
+  }
+  setFormData({
+    ...formData,
+    [name]: value,
+  });
+}
+const handleReturnNavigate=()=>{
+  navigate("/homepage", { state: {} });
+}
+ const handleSunbmit=(e)=>{   
+  e.preventDefault();
+  setError(null);
+  if (    motorbikeBrandError || motorbikeModelError ||
+          motorbikePlateError || manufactureYearError) {
+    setError("Please enter correct  before submitting.");
+  }else{
+    setLoading(true)
+    navigate('/registermotorbike/step2', { state: {formData} });
+  }
+ }
+  return ( 
     <div className={`min-h-screen bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100`}>
       <Navbar />
       <div className={`bg-white dark:bg-zinc-800 ${sharedClasses.shadow} ${sharedClasses.p4} ${sharedClasses.mt4} ${sharedClasses.flex} ${sharedClasses.justifyCenter} ${sharedClasses.spaceX4}`}>
@@ -123,29 +285,50 @@ const RegisterMotorbikeStep1 = () => {
         <StepIndicator stepNumber="3" stepText="Image" />
       </div>
       <div className={`bg-white dark:bg-zinc-800 ${sharedClasses.shadow} ${sharedClasses.p6} ${sharedClasses.mt4} ${sharedClasses.mx4} ${sharedClasses.roundedLG}`}>
-        <FormInput label="License plates" placeholder="License plate" />
-        <FormInput label="Basic Information" placeholder="Moto company" />
-        <FormInput label="Year of manufacture" placeholder="Year of manufacture" />
-        <FormInput label="Moto model" placeholder="Moto model" />
-        <FormInput label="Fuel type" placeholder="Fuel type" />
-        <FormInput label="Fuel consumption level" placeholder="Fuel consumption level" />
-        <TextAreaInput label="Describe" placeholder="Describe" />
-        <div className={`${sharedClasses.mb4} ${sharedClasses.gridCols3} ${sharedClasses.gap4} ${sharedClasses.mt2}`}>
-          <FormInput label="Feature 1" placeholder="Feature 1" />
-          <FormInput label="Feature 2" placeholder="Feature 2" />
-          <FormInput label="Feature 3" placeholder="Feature 3" />
-          <FormInput label="Feature 4" placeholder="Feature 4" />
-          <FormInput label="Feature 5" placeholder="Feature 5" />
-          <FormInput label="Feature 6" placeholder="Feature 6" />
-        </div>
+      <div className={sharedClasses.mb4}>
+      <h2 className={`${sharedClasses.textLg} ${sharedClasses.fontSemibold}`}>Motorbike Plate</h2>
+      <input  type="text"
+            name="motorbikePlate"
+            placeholder="Enter your motorbike plate"
+            value={formData.motorbikePlate}
+            onChange={handleChange}  className={`${sharedClasses.wFull} mt-2 p-2 ${sharedClasses.border} ${sharedClasses.borderZinc300} ${sharedClasses.roundedLG}`}  />
+    </div>
+        {motorbikePlateError&& <div className="text-red-500">{motorbikePlateError}</div>}
+        <FormSelect label="Motorbike Brand"  name="brand"onChange={handleBrandsChange}  options={brands} keyName="brandName" keyId="brandId" disableCondition="" value={brands.brandName}/>
+        {motorbikeBrandError && <div className="text-red-500">{motorbikeBrandError}</div>}        
+        <FormSelect label="Motorbike Model"  name="model"onChange={handleModelChange}  options={newModels} keyName="modelName" keyId="id" disableCondition="" value={newModels.modelName}/>        
+        {motorbikeModelError && <div className="text-red-500">{motorbikeModelError}</div>}
+        <h2 className={`${sharedClasses.textLg} ${sharedClasses.fontSemibold}`}>Manufacture Year</h2>
+        <input  type="text"
+            name="yearOfManuFacture"
+            placeholder="enter manufacture year"
+            value={formData.yearOfManuFacture}
+            onChange={handleChange}  className={`${sharedClasses.wFull} mt-2 p-2 ${sharedClasses.border} ${sharedClasses.borderZinc300} ${sharedClasses.roundedLG}`}  />
+        {manufactureYearError && <div className="text-red-500">{manufactureYearError}</div>}
+        <h2 className={`${sharedClasses.textLg} ${sharedClasses.fontSemibold}`}>Description</h2>
+        <input  type="text"
+            name="description"
+            placeholder="Description"
+            value={formData.description}
+            onChange={handleChange}  className={`${sharedClasses.wFull} mt-2 p-2 ${sharedClasses.border} ${sharedClasses.borderZinc300} ${sharedClasses.roundedLG}`}  />
+        <h2 className={`${sharedClasses.textLg} ${sharedClasses.fontSemibold}`}>Constraint Motorbike</h2>
+        <input  type="text"
+            name="constraintMotorbike"
+            placeholder="Constraint Motorbike"
+            value={formData.constraintMotorbike}
+            onChange={handleChange}  className={`${sharedClasses.wFull} mt-2 p-2 ${sharedClasses.border} ${sharedClasses.borderZinc300} ${sharedClasses.roundedLG}`}  />
+
         <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.mt4}`}>
-          <button className={`${sharedClasses.bgGreen} ${sharedClasses.textWhite} px-4 py-2 ${sharedClasses.roundedLG}`}>Back</button>
-          <button className={`${sharedClasses.bgGreen} ${sharedClasses.textWhite} px-4 py-2 ${sharedClasses.roundedLG}`}>Continue</button>
+          <button type="button" onClick={handleReturnNavigate} className={`${sharedClasses.bgGreen} ${sharedClasses.textWhite} px-4 py-2 ${sharedClasses.roundedLG}`}>Back</button>
+          <button type="submit" onClick={handleSunbmit}className={`${sharedClasses.bgGreen} ${sharedClasses.textWhite} px-4 py-2 ${sharedClasses.roundedLG}`} >
+          {loading ? "Continue..." : "Continue"}</button>
         </div>
       </div>
       <Footer />
+      
     </div>
   );
 };
 
 export default RegisterMotorbikeStep1;
+

@@ -3,7 +3,7 @@ import { json, useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 const Login = () => {
-  const apiLogin = process.env.REACT_APP_API_URL;
+  const apiLogin = "http://localhost:8080/api/auth/signin";
   const containerClasses =
     "flex items-center justify-center min-h-screen bg-gray-100 light:bg-zinc-900";
   const contentClasses =
@@ -107,7 +107,7 @@ const Login = () => {
             value={credentials.password}
           />
           <div className="flex justify-between text-sm text-zinc-600 dark:text-zinc-400">
-            <Link to="/register" className={linkClasses}>
+            <Link to="/register/form" className={linkClasses}>
               Register
             </Link>
             <Link to="/forgotpassword" className={linkClasses}>

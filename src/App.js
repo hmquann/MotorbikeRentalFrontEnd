@@ -14,9 +14,9 @@ import Privacy from "./pages/privacy/Privacy";
 import PrivacyList from "./pages/privacy/PrivacyList"
 import UserInformation from "./pages/dashboard/UserInformation";
 import UserData from "./pages/dashboard/UserData";
-import EmailVerify from "./pages/register/EmailVerify";
 import RegisterMotorbikeStep1 from "./pages/registerMotorbike/RegisterMotorbikeStep1";
-
+import RegisterMotorbikeStep2 from "./pages/registerMotorbike/RegisterMotorbikeStep2";
+import RegisterSuccess from "./pages/register/RegisterSuccess";
 function App() {
   return (
     <>
@@ -28,8 +28,9 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/forgotpassword" element={<Forgotpassword />} />
         <Route path="/register/form" element={<Register />} />
-        <Route path="/register/emailverify"element={<EmailVerify/>}/>
-        <Route path="/registermotorbike/step1"element={<RegisterMotorbikeStep1/>}/>
+        <Route path="/register/registersuccess"element={<RegisterSuccess/>}/>
+        <Route path="/registermotorbike"element={<RegisterMotorbikeStep1/>}/>
+        <Route path="/registermotorbike/step2"element={<RegisterMotorbikeStep2/>}/>
         <Route path="/" element={<Navigate to="/homepage" />} />
         <Route path="/homepage" element={<Homepage />} />
         <Route path="/privacy" element={<Privacy />} />
