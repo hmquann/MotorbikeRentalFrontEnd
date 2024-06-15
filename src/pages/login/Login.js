@@ -36,9 +36,11 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(apiLogin + "signin", {
+      const response = await fetch(apiLogin , {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        },
         body: JSON.stringify(credentials),
       });
       if (response.ok) {

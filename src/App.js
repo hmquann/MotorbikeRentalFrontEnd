@@ -14,8 +14,8 @@ import Privacy from "./pages/privacy/Privacy";
 import PrivacyList from "./pages/privacy/PrivacyList"
 import UserInformation from "./pages/dashboard/UserInformation";
 import UserData from "./pages/dashboard/UserData";
-import RegisterMotorbikeStep1 from "./pages/registerMotorbike/RegisterMotorbikeStep1";
-import RegisterMotorbikeStep2 from "./pages/registerMotorbike/RegisterMotorbikeStep2";
+import RegisterMotorbikeStep1 from "./pages/motorbike/RegisterMotorbikeStep1";
+import RegisterMotorbikeStep2 from "./pages/motorbike/RegisterMotorbikeStep2";
 import RegisterSuccess from "./pages/register/RegisterSuccess";
 function App() {
   return (
