@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { json, useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 const Login = () => {
   const apiLogin = "http://localhost:8080/api/auth/signin";
@@ -24,7 +25,6 @@ const Login = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
 
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCredentials((prevCredentials) => ({
@@ -42,36 +42,42 @@ const Login = () => {
         //   Authorization: `Bearer ${localStorage.getItem("token")}`
         // },
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(credentials),
       });
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem("token", data.token);
-        if (data.roles.length > 0) {
-          localStorage.setItem("roles", JSON.stringify(data.roles));
-        } else {
-          console.error("No roles found in the response:", data.roles);
-        }
-        setIsLoggedIn(true);
-        if (data.roles.includes("ADMIN")) {
-          navigate("/dashboard");
-        } else if (data.roles && data.roles.includes("USER")) {
-          navigate("/homepage");
-        }
+      const data = response.data;
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("userId", data.id);
+      localStorage.setItem("balance", data.balance);
+      if (data.roles.length > 0) {
+        localStorage.setItem("roles", JSON.stringify(data.roles));
       } else {
-        if (response.status === 401) {
-          setError("Please check your username and password.");
-        } else if(response.status == 403){
-          setIsLocked(true);
-          setError("Your account has been locked")
-        }else {
-          const errorMessage = await response.text();
-          setError(errorMessage || "Something went wrong");
-        }
+        console.error("No roles found in the response:", data.roles);
+      }
+      setIsLoggedIn(true);
+      if (data.roles.includes("ADMIN")) {
+        navigate("/dashboard");
+      } else if (data.roles && data.roles.includes("USER")) {
+        navigate("/homepage");
       }
     } catch (error) {
-      setError("Something went wrong");
-      console.error("Login error:", error);
+      if (error.response) {
+        const { status, data } = error.response;
+        if (status === 401) {
+          setError("Please check your username and password.");
+
+        } else if (status === 403) {
+          setIsLocked(true);
+          setError("Your account has been locked");
+        } else {
+          setError(data.message || "Something went wrong");
+
+        }
+      } else if (error.request) {
+        // Request was made but no response received
+        setError("No response received from the server.");
+      } else {
+        // Something else happened while setting up the request
+        setError("Error setting up the request.");
+      }
     }
   };
 
@@ -79,6 +85,7 @@ const Login = () => {
     const token = localStorage.getItem("token");
     if (token) {
       setIsLoggedIn(true);
+      navigate("/homepage");
     } else {
       setIsLoggedIn(false);
     }
@@ -96,7 +103,7 @@ const Login = () => {
           <input
             type="text"
             name="emailOrPhone"
-            placeholder="Username or PhoneNumber"
+            placeholder="Email or PhoneNumber"
             className={inputClasses}
             onChange={handleChange}
             value={credentials.emailOrPhone}

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-// import Popup from "../forgotpassword/PopUpSuccess";
+import Popup from "../forgotpassword/PopUpSuccess";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -269,9 +269,9 @@ const Register = () => {
             <div className="text-red-500 text-center mt-4">{error}</div>
           )}
         </form>
-        {/* {showPopup && (
+        {showPopup && (
           <Popup message="Your request sent successfully! Please check your email!" />
-        )} */}
+        )}
       </div>
     </div>
   );

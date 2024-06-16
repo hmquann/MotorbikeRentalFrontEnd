@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-// import Popup from "../forgotpassword/PopUpSuccess";
+import Popup from "../forgotpassword/PopUpSuccess";
 
 const RegisterSuccess = () => {
   const [showPopup, setShowPopup] = useState(false);
@@ -30,12 +30,11 @@ const RegisterSuccess = () => {
 
   return (
     <div>
-      {/* {showPopup && (
+      {showPopup && (
         <Popup message="Your account has been successfully verified!" />
-      )} */}
+      )}
     </div>
   );
 };
 
 export default RegisterSuccess;
-

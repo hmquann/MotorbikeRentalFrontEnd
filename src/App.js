@@ -11,12 +11,19 @@ import Register from "./pages/register/Register";
 import Homepage from "./pages/hompage/Homepage";
 import { useState } from "react";
 import Privacy from "./pages/privacy/Privacy";
-import PrivacyList from "./pages/privacy/PrivacyList"
+import PrivacyList from "./pages/privacy/PrivacyList";
 import UserInformation from "./pages/dashboard/UserInformation";
 import UserData from "./pages/dashboard/UserData";
-import RegisterMotorbikeStep1 from "./pages/motorbike/RegisterMotorbikeStep1";
-import RegisterMotorbikeStep2 from "./pages/motorbike/RegisterMotorbikeStep2";
+import UserWallet from "./pages/wallet/UserWallet";
+import PaymentSuccess from "./pages/wallet/PaymentSuccess";
+import PaymentFailed from "./pages/wallet/PaymentFailed";
+
+
+import RegisterMotorbikeStep1 from "./pages/registerMotorbike/RegisterMotorbikeStep1";
 import RegisterSuccess from "./pages/register/RegisterSuccess";
+import ResetNewPassword from "./pages/forgotpassword/ResetNewPassword";
+import BrandList from "./pages/brand/BrandList";
+
 function App() {
   return (
     <>
@@ -27,17 +34,27 @@ function App() {
         <Route path="/employee/:id" element={<UpdateUser />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgotpassword" element={<Forgotpassword />} />
-        <Route path="/register/form" element={<Register />} />
-        <Route path="/register/registersuccess"element={<RegisterSuccess/>}/>
-        <Route path="/registermotorbike"element={<RegisterMotorbikeStep1/>}/>
-        <Route path="/registermotorbike/step2"element={<RegisterMotorbikeStep2/>}/>
+        <Route
+          path="password/resetnewpassword/:token"
+          element={<ResetNewPassword />}
+        />
+        <Route path="/register" element={<Register />} />
+
+        <Route path="/verify/:token" element={<RegisterSuccess />} />
+        <Route
+          path="/registermotorbike/step1"
+          element={<RegisterMotorbikeStep1 />}
+        />
         <Route path="/" element={<Navigate to="/homepage" />} />
         <Route path="/homepage" element={<Homepage />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/privacyList" element={<PrivacyList />} />
         <Route path="/userInformation" element={<UserInformation />} />
         <Route path="/userData" element={<UserData />} />
-
+        <Route path="/wallet" element={<UserWallet />} />
+        <Route path="/payment-success" element={<PaymentSuccess />} />
+        <Route path="/payment-failed" element={<PaymentFailed />} />
+        <Route path="/brand" element={<BrandList />} />
         <Route path="*" element={<NoMatch />} />
       </Routes>
     </>

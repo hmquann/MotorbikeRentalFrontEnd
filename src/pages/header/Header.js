@@ -19,7 +19,8 @@ const Header = () => {
   };
 
   const handleConfirmLogout = () => {
-    localStorage.removeItem("token");
+    // localStorage.removeItem("token");
+    localStorage.clear();
     setIsLoggedIn(false);
     navigate("");
     setShowLogoutModal(false);
