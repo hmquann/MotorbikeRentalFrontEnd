@@ -150,10 +150,7 @@ const RegisterMotorbikeStep1 = () => {
     delivery:"",
     freeshipDistance:"",
     deliveryFeePerKilometer:"",
-    province:"",
-    district:"",
-    ward:"",
-    addressDetail:""
+    motorbikeAddress:""
   });
   const [models, setModels] = useState([]);
   const [newModels,setNewModels]=useState([]);
@@ -175,8 +172,6 @@ const RegisterMotorbikeStep1 = () => {
           .then(response => setBrands(response.data))
           .catch(error => console.error('Error fetching other entities 1:', error));
   }, []);
-  console.log(brands);
-  console.log(models)
   const checkPlate=(plateNumber)=>{
     const regex = /^\d{2}-[A-Z0-9]{2}-\d{5}$/;
   return regex.test(plateNumber);
@@ -234,7 +229,6 @@ useEffect(() => {
  }
 const handleChange=(e)=>{
   const {name,value}=e.target;
-  let errorMsg = "";
   if (name === "motorbikePlate") {
     if (!value) {
       setMotorbikePlateError( "Plate number cannot be empty.");

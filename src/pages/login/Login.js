@@ -38,9 +38,10 @@ const Login = () => {
     try {
       const response = await fetch(apiLogin , {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`
-        },
+        // headers: {
+        //   Authorization: `Bearer ${localStorage.getItem("token")}`
+        // },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(credentials),
       });
       if (response.ok) {
@@ -55,7 +56,7 @@ const Login = () => {
         if (data.roles.includes("ADMIN")) {
           navigate("/dashboard");
         } else if (data.roles && data.roles.includes("USER")) {
-          navigate("/employee");
+          navigate("/homepage");
         }
       } else {
         if (response.status === 401) {

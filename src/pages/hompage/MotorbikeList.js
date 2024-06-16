@@ -13,35 +13,30 @@ const MotorbikeList = () => {
             .catch(error => console.error('Error fetching models:', error));
         }, []);
         console.log(motorbikeList)
+        const handleViewDetail=()=>{
+
+        }
   return (
     <div className="p-8">
-        <h1 className="text-center text-2xl font-semibold mb-8 text-zinc-900 dark:text-zinc-100">
-          Moto for you
-        </h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(8)].map((_, index) => (
-            <div key={index} className={cardClasses}>
-              <div className="bg-zinc-300 h-32 rounded-md mb-4 flex items-center justify-center shadow-inner">
-                <img
-                  src="https://via.placeholder.com/150"
-                  alt="Motorbike"
-                  className="w-full h-full object-cover rounded-md"
-                />
-              </div>
-              <div className="flex justify-between items-center mb-2">
-                <span className={`text-red-400 ${badgeClasses}`}>-16%</span>
-                <span className={`text-green-500 ${badgeClasses}`}>$ Price</span>
-              </div>
-              <h2 className="text-center text-lg font-semibold mb-2 text-zinc-800 dark:text-zinc-100">
-                Name
-              </h2>
-              <div className="flex justify-around">
-                <button className={buttonClasses}>Btn</button>
-                <button className={buttonClasses}>Type</button>
-                <button className={buttonClasses}>Price</button>
-              </div>
-            </div>
-          ))}
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {motorbikeList.map((motorbike, index) => (
+  <div key={index} className={cardClasses}>
+    <div className="bg-zinc-300  h-64 rounded-md mb-4 flex items-center justify-center">
+      {/* <img src="https://img.tinxe.vn/resize/1000x-/2023/01/09/uU7VvIGZ/hew0hooi3tuxxgldlro8-541c.png" alt="Motorbike" className="w-full h-full object-cover round-md" /> */}
+    </div>
+    <div className="flex justify-between items-center mb-2">
+      <span className={`text-red-400 ${badgeClasses}`}>-16%</span>
+      <span className={`text-orange-300 ${badgeClasses}`}></span>
+    </div>
+    <h2 className="text-center text-sm font-semibold mb-2">{motorbike.name}</h2>
+    <div className="flex justify-around">
+      <button className={buttonClasses}>Btn</button>
+      <button className={buttonClasses}>Type</button>
+      <button className={buttonClasses}>{motorbike.price}</button>
+    </div>
+  </div>
+))}
         </div>
       </div>
   );

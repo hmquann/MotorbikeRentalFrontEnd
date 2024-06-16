@@ -2,22 +2,22 @@ import React, { useEffect, useState } from 'react';
 import { format, addDays } from 'date-fns';
 
 const SearchMotorbike = () => {
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [rentalStartTime, setRentalStartTime] = useState('');
-  const [rentalEndTime, setRentalEndTime] = useState('');
-
-  useEffect(() => {
-    const getCurrentTime = () => {
-      const now = new Date();
-      const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), Math.ceil(now.getHours()) + 1, 0);
-      const end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, Math.ceil(now.getHours()) + 1, 0);
-
-      setRentalStartTime(start);
-      setRentalEndTime(end);
-    };
-
-    getCurrentTime();
-  }, []);
+    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [rentalStartTime, setRentalStartTime] = useState(new Date());
+    const [rentalEndTime, setRentalEndTime] = useState(addDays(new Date(), 1));
+    
+    useEffect(() => {
+      const getCurrentTime = () => {
+        const now = new Date();
+        const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), Math.ceil(now.getHours()) + 1, 0);
+        const end = addDays(start, 1);
+    
+        setRentalStartTime(start);
+        setRentalEndTime(end);
+      };
+    
+      getCurrentTime();
+    }, []);
 
   const handleDateChange = (e) => {
     const date = new Date(e.target.value);

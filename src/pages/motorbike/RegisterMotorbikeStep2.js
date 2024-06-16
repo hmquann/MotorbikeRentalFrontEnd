@@ -13,6 +13,7 @@ const RegisterMotorbikeStep2 = () => {
   const [selectedProvince, setSelectedProvince] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedWard, setSelectedWard] = useState("");
+  const[addressDetail,setAddressDetail]=useState("");
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
@@ -57,10 +58,6 @@ const RegisterMotorbikeStep2 = () => {
     const provinceId = event.target.value;
     const selectedProvince = provinces.find(d => d.province_id === provinceId);
     setSelectedProvince(provinceId);
-    setFormData({
-      ...formData,
-      province: selectedProvince.province_name,
-    })
     // Fetch districts based on selected province
     fetch(`https://vapi.vnappmob.com/api/province/district/${provinceId}`)
       .then((response) => response.json())
@@ -83,10 +80,6 @@ const RegisterMotorbikeStep2 = () => {
     const districtId = event.target.value;
     const selectedDistrict = districts.find(d => d.district_id === districtId);
     setSelectedDistrict(districtId);
-    setFormData({
-      ...formData,
-      district: selectedDistrict.district_name,
-    })
     // Fetch wards based on selected district
     fetch(`https://vapi.vnappmob.com/api/province/ward/${districtId}`)
       .then((response) => response.json())
@@ -109,11 +102,7 @@ const RegisterMotorbikeStep2 = () => {
   const handleWardChange = (event) => {
     const wardId = event.target.value;
     const selectedWard = wards.find(d => d.ward_id === wardId);
-    setSelectedWard(wardId);
-    setFormData({
-      ...formData,
-      ward: selectedWard.ward_name,
-    })
+    setSelectedWard(wardId);   
   };
   const regexValueInput=(input)=>{
     const regex=/^(?:[0-9]|[1-9][0-9]{0,5}|1000000)$/
@@ -125,6 +114,9 @@ const RegisterMotorbikeStep2 = () => {
         if(!regexValueInput(value)){
           setOvertimeFeeError("Must be number")
         }
+        if(value===""){
+          setOvertimeFeeError("Not null")
+        }
         else{
           setOvertimeFeeError("")
         }     
@@ -133,6 +125,9 @@ const RegisterMotorbikeStep2 = () => {
         if(!regexValueInput(value)){
           setPriceError("Must be number")
         }
+        if(value===""){
+          setPriceError("Not null")
+        }
         else{
           setPriceError("")
         }     
@@ -140,6 +135,8 @@ const RegisterMotorbikeStep2 = () => {
       if(name==="overtimeLimit"){
         if(!regexValueInput(value)){
           setOvertimeLimitError("Must be number")
+        } if(value===""){
+          setOvertimeLimitError("Not null")
         }
         else{
           setOvertimeLimitError("")
@@ -148,6 +145,8 @@ const RegisterMotorbikeStep2 = () => {
       if(name==="freeshipDistance"){
         if(!regexValueInput(value)){
           setFreeshipError("Must be number")
+        }if(value===""){
+          setFreeshipError("Not null")
         }
         else{
           setFreeshipError("")
@@ -156,27 +155,42 @@ const RegisterMotorbikeStep2 = () => {
       if(name==="deliveryFeePerKilometer"){
         if(!regexValueInput(value)){
           setDeliveryFeeError("Must be number")
+        }if(value===""){
+          setDeliveryFeeError("Not null")
         }
         else{
           setDeliveryFeeError("")
         }     
       }
-     
       setFormData({
         ...formData,
         [name]: value,
       })
     
   };
+  const handleAddressChange=(e)=>{
+        setAddressDetail(e.target.value);
+  }
   const handleReturnClick = () => {
     navigate("/registermotorbike", { state: { receiveData} });
   };
   const handleSubmitClick=()=>{
+    if(deliveryFeeError||overtimeFeeError||overtimeLimitError||freeshipError){
+      setError("Please enter correct  before submitting.");
+    }
+    const province = provinces.find(d => d.province_id === selectedProvince).province_name;
+    const district = districts.find(d => d.district_id === selectedDistrict).district_name;
+    const ward = wards.find(d => d.ward_id === selectedWard).ward_name;
+    const address=province+","+district+","+ward+","+addressDetail
+    setFormData({
+      ...formData,
+      motorbikeAddress:address
+    })
     console.log(formData)
     axios
       .post("http://localhost:8080/motorbike/register", formData, {
         headers: {
-          "Content-Type": "application/json",
+         Authorization: `Bearer ${localStorage.getItem("token")}`
         },
       })
     .then((response) => {
@@ -323,8 +337,8 @@ const RegisterMotorbikeStep2 = () => {
             <input
               placeholder="Enter address detail"
               name="addressDetail"
-              value={formData.addressDetail}
-              onChange={handleChange}
+              value={addressDetail}
+              onChange={handleAddressChange}
               disabled={checkLocation}
               type="text"
                 className="w-2/3 p-2 border rounded mr-2 focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -377,7 +391,7 @@ const RegisterMotorbikeStep2 = () => {
           <div className="w-full sm:w-1/2 pr-3 mb-6 sm:mb-0">
          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Car delivery to your location</h2>
          <label className="relative inline-flex items-center cursor-pointer">
-           <input type="checkbox" value="" className="sr-only peer" onClick={handleCheckDelivery}/>
+           <input type="checkbox" value={checkDelivery} className="sr-only peer" onClick={handleCheckDelivery}/>
           <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 dark:peer-focus:ring-green-800 rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-zinc-600 peer-checked:bg-green-600"></div>
          </label>
       </div>
