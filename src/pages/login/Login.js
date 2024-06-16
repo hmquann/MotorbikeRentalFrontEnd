@@ -36,8 +36,11 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-
-      const response = await axios.post(apiLogin , credentials, {
+      const response = await fetch(apiLogin , {
+        method: "POST",
+        // headers: {
+        //   Authorization: `Bearer ${localStorage.getItem("token")}`
+        // },
         headers: { "Content-Type": "application/json" },
       });
       const data = response.data;
@@ -114,7 +117,7 @@ const Login = () => {
             value={credentials.password}
           />
           <div className="flex justify-between text-sm text-zinc-600 dark:text-zinc-400">
-            <Link to="/register" className={linkClasses}>
+            <Link to="/register/form" className={linkClasses}>
               Register
             </Link>
             <Link to="/forgotpassword" className={linkClasses}>

@@ -135,7 +135,6 @@ const Register = () => {
         return;
       }
     }
-    setFormData(formData);
     axios
       .post("http://localhost:8080/api/auth/signup", formData, {
         headers: {

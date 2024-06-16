@@ -43,7 +43,10 @@ const Header = () => {
             <Nav.Link as={Link} to="" className="nav-link">
               About MiMOTORBIKE
             </Nav.Link>
-            <Nav.Link as={Link} to="" className="nav-link">
+            <Nav.Link as={Link} to="/privacy" className="nav-link">
+              Privacy
+            </Nav.Link>
+            <Nav.Link as={Link} to="/registermotorbike" className="nav-link">
               Become Lessor
             </Nav.Link>
             {isLoggedIn ? (
