@@ -21,6 +21,8 @@ import Menu from "./pages/menu/Menu";
 import Booking from "./pages/booking/Booking";
 import Layout from "./pages/test-layuot/Layout";
 import DetailBooking from "./pages/booking/detail/DetailBooking";
+import Address from "./pages/booking/address/Address";
+import ChatMessage from "./pages/chatting/ChatMessage";
 
 function App() {
   return (
@@ -54,6 +56,8 @@ function App() {
         <Route path="*" element={<NoMatch />} />
         <Route path="/layout" element={<Layout />} />
         <Route path="/detailbooking" element={<DetailBooking />} />
+        <Route path="/booking/address" element={<Address />} />
+        <Route path="/chatmessage" element={<ChatMessage />} />
       </Routes>
     </>
   );

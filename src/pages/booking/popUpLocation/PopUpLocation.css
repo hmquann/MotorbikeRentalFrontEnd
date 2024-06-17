@@ -1,0 +1,9 @@
+.popup-location {
+    transform: scale(1);
+    transition: transform 0.2s ease;
+  }
+  
+  .popup-location-small {
+    transform: scale(0.7); /* Giảm kích thước Popup xuống 70% */
+    transition: transform 0.2s ease;
+  }
