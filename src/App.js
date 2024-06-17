@@ -19,7 +19,7 @@ import PaymentSuccess from "./pages/wallet/PaymentSuccess";
 import PaymentFailed from "./pages/wallet/PaymentFailed";
 
 
-import RegisterMotorbikeStep1 from "./pages/registerMotorbike/RegisterMotorbikeStep1";
+import RegisterMotorbikeStep1 from "./pages/motorbike/RegisterMotorbikeStep1";
 import RegisterSuccess from "./pages/register/RegisterSuccess";
 import ResetNewPassword from "./pages/forgotpassword/ResetNewPassword";
 import BrandList from "./pages/brand/BrandList";
