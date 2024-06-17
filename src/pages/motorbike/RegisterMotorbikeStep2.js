@@ -181,7 +181,7 @@ const RegisterMotorbikeStep2 = () => {
     const province = provinces.find(d => d.province_id === selectedProvince).province_name;
     const district = districts.find(d => d.district_id === selectedDistrict).district_name;
     const ward = wards.find(d => d.ward_id === selectedWard).ward_name;
-    const address=province+","+district+","+ward+","+addressDetail
+    const address=addressDetail+","+ward+","+district+","+province
     setFormData({
       ...formData,
       motorbikeAddress:address

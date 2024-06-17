@@ -48,13 +48,13 @@ const Header = () => {
       <header className="flex justify-between items-center p-4">
         <div className="flex items-center">
           <span className="ml-2 text-xl font-bold text-zinc-800 dark:text-dark">
-            MiMOTORBIKE
+            MiMOTOR
           </span>
         </div>
         <nav className="flex space-x-4">
           <Nav className="ml-auto">
             <Nav.Link as={Link} to="" className="nav-link">
-              About MiMOTORBIKE
+              About MiMOTOR
             </Nav.Link>
             <Nav.Link as={Link} to="/privacy" className="nav-link">
               Privacy
