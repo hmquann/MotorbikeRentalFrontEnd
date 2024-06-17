@@ -30,6 +30,7 @@ import PaymentSuccess from "./pages/wallet/PaymentSuccess";
 import PaymentFailed from "./pages/wallet/PaymentFailed";
 
 import BrandList from "./pages/brand/BrandList";
+import ModelList from "./pages/modelMotorbike/ModelList";
 
 function App() {
   return (
@@ -66,6 +67,8 @@ function App() {
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/payment-failed" element={<PaymentFailed />} />
         <Route path="/brand" element={<BrandList />} />
+
+        <Route path="/model" element={<ModelList />} />
 
         <Route path="*" element={<NoMatch />} />
         <Route path="/layout" element={<Layout />} />
