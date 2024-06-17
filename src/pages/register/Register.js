@@ -135,7 +135,6 @@ const Register = () => {
         return;
       }
     }
-    setFormData(formData);
     axios
       .post("https://java-app-d52f5a1a8410.herokuapp.com/api/auth/signup", formData, {
         headers: {

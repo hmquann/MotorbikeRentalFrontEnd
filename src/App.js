@@ -14,6 +14,7 @@ import Privacy from "./pages/privacy/Privacy";
 import PrivacyList from "./pages/privacy/PrivacyList";
 import UserInformation from "./pages/dashboard/UserInformation";
 import UserData from "./pages/dashboard/UserData";
+
 import RegisterMotorbikeStep1 from "./pages/registerMotorbike/RegisterMotorbikeStep1";
 import RegisterSuccess from "./pages/register/RegisterSuccess";
 import ResetNewPassword from "./pages/forgotpassword/ResetNewPassword";
@@ -23,6 +24,13 @@ import Layout from "./pages/test-layuot/Layout";
 import DetailBooking from "./pages/booking/detail/DetailBooking";
 import Address from "./pages/booking/address/Address";
 import ChatMessage from "./pages/chatting/ChatMessage";
+
+import UserWallet from "./pages/wallet/UserWallet";
+import PaymentSuccess from "./pages/wallet/PaymentSuccess";
+import PaymentFailed from "./pages/wallet/PaymentFailed";
+
+import BrandList from "./pages/brand/BrandList";
+
 
 function App() {
   return (
@@ -51,8 +59,15 @@ function App() {
         <Route path="/privacyList" element={<PrivacyList />} />
         <Route path="/userInformation" element={<UserInformation />} />
         <Route path="/userData" element={<UserData />} />
+
         <Route path="/menu" element={<Menu />} />
         <Route path="/booking" element={<Booking />} />
+
+        <Route path="/wallet" element={<UserWallet />} />
+        <Route path="/payment-success" element={<PaymentSuccess />} />
+        <Route path="/payment-failed" element={<PaymentFailed />} />
+        <Route path="/brand" element={<BrandList />} />
+
         <Route path="*" element={<NoMatch />} />
         <Route path="/layout" element={<Layout />} />
         <Route path="/detailbooking" element={<DetailBooking />} />

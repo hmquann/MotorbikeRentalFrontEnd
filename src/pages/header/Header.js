@@ -33,8 +33,7 @@ const Header = () => {
   };
 
   const handleConfirmLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    localStorage.clear();
     setIsLoggedIn(false);
     navigate("");
     setShowLogoutModal(false);
@@ -60,7 +59,7 @@ const Header = () => {
             <Nav.Link as={Link} to="/privacy" className="nav-link">
               Privacy
             </Nav.Link>
-            <Nav.Link as={Link} to="" className="nav-link">
+            <Nav.Link as={Link} to="/registermotorbike" className="nav-link">
               Become Lessor
             </Nav.Link>
             {isLoggedIn ? (
