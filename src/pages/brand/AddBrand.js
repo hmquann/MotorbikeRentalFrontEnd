@@ -8,7 +8,7 @@ const modalContentClasses =
 const closeButtonClasses = "text-zinc-500 dark:text-zinc-300";
 const inputClasses = "p-1 rounded mb-2";
 const buttonClasses =
-  "hover:bg-blue-700 dark:bg-blue-600 text-white dark:text-zinc-900 py-2 px-4 rounded-lg text-right";
+  "hover:bg-blue-700 bg-blue-600 text-white dark:text-zinc-900 py-2 px-4 rounded-lg text-right";
 
 const AddBrand = ({ showModal, setShowModal, onBrandCreated }) => {
   const [brandName, setBrandName] = useState("");

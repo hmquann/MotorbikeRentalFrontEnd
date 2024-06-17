@@ -13,51 +13,41 @@ const EditBrand = ({
 
   useEffect(() => {
     if (brandToEdit) {
-      setBrandName(brandToEdit.brandName);
-      setOrigin(brandToEdit.origin);
+      setBrandName(brandToEdit.brandName || "");
+      setOrigin(brandToEdit.origin || "");
     }
-    const handleKeyDown = (e) => {
-      if (e.key === "Escape") {
-        setShowModal(false);
-      } else if (e.key === "Enter") {
-        handleSubmit();
-      }
-    };
+  }, [brandToEdit, showModal]);
 
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [brandToEdit, setShowModal]);
-
-  const handleSubmit = async () => {
-    if (brandToEdit.brandName !== brandName && brandToEdit.origin !== origin) {
-      try {
-        await axios.patch(
-          `http://localhost:8080/api/brand/updateBrand/${brandToEdit.brandId}`,
-          {
-            brandName,
-            origin,
-          }
-        );
-        onBrandUpdated();
-        setShowModal(false);
-      } catch (error) {
-        if (error.response) {
-          if (error.response.status === 400) {
-            setError("Brand name already existed");
-          }
-        } else if (error.request) {
-          console.error("Error connecting to server:", error.request);
-        } else {
-          console.error("Error setting up request:", error.message);
-        }
-      }
-    } else {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const updatedBrand = {
+        ...brandToEdit,
+        brandName,
+        origin,
+      };
+  
+      await axios.patch(
+        `http://localhost:8080/api/brand/updateBrand/${brandToEdit.brandId}`,
+        updatedBrand
+      );
+  
+      onBrandUpdated();
       setShowModal(false);
+    } catch (error) {
+      if (error.response) {
+        if (error.response.status === 400) {
+          setError("Brand name already existed");
+          console.log(error.response);
+        }
+      } else if (error.request) {
+        console.error("Error connecting to server:", error.request);
+      } else {
+        console.error("Error setting up request:", error.message);
+      }
     }
   };
+  
 
   return (
     showModal && (
