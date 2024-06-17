@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {  useNavigate } from "react-router-dom";
+import { json, useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
@@ -43,12 +43,14 @@ const Login = () => {
         // },
         headers: { "Content-Type": "application/json" },
       });
+
       const data = response.data;
       localStorage.setItem("token", data.token);
       localStorage.setItem("userId", data.id);
       localStorage.setItem("balance", data.balance);
       if (data.roles.length > 0) {
         localStorage.setItem("roles", JSON.stringify(data.roles));
+
       } else {
         console.error("No roles found in the response:", data.roles);
       }

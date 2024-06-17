@@ -82,7 +82,7 @@ const PasswordResetForm = () => {
 
     axios
       .post(
-        `http://localhost:8080/password/reset/${token}`,
+        `https://java-app-d52f5a1a8410.herokuapp.com/password/reset/${token}`,
         {
           password: newPassword,
         },
