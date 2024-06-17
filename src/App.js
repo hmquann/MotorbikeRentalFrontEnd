@@ -15,7 +15,7 @@ import PrivacyList from "./pages/privacy/PrivacyList";
 import UserInformation from "./pages/dashboard/UserInformation";
 import UserData from "./pages/dashboard/UserData";
 
-import RegisterMotorbikeStep1 from "./pages/registerMotorbike/RegisterMotorbikeStep1";
+import RegisterMotorbikeStep1 from "./pages/motorbike/RegisterMotorbikeStep1";
 import RegisterSuccess from "./pages/register/RegisterSuccess";
 import ResetNewPassword from "./pages/forgotpassword/ResetNewPassword";
 import Menu from "./pages/menu/Menu";
@@ -30,7 +30,6 @@ import PaymentSuccess from "./pages/wallet/PaymentSuccess";
 import PaymentFailed from "./pages/wallet/PaymentFailed";
 
 import BrandList from "./pages/brand/BrandList";
-
 
 function App() {
   return (
