@@ -12,9 +12,7 @@ const Menu = () => {
   };
 
   const handleConfirmLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("roles");
+    localStorage.clear();
     // setIsLoggedIn(false);
     navigate("/login");
     setShowLogoutModal(false);
