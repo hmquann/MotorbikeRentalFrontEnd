@@ -147,7 +147,7 @@ const ModelList = () => {
                   key={model.id}
                   className={index % 2 === 0 ? "bg-stone-300" : "bg-zinc-100"}
                 >
-                  <td className="whitespace-nowrap px-6 py-4 font-bold text-gray-900">{model.id}</td>
+                  <td className="whitespace-nowrap px-6 py-4 font-bold text-gray-900">{model.modelId}</td>
                   <td className={tableCellClasses}>{model.modelName}</td>
                   <td className={tableCellClasses}>{model.brand?.brandName}</td>
                   <td className={tableCellClasses}>
@@ -207,7 +207,7 @@ const ModelList = () => {
         <ViewModel
           showModal={showViewModal}
           setShowModal={setShowViewModal}
-          modelId={modelToView.id} // Pass the selected model ID to the ViewModel component
+          modelId={modelToView.modelId} // Pass the selected model ID to the ViewModel component
         />
       )}
     </div>

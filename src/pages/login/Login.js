@@ -36,21 +36,16 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(apiLogin , {
-        method: "POST",
-        // headers: {
-        //   Authorization: `Bearer ${localStorage.getItem("token")}`
-        // },
+
+      const response = await axios.post(apiLogin , credentials, {
         headers: { "Content-Type": "application/json" },
       });
-
       const data = response.data;
       localStorage.setItem("token", data.token);
       localStorage.setItem("userId", data.id);
       localStorage.setItem("balance", data.balance);
       if (data.roles.length > 0) {
         localStorage.setItem("roles", JSON.stringify(data.roles));
-
       } else {
         console.error("No roles found in the response:", data.roles);
       }
@@ -82,7 +77,6 @@ const Login = () => {
       }
     }
   };
-
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {

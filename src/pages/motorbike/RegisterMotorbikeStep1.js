@@ -164,11 +164,11 @@ const RegisterMotorbikeStep1 = () => {
   const[motorbikeModelError,setMotorbikeModelError]=useState([]);
   const[manufactureYearError,setManufactureYearError]=useState([]);
   useEffect(() => {
-      axios.get('http://localhost:8080/motorbike/modelList')
+      axios.get('http://localhost:8080/api/model/getAllModel')
           .then(response => setModels(response.data))
           .catch(error => console.error('Error fetching models:', error));
 
-      axios.get('http://localhost:8080/motorbike/brandList')
+      axios.get('http://localhost:8080/api/brand/getAllBrand')
           .then(response => setBrands(response.data))
           .catch(error => console.error('Error fetching other entities 1:', error));
   }, []);
