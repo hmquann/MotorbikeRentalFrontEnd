@@ -30,12 +30,13 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+
       const response = await axios.post(apiLogin, credentials, {
         headers: {
           "Content-Type": "application/json",
         },
-      });
 
+      });
       const data = response.data;
       console.log(response.data.user);
       localStorage.setItem("token", data.token);
@@ -70,7 +71,6 @@ const Login = () => {
       }
     }
   };
-
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {

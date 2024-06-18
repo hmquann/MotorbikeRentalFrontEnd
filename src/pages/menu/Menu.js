@@ -14,7 +14,7 @@ const Menu = () => {
   const handleConfirmLogout = () => {
     localStorage.clear();
     // setIsLoggedIn(false);
-    navigate("/login");
+    navigate("/homepage");
     setShowLogoutModal(false);
   };
 
