@@ -5,7 +5,8 @@
 .menu-left {
   width: 200px; /* Độ rộng của phần menu items */
   padding: 20px;
-  background-color: #f0f0f0; /* Màu nền của phần menu items */
+  background-color: #f0f0f0; 
+  margin-left: 20px;/* Màu nền của phần menu items */
 }
 
 .menu-right {

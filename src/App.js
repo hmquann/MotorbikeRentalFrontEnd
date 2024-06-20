@@ -33,6 +33,7 @@ import PaymentFailed from "./pages/wallet/PaymentFailed";
 
 import BrandList from "./pages/brand/BrandList";
 import ModelList from "./pages/modelMotorbike/ModelList";
+import ApproveMotorbikeRegistration from "./pages/motorbike/ApproveMotorbikeRegistration ";
 
 function App() {
   return (
@@ -55,6 +56,8 @@ function App() {
           path="/registermotorbike/step1"
           element={<RegisterMotorbikeStep1 />}
         />
+    
+
         <Route path="/" element={<Navigate to="/homepage" />} />
         <Route path="/homepage" element={<Homepage />} />
         <Route path="/privacy" element={<Privacy />} />
@@ -62,15 +65,19 @@ function App() {
         <Route path="/userInformation" element={<UserInformation />} />
         <Route path="/userData" element={<UserData />} />
 
-        <Route path="/menu" element={<Menu />} />
+        <Route path="/menu" element={<Menu />} >
+        <Route path="/menu/wallet" element={<UserWallet />} />
+        <Route path="/menu/approveMotorbike" element={<ApproveMotorbikeRegistration />} />
+        <Route path="/menu/brand" element={<BrandList />} />
+        <Route path="/menu/model" element={<ModelList />} />
+
+
+        </Route>
         <Route path="/booking" element={<Booking />} />
 
-        <Route path="/wallet" element={<UserWallet />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/payment-failed" element={<PaymentFailed />} />
-        <Route path="/brand" element={<BrandList />} />
 
-        <Route path="/model" element={<ModelList />} />
 
         <Route path="*" element={<NoMatch />} />
         <Route path="/layout" element={<Layout />} />
