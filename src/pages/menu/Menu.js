@@ -2,6 +2,10 @@ import React, { useState } from "react";
 import { NavLink, Route, Routes, useNavigate } from "react-router-dom";
 import "./Menu.css";
 import ChatMessage from "../chatting/ChatMessage";
+import UserWallet from "../wallet/UserWallet";
+import ApproveMotorbikeRegistration from "../motorbike/ApproveMotorbikeRegistration ";
+import BrandList from "../brand/BrandList";
+import ModelList from "../modelMotorbike/ModelList";
 
 const Menu = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -36,18 +40,34 @@ const Menu = () => {
           </li>
           <li>
             <NavLink
-              to="/menu"
+              to="/menu/wallet"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
-              Employee
+              Wallet
             </NavLink>
           </li>
           <li>
             <NavLink
-              to="/chatmessage"
+              to="/menu/brand"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
-              Chatting
+              Manage Brand
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/menu/model"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              Manage Model
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/menu/approveMotorbike"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              Motorbike Registration
             </NavLink>
           </li>
           <li>
@@ -60,7 +80,10 @@ const Menu = () => {
       </div>
       <div className="menu-right">
         <Routes>
-          <Route path="/chatmessage" element={<ChatMessage />} />
+          <Route path="/wallet" element={<UserWallet />} />
+          <Route path="/approveMotorbike" element={<ApproveMotorbikeRegistration />} />
+          <Route path="/brand" element={<BrandList />} />
+          <Route path="/model" element={<ModelList />} />
           {/* code chatting room here */}
         </Routes>
       </div>

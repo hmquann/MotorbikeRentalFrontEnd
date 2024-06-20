@@ -21,6 +21,14 @@ const EditBrand = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      if (!brandName) {
+        setError("Brand name cannot be empty");
+        return;
+      }
+      if (!origin) {
+        setError("Origin cannot be empty");
+        return;
+      }
       const updatedBrand = {
         ...brandToEdit,
         brandName,
