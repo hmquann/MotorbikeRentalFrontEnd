@@ -12,7 +12,7 @@ const RegisterSuccess = () => {
     console.log(token);
     if (token !== null) {
       axios
-        .get(`https://java-app-d52f5a1a8410.herokuapp.com/verify/${token}`)
+        .get(`http://localhost:8080/verify/${token}`)
         .then((response) => {
           console.log("User:", response.data);
           setShowPopup(true); // Hiển thị popup khi thành công

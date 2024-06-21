@@ -16,7 +16,7 @@ const Header = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const userDataString = localStorage.getItem("user");
+    const userDataString = localStorage.getItem("userData");
 
     // Chuyển đổi chuỗi JSON thành đối tượng JavaScript
     const userData = JSON.parse(userDataString);
@@ -91,7 +91,6 @@ const Header = () => {
           </Nav>
         </nav>
       </header>
-      
     </>
   );
 };
