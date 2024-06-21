@@ -56,7 +56,7 @@ const Homepage = () => {
 
     </div>
     <div className="flex justify-center">
-      <div style={{ width: '90%' }}>
+      <div style={{ width: '95%' }}>
       <MotorbikeList/>
       </div>
     </div>

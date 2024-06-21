@@ -1,9 +1,26 @@
-import React from 'react';
+import React,{useState} from 'react';
+import axios from "axios";
+import { useEffect } from "react";
 
+import { useNavigate } from "react-router-dom";
 const Filter = () => {
 const buttonClasses = 'flex items-center border rounded-full px-3 py-1';
 const imageClasses = 'mr-2';
 const infoImageClasses = 'ml-2';
+const [brands, setBrands] = useState([]);
+const [models, setModels] = useState([]);
+useEffect(() => {
+    axios.get('http://localhost:8080/api/model/getAllModel')
+        .then(response => setModels(response.data))
+        .catch(error => console.error('Error fetching models:', error));
+
+    axios.get('http://localhost:8080/api/brand/getAllBrand')
+        .then(response => setBrands(response.data))
+        .catch(error => console.error('Error fetching other entities 1:', error));
+}, []);
+const handleMotorList=(e)=>{
+
+}
     return (
         <div>
     <div className="flex flex-wrap gap-2 p-4">
@@ -14,10 +31,16 @@ const infoImageClasses = 'ml-2';
   </svg>
         Loại xe
       </button>
-      <button className={buttonClasses}>
-      <svg class="h-8 w-8 text-green-500"  width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">  <path stroke="none" d="M0 0h24v24H0z"/>  <circle cx="5" cy="18" r="3" />  <circle cx="19" cy="18" r="3" />  <polyline points="12 19 12 15 9 12 14 8 16 11 19 11" />  <circle cx="17" cy="5" r="1" /></svg>
-        Hãng xe
-      </button>
+      <button class={buttonClasses} onclick="toggleDropdown()">
+            <svg class="h-8 w-8 text-green-500" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" />
+                <circle cx="5" cy="18" r="3" />
+                <circle cx="19" cy="18" r="3" />
+                <polyline points="12 19 12 15 9 12 14 8 16 11 19 11" />
+                <circle cx="17" cy="5" r="1" />
+            </svg>
+            Hãng xe
+        </button>
       <button className={buttonClasses}>
         Chủ xe 5 sao
         </button>
