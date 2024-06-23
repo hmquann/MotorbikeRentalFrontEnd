@@ -4,6 +4,7 @@ import AddModel from "./AddModel";
 import ViewModel from "./ViewModel";
 import { MdOutlineAddCircleOutline, MdSearch } from "react-icons/md";
 import { IoEyeOutline } from "react-icons/io5";
+import useDebounce from "../../hooks/useDebounce";
 
 const buttonClasses = "font-semibold px-4 py-2 rounded-lg";
 const tableCellClasses = " px-6 py-4 whitespace-nowrap text-amber-700";
@@ -21,6 +22,9 @@ const ModelList = () => {
   const [searchTerm, setSearchTerm] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
   
 
   const fetchModels = async () => {
@@ -81,12 +85,19 @@ const ModelList = () => {
     }
   };
   useEffect(() => {
-    if (isSearching) {
-      searchModels(searchTerm, currentPage, pageSize);
+    if (debouncedSearchTerm !== null && typeof debouncedSearchTerm === 'string' && debouncedSearchTerm.trim() !== '') {
+      setIsSearching(true);
+      searchModels(debouncedSearchTerm, currentPage, pageSize);
     } else {
+      setIsSearching(false);
       fetchModels(currentPage, pageSize);
     }
-  }, [currentPage, pageSize, isSearching]);
+  }, [debouncedSearchTerm, currentPage, pageSize, isSearching]);
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(0); // Reset page to 0 when searching
+  };
   const handleNextPage = () => {
     if (currentPage < totalPages - 1) {
       setCurrentPage(currentPage + 1);
@@ -102,18 +113,7 @@ const ModelList = () => {
   const handlePageClick = (page) => {
     setCurrentPage(page);
   };
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
-    if (e.target.value) {
-      setIsSearching(true);
-      searchModels(e.target.value, 0, pageSize);
-      setCurrentPage(0);
-    } else {
-      setIsSearching(false);
-      fetchModels(0, pageSize);
-      setCurrentPage(0);
-    }
-  };
+
 
   const renderPageNumbers = () => {
     const pages = [];
@@ -166,6 +166,7 @@ const ModelList = () => {
         </div>
       </div>
       <div className="overflow-x-auto bg-white shadow-md rounded-b-lg">
+      <div className="mt-1 mb-1 flex justify-end flex-wrap mx-auto">
       <div className="p-2 w-1/5">
           <input
             type="text"
@@ -174,6 +175,7 @@ const ModelList = () => {
             onChange={handleSearch}
             className="p-2 border border-gray-300 rounded-md w-full"
           />
+        </div>
         </div>
         <table className="min-w-full table-fixed divide-y divide-zinc-200">
           <thead className="bg-zinc-100 ">

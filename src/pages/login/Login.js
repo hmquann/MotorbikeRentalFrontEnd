@@ -51,7 +51,7 @@ const Login = () => {
 
       if (data.roles.includes("ADMIN")) {
         navigate("/dashboard");
-      } else if (data.roles && data.roles.includes("USER")) {
+      } else if (data.roles && data.roles.includes("USER","LESSOR")) {
         navigate("/homepage");
       }
     } catch (error) {
