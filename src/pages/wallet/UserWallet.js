@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const sharedClasses = {
-  blueGradient: 'bg-gradient-to-r dark:from-zinc-400 dark:to-cyan-800',
+  blueGradient: 'bg-gradient-to-r from-zinc-400 to-cyan-800',
   zincBorders: 'border-t border-zinc-200 dark:border-zinc-700',
   button: 'px-4 py-2 rounded-lg',
 };
@@ -100,7 +100,7 @@ const UserWallet = () => {
   };
 
   return (
-    <div className="bg-zinc-300 min-h-screen flex items-center justify-center">
+    <div className="bg-zinc-100 dark:bg-zinc-800 py-40 px-10 rounded-lg shadow-md max-w-5xl  mx-auto">
       <div className={`${sharedClasses.blueGradient} shadow-md rounded-lg p-4 w-full md:w-1/2 mx-auto`}>
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -134,7 +134,7 @@ const UserWallet = () => {
               value={amount}
               onChange={handleAmountChange}
             />
-            <button className={`hover:from-zinc-700 hover:to-pink-800 bg-gradient-to-r dark:from-zinc-600 dark:to-pink-800 text-white mt-2 ${sharedClasses.button}`} onClick={handlePayment}>Add Money</button>
+            <button className={`hover:from-zinc-700 hover:to-pink-800 bg-gradient-to-r from-zinc-600 to-pink-800 text-white mt-2 ${sharedClasses.button}`} onClick={handlePayment}>Add Money</button>
           </div>
         )}
         {error && <div className="text-red-500 mt-2">{error}</div>}

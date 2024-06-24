@@ -91,29 +91,7 @@ const SearchMotorbike = () => {
         </button>
       </div>
 
-      <div className="mt-4">
-        <label htmlFor="selectedDate" className="text-sm">
-          Chọn ngày thuê:
-        </label>
-        <select
-          id="selectedDate"
-          name="selectedDate"
-          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-zinc-500 focus:ring focus:ring-zinc-200 dark:bg-zinc-800 dark:border-zinc-600 dark:focus:ring-zinc-400 dark:text-white"
-          value={format(selectedDate, 'yyyy-MM-dd')}
-          onChange={handleDateChange}
-        >
-          <option value={format(new Date(), 'yyyy-MM-dd')}>
-            {format(new Date(), 'dd/MM/yyyy')}
-          </option>
-          <option value={format(addDays(new Date(), 1), 'yyyy-MM-dd')}>
-            {format(addDays(new Date(), 1), 'dd/MM/yyyy')}
-          </option>
-          <option value={format(addDays(new Date(), 2), 'yyyy-MM-dd')}>
-            {format(addDays(new Date(), 2), 'dd/MM/yyyy')}
-          </option>
-          {/* Add more options as needed */}
-        </select>
-      </div>
+      
     </div>
   );
 };

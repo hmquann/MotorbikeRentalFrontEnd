@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 const inputClasses =
-  "mt-1 block w-full p-2 border border-zinc-300 rounded-md dark:text-green-800 font-semibold";
+  "mt-1 block w-full p-2 border border-zinc-300 rounded-md text-green-800 font-semibold";
 const labelClasses = "block text-sm font-bold dark:text-neutral-300";
 
 const ViewModel = ({ showModal, setShowModal, modelId }) => {
@@ -107,7 +107,7 @@ const ViewModel = ({ showModal, setShowModal, modelId }) => {
             <input
               type="text"
               name="brandName"
-              value={modelData.brand.brandName}
+              value={modelData.brand?.brandName}
               readOnly
               className={inputClasses}
             />
