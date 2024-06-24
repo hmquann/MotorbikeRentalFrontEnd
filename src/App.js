@@ -39,6 +39,7 @@ import VerifyChangeEmail from "./pages/profile/VerifyChangeEmail";
 import ModelList from "./pages/modelMotorbike/ModelList";
 import ApproveMotorbikeRegistration from "./pages/motorbike/ApproveMotorbikeRegistration ";
 
+
 function App() {
   return (
     <>
@@ -76,14 +77,13 @@ function App() {
         <Route path="/menu/brand" element={<BrandList />} />
         <Route path="/menu/model" element={<ModelList />} />
         <Route path="/menu/profile" element={<Profile />} />
-
+        <Route path="/menu/profile" element={<Profile />} />
         </Route>
 
         <Route path="/booking" element={<Booking />} />
 
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/payment-failed" element={<PaymentFailed />} />
-
 
         <Route path="*" element={<NoMatch />} />
         <Route path="/layout" element={<Layout />} />
