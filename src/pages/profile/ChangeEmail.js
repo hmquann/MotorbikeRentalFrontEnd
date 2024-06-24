@@ -1,9 +1,7 @@
 import axios from "axios";
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Popup from "./PopUpSuccess";
-
+import PopupMessage from "./PopupMessage";
 const modalOverlayClasses =
   "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50";
 const modalContentClasses =
@@ -14,18 +12,17 @@ const inputClasses =
   "w-full p-2 mb-4 bg-zinc-200 rounded-lg light:bg-zinc-700 dark:text-zinc-200-dark";
 const submitButtonClasses =
   "w-full p-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600";
-
-const Forgotpassword = () => {
-  const [isOpen, setIsOpen] = useState(true);
+const ChangeEmail = ({ onClose, isOpen }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [error, setError] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
+  const userDataString = localStorage.getItem("user");
+  const userData = JSON.parse(userDataString);
 
   const handleClose = () => {
-    setIsOpen(false);
-    navigate("/login"); // Điều hướng đến trang chủ hoặc trang bạn muốn sau khi đóng modal
+    onClose();
   };
 
   const handleChange = (event) => {
@@ -40,19 +37,26 @@ const Forgotpassword = () => {
     }
     e.preventDefault();
     setLoading(true);
-
+    console.log("123123213");
     axios
-      .post("http://localhost:8080/password/forgot", null, {
-        params: { email: email },
-        headers: {
-          "Content-Type": "application/json",
+      .post(
+        "http://localhost:8080/api/auth/changeEmail",
+        {
+          userId: userData.id,
+          newEmail: email,
         },
-      })
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
       .then((response) => {
         console.log(response.data);
         setShowPopup(true); // Hiển thị popup khi thành công
         setTimeout(() => {
           setShowPopup(false); // Ẩn popup sau 3 giây
+          localStorage.clear();
           navigate("/login"); //chuyển sang trang login sau khi thông báo
         }, 3000);
         // Xử lý phản hồi thành công
@@ -68,12 +72,13 @@ const Forgotpassword = () => {
   };
 
   if (!isOpen) return null;
+
   return (
     <div className={modalOverlayClasses}>
       <div className={modalContentClasses}>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100-dark">
-            Forgotten Password
+            Change Email
           </h2>
           <button
             onClick={handleClose}
@@ -99,11 +104,11 @@ const Forgotpassword = () => {
           )}
         </form>
         {showPopup && (
-          <Popup message="Your request sent successfully! Please check your email!" />
+          <PopupMessage message="Your request sent successfully! Please check your email!"></PopupMessage>
         )}
       </div>
     </div>
   );
 };
 
-export default Forgotpassword;
+export default ChangeEmail;

@@ -1,18 +1,18 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import Popup from "../forgotpassword/PopUpSuccess";
+import PopupMessage from "./PopupMessage";
 
-const RegisterSuccess = () => {
-  const [showPopup, setShowPopup] = useState(false);
-  const { token } = useParams("");
+const VerifyChangeEmail = () => {
+  const [showPopup, setShowPopup] = useState(true);
+  const { token, newEmail } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
     console.log(token);
     if (token !== null) {
       axios
-        .get(`http://localhost:8080/verify/${token}`)
+        .post(`http://localhost:8080/updateEmail/${token}/${newEmail}`)
         .then((response) => {
           console.log("User:", response.data);
           setShowPopup(true); // Hiển thị popup khi thành công
@@ -31,10 +31,10 @@ const RegisterSuccess = () => {
   return (
     <div>
       {showPopup && (
-        <Popup message="Your account has been successfully verified!" />
+        <PopupMessage message="Your account's email has been successfully changed!" />
       )}
     </div>
   );
 };
 
-export default RegisterSuccess;
+export default VerifyChangeEmail;

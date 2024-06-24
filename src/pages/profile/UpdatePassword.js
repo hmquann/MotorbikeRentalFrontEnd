@@ -1,7 +1,7 @@
-import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate, useParams } from "react-router-dom";
-import Popup from "./PopUpSuccess";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Popup from "./PopupMessage";
 
 const modalOverlayClasses =
   "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50";
@@ -14,18 +14,21 @@ const inputClasses =
 const submitButtonClasses =
   "w-full p-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600";
 
-const PasswordResetForm = () => {
-  const [newPassword, setNewPassword] = useState("");
-  const [renewPassword, setRenewPassword] = useState("");
+const UpdatePassword = ({ onClose, isOpen }) => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [renewPassword, setRenewPassword] = useState("");
+  const [oldPassword, setOldPassword] = useState("");
   const [repasswordError, setRepasswordError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [isOpen, setIsOpen] = useState(true);
-  const navigate = useNavigate();
-  const { token } = useParams();
-  const [showPopup, setShowPopup] = useState(false);
+  const [oldPasswordError, setOldPasswordError] = useState("");
 
+  const handleClose = () => {
+    onClose();
+  };
   const validatePassword = (password) => {
     return !(
       password.length < 8 ||
@@ -35,7 +38,25 @@ const PasswordResetForm = () => {
     );
   };
 
+  const handleChangeOldPassWord = (e) => {
+    setOldPasswordError("");
+    setError("");
+    const oldPasswordValue = e.target.value;
+    setOldPassword(oldPasswordValue);
+    if (!validatePassword(oldPasswordValue)) {
+      setOldPasswordError(
+        "Password length 8-20 characters and contains upper character and number."
+      );
+    } else {
+      setOldPasswordError("");
+      setOldPassword(oldPasswordValue); // Cập nhật giá trị của newPassword
+    }
+  };
+
   const handleChangeNewPassWord = (e) => {
+    if (newPassword !== renewPassword) {
+      setRepasswordError("Password does not match");
+    }
     const newPasswordValue = e.target.value;
     setNewPassword(newPasswordValue);
     if (!validatePassword(newPasswordValue)) {
@@ -58,33 +79,29 @@ const PasswordResetForm = () => {
     }
   };
 
-  const handleClose = () => {
-    setIsOpen(false);
-    navigate("/login"); // Điều hướng đến trang login sau khi đóng modal
-  };
-
+  const userDataString = localStorage.getItem("user");
+  const userData = JSON.parse(userDataString);
+  const token = userData.token;
   const handleSubmit = (e) => {
+    if (renewPassword !== newPassword) {
+      setError("Password should not be empty!");
+      return;
+    }
+    if (!newPassword || newPassword.trim() === "") {
+      setError("Password should not be empty!");
+      return;
+    }
+    console.log(333333);
     e.preventDefault();
     setLoading(true);
-    setError(null);
-
-    if (!newPassword.trim()) {
-      setError("Password cannot be empty.");
-      setLoading(false);
-      return;
-    }
-
-    if (repasswordError || passwordError) {
-      setError("Please correct the errors before submitting.");
-      setLoading(false);
-      return;
-    }
 
     axios
       .post(
-        `http://localhost:8080/password/reset/${token}`,
+        "http://localhost:8080/password/change",
         {
-          password: newPassword,
+          oldPassword: oldPassword,
+          newPassword: newPassword,
+          token: token,
         },
         {
           headers: {
@@ -98,11 +115,13 @@ const PasswordResetForm = () => {
         setTimeout(() => {
           setShowPopup(false); // Ẩn popup sau 3 giây
           navigate("/login"); //chuyển sang trang login sau khi thông báo
+          localStorage.clear();
         }, 3000);
+        // Xử lý phản hồi thành công
       })
       .catch((error) => {
         console.error(error);
-        setError("An error occurred. Please try again.");
+        setOldPasswordError(error.response.data);
         // Xử lý lỗi
       })
       .finally(() => {
@@ -111,13 +130,12 @@ const PasswordResetForm = () => {
   };
 
   if (!isOpen) return null;
-
   return (
     <div className={modalOverlayClasses}>
       <div className={modalContentClasses}>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100-dark">
-            Reset Password
+            Change Password
           </h2>
           <button
             onClick={handleClose}
@@ -128,17 +146,27 @@ const PasswordResetForm = () => {
           </button>
         </div>
         <form onSubmit={handleSubmit}>
+          <label>Enter old password</label>
           <input
             type="password"
-            placeholder="Enter new password"
+            value={oldPassword}
+            onChange={handleChangeOldPassWord}
+            className={inputClasses}
+          />
+          {oldPasswordError && (
+            <div className="text-red-500">{oldPasswordError}</div>
+          )}
+          <label>Enter new password</label>
+          <input
+            type="password"
             value={newPassword}
             onChange={handleChangeNewPassWord}
             className={inputClasses}
           />
           {passwordError && <div className="text-red-500">{passwordError}</div>}
+          <label>Enter renew password</label>
           <input
             type="password"
-            placeholder="Confirm new password"
             onChange={handleChangeRenewPassword}
             value={renewPassword}
             className={inputClasses}
@@ -153,10 +181,12 @@ const PasswordResetForm = () => {
             <div className="text-red-500 text-center mt-4">{error}</div>
           )}
         </form>
-        {showPopup && <Popup message="Password changed successfully!" />}
+        {showPopup && (
+          <Popup message="Your request sent successfully! Please check your email!" />
+        )}
       </div>
     </div>
   );
 };
 
-export default PasswordResetForm;
+export default UpdatePassword;

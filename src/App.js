@@ -30,6 +30,8 @@ import PaymentSuccess from "./pages/wallet/PaymentSuccess";
 import PaymentFailed from "./pages/wallet/PaymentFailed";
 
 import BrandList from "./pages/brand/BrandList";
+import Profile from "./pages/profile/Profile";
+import VerifyChangeEmail from "./pages/profile/VerifyChangeEmail";
 
 function App() {
   return (
@@ -59,7 +61,6 @@ function App() {
         <Route path="/userInformation" element={<UserInformation />} />
         <Route path="/userData" element={<UserData />} />
 
-        <Route path="/menu" element={<Menu />} />
         <Route path="/booking" element={<Booking />} />
 
         <Route path="/wallet" element={<UserWallet />} />
@@ -72,6 +73,13 @@ function App() {
         <Route path="/detailbooking" element={<DetailBooking />} />
         <Route path="/booking/address" element={<Address />} />
         <Route path="/chatmessage" element={<ChatMessage />} />
+        <Route
+          path="/updateEmail/:token/:newEmail"
+          element={<VerifyChangeEmail />}
+        />
+        <Route path="/menu" element={<Menu />}>
+          <Route path="/menu/profile" element={<Profile />} />
+        </Route>
       </Routes>
     </>
   );

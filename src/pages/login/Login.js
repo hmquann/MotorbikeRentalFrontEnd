@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {  useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
@@ -36,21 +36,19 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(apiLogin , {
-        method: "POST",
-        // headers: {
-        //   Authorization: `Bearer ${localStorage.getItem("token")}`
-        // },
-        headers: { "Content-Type": "application/json" },
+      const response = await axios.post(apiLogin, credentials, {
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
 
       const data = response.data;
       localStorage.setItem("token", data.token);
       localStorage.setItem("userId", data.id);
       localStorage.setItem("balance", data.balance);
+      localStorage.setItem("user", JSON.stringify(data.user));
       if (data.roles.length > 0) {
         localStorage.setItem("roles", JSON.stringify(data.roles));
-
       } else {
         console.error("No roles found in the response:", data.roles);
       }
@@ -65,13 +63,11 @@ const Login = () => {
         const { status, data } = error.response;
         if (status === 401) {
           setError("Please check your username and password.");
-
         } else if (status === 403) {
           setIsLocked(true);
           setError("Your account has been locked");
         } else {
           setError(data.message || "Something went wrong");
-
         }
       } else if (error.request) {
         // Request was made but no response received
