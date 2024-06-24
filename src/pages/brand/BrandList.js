@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import AddBrand from "./AddBrand";
 import EditBrand from "./EditBrand";
+import { MdOutlineAddCircleOutline } from "react-icons/md";
+import { FaRegEdit } from "react-icons/fa";
 
 const buttonClasses = "px-4 py-2 rounded-lg";
 const tableCellClasses = "px-6 py-4 whitespace-nowrap";
-const actionButtonClasses = "text-zinc-500 rounded-full hover:bg-yellow-400 bg-yellow-300 px-3";
+const actionButtonClasses = "text-zinc-500 rounded-full hover:bg-yellow-400 bg-yellow-300 px-3 py-2";
 const deleteButtonClasses = "text-red-500";
 
 const BrandList = () => {
@@ -58,12 +60,26 @@ const BrandList = () => {
 
   const renderPageNumbers = () => {
     const pages = [];
-    for (let i = 0; i < totalPages; i++) {
+    const maxVisiblePages = 3; // Số trang tối đa được hiển thị
+    const halfVisiblePages = Math.floor(maxVisiblePages / 2); // Số trang được hiển thị ở mỗi bên của trang hiện tại
+  
+    let startPage = Math.max(0, currentPage - halfVisiblePages);
+    let endPage = Math.min(totalPages - 1, currentPage + halfVisiblePages);
+  
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      if (startPage === 0) {
+        endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
+      } else if (endPage === totalPages - 1) {
+        startPage = Math.max(0, endPage - maxVisiblePages + 1);
+      }
+    }
+  
+    for (let i = startPage; i <= endPage; i++) {
       pages.push(
         <button
           key={i}
-          className={`px-3 py-1 border border-zinc-300 text-zinc-500 rounded-md ${
-            currentPage === i ? "bg-zinc-300 text-white" : ""
+          className={`hover:bg-sky-200 px-3 py-1 border border-zinc-300 text-zinc-500 rounded-md ${
+            currentPage === i ? "bg-sky-600 text-white" : ""
           }`}
           onClick={() => handlePageClick(i)}
         >
@@ -73,14 +89,14 @@ const BrandList = () => {
     }
     return pages;
   };
-
+  
   const handleEdit = (brand) => {
     setBrandToEdit(brand);
     setShowEditModal(true);
   };
   
   return (
-    <div className="max-w-9xl mx-auto p-4 bg-zinc-100">
+    <div className="max-w-5xl mx-auto p-4 bg-zinc-100">
       <div className="bg-gradient-to-r from-cyan-700 from-40% to-red-500 text-white p-4 rounded-t-lg flex justify-between items-center">
         <h2 className="text-2xl font-bold">Manage Brand</h2>
         <div>
@@ -88,7 +104,7 @@ const BrandList = () => {
             className={`${buttonClasses}hover:from-zinc-700 hover:to-pink-800 bg-gradient-to-r from-red-800 to-red-700 text-white rounded-full `}
             onClick={() => setShowModal(true)}
           >
-            Add New Brand
+            <MdOutlineAddCircleOutline />
           </button>
         </div>
       </div>
@@ -117,7 +133,7 @@ const BrandList = () => {
             {brands.map((brand, index) => (
               <tr
                 key={brand.brandId}
-                className={index % 2 === 0 ? "bg-white-100" : "bg-gray-200"}
+                className={index % 2 === 0 ? "bg-stone-300" : "bg-zinc-100"}
               >
                 <td className={tableCellClasses}>{brand.brandName}</td>
                 <td className={tableCellClasses}>{brand.origin}</td>
@@ -126,7 +142,8 @@ const BrandList = () => {
                     className={`${actionButtonClasses} mr-2`}
                     onClick={() => handleEdit(brand)}
                   >
-                    Edit
+                    <FaRegEdit />
+
                   </button>
                 </td>
               </tr>

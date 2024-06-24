@@ -2,6 +2,12 @@ import React, { useState } from "react";
 import { NavLink, Route, Routes, useNavigate } from "react-router-dom";
 import "./Menu.css";
 import Profile from "../profile/Profile";
+import ChatMessage from "../chatting/ChatMessage";
+import UserWallet from "../wallet/UserWallet";
+import ApproveMotorbikeRegistration from "../motorbike/ApproveMotorbikeRegistration ";
+import BrandList from "../brand/BrandList";
+import ModelList from "../modelMotorbike/ModelList";
+
 
 const Menu = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -13,7 +19,7 @@ const Menu = () => {
 
   const handleConfirmLogout = () => {
     localStorage.clear();
-    navigate("/login");
+    navigate("/homepage");
     setShowLogoutModal(false);
   };
 
@@ -35,18 +41,34 @@ const Menu = () => {
           </li>
           <li>
             <NavLink
-              to="#"
+              to="/menu/wallet"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
-              Employee
+              Wallet
             </NavLink>
           </li>
           <li>
             <NavLink
-              to="#"
+              to="/menu/brand"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
-              Chatting
+              Manage Brand
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/menu/model"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              Manage Model
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/menu/approveMotorbike"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              Motorbike Status
             </NavLink>
           </li>
           <li>
@@ -67,6 +89,11 @@ const Menu = () => {
       <div className="menu-right">
         <Routes>
           <Route path="profile" element={<Profile />} />
+          <Route path="/wallet" element={<UserWallet />} />
+          <Route path="/approveMotorbike" element={<ApproveMotorbikeRegistration />} />
+          <Route path="/brand" element={<BrandList />} />
+          <Route path="/model" element={<ModelList />} />
+          {/* code chatting room here */}
         </Routes>
       </div>
 
