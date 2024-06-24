@@ -32,6 +32,10 @@ import PaymentFailed from "./pages/wallet/PaymentFailed";
 
 
 import BrandList from "./pages/brand/BrandList";
+
+import Profile from "./pages/profile/Profile";
+import VerifyChangeEmail from "./pages/profile/VerifyChangeEmail";
+
 import ModelList from "./pages/modelMotorbike/ModelList";
 import ApproveMotorbikeRegistration from "./pages/motorbike/ApproveMotorbikeRegistration ";
 
@@ -64,15 +68,17 @@ function App() {
         <Route path="/privacyList" element={<PrivacyList />} />
         <Route path="/userInformation" element={<UserInformation />} />
         <Route path="/userData" element={<UserData />} />
+      
 
         <Route path="/menu" element={<Menu />} >
         <Route path="/menu/wallet" element={<UserWallet />} />
         <Route path="/menu/approveMotorbike" element={<ApproveMotorbikeRegistration />} />
         <Route path="/menu/brand" element={<BrandList />} />
         <Route path="/menu/model" element={<ModelList />} />
-
+        <Route path="/menu/profile" element={<Profile />} />
 
         </Route>
+
         <Route path="/booking" element={<Booking />} />
 
         <Route path="/payment-success" element={<PaymentSuccess />} />
@@ -84,6 +90,10 @@ function App() {
         <Route path="/detailbooking" element={<DetailBooking />} />
         <Route path="/booking/address" element={<Address />} />
         <Route path="/chatmessage" element={<ChatMessage />} />
+        <Route
+          path="/updateEmail/:token/:newEmail"
+          element={<VerifyChangeEmail />}
+        />
       </Routes>
     </>
   );

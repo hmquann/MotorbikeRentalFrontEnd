@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -30,7 +31,6 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-
       const response = await axios.post(apiLogin, credentials, {
         headers: {
           "Content-Type": "application/json",
@@ -42,8 +42,9 @@ const Login = () => {
       localStorage.setItem("token", data.token);
       localStorage.setItem("userId", data.id);
       localStorage.setItem("balance", data.balance);
-      localStorage.setItem("userData", JSON.stringify(data.user));
+      localStorage.setItem("user", JSON.stringify(data.user));
       if (data.roles && data.roles.length > 0) {
+
         localStorage.setItem("roles", JSON.stringify(data.roles));
       } else {
         console.error("No roles found in the response:", data.roles);
