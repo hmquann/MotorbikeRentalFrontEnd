@@ -14,7 +14,7 @@ const avatarClasses = "w-10 h-10 rounded-full border-2 border-yellow-400";
 const MotorbikeList = () => {
     const[motorbikeList,setMotorbikeList]=useState([]);
     useEffect(() => {
-        axios.get('http://localhost:8080/motorbike/motorbikeList')
+        axios.get('http://localhost:8080/api/motorbike/activeMotorbikeList')
             .then(response => setMotorbikeList(response.data))
             .catch(error => console.error('Error fetching models:', error));
         }, []);

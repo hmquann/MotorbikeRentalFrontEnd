@@ -58,7 +58,7 @@ function App() {
 
         <Route path="/verify/:token" element={<RegisterSuccess />} />
         <Route
-          path="/registermotorbike/step1"
+          path="/registermotorbike"
           element={<RegisterMotorbikeStep1 />}
         />
     
@@ -77,7 +77,7 @@ function App() {
         <Route path="/menu/brand" element={<BrandList />} />
         <Route path="/menu/model" element={<ModelList />} />
         <Route path="/menu/profile" element={<Profile />} />
-        <Route path="/menu/profile" element={<Profile />} />
+
         </Route>
 
         <Route path="/booking" element={<Booking />} />
