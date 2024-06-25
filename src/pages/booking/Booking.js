@@ -1,11 +1,15 @@
-
 import "./Booking.css";
-import { useLocation,useNavigate } from "react-router-dom";
-import {faArrowRight,faGasPump,faOilCan} from "@fortawesome/free-solid-svg-icons";
+import { useLocation, useNavigate } from "react-router-dom";
+import {
+  faArrowRight,
+  faGasPump,
+  faOilCan,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState, useEffect } from "react";
 import RentalDocument from "./rentaldocument/RentalDocument";
 import PopUpLocation from "./popUpLocation/PopUpLocation";
+import MotorbikeSchedulePopUp from "./schedule/MotorbikeSchedulePopUp";
 const sharedClasses = {
   rounded: "rounded",
   flex: "flex",
@@ -63,16 +67,27 @@ const FeatureItem = ({ icon, altText, title, description }) => (
     <FontAwesomeIcon icon={icon} className="text-green-600 text-xl mr-2" />
     <div>
       <p className="text-zinc-500 font-bold">{title}</p>
-      <p className="text-lg">{description}{title==="con"}l/100km</p>
+      <p className="text-lg">
+        {description}
+        {title === "con"}l/100km
+      </p>
     </div>
   </div>
 );
 const Booking = () => {
+  const getAddress = (inputString) => {
+    if (typeof inputString !== "string" || inputString.trim() === "") {
+      return "";
+    }
+    const parts = inputString.split(",").map((part) => part.trim());
+    return parts.length > 2 ? parts.slice(2).join(", ") : parts.join(", ");
+  };
   const location = useLocation();
   const receiveData = location.state.selectedMotorbike;
-  console.log(receiveData)
+  console.log(receiveData);
   const [selectedLocation, setSelectedLocation] = useState("");
   const [showPopUp, setShowPopUp] = useState(false);
+  const[schedulePopUp,setSchedulePopUp]=useState(false);
   const [pickupDate, setPickupDate] = useState("");
   const [returnDate, setReturnDate] = useState("");
   const [promoCode, setPromoCode] = useState("");
@@ -81,7 +96,16 @@ const Booking = () => {
   const handleClosePopup = () => {
     setShowPopUp(false);
   };
-
+  const handleOpenPopup=()=>{
+    setShowPopUp(true)
+  }
+  const handleOpenSchedulePopup=()=>{
+    console.log("yes")
+    setSchedulePopUp(true)
+  }
+  const handleCloseSchedulePopup=()=>{
+    setSchedulePopUp(false)
+  }
   const handleSelectLocation = (location) => {
     setSelectedLocation(location);
     setShowPopUp(false);
@@ -151,7 +175,9 @@ const Booking = () => {
     }
   }, [pickupDate, returnDate]);
 
-  const [gettedLocation, setGettedLocation] = useState();
+  const [gettedLocation, setGettedLocation] = useState(
+    getAddress(receiveData.motorbikeAddress)
+  );
   useEffect(() => {
     if (gettedLocation === null) {
       setGettedLocation("");
@@ -211,179 +237,187 @@ const Booking = () => {
         </div>
       </div>
 
-      < div className={`${sharedClasses.p4} ${sharedClasses.maxW7xl} mx-auto`}>
-      <div className="flex justify-between">
-        {/* Left Column - 60% width */}
-        <div
-          className={`${sharedClasses.w2_3} ${sharedClasses.p4} ${sharedClasses.rounded}`}
-        >
-          {/* Header Section */}
+      <div className={`${sharedClasses.p4} ${sharedClasses.maxW7xl} mx-auto`}>
+        <div className="flex justify-between">
+          {/* Left Column - 60% width */}
           <div
-            className={`flex flex-col md:flex-row justify-between items-start md:items-center ${sharedClasses.mb4}`}
+            className={`${sharedClasses.w2_3} ${sharedClasses.p4} ${sharedClasses.rounded}`}
           >
-            <div>
-              <h1 className={`text-2xl ${sharedClasses.fontBold}`}>
-                {receiveData.model.modelName}
-              </h1>
-              <div
-                className={`flex ${sharedClasses.itemsCenter} ${sharedClasses.textSm} ${sharedClasses.textZinc500} ${sharedClasses.mb2}`}
-              >
-                <span className="mr-2"></span>
-                <span className="mr-2">{receiveData.tripCount}</span>
-                <span>{receiveData.motorbikeAddress}</span>
+            {/* Header Section */}
+            <div
+              className={`flex flex-col md:flex-row justify-between items-start md:items-center ${sharedClasses.mb4}`}
+            >
+              <div>
+                <h1 className={`text-2xl ${sharedClasses.fontBold}`}>
+                  {receiveData.model.modelName}
+                </h1>
+                <div
+                  className={`flex ${sharedClasses.itemsCenter} ${sharedClasses.textSm} ${sharedClasses.textZinc500} ${sharedClasses.mb2}`}
+                >
+                  <span className="mr-2"></span>
+                  <span className="mr-2">{receiveData.tripCount}</span>
+                  <span>{receiveData.motorbikeAddress}</span>
+                </div>
+                <div
+                  className={`flex ${sharedClasses.spaceX2} ${sharedClasses.mt2}`}
+                >
+                  <span
+                    className={`${sharedClasses.bgBlue100} ${sharedClasses.textBlue800} ${sharedClasses.px2} ${sharedClasses.py1} ${sharedClasses.rounded}`}
+                  >
+                    {receiveData.delivery ? "Giao xe tận nơi" : ""}
+                  </span>
+                </div>
               </div>
               <div
-                className={`flex ${sharedClasses.spaceX2} ${sharedClasses.mt2}`}
+                className={`flex ${sharedClasses.spaceX2} ${sharedClasses.mt4} md:${sharedClasses.mt0}`}
+              ></div>
+            </div>
+
+            {/* Features Section */}
+            <div
+              className={`${sharedClasses.grid} ${sharedClasses.gridCols2} ${sharedClasses.gap4} ${sharedClasses.mb4}`}
+            >
+              <FeatureItem
+                icon={faGasPump}
+                altText="fuel"
+                title="Fuel"
+                description={receiveData.model.fuelType}
+              />
+              <FeatureItem
+                icon={faOilCan}
+                altText="consumption"
+                title="Fuel consumption"
+                description={receiveData.model.fuelConsumption}
+              />
+            </div>
+
+            {/* Description Section */}
+            <div className={`${sharedClasses.mb4}`}>
+              <h2
+                className={`text-xl ${sharedClasses.fontSemibold} ${sharedClasses.mb2}`}
               >
-                <span
-                  className={`${sharedClasses.bgBlue100} ${sharedClasses.textBlue800} ${sharedClasses.px2} ${sharedClasses.py1} ${sharedClasses.rounded}`}
+                Description
+              </h2>
+              <p
+                className={`${sharedClasses.textZinc700} ${sharedClasses.mb4}`}
+              >
+                Cho thuê xe Ciaz 2021 số tự động
+                <br />5 chỗ ngồi rộng rãi sạch sẽ
+                <br />
+                Trang bị camera hành trình trước sau
+                <br />
+                Màn hình giải trí android kết nối 4g
+                <br />
+                Có bảo hiểm đầy đủ
+                <br />
+                Chủ xe thân thiện hỗ trợ nhiệt tình
+              </p>
+            </div>
+
+            {/* Other amenities section */}
+            <div
+              className={`${sharedClasses.grid} ${sharedClasses.gridCols4} ${sharedClasses.gap4}`}
+            >
+              {/* Other amenities go here */}
+            </div>
+            <RentalDocument />
+          </div>
+
+          {/* Right Column - 40% width */}
+          <div
+            className={`${sharedClasses.w1_3} bg-zinc-100 ${sharedClasses.p4} ${sharedClasses.rounded}`}
+          >
+            <form onSubmit={handleFormSubmit}>
+              {/* Rental Section */}
+              <h2
+                className={`text-xl ${sharedClasses.fontSemibold} ${sharedClasses.mb4}`}
+              >
+                {receiveData.price / 1000}K /day
+              </h2>
+              <div className={sharedClasses.mb4}>                       
+                <div className="grid grid-cols-2 gap-4 mb-4" >
+                  <div className="border border-red-500 p-4 rounded-lg" onClick={handleOpenSchedulePopup}>
+                    <p className="text-zinc-700 dark:text-zinc-300">Nhận xe</p>
+                    <p className="text-zinc-700 dark:text-zinc-300 text-zinc-900 dark:text-white font-semibold">
+                      20/06/2024
+                    </p>
+                    <p className="text-zinc-900 dark:text-white">21:00</p>
+                  </div>
+                  <div className="border border-red-500 p-4 rounded-lg" onClick={handleOpenSchedulePopup}>
+                    <p className="text-zinc-700 dark:text-zinc-300">Trả xe</p>
+                    <p className="text-zinc-700 dark:text-zinc-300 text-zinc-900 dark:text-white font-semibold">
+                      23/06/2024
+                    </p>
+                    <p className="text-zinc-900 dark:text-white">20:00</p>
+                  </div>
+                 
+                    <MotorbikeSchedulePopUp isOpen={schedulePopUp} onClose={() => setSchedulePopUp(false)} />
+                </div>
+              </div>
+              <div className={sharedClasses.mb4}>
+                <label
+                  className={`block text-sm font-medium ${sharedClasses.textZinc700}`}
                 >
-                {receiveData.delivery?"Giao xe tận nơi":"" }   
+                  Vehicle return time
+                </label>
+                <input
+                  type="datetime-local"
+                  className={`mt-1 ${sharedClasses.block} w-full ${sharedClasses.borderZinc300} ${sharedClasses.rounded} ${sharedClasses.shadowSm}`}
+                  value={returnDate}
+                  onChange={(e) => setReturnDate(e.target.value)}
+                  min={pickupDate || minDateTime}
+                />
+              </div>
+              <div className="mb-3">
+                <label className="block text-sm font-medium text-zinc-700 mb-1">
+                  Pick up location
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    className={`w-full px-3 py-2 border border-zinc-300 rounded shadow-sm focus:outline-none focus:border-zinc-500`}
+                    value={gettedLocation}
+                    readOnly
+                    onClick={() => setShowPopUp(true)}
+                  />
+                  {showPopUp && (
+                    <PopUpLocation onClose={() => setShowPopUp(false)} />
+                  )}
+                </div>
+              </div>
+
+              <div className={`flex justify-between ${sharedClasses.mb2}`}>
+                <span>Price:</span>
+                <span>{receiveData.price}đ/ ngày</span>
+              </div>
+              <div className={`flex justify-between ${sharedClasses.mb2}`}>
+                <span>Total Price:</span>
+                <span>
+                  {receiveData.price}đ x {rentalDays} ngày
                 </span>
               </div>
-            </div>
-            <div
-              className={`flex ${sharedClasses.spaceX2} ${sharedClasses.mt4} md:${sharedClasses.mt0}`}
-            >
-            </div>
-          </div>
-
-          {/* Features Section */}
-          <div
-            className={`${sharedClasses.grid} ${sharedClasses.gridCols2} ${sharedClasses.gap4} ${sharedClasses.mb4}`}
-          >
-            <FeatureItem
-              icon={faGasPump}
-              altText="fuel"
-              title="Fuel"
-              description={receiveData.model.fuelType}
-            />
-            <FeatureItem
-              icon={faOilCan}
-              altText="consumption"
-              title="Fuel consumption"
-              description={receiveData.model.fuelConsumption}
-            />
-          </div>
-
-          {/* Description Section */}
-          <div className={`${sharedClasses.mb4}`}>
-            <h2
-              className={`text-xl ${sharedClasses.fontSemibold} ${sharedClasses.mb2}`}
-            >
-              Description
-            </h2>
-            <p className={`${sharedClasses.textZinc700} ${sharedClasses.mb4}`}>
-              Cho thuê xe Ciaz 2021 số tự động
-              <br />5 chỗ ngồi rộng rãi sạch sẽ
-              <br />
-              Trang bị camera hành trình trước sau
-              <br />
-              Màn hình giải trí android kết nối 4g
-              <br />
-              Có bảo hiểm đầy đủ
-              <br />
-              Chủ xe thân thiện hỗ trợ nhiệt tình
-            </p>
-          </div>
-
-          {/* Other amenities section */}
-          <div
-            className={`${sharedClasses.grid} ${sharedClasses.gridCols4} ${sharedClasses.gap4}`}
-          >
-            {/* Other amenities go here */}
-          </div>
-          <RentalDocument />
-        </div>
-
-        {/* Right Column - 40% width */}
-        <div
-          className={`${sharedClasses.w1_3} bg-zinc-100 ${sharedClasses.p4} ${sharedClasses.rounded}`}
-        >
-          <form onSubmit={handleFormSubmit}>
-            {/* Rental Section */}
-            <h2
-              className={`text-xl ${sharedClasses.fontSemibold} ${sharedClasses.mb4}`}
-            >
-              {receiveData.price/1000}K /day
-            </h2>
-            <div className={sharedClasses.mb4}>
-              <label
-                className={`block text-sm font-medium ${sharedClasses.textZinc700}`}
+              <div
+                className={`flex justify-between ${sharedClasses.mb4} hover:${sharedClasses.cursorPointer}`}
               >
-                Vehicle pick up time
-              </label>
-              <input
-                type="datetime-local"
-                className={`mt-1 ${sharedClasses.block} w-full ${sharedClasses.borderZinc300} ${sharedClasses.rounded} ${sharedClasses.shadowSm}`}
-                value={pickupDate}
-                onChange={(e) => setPickupDate(e.target.value)}
-                min={minDateTime}
-              />
-            </div>
-            <div className={sharedClasses.mb4}>
-              <label
-                className={`block text-sm font-medium ${sharedClasses.textZinc700}`}
-              >
-               Vehicle return time
-              </label>
-              <input
-                type="datetime-local"
-                className={`mt-1 ${sharedClasses.block} w-full ${sharedClasses.borderZinc300} ${sharedClasses.rounded} ${sharedClasses.shadowSm}`}
-                value={returnDate}
-                onChange={(e) => setReturnDate(e.target.value)}
-                min={pickupDate || minDateTime}
-              />
-            </div>
-            <div className="mb-3">
-              <label className="block text-sm font-medium text-zinc-700 mb-1">
-                Pick up location
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  className={`w-full px-3 py-2 border border-zinc-300 rounded shadow-sm focus:outline-none focus:border-zinc-500`}
-                  value={gettedLocation}
-                  readOnly
-                  onClick={() => setShowPopUp(true)}
-                />
-                {showPopUp && (
-                  <PopUpLocation onClose={() => setShowPopUp(false)} />
-                )}
+                <span>Mã khuyến mãi</span>
+                <span>
+                  <FontAwesomeIcon icon={faArrowRight} />
+                </span>
               </div>
-            </div>
-
-            <div className={`flex justify-between ${sharedClasses.mb2}`}>
-              <span>Price:</span>
-              <span>{receiveData.price}đ/ ngày</span>
-            </div>
-            <div className={`flex justify-between ${sharedClasses.mb2}`}>
-              <span>Total Price:</span>
-              <span>{receiveData.price}đ x {rentalDays} ngày</span>
-            </div>
-            <div
-              className={`flex justify-between ${sharedClasses.mb4} hover:${sharedClasses.cursorPointer}`}
-            >
-              <span>Mã khuyến mãi</span>
-              <span>
-                <FontAwesomeIcon icon={faArrowRight} />
-              </span>
-            </div>
-            <div className={`flex justify-between ${sharedClasses.mb1}`}>
-              <span>Total:</span>
-              <span>{totalPrice}đ</span>
-            </div>
-            <button
-              type="submit"
-              className={`${sharedClasses.mt4} ${sharedClasses.wFull} ${sharedClasses.bgGreen500} ${sharedClasses.textWhite} ${sharedClasses.py2} ${sharedClasses.rounded}`}
-            >
-              RENT
-            </button>
-          </form>
+              <div className={`flex justify-between ${sharedClasses.mb1}`}>
+                <span>Total:</span>
+                <span>{totalPrice}đ</span>
+              </div>
+              <button
+                type="submit"
+                className={`${sharedClasses.mt4} ${sharedClasses.wFull} ${sharedClasses.bgGreen500} ${sharedClasses.textWhite} ${sharedClasses.py2} ${sharedClasses.rounded}`}
+              >
+                RENT
+              </button>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
-
     </div>
   );
 };
