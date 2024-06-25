@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -30,16 +31,17 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-
-      const response = await axios.post(apiLogin , credentials, {
-        headers: { "Content-Type": "application/json" },
+      const response = await axios.post(apiLogin, credentials, {
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
       const data = response.data;
       console.log(response.data.user);
       localStorage.setItem("token", data.token);
       localStorage.setItem("userId", data.id);
       localStorage.setItem("balance", data.balance);
-      localStorage.setItem("userData", JSON.stringify(data.user));
+      localStorage.setItem("user", JSON.stringify(data.user));
       if (data.roles && data.roles.length > 0) {
         localStorage.setItem("roles", JSON.stringify(data.roles));
       } else {
@@ -48,7 +50,7 @@ const Login = () => {
 
       if (data.roles.includes("ADMIN")) {
         navigate("/dashboard");
-      } else if (data.roles && data.roles.includes("USER")) {
+      } else if (data.roles && data.roles.includes("USER","LESSOR")) {
         navigate("/homepage");
       }
     } catch (error) {
