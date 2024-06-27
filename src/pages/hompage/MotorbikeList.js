@@ -19,9 +19,6 @@ const MotorbikeList = () => {
             .catch(error => console.error('Error fetching models:', error));
         }, []);
         console.log(motorbikeList)
-        const handleViewDetail=()=>{
-
-        }
   return (
     <div>
     <div className="p-8">
