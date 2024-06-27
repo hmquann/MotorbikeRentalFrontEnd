@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { NavLink, Route, Routes, useNavigate } from "react-router-dom";
 import "./Menu.css";
 import Profile from "../profile/Profile";
@@ -10,6 +10,13 @@ import ModelList from "../modelMotorbike/ModelList";
 const Menu = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const navigate = useNavigate();
+  const [userRole, setUserRole] = useState("")
+
+  useEffect(() => {
+    const role = JSON.parse(localStorage.getItem('roles')); // Lấy vai trò người dùng từ localStorage
+    setUserRole(role);
+  }, []);
+  const isAdmin = userRole.includes("ADMIN")
 
   const handleLogout = () => {
     setShowLogoutModal(true);
@@ -26,7 +33,7 @@ const Menu = () => {
   };
 
   return (
-    <div className="menu">
+    <div className="menu bg-zinc-100">
       <div className="menu-left">
         <ul>
           <li>
@@ -45,7 +52,9 @@ const Menu = () => {
               Wallet
             </NavLink>
           </li>
-          <li>
+          {isAdmin && (
+            <>
+            <li>
             <NavLink
               to="/menu/brand"
               className={({ isActive }) => (isActive ? "active" : "")}
@@ -61,6 +70,8 @@ const Menu = () => {
               Manage Model
             </NavLink>
           </li>
+            </>
+          )}
           <li>
             <NavLink
               to="/menu/approveMotorbike"
@@ -92,13 +103,18 @@ const Menu = () => {
           </li>
         </ul>
       </div>
-      <div className="menu-right">
+      <div className="menu-right mt-4">
         <Routes>
           <Route path="profile" element={<Profile />} />
           <Route path="/wallet" element={<UserWallet />} />
+          {isAdmin && (
+            <>
+               <Route path="/brand" element={<BrandList />} />
+               <Route path="/model" element={<ModelList />} />
+            </>
+          )}
           <Route path="/approveMotorbike" element={<ApproveMotorbikeRegistration />} />
-          <Route path="/brand" element={<BrandList />} />
-          <Route path="/model" element={<ModelList />} />
+          {/* code chatting room here */}
         </Routes>
       </div>
 
