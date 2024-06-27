@@ -21,6 +21,7 @@ const RegisterMotorbikeStep2 = () => {
   const [error, setError] = useState(null);
   const location = useLocation();
   const receiveData = location.state.formData;
+
   const [checkDelivery,setCheckDelivery]=useState(true);
   const[checkLocation,setCheckLocation]=useState(true);
   const[formData,setFormData]=useState(receiveData);
@@ -49,6 +50,10 @@ const RegisterMotorbikeStep2 = () => {
   }, []);
   const handleCheckDelivery = (event) => {
     setCheckDelivery(!event.target.checked);
+    setFormData({
+      ...formData,
+      delivery:checkDelivery
+    })
   };
   const handleCheckLocation=(event)=>{
     setCheckLocation(!event.target.checked)
@@ -188,9 +193,9 @@ const RegisterMotorbikeStep2 = () => {
     })
     console.log(formData)
     axios
-      .post("http://localhost:8080/motorbike/register", formData, {
+      .post("http://localhost:8080/api/motorbike/register", formData, {
         headers: {
-         Authorization: `Bearer ${localStorage.getItem("token")}`
+         Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       })
     .then((response) => {
@@ -391,7 +396,7 @@ const RegisterMotorbikeStep2 = () => {
           <div className="w-full sm:w-1/2 pr-3 mb-6 sm:mb-0">
          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Car delivery to your location</h2>
          <label className="relative inline-flex items-center cursor-pointer">
-           <input type="checkbox" value={checkDelivery} className="sr-only peer" onClick={handleCheckDelivery}/>
+           <input type="checkbox" value={checkDelivery} className="sr-only peer" onClick={handleCheckDelivery} />
           <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 dark:peer-focus:ring-green-800 rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-zinc-600 peer-checked:bg-green-600"></div>
          </label>
       </div>

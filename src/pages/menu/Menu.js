@@ -1,12 +1,12 @@
 import React, { useState,useEffect } from "react";
 import { NavLink, Route, Routes, useNavigate } from "react-router-dom";
 import "./Menu.css";
+import Profile from "../profile/Profile";
 import ChatMessage from "../chatting/ChatMessage";
 import UserWallet from "../wallet/UserWallet";
 import ApproveMotorbikeRegistration from "../motorbike/ApproveMotorbikeRegistration ";
 import BrandList from "../brand/BrandList";
 import ModelList from "../modelMotorbike/ModelList";
-
 const Menu = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const navigate = useNavigate();
@@ -24,7 +24,6 @@ const Menu = () => {
 
   const handleConfirmLogout = () => {
     localStorage.clear();
-    // setIsLoggedIn(false);
     navigate("/homepage");
     setShowLogoutModal(false);
   };
@@ -39,7 +38,7 @@ const Menu = () => {
         <ul>
           <li>
             <NavLink
-              to="/menu"
+              to="#"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
               Dashboard
@@ -82,15 +81,31 @@ const Menu = () => {
             </NavLink>
           </li>
           <li>
+            <NavLink
+              to="/menu/profile"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              Profile
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/menu/profile"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              Profile
+            </NavLink>
+          </li>
+          <li>
             <NavLink onClick={handleLogout} className="nav-link">
               Logout
             </NavLink>
           </li>
-          {/* Add more menu items as needed */}
         </ul>
       </div>
       <div className="menu-right mt-4">
         <Routes>
+          <Route path="profile" element={<Profile />} />
           <Route path="/wallet" element={<UserWallet />} />
           {isAdmin && (
             <>
@@ -99,21 +114,20 @@ const Menu = () => {
             </>
           )}
           <Route path="/approveMotorbike" element={<ApproveMotorbikeRegistration />} />
-       
           {/* code chatting room here */}
         </Routes>
       </div>
 
       {showLogoutModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white  dark:bg-zinc-800 rounded-lg p-4 shadow-md">
+          <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 shadow-md">
             <p className="text-lg text-zinc-800 light:text-zinc-200">
               Are you sure you want to log out?
             </p>
             <div className="mt-4 flex justify-end">
               <button
                 onClick={handleConfirmLogout}
-                className="bg-green-500 hover:bg-green-600 text-white mr-2 px-4 py-2 rounded-lg "
+                className="bg-green-500 hover:bg-green-600 text-white mr-2 px-4 py-2 rounded-lg"
               >
                 Yes
               </button>
