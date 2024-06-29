@@ -16,7 +16,7 @@ const Header = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const userDataString = localStorage.getItem("userData");
+    const userDataString = localStorage.getItem("user");
 
     // Chuyển đổi chuỗi JSON thành đối tượng JavaScript
     const userData = JSON.parse(userDataString);
@@ -60,7 +60,7 @@ const Header = () => {
             <Nav.Link as={Link} to="/privacy" className="nav-link">
               Privacy
             </Nav.Link>
-            <Nav.Link as={Link} to="/registermotorbike/step1" className="nav-link">
+            <Nav.Link as={Link} to="/registermotorbike" className="nav-link">
               Become Lessor
             </Nav.Link>
             {isLoggedIn ? (

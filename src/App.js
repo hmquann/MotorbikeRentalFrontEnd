@@ -18,7 +18,7 @@ import RegisterSuccess from "./pages/register/RegisterSuccess";
 import ResetNewPassword from "./pages/forgotpassword/ResetNewPassword";
 import Menu from "./pages/menu/Menu";
 import Booking from "./pages/booking/Booking";
-import Layout from "./pages/test-layuot/Layout";
+import Layout from "./pages/test-layout/Layout";
 import DetailBooking from "./pages/booking/detail/DetailBooking";
 import Address from "./pages/booking/address/Address";
 import ChatMessage from "./pages/chatting/ChatMessage";
@@ -55,7 +55,7 @@ function App() {
 
         <Route path="/verify/:token" element={<RegisterSuccess />} />
         <Route
-          path="/registermotorbike/step1"
+          path="/registermotorbike"
           element={<RegisterMotorbikeStep1 />}
         />
         <Route path="/registermotorbike/step2"element={<RegisterMotorbikeStep2/>}/>

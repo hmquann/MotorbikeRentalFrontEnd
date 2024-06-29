@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import { faMotorcycle, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import UpdatePassword from "./UpdatePassword";
 import ChangeEmail from "./ChangeEmail";
+import License from "../license/License";
+import axios from "axios";
 
 const cardClasses =
   "bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-md max-w-4xl mx-auto border border-zinc-300 dark:border-zinc-700 mt-8";
@@ -28,11 +30,11 @@ const sharedClasses = {
 };
 
 const Profile = () => {
-  const userDataString = localStorage.getItem("user");
-  const userData = JSON.parse(userDataString);
+  const user=JSON.parse(localStorage.getItem("user"))
+
   const [showPopUpPassword, setShowPopUpPassword] = useState(false);
   const [showPopUpEmail, setShowPopUpEmail] = useState(false);
-
+  
   return (
     <div>
       <div className={cardClasses}>
@@ -49,10 +51,10 @@ const Profile = () => {
           </div>
           <div className="ml-6 flex flex-col justify-center">
             <div className={`text-lg font-semibold ${textClasses}`}>
-              {(userData.gender ? "Mr. " : "Mrs. ") +
-                userData.lastName +
+              {(user.gender ? "Mr. " : "Mrs. ") +
+                user.lastName +
                 " " +
-                userData.firstName}
+                user.firstName}
             </div>
           </div>
           <div className="flex-shrink-0 text-center ml-auto">
@@ -74,7 +76,7 @@ const Profile = () => {
               </span>
             </div>
             <div className="flex items-center">
-              <div className={textClasses}>{userData.email}</div>
+              <div className={textClasses}>{user.email}</div>
               <button
                 className={`ml-2 ${buttonClasses}`}
                 onClick={() => setShowPopUpEmail(true)}
@@ -97,7 +99,7 @@ const Profile = () => {
               </span>
             </div>
             <div className="flex items-center">
-              <div className={textClasses}>{userData.phone}</div>
+              <div className={textClasses}>{user.phone}</div>
               <button className={`ml-2 ${buttonClasses}`}>
                 <FontAwesomeIcon icon={faPenToSquare} />
               </button>
@@ -121,64 +123,7 @@ const Profile = () => {
         </div>
       </div>
 
-      <div className={cardClasses}>
-        <div className={sharedClasses.card}>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className={sharedClasses.title}>
-              Driver's license{" "}
-              <span className="ml-2 bg-red-100 dark:bg-green-700 text-green-800 dark:text-green-300 text-xs px-2 py-1 rounded-full">
-                Not verified
-              </span>
-            </h2>
-
-            <div className="flex items-center space-x-2">
-              <button className={sharedClasses.button}>Edit</button>
-            </div>
-          </div>
-          <div className={sharedClasses.note}>
-            <p className={sharedClasses.info}>
-              Note: To avoid any issues during the rental process,{" "}
-              <span className="font-semibold">the person booking</span> on
-              MiMOTORBIKE (with verified driver's license){" "}
-              <span className="font-semibold">MUST ALSO</span> phải là{" "}
-              <span className="font-semibold">be the person receiving</span>.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h3 className={sharedClasses.title}>Image</h3>
-              <img
-                src="https://placehold.co/600x400"
-                alt="Hình ảnh"
-                className={sharedClasses.image}
-              />
-              {/* <p className={sharedClasses.info}>
-                Vì sao tôi phải xác thực GPLX{" "}
-                <span className="text-zinc-900 dark:text-white">?</span>
-              </p> */}
-            </div>
-            <div>
-              <h3 className={sharedClasses.title}>Information</h3>
-              <div className="space-y-4">
-                <div>
-                  <label className={sharedClasses.label}>
-                    License's number
-                  </label>
-                  <div className={sharedClasses.content}>12332123312</div>
-                </div>
-                <div>
-                  <label className={sharedClasses.label}>Full name</label>
-                  <div className={sharedClasses.content}>1233123</div>
-                </div>
-                <div>
-                  <label className={sharedClasses.label}>Date of birth</label>
-                  <div className={sharedClasses.content}>01-01-1970</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+       <License/>
     </div>
   );
 };
