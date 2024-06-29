@@ -3,7 +3,8 @@ import React, { useEffect, useState } from "react";
 import { faMotorcycle, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import UpdatePassword from "./UpdatePassword";
 import ChangeEmail from "./ChangeEmail";
-import License from "./License";
+import License from "../license/License";
+import axios from "axios";
 
 const cardClasses =
   "bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-md max-w-4xl mx-auto border border-zinc-300 dark:border-zinc-700 mt-8";
@@ -29,11 +30,11 @@ const sharedClasses = {
 };
 
 const Profile = () => {
-  const userDataString = localStorage.getItem("user");
-  const userData = JSON.parse(userDataString);
+  const user=JSON.parse(localStorage.getItem("user"))
+
   const [showPopUpPassword, setShowPopUpPassword] = useState(false);
   const [showPopUpEmail, setShowPopUpEmail] = useState(false);
-
+  
   return (
     <div>
       <div className={cardClasses}>
@@ -50,10 +51,10 @@ const Profile = () => {
           </div>
           <div className="ml-6 flex flex-col justify-center">
             <div className={`text-lg font-semibold ${textClasses}`}>
-              {(userData.gender ? "Mr. " : "Mrs. ") +
-                userData.lastName +
+              {(user.gender ? "Mr. " : "Mrs. ") +
+                user.lastName +
                 " " +
-                userData.firstName}
+                user.firstName}
             </div>
           </div>
           <div className="flex-shrink-0 text-center ml-auto">
@@ -75,7 +76,7 @@ const Profile = () => {
               </span>
             </div>
             <div className="flex items-center">
-              <div className={textClasses}>{userData.email}</div>
+              <div className={textClasses}>{user.email}</div>
               <button
                 className={`ml-2 ${buttonClasses}`}
                 onClick={() => setShowPopUpEmail(true)}
@@ -98,7 +99,7 @@ const Profile = () => {
               </span>
             </div>
             <div className="flex items-center">
-              <div className={textClasses}>{userData.phone}</div>
+              <div className={textClasses}>{user.phone}</div>
               <button className={`ml-2 ${buttonClasses}`}>
                 <FontAwesomeIcon icon={faPenToSquare} />
               </button>

@@ -140,7 +140,7 @@ const RegisterMotorbikeStep1 = () => {
   const [formData, setFormData] = useState({
     motorbikePlate: "",
     brand:{ brandId: "",brandName:"",origin:""},
-    model: {modelId: "",modelName:"",cylinderCapacity:"",fuelType:"",fuelConsumption:"",modelType:"",brand:{}},
+    model: {id: "",modelName:"",cylinderCapacity:"",fuelType:"",fuelConsumption:"",modelType:"",brand:{}},
     yearOfManuFacture: "",
     description: "",
     constraintMotorbike: "",
@@ -209,7 +209,7 @@ useEffect(() => {
           origin: selectedBrand.origin
         },
       model: {
-        modelId: selectedModel.modelId,
+        id: selectedModel.modelId,
         modelName:selectedModel.modelName,
         cylinderCapacity:selectedModel.cylinderCapacity,
         fuelType:selectedModel.fuelType,

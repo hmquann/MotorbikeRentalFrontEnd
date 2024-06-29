@@ -16,10 +16,13 @@ const MotorbikeList = () => {
 
     useEffect(() => {
         axios.get('http://localhost:8080/api/motorbike/activeMotorbikeList')
-            .then(response => setMotorbikeList(response.data))
+            .then(response => setMotorbikeList((response.data)))
             .catch(error => console.error('Error fetching motorbikes:', error));
-    }, []);
-    console.log(motorbikeList)
+    }, motorbikeList);
+    if(motorbikeList.length>0){
+      console.log(motorbikeList[0].model.modelType)
+    }
+    
     const getAddress = (inputString) => {
         if (typeof inputString !== 'string' || inputString.trim() === '') {
             return '';
@@ -76,10 +79,10 @@ const MotorbikeList = () => {
             />
             <div className="ml-2">
               <span className="block text-sm font-semibold text-green-600 dark:text-green-400">5.0</span>
-              <span className="block text-xs text-zinc-500 dark:text-zinc-400">{motorbike.model.modelType}</span>
+              <span className="block text-xs text-zinc-500 dark:text-zinc-400"></span>
             </div>
           </div>
-          <h2 className="text-lg font-bold text-zinc-900 dark:text-white">{motorbike.model.modelName}</h2>
+          <h2 className="text-lg font-bold text-zinc-900 dark:text-white"></h2>
           <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-2 inline-flex items-center space-x-2">
             <svg
               className="h-4 w-4 text-green-500"

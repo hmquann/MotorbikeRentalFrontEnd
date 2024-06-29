@@ -13,9 +13,11 @@ const Menu = () => {
   const [userRole, setUserRole] = useState("")
 
   useEffect(() => {
-    const role = JSON.parse(localStorage.getItem('roles')); // Lấy vai trò người dùng từ localStorage
-    setUserRole(role);
+    const roles = localStorage.getItem('roles'); 
+    console.log(roles)
+    setUserRole(roles);
   }, []);
+ 
   const isAdmin = userRole.includes("ADMIN")
 
   const handleLogout = () => {
