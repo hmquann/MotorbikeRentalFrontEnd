@@ -2,14 +2,18 @@ import React, { useState } from "react";
 import { NavLink, Route, Routes, useNavigate } from "react-router-dom";
 import "./Menu.css";
 import Profile from "../profile/Profile";
-import ChatMessage from "../chatting/ChatMessage";
+
 import UserWallet from "../wallet/UserWallet";
 import ApproveMotorbikeRegistration from "../motorbike/ApproveMotorbikeRegistration ";
 import BrandList from "../brand/BrandList";
 import ModelList from "../modelMotorbike/ModelList";
+
+import { Message } from "../chatting/Message";
 const Menu = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+  const [room, setRoom] = useState("");
 
   const handleLogout = () => {
     setShowLogoutModal(true);
@@ -55,6 +59,14 @@ const Menu = () => {
           </li>
           <li>
             <NavLink
+              to="/menu/message"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              Chatting
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
               to="/menu/model"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
@@ -78,14 +90,6 @@ const Menu = () => {
             </NavLink>
           </li>
           <li>
-            <NavLink
-              to="/menu/profile"
-              className={({ isActive }) => (isActive ? "active" : "")}
-            >
-              Profile
-            </NavLink>
-          </li>
-          <li>
             <NavLink onClick={handleLogout} className="nav-link">
               Logout
             </NavLink>
@@ -94,9 +98,16 @@ const Menu = () => {
       </div>
       <div className="menu-right">
         <Routes>
-          <Route path="profile" element={<Profile />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route
+            path="/message"
+            element={<Message room={"room1"} userId={1} />}
+          />
           <Route path="/wallet" element={<UserWallet />} />
-          <Route path="/approveMotorbike" element={<ApproveMotorbikeRegistration />} />
+          <Route
+            path="/approveMotorbike"
+            element={<ApproveMotorbikeRegistration />}
+          />
           <Route path="/brand" element={<BrandList />} />
           <Route path="/model" element={<ModelList />} />
         </Routes>

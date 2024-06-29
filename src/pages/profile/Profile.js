@@ -28,7 +28,7 @@ const sharedClasses = {
 };
 
 const Profile = () => {
-  const userDataString = localStorage.getItem("user");
+  const userDataString = localStorage.getItem("userData");
   const userData = JSON.parse(userDataString);
   const [showPopUpPassword, setShowPopUpPassword] = useState(false);
   const [showPopUpEmail, setShowPopUpEmail] = useState(false);

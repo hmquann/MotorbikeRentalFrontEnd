@@ -23,22 +23,18 @@ import Booking from "./pages/booking/Booking";
 import Layout from "./pages/test-layuot/Layout";
 import DetailBooking from "./pages/booking/detail/DetailBooking";
 import Address from "./pages/booking/address/Address";
-import ChatMessage from "./pages/chatting/ChatMessage";
-
 import UserWallet from "./pages/wallet/UserWallet";
 import PaymentSuccess from "./pages/wallet/PaymentSuccess";
 import PaymentFailed from "./pages/wallet/PaymentFailed";
-
-
 
 import BrandList from "./pages/brand/BrandList";
 
 import Profile from "./pages/profile/Profile";
 import VerifyChangeEmail from "./pages/profile/VerifyChangeEmail";
-
+import Message from "./pages/chatting/Message";
 import ModelList from "./pages/modelMotorbike/ModelList";
 import ApproveMotorbikeRegistration from "./pages/motorbike/ApproveMotorbikeRegistration ";
-
+import ChatApp from "./pages/chatapp/ChatApp";
 
 function App() {
   return (
@@ -61,7 +57,6 @@ function App() {
           path="/registermotorbike/step1"
           element={<RegisterMotorbikeStep1 />}
         />
-    
 
         <Route path="/" element={<Navigate to="/homepage" />} />
         <Route path="/homepage" element={<Homepage />} />
@@ -69,15 +64,16 @@ function App() {
         <Route path="/privacyList" element={<PrivacyList />} />
         <Route path="/userInformation" element={<UserInformation />} />
         <Route path="/userData" element={<UserData />} />
-      
-
-        <Route path="/menu" element={<Menu />} >
-        <Route path="/menu/wallet" element={<UserWallet />} />
-        <Route path="/menu/approveMotorbike" element={<ApproveMotorbikeRegistration />} />
-        <Route path="/menu/brand" element={<BrandList />} />
-        <Route path="/menu/model" element={<ModelList />} />
-        <Route path="/menu/profile" element={<Profile />} />
-        <Route path="/menu/profile" element={<Profile />} />
+        <Route path="/menu" element={<Menu />}>
+          <Route path="/menu/wallet" element={<UserWallet />} />
+          <Route path="/menu/message" element={<Message />} />
+          <Route
+            path="/menu/approveMotorbike"
+            element={<ApproveMotorbikeRegistration />}
+          />
+          <Route path="/menu/brand" element={<BrandList />} />
+          <Route path="/menu/model" element={<ModelList />} />
+          <Route path="/menu/profile" element={<Profile />} />
         </Route>
 
         <Route path="/booking" element={<Booking />} />
@@ -89,11 +85,11 @@ function App() {
         <Route path="/layout" element={<Layout />} />
         <Route path="/detailbooking" element={<DetailBooking />} />
         <Route path="/booking/address" element={<Address />} />
-        <Route path="/chatmessage" element={<ChatMessage />} />
         <Route
           path="/updateEmail/:token/:newEmail"
           element={<VerifyChangeEmail />}
         />
+        <Route path="/chatapp" element={<ChatApp />} />
       </Routes>
     </>
   );
