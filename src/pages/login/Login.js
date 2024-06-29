@@ -35,14 +35,23 @@ const Login = () => {
         headers: {
           "Content-Type": "application/json",
         },
-
       });
       const data = response.data;
-      console.log(response.data.user);
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("userId", data.id);
-      localStorage.setItem("balance", data.balance);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      
+      console.log(response.data);
+      const userInfor={
+      // token: data.token,
+      userId:data.id,
+      roles:data.roles,
+      balance: data.balance,
+      gender:data.isGender,
+      email:data.email,
+      firstName:data.firstName,
+      lastName:data.lastName,
+      phone:data.phone
+      }
+      localStorage.setItem("user",JSON.stringify(userInfor))
+      const token = localStorage.setItem("token", data.token)
       if (data.roles && data.roles.length > 0) {
         localStorage.setItem("roles", JSON.stringify(data.roles));
       } else {
@@ -72,7 +81,7 @@ const Login = () => {
     }
   };
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("user");
     if (token) {
       navigate("/homepage");
     }

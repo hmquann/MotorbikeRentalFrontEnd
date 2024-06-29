@@ -12,10 +12,11 @@ const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [username, setUsername] = useState(""); // Khai báo state cho username
+  const avatarClasses = "w-10 h-10 rounded-full border-2 border-yellow-400";
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const userDataString = localStorage.getItem("userData");
+    const userDataString = localStorage.getItem("user");
 
     // Chuyển đổi chuỗi JSON thành đối tượng JavaScript
     const userData = JSON.parse(userDataString);
@@ -47,9 +48,9 @@ const Header = () => {
     <>
       <header className="flex justify-between items-center p-4">
         <div className="flex items-center">
-          <span className="ml-2 text-xl font-bold text-zinc-800 dark:text-dark">
-            MiMOTOR
-          </span>
+          <Nav.Link as={Link} to="/homepage" >
+          <img className={avatarClasses} src="./image/logo.jpg" alt="Logo" />
+          </Nav.Link>
         </div>
         <nav className="flex space-x-4">
           <Nav className="ml-auto">
@@ -70,11 +71,7 @@ const Header = () => {
                 className="flex items-center cursor-pointer"
                 onClick={handleAccount}
               >
-                <FontAwesomeIcon
-                  icon={faUser}
-                  className="text-green-500 mr-2"
-                  size="2x"
-                />
+                          <img className={avatarClasses} src="https://kenhmuabanxehoi.net/uploads/truong-the-vinh_1680594107/halinh2.jpg" alt="User Avatar" />
                 <span className="text-green-500 mr-2">{username}</span>
                 <FontAwesomeIcon
                   icon={faCaretDown}

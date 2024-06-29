@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { NavLink, Route, Routes, useNavigate } from "react-router-dom";
 import "./Menu.css";
 import Profile from "../profile/Profile";
@@ -12,6 +12,15 @@ import { Message } from "../chatting/Message";
 const Menu = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const navigate = useNavigate();
+  const [userRole, setUserRole] = useState("")
+
+  useEffect(() => {
+    const roles = localStorage.getItem('roles'); 
+    console.log(roles)
+    setUserRole(roles);
+  }, []);
+ 
+  const isAdmin = userRole.includes("ADMIN")
   const [username, setUsername] = useState("");
   const [room, setRoom] = useState("");
 
@@ -30,7 +39,7 @@ const Menu = () => {
   };
 
   return (
-    <div className="menu">
+    <div className="menu bg-zinc-100">
       <div className="menu-left">
         <ul>
           <li>
@@ -49,7 +58,9 @@ const Menu = () => {
               Wallet
             </NavLink>
           </li>
-          <li>
+          {isAdmin && (
+            <>
+            <li>
             <NavLink
               to="/menu/brand"
               className={({ isActive }) => (isActive ? "active" : "")}
@@ -73,6 +84,8 @@ const Menu = () => {
               Manage Model
             </NavLink>
           </li>
+            </>
+          )}
           <li>
             <NavLink
               to="/menu/approveMotorbike"
@@ -96,7 +109,7 @@ const Menu = () => {
           </li>
         </ul>
       </div>
-      <div className="menu-right">
+      <div className="menu-right mt-4">
         <Routes>
           <Route path="/profile" element={<Profile />} />
           <Route
@@ -104,12 +117,14 @@ const Menu = () => {
             element={<Message room={"room1"} userId={1} />}
           />
           <Route path="/wallet" element={<UserWallet />} />
-          <Route
-            path="/approveMotorbike"
-            element={<ApproveMotorbikeRegistration />}
-          />
-          <Route path="/brand" element={<BrandList />} />
-          <Route path="/model" element={<ModelList />} />
+          {isAdmin && (
+            <>
+               <Route path="/brand" element={<BrandList />} />
+               <Route path="/model" element={<ModelList />} />
+            </>
+          )}
+          <Route path="/approveMotorbike" element={<ApproveMotorbikeRegistration />} />
+          {/* code chatting room here */}
         </Routes>
       </div>
 

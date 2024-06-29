@@ -1,20 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
-const sharedClasses = {
-  blueGradient: 'bg-gradient-to-r from-zinc-400 to-cyan-800',
-  zincBorders: 'border-t border-zinc-200 dark:border-zinc-700',
-  button: 'px-4 py-2 rounded-lg',
-};
+import { useNavigate } from "react-router-dom";
+import TopUp from "./TopUp";
+import WithDraw from "./WithDraw";
+import TransactionListModal from "./TransactionModal";
 
 const UserWallet = () => {
-  const [amount, setAmount] = useState("");
   const [balance, setBalance] = useState(0);
   const [error, setError] = useState(null);
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [showAmountInput, setShowAmountInput] = useState(false); // Trạng thái để điều khiển hiển thị phần nhập số tiền
+  const [transactions, setTransactions] = useState([]);
+  const [filteredTransactions, setFilteredTransactions] = useState([]);
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+  const [showTopUpModal, setShowTopUpModal] = useState(false);
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(5);
+  const [hasSearched, setHasSearched] = useState(false); 
+  const [selectedTransactions, setSelectedTransactions] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false); 
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,6 +27,7 @@ const UserWallet = () => {
       navigate("/login");
     } else {
       fetchUserBalance();
+      fetchTransactions();
     }
   }, []);
 
@@ -31,18 +36,18 @@ const UserWallet = () => {
     const token = localStorage.getItem("token");
 
     try {
-      const response = await axios.get(`http://localhost:8080/api/user/${userId}`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get(
+        `http://localhost:8080/api/user/${userId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (response.status === 200) {
         const user = response.data;
         setBalance(user.balance);
-        setFirstName(user.firstName);
-        setLastName(user.lastName);
-        localStorage.setItem("balance", user.balance);
       } else {
         console.error("Failed to fetch user balance");
       }
@@ -51,11 +56,33 @@ const UserWallet = () => {
     }
   };
 
-  const handleAmountChange = (e) => {
-    setAmount(e.target.value);
+  const fetchTransactions = async () => {
+    const userId = localStorage.getItem("userId");
+    const token = localStorage.getItem("token");
+
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/api/transaction/${userId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response.status === 200) {
+        setTransactions(response.data);
+      } else {
+        console.error("Failed to fetch transactions");
+        setTransactions([]);
+      }
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+      setTransactions([]);
+    }
   };
 
-  const handlePayment = async () => {
+  const handlePayment = async (amount) => {
     const token = localStorage.getItem("token");
     const userId = localStorage.getItem("userId");
     const apiPayment = `http://localhost:8080/api/payment/create_payment?id=${userId}&amount=${amount}`;
@@ -84,61 +111,173 @@ const UserWallet = () => {
     }
   };
 
-  useEffect(() => {
-    const handleWindowFocus = () => {
-      fetchUserBalance();
-    };
+  const handleWithdraw = async (amount) => {
+    const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
+    try {
+      const response = await axios.post(`http://localhost:8080/api/payment/withdraw`, null, {
+        params: {
+          id: userId,
+          amount: amount,
+        },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+      });
 
-    window.addEventListener("focus", handleWindowFocus);
-    return () => {
-      window.removeEventListener("focus", handleWindowFocus);
-    };
-  }, []);
+      if (response.status !== 200) {
+        throw new Error('Failed to withdraw');
+      }
+
+      const data = response.data;
+      setBalance((prevBalance) => prevBalance - parseFloat(amount));
+      fetchTransactions()
+
+    } catch (error) {
+      console.error('Error during withdrawal:', error);
+    }
+  };
 
   const handleDepositClick = () => {
-    setShowAmountInput((prevShowAmountInput) => !prevShowAmountInput);
+    setShowTopUpModal(true);
+  };
+
+  const handleWithdrawClick = () => {
+    setShowWithdrawModal(true);
+  };
+
+  const handleFromDateChange = (e) => {
+    setFromDate(e.target.value);
+  };
+
+  const handleToDateChange = (e) => {
+    setToDate(e.target.value);
+  };
+
+  const handleSearch = () => {
+    const fromDateObj = new Date(fromDate);
+    const toDateObj = new Date(toDate);
+
+    const filtered = transactions.filter((transaction) => {
+      const transactionDate = new Date(transaction.transactionDate);
+      return (
+        transactionDate.getFullYear() === fromDateObj.getFullYear() &&
+        transactionDate.getMonth() === fromDateObj.getMonth() &&
+        transactionDate.getDate() >= fromDateObj.getDate() &&
+        transactionDate.getFullYear() === toDateObj.getFullYear() &&
+        transactionDate.getMonth() === toDateObj.getMonth() &&
+        transactionDate.getDate() <= toDateObj.getDate()
+      );
+    });
+    if(filtered.length === 0){
+      setError("No transaction found for the selected date range");
+      setModalOpen(false);
+    }else{
+    setFilteredTransactions(filtered);
+    setPage(0); 
+    setHasSearched(true);
+    setModalOpen(true)
+    setSelectedTransactions(filtered)
+    setError("")
+    }
+  };
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+    setFilteredTransactions([]); 
+    setHasSearched(false); 
   };
 
   return (
-    <div className="bg-zinc-100 dark:bg-zinc-800 py-40 px-10 rounded-lg shadow-md max-w-5xl  mx-auto">
-      <div className={`${sharedClasses.blueGradient} shadow-md rounded-lg p-4 w-full md:w-1/2 mx-auto`}>
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="text-lg font-semibold">{lastName}'s Wallet</h2>
-            <p className="text-lg text-zinc-500 dark:text-zinc-600">Balance : {balance} VND</p>
-          </div>
-          <svg
-        class="w-12 h-12 rounded-full bg-white p-2"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M12 14l9-5-9-5-9 5 9 5z"
-        ></path>
-      </svg>
-        </div>
-        <div className={`${sharedClasses.zincBorders} pt-4`}>
-          <button className={`hover:bg-cyan-700 bg-cyan-600 text-white mr-2 ${sharedClasses.button}`} onClick={handleDepositClick}>Deposit</button>
-        </div>
-        {showAmountInput && (
-          <div className="mt-4">
-            <input
-              type="number"
-              placeholder="Enter amount"
-              className="w-full px-3 py-3 border rounded-md"
-              value={amount}
-              onChange={handleAmountChange}
-            />
-            <button className={`hover:from-zinc-700 hover:to-pink-800 bg-gradient-to-r from-zinc-600 to-pink-800 text-white mt-2 ${sharedClasses.button}`} onClick={handlePayment}>Add Money</button>
-          </div>
-        )}
-        {error && <div className="text-red-500 mt-2">{error}</div>}
+    <div className="p-6 max-w-4xl mx-auto bg-white rounded-xl dark:bg-zinc-800">
+      <h1 className="text-3xl font-bold">My Wallet</h1>
+      <p className="mt-4 text-lg font-medium">Your current balance:</p>
+      <p className="text-3xl text-green-600 font-base">{balance.toLocaleString()} VND</p>
+      <div className="mt-4 flex space-x-4">
+        <button
+          className={`bg-orange-400 hover:bg-orange-500 text-white py-2 px-4 rounded`}
+          onClick={handleWithdrawClick}
+        >
+          Withdraw
+        </button>
+        <button
+          className={`bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded`}
+          onClick={handleDepositClick}
+        >
+          Top-up
+        </button>
       </div>
+      <h2 className="mt-8 text-3xl font-bold">Transactions</h2>
+      <div className="mt-4 flex space-x-4">
+        <div className="flex items-center space-x-2">
+          <label htmlFor="from-date" className="text-lg">
+            From
+          </label>
+          <input
+            id="from-date"
+            type="date"
+            className="border border-zinc-300 p-2 rounded"
+            value={fromDate}
+            onChange={handleFromDateChange}
+          />
+        </div>
+        <div className="flex items-center space-x-2">
+          <label htmlFor="to-date" className="text-lg">
+            To
+          </label>
+          <input
+            id="to-date"
+            type="date"
+            className="border border-zinc-300 p-2 rounded"
+            value={toDate}
+            onChange={handleToDateChange}
+          />
+        </div>
+        <button
+          className={`bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded`}
+          onClick={handleSearch}
+        >
+          Search
+        </button>
+      </div>
+      {modalOpen && (
+        <TransactionListModal
+          transactions={selectedTransactions} 
+          onClose={handleModalClose} 
+        />
+      )}
+
+      {showWithdrawModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
+          <div className="bg-slate-200 p-4 rounded-lg shadow-lg">
+            <WithDraw 
+              balance={balance}
+              onClose={() => setShowWithdrawModal(false)}
+              onConfirm={(amount) => {
+                handleWithdraw(amount);
+                setShowWithdrawModal(false);
+              }}
+              setError={setError}
+            />
+          </div>
+        </div>
+      )}
+      {showTopUpModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
+          <div className="bg-slate-200 p-4 rounded-lg shadow-lg">
+            <TopUp 
+              onClose={() => setShowTopUpModal(false)}
+              onConfirm={(amount) => {
+                handlePayment(amount); 
+                setShowTopUpModal(false);
+              }}
+              setError={setError}
+            />
+          </div>
+        </div>
+      )}
+      {error && <div className="text-red-500 font-medium mt-2 ml-10">{error}</div>}
     </div>
   );
 };

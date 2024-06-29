@@ -139,8 +139,8 @@ const RegisterMotorbikeStep1 = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     motorbikePlate: "",
-    brand:{ brandId: "",brandName:"",origin:"",modelSet:[{}]},
-    model: {id: "",modelName:"",cylinderCapacity:"",fuelType:"",fuelConsumption:"",modelType:"",motorbikeSet:[{}]},
+    brand:{ brandId: "",brandName:"",origin:""},
+    model: {id: "",modelName:"",cylinderCapacity:"",fuelType:"",fuelConsumption:"",modelType:"",brand:{}},
     yearOfManuFacture: "",
     description: "",
     constraintMotorbike: "",
@@ -157,8 +157,8 @@ const RegisterMotorbikeStep1 = () => {
   const [brands, setBrands] = useState([]);
   const[error,setError]=useState(null);
   const[loading,setLoading]=useState(false);
-  const [selectedBrand, setSelectedBrand] = useState([]);
-  const [selectedModel, setSelectedModel] = useState();
+  const [selectedBrand, setSelectedBrand] = useState(null);
+  const [selectedModel, setSelectedModel] = useState(null);
   const[motorbikePlateError,setMotorbikePlateError]=useState([]);
   const[motorbikeBrandError,setMotorbikeBrandError]=useState([]);
   const[motorbikeModelError,setMotorbikeModelError]=useState([]);
@@ -182,7 +182,8 @@ const RegisterMotorbikeStep1 = () => {
   }
   useEffect(() => {  
     if (selectedBrand && selectedBrand.brandId) {
-      setNewModels(selectedBrand.modelSet) 
+      console.log(selectedBrand)
+      setNewModels(models.filter((model)=>model.brand.brandId==selectedBrand.brandId))
     }
   }, [selectedBrand]);
   const handleBrandsChange=(e)=>{
@@ -197,36 +198,39 @@ const RegisterMotorbikeStep1 = () => {
  
 useEffect(() => {
     
-  if (selectedModel && selectedModel.id) {
+  if (selectedModel) {
+    console.log("Brand:"+selectedBrand+"Model:"+selectedModel)
     setFormData(prevFormData => ({
       ...prevFormData,
     
         brand: {
           brandId: selectedBrand.brandId,
           brandName: selectedBrand.brandName,
-          origin: selectedBrand.origin,
-          modelSet: selectedBrand.modelSet
+          origin: selectedBrand.origin
         },
       model: {
-        id: selectedModel.id,
+        id: selectedModel.modelId,
         modelName:selectedModel.modelName,
         cylinderCapacity:selectedModel.cylinderCapacity,
         fuelType:selectedModel.fuelType,
         fuelConsumption:selectedModel.fuelConsumption,
-        modelType:selectedModel.modelType,
-        motorbikeSet:selectedModel.motorbikeSet
+        brand:selectedModel.brand,
+        modelType:selectedModel.modelType
       }
     }));
   }
 }, [selectedModel]);
  const handleModelChange=(e)=>{
+  console.log(newModels.find((model) => model.modelName == e.target.value))
   setSelectedModel(newModels.find((model) => model.modelName == e.target.value));  
+  console.log(selectedModel)
   if(e.target.value==""){
     setMotorbikeModelError("Not be empty")
   }else{
     setMotorbikeModelError("")
   }
  }
+
 const handleChange=(e)=>{
   const {name,value}=e.target;
   if (name === "motorbikePlate") {
@@ -258,6 +262,7 @@ const handleReturnNavigate=()=>{
   navigate("/homepage", { state: {} });
 }
  const handleSunbmit=(e)=>{   
+  console.log(formData)
   e.preventDefault();
   setError(null);
   if (    motorbikeBrandError || motorbikeModelError ||

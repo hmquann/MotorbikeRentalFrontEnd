@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { format, addDays } from 'date-fns';
+import MotorbikeSchedulePopUp from '../booking/schedule/MotorbikeSchedulePopUp';
 
 const SearchMotorbike = () => {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [rentalStartTime, setRentalStartTime] = useState(new Date());
     const [rentalEndTime, setRentalEndTime] = useState(addDays(new Date(), 1));
-    
+    const[schedulePopUp,setSchedulePopUp]=useState(false);
     useEffect(() => {
       const getCurrentTime = () => {
         const now = new Date();
@@ -18,12 +19,16 @@ const SearchMotorbike = () => {
     
       getCurrentTime();
     }, []);
-
+    const handleOpenSchedulePopup=()=>{
+      setSchedulePopUp(true)
+    }
   const handleDateChange = (e) => {
     const date = new Date(e.target.value);
     setSelectedDate(date);
   };
+  const handleSearchMotor=()=>{
 
+  }
   return (
     <div>
       <div className="bg-white dark:bg-zinc-800 p-4 rounded-lg shadow-md flex items-center justify-between">
@@ -58,7 +63,7 @@ const SearchMotorbike = () => {
           </div>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2" onClick={handleOpenSchedulePopup}>
           <div>
             <span className="text-zinc-600 dark:text-zinc-300">
               Thời gian thuê
@@ -84,9 +89,10 @@ const SearchMotorbike = () => {
               </span>
             </div>
           </div>
+          <MotorbikeSchedulePopUp isOpen={schedulePopUp} onClose={() => setSchedulePopUp(false)} />
         </div>
 
-        <button className="bg-green-500 text-white px-4 py-2 rounded-lg">
+        <button className="bg-green-500 text-white px-4 py-2 rounded-lg" onClick={handleSearchMotor}>
           Tìm Xe
         </button>
       </div>

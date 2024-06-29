@@ -14,19 +14,16 @@ import Privacy from "./pages/privacy/Privacy";
 import PrivacyList from "./pages/privacy/PrivacyList";
 import UserInformation from "./pages/dashboard/UserInformation";
 import UserData from "./pages/dashboard/UserData";
-
-import RegisterMotorbikeStep1 from "./pages/motorbike/RegisterMotorbikeStep1";
 import RegisterSuccess from "./pages/register/RegisterSuccess";
 import ResetNewPassword from "./pages/forgotpassword/ResetNewPassword";
 import Menu from "./pages/menu/Menu";
 import Booking from "./pages/booking/Booking";
-import Layout from "./pages/test-layuot/Layout";
+import Layout from "./pages/test-layout/Layout";
 import DetailBooking from "./pages/booking/detail/DetailBooking";
 import Address from "./pages/booking/address/Address";
 import UserWallet from "./pages/wallet/UserWallet";
 import PaymentSuccess from "./pages/wallet/PaymentSuccess";
 import PaymentFailed from "./pages/wallet/PaymentFailed";
-
 import BrandList from "./pages/brand/BrandList";
 
 import Profile from "./pages/profile/Profile";
@@ -35,6 +32,10 @@ import Message from "./pages/chatting/Message";
 import ModelList from "./pages/modelMotorbike/ModelList";
 import ApproveMotorbikeRegistration from "./pages/motorbike/ApproveMotorbikeRegistration ";
 import ChatApp from "./pages/chatapp/ChatApp";
+import RegisterMotorbikeStep1 from "./pages/motorbike/RegisterMotorbikeStep1";
+import RegisterMotorbikeStep2 from "./pages/motorbike/RegisterMotorbikeStep2";
+
+
 
 function App() {
   return (
@@ -54,26 +55,25 @@ function App() {
 
         <Route path="/verify/:token" element={<RegisterSuccess />} />
         <Route
-          path="/registermotorbike/step1"
+          path="/registermotorbike"
           element={<RegisterMotorbikeStep1 />}
         />
-
+        <Route path="/registermotorbike/step2"element={<RegisterMotorbikeStep2/>}/>
         <Route path="/" element={<Navigate to="/homepage" />} />
         <Route path="/homepage" element={<Homepage />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/privacyList" element={<PrivacyList />} />
         <Route path="/userInformation" element={<UserInformation />} />
         <Route path="/userData" element={<UserData />} />
-        <Route path="/menu" element={<Menu />}>
-          <Route path="/menu/wallet" element={<UserWallet />} />
-          <Route path="/menu/message" element={<Message />} />
-          <Route
-            path="/menu/approveMotorbike"
-            element={<ApproveMotorbikeRegistration />}
-          />
-          <Route path="/menu/brand" element={<BrandList />} />
-          <Route path="/menu/model" element={<ModelList />} />
-          <Route path="/menu/profile" element={<Profile />} />
+      
+
+        <Route path="/menu" element={<Menu />} >
+        <Route path="/menu/wallet" element={<UserWallet />} />
+        <Route path="/menu/approveMotorbike" element={<ApproveMotorbikeRegistration />} />
+        <Route path="/menu/brand" element={<BrandList />} />
+        <Route path="/menu/model" element={<ModelList />} />
+        <Route path="/menu/profile" element={<Profile />} />
+
         </Route>
 
         <Route path="/booking" element={<Booking />} />
