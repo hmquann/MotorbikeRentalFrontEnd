@@ -7,6 +7,7 @@ import UserWallet from "../wallet/UserWallet";
 import ApproveMotorbikeRegistration from "../motorbike/ApproveMotorbikeRegistration ";
 import BrandList from "../brand/BrandList";
 import ModelList from "../modelMotorbike/ModelList";
+import UserData from "../dashboard/UserData";
 const Menu = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const navigate = useNavigate();
@@ -70,6 +71,14 @@ const Menu = () => {
               Manage Model
             </NavLink>
           </li>
+          <li>
+            <NavLink
+              to="/menu/userData"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              User Management
+            </NavLink>
+          </li>
             </>
           )}
           <li>
@@ -80,14 +89,7 @@ const Menu = () => {
               Motorbike Status
             </NavLink>
           </li>
-          <li>
-            <NavLink
-              to="/menu/profile"
-              className={({ isActive }) => (isActive ? "active" : "")}
-            >
-              Profile
-            </NavLink>
-          </li>
+
           <li>
             <NavLink
               to="/menu/profile"
@@ -111,6 +113,7 @@ const Menu = () => {
             <>
                <Route path="/brand" element={<BrandList />} />
                <Route path="/model" element={<ModelList />} />
+               <Route path="/userData" element={<UserData />} />
             </>
           )}
           <Route path="/approveMotorbike" element={<ApproveMotorbikeRegistration />} />

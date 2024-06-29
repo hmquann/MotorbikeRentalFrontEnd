@@ -64,7 +64,6 @@ function App() {
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/privacyList" element={<PrivacyList />} />
         <Route path="/userInformation" element={<UserInformation />} />
-        <Route path="/userData" element={<UserData />} />
       
 
         <Route path="/menu" element={<Menu />} >
@@ -73,7 +72,8 @@ function App() {
         <Route path="/menu/brand" element={<BrandList />} />
         <Route path="/menu/model" element={<ModelList />} />
         <Route path="/menu/profile" element={<Profile />} />
-        <Route path="/menu/profile" element={<Profile />} />
+        <Route path="/menu/userData" element={<UserData />} />
+
         </Route>
 
         <Route path="/booking" element={<Booking />} />
