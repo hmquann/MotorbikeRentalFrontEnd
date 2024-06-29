@@ -5,11 +5,12 @@ import Message from "./Message"; // Import the Message component
 import { useFetch } from "./useFetch"; // Custom hook to fetch data
 import GetUserNameByEmail from "./GetUserNameByEmail";
 import GetLastMessage from "./GetLastMessage";
+import MessageList from "./MessageList";
 
 function ChatApp() {
   const [selectedRoom, setSelectedRoom] = useState(null);
-  const [uniqueRooms,setUniqueRooms] = useState();
-  const userDataString = localStorage.getItem("userData");
+  const [uniqueRooms, setUniqueRooms] = useState();
+  const userDataString = localStorage.getItem("user");
   const userData = JSON.parse(userDataString);
   const email = userData.email;
   console.log(email);
@@ -26,11 +27,17 @@ function ChatApp() {
   // }, [rooms]);
   console.log(message);
 
-  useEffect(()=>{
-     setUniqueRooms([...new Set((message || []).map(message => message.room))]);
-  },[message])
+  useEffect(() => {
+    setUniqueRooms([
+      ...new Set((message || []).map((message) => message.room)),
+    ]);
+  }, [message]);
   console.log(uniqueRooms);
 
+  const handleRoom = (uniqueRooms) => {
+    console.log(uniqueRooms);
+    setSelectedRoom(uniqueRooms);
+  };
 
   return (
     <div>
@@ -73,7 +80,7 @@ function ChatApp() {
                         message.name === message ? "active_chat" : ""
                       }`}
                       key={message.id}
-                      onClick={() => setSelectedRoom(message.room)}
+                      onClick={() => handleRoom(uniqueRooms)}
                     >
                       <div className="chat_people">
                         <div className="chat_img">
@@ -85,11 +92,13 @@ function ChatApp() {
                         <div className="chat_ib">
                           <h5>
                             <GetUserNameByEmail
-                              email={uniqueRooms.replace(email, '')}
+                              email={uniqueRooms.replace(email, "")}
                             ></GetUserNameByEmail>
                           </h5>
                           <h7>
-                            <GetLastMessage uniqueRooms={uniqueRooms}></GetLastMessage>
+                            <GetLastMessage
+                              uniqueRooms={uniqueRooms}
+                            ></GetLastMessage>
                           </h7>
                         </div>
                       </div>
@@ -97,13 +106,23 @@ function ChatApp() {
                   ))}
               </div>
             </div>
-            <div className="mesgs">
-              {selectedRoom ? (
-                <Message room={selectedRoom} username={username} />
-              ) : (
-                <div>Select a room to start chatting</div>
-              )}
-            </div>
+            {/* <div className="mesgs">
+              <div className="msg_history">
+              <MessageList userEmail={email} messageList={messageList} />
+              </div>
+              <div class="type_msg">
+                <div class="input_msg_write">
+                  <input
+                    type="text"
+                    class="write_msg"
+                    placeholder="Type a message"
+                  />
+                  <button class="msg_send_btn" type="button">
+                    <i class="fa fa-paper-plane-o" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+            </div> */}
           </div>
         </div>
       </div>

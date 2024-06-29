@@ -5,7 +5,7 @@ export const GetLastMessage = (uniqueRooms) => {
   const [responseData, setResponseData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  console.log(uniqueRooms);
+  console.log(uniqueRooms.uniqueRooms);
   useEffect(() => {
     (async function () {
       try {
@@ -15,7 +15,7 @@ export const GetLastMessage = (uniqueRooms) => {
           "http://localhost:8080/message/getLastMessageByUniqueRoom/" +
             uniqueRooms.uniqueRooms
         );
-        setResponseData(response.data);
+        setResponseData(response.data.content);
       } catch (err) {
         setError(err);
       } finally {
@@ -23,8 +23,7 @@ export const GetLastMessage = (uniqueRooms) => {
       }
     })();
   }, [uniqueRooms]);
-  console.log(responseData);
-  return responseData.content;
+  return responseData;
 };
 
 export default GetLastMessage;
