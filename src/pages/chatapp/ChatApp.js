@@ -6,38 +6,40 @@ import { useFetch } from "./useFetch"; // Custom hook to fetch data
 import GetUserNameByEmail from "./GetUserNameByEmail";
 import GetLastMessage from "./GetLastMessage";
 import MessageList from "./MessageList";
+import { GetListMessageByUniqueRoom } from "./GetListMessageByUniqueRoom";
+import GetLastMessageAllRoom from "./GetLastMessageAllRoom";
 
 function ChatApp() {
-  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [listMessage, setListMessage] = useState();
   const [uniqueRooms, setUniqueRooms] = useState();
   const userDataString = localStorage.getItem("user");
   const userData = JSON.parse(userDataString);
   const email = userData.email;
   console.log(email);
-  const [username, setUsername] = useState("John Doe"); // Assuming a static username for now
+  const [selectedRoom, setSelectedRoom] = useState();
+
   const {
     responseData: message,
     error,
     loading,
   } = useFetch("/message/getAllMessageByUser/" + email); // Fetch rooms
-  // useEffect(() => {
-  //   if (rooms && rooms.length > 0) {
-  //     setSelectedRoom(rooms[0].name); // Select the first room by default
-  //   }
-  // }, [rooms]);
-  console.log(message);
 
   useEffect(() => {
     setUniqueRooms([
       ...new Set((message || []).map((message) => message.room)),
     ]);
   }, [message]);
-  console.log(uniqueRooms);
 
   const handleRoom = (uniqueRooms) => {
-    console.log(uniqueRooms);
     setSelectedRoom(uniqueRooms);
   };
+
+  const { responseData: lastRoom } = GetLastMessageAllRoom(email);
+  console.log(lastRoom);
+
+  const { responseData: listSelectedMessage } =
+    GetListMessageByUniqueRoom(selectedRoom);
+  console.log(listSelectedMessage);
 
   return (
     <div>
@@ -52,7 +54,10 @@ function ChatApp() {
           <div className="inbox_msg">
             <div className="inbox_people">
               <div className="headind_srch">
-                <div className="recent_heading">
+                <div
+                  className="recent_heading"
+                  style={{ visibility: "hidden" }}
+                >
                   <h4>Rooms</h4>
                 </div>
                 <div className="srch_bar">
@@ -106,9 +111,14 @@ function ChatApp() {
                   ))}
               </div>
             </div>
-            {/* <div className="mesgs">
+            <div className="mesgs">
               <div className="msg_history">
-              <MessageList userEmail={email} messageList={messageList} />
+                {listSelectedMessage && (
+                  <MessageList
+                    userEmail={email}
+                    listSelectedMessage={listSelectedMessage}
+                  />
+                )}
               </div>
               <div class="type_msg">
                 <div class="input_msg_write">
@@ -122,7 +132,7 @@ function ChatApp() {
                   </button>
                 </div>
               </div>
-            </div> */}
+            </div>
           </div>
         </div>
       </div>

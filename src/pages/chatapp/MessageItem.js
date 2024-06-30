@@ -3,8 +3,14 @@ import { timeStampConverter } from "./timeUtils";
 import "./Message.css";
 
 export const MessageItem = ({ message, username }) => {
+  const userDataString = localStorage.getItem("user");
+  const userData = JSON.parse(userDataString);
+  const userId = userData.userId;
   const type = message.messageType.toLowerCase();
-  const self = message.username == username ? "_self" : "";
+  const self = message.userId === userId ? "_self" : "";
+  console.log("aaaaaaaaaaaaa" + message.user_id);
+  console.log(message);
+  console.log("bbbbbbbbbbbbbbb" + userId);
   const time = timeStampConverter(message.timestamp);
 
   return (
