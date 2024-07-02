@@ -32,7 +32,7 @@ const BrandList = () => {
         setBrands(response.data.content || []); 
         setTotalPages(response.data.totalPages); 
         setIsLoading(false)
-      },1000)
+      },500)
      
     } catch (error) {
       console.error("Error fetching brands:", error);
@@ -164,7 +164,7 @@ const BrandList = () => {
             brands.map((brand, index) => (
               <tr
                 key={brand.brandId}
-                className=" text-center transition duration-300 ease-in-out hover:bg-neutral-200"
+                className={`text-center transition duration-300 ease-in-out hover:bg-slate-300 ${index % 2 === 0 ? 'bg-white-100' : 'bg-gray-100'}`}
               >
                 <td className={tableCellClasses}>{brand.brandName}</td>
                 <td className={tableCellClasses}>{brand.origin}</td>

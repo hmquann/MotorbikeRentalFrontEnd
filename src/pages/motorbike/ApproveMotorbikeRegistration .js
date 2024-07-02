@@ -283,7 +283,7 @@ const ApproveMotorbikeRegistration = () => {
     {filteredMotorbikes.map((motorbike) => (
       <tr
         key={motorbike.id}
-        className="border-b transition duration-300 ease-in-out hover:bg-neutral-100 "
+        className="border-b transition duration-300 ease-in-out hover:bg-slate-200 "
       >
         {isAdmin && (
           <td className="px-6 py-4 whitespace-nowrap font-bold text-sky-900 ">

@@ -234,7 +234,7 @@ const ModelList = () => {
               models.map((model, index) => (
                 <tr
                   key={model.id}
-                  className=" text-center transition duration-300 ease-in-out hover:bg-neutral-200"
+                  className={`text-center transition duration-300 ease-in-out hover:bg-slate-300 ${index % 2 === 0 ? 'bg-white-100' : 'bg-gray-100'}`}
                 >
                   <td className="whitespace-nowrap px-6 py-4 font-bold text-gray-900">{model.modelId}</td>
                   <td className={tableCellClasses}>{model.modelName}</td>
