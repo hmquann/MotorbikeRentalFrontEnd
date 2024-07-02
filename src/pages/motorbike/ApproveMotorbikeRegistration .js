@@ -205,7 +205,7 @@ const ApproveMotorbikeRegistration = () => {
   };
 
   return (
-    <div className="bg-zinc-300  p-6 rounded-lg shadow-md max-w-5xl mx-auto">
+    <div className="p-4 rounded-lg max-w-5xl mx-auto">
       <div className="bg-gradient-to-r from-slate-500 from-60% to-zinc-500 text-white p-4 rounded-t-lg flex justify-between items-center">
         <h1 className="text-4xl font-semibold mb-4">Motorbike Status</h1>
       </div>
@@ -246,7 +246,7 @@ const ApproveMotorbikeRegistration = () => {
             </tr>
           </thead>
           <tbody className="bg-white dark:bg-black divide-y divide-gray-400 ">
-          {isLoading ? ( // Hiển thị animation nếu đang tải dữ liệu
+          {isLoading ? ( 
              <tr>
              <td colSpan="6" className="p-4">
                <div className="flex justify-center items-center">
@@ -297,9 +297,9 @@ const ApproveMotorbikeRegistration = () => {
         )}
         <td className={tableCellClasses}>{motorbike.model.modelName}</td>
         <td className={tableCellClasses}>{motorbike.motorbikePlate}</td>
-        <td className={tableCellClasses}>{motorbike.status}</td>
+        <td className={tableCellClasses}>{motorbike.motorbikeStatus}</td>
         <td className={tableCellClasses}>
-          {isAdmin && motorbike.status === 'PENDING' ? (
+          {isAdmin && motorbike.motorbikeStatus === 'PENDING' ? (
             <>
               <button
                 className={`hover:bg-green-600 bg-green-500 text-white mr-2 ${buttonClasses}`}
@@ -315,9 +315,9 @@ const ApproveMotorbikeRegistration = () => {
               </button>
             </>
           ) : isLessor &&
-            (motorbike.status === 'ACTIVE' ||
-              motorbike.status === 'DEACTIVE') ? (
-            motorbike.status === 'ACTIVE' ? (
+            (motorbike.motorbikeStatus === 'ACTIVE' ||
+              motorbike.motorbikeStatus === 'DEACTIVE') ? (
+            motorbike.motorbikeStatus === 'ACTIVE' ? (
               <button
                 className={`hover:bg-red-600 bg-red-500 text-white ${buttonClasses}`}
                 onClick={() => handleAction(motorbike, 'deactivate')}

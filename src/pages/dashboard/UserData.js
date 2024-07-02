@@ -1,42 +1,76 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import UserInformation from "./UserInformation";
+import useDebounce from "../../hooks/useDebounce";
 
 const UserData = () => {
   const [users, setUsers] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
-  const [pageSize, setPageSize] = useState(6);
+  const [pageSize, setPageSize] = useState(5);
   const [totalPages, setTotalPages] = useState(0);
-  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState([]);
+  const debouncedSearchTerm = useDebounce(searchTerm, 1000);
+
+  
 
   const fetchUsers = async () => {
     try {
+      setIsLoading(true)
       const response = await axios.get(
         `http://localhost:8080/api/user/allUser/${currentPage}/${pageSize}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
+      
       );
 
-      // Lọc các người dùng có vai trò 'USER' hoặc 'LESSOR'
-      const filtered = response.data.content.filter((user) =>
-        user.roles.some((role) => role.name === "USER" || role.name === "LESSOR")
-      );
-
-      setFilteredUsers(filtered);
-      setUsers(filtered);
-      setTotalPages(response.data.totalPages); // Tổng số trang từ backend
+      setTimeout(() => {
+      setUsers(response.data.content);
+      setTotalPages(response.data.totalPages); 
+      setIsLoading(false)
+      },500)
     } catch (error) {
       console.error("Error fetching users:", error);
       setUsers([]);
     }
   };
 
+  const searchUsers = async (term, page, size) => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get(
+        `http://localhost:8080/api/user/search`,
+        {
+          params: {
+            searchTerm: term,
+            page,
+            size,
+          },
+          // headers: {
+          //   Authorization: `Bearer ${localStorage.getItem("token")}`,
+          // },
+        }
+      );
+
+      setTimeout(() => {
+        setUsers(response.data.content);
+        setTotalPages(response.data.totalPages);
+        setIsLoading(false);
+      }, 500);
+    } catch (error) {
+      console.error("Error searching users:", error);
+      setUsers([]);
+    }
+  };
   useEffect(() => {
     fetchUsers();
   }, [currentPage, pageSize]);
+
+  useEffect(() => {
+    if (debouncedSearchTerm !== null && typeof debouncedSearchTerm === 'string' && debouncedSearchTerm.trim() !== '') {
+      searchUsers(debouncedSearchTerm, currentPage, pageSize);
+    } else {
+      fetchUsers();
+    }
+  }, [debouncedSearchTerm, currentPage, pageSize]);
 
   const handleNextPage = () => {
     if (currentPage < totalPages - 1) {
@@ -54,17 +88,25 @@ const UserData = () => {
     setCurrentPage(page);
   };
 
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(0); 
+  };
+
   return (
     <div>
       <UserInformation
         users={users}
-        filteredUsers={filteredUsers}
         currentPage={currentPage}
         totalPages={totalPages}
         handleNextPage={handleNextPage}
         handlePreviousPage={handlePreviousPage}
         handlePageClick={handlePageClick}
+        handleSearch={handleSearch}
         setUsers={setUsers}
+        searchTerm={searchTerm}
+        isLoading={isLoading}
+        setIsLoading={setIsLoading}
       />
     </div>
   );
