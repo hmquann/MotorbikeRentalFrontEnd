@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 const inputClasses =
-  "mt-1 block w-full p-2 border border-zinc-300 rounded-md text-green-800 font-semibold";
-const labelClasses = "block text-sm font-bold dark:text-neutral-300";
+  "mt-1 block w-full p-2 border border-zinc-300 rounded-md text-black font-medium";
+const labelClasses = "block text-md font-bold text-slate-500 dark:text-neutral-300";
 
 const ViewModel = ({ showModal, setShowModal, modelId }) => {
   const [modelData, setModelData] = useState({
@@ -41,8 +41,8 @@ const ViewModel = ({ showModal, setShowModal, modelId }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 ">
-      <div className="bg-gradient-to-r from-cyan-800 from-40% to-zinc-500 p-4 rounded-lg shadow-lg max-w-4xl mx-auto">
-        <div className="bg-gradient-to-r from-cyan-700 from-40% to-zinc-500 text-lime-400 p-2 rounded-t-lg">
+      <div className="bg-gray-100 p-4 rounded-lg shadow-lg max-w-4xl mx-auto">
+        <div className="bg-zinc-200 text-slate-600 p-2 rounded-t-lg">
           <h2 className="text-lg-lg font-bold">Model Details</h2>
         </div>
         <form className="space-y-4 p-4">

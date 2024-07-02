@@ -166,7 +166,7 @@ const UserInformation = ({
               users.map((user) => (
                 <tr
                   key={user.id}
-                  className=" text-center transition duration-300 ease-in-out hover:bg-neutral-200"
+                  className=" text-center transition duration-300 ease-in-out hover:bg-slate-200"
                 >
                   <td
                     className="font-semibold"
