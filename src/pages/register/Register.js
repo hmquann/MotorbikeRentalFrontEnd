@@ -136,15 +136,11 @@ const Register = () => {
       }
     }
     axios
-      .post(
-        "https://rentalmotorbike.azurewebsites.net/api/auth/signup",
-        formData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      )
+      .post("http://localhost:8080/api/auth/signup", formData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
       .then((response) => {
         console.log("Data sent successfully:", response.data);
         setShowPopup(true); // Hiển thị popup khi thành công

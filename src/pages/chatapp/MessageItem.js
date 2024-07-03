@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { timeStampConverter } from "./timeUtils";
-import "./Message.css";
+import "./ChatApp.css";
 
 export const MessageItem = ({ message, username }) => {
   const userDataString = localStorage.getItem("user");
@@ -8,21 +8,37 @@ export const MessageItem = ({ message, username }) => {
   const userId = userData.userId;
   const type = message.messageType.toLowerCase();
   const self = message.userId === userId ? "_self" : "";
-  console.log("aaaaaaaaaaaaa" + message.user_id);
   console.log(message);
-  console.log("bbbbbbbbbbbbbbb" + userId);
   const time = timeStampConverter(message.timestamp);
 
   return (
-    <div className={"message_item_" + type + self}>
+    <>
       {type != "server" && self == "" && (
-        <span className="message_item_username">{message.username}</span>
+        <div class="incoming_msg">
+          <div class="incoming_msg_img">
+            {" "}
+            <img
+              src="https://bootdey.com/img/Content/avatar/avatar1.png"
+              alt="sunil"
+            />{" "}
+          </div>
+          <div class="received_msg">
+            <div class="received_withd_msg">
+              <p>{message.content}</p>
+              <span class="time_date">{time}</span>
+            </div>
+          </div>
+        </div>
       )}
-      <div className={"message_content_" + type + self}>
-        <span className="message_content_value">{message.content}</span>
-        <span>{time}</span>
-      </div>
-    </div>
+      {type != "server" && self == "_self" && (
+        <div class="outgoing_msg">
+          <div class="sent_msg">
+            <p>{message.content}</p>
+            <span class="time_date">{time}</span>{" "}
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

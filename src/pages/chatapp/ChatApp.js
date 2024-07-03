@@ -41,6 +41,26 @@ function ChatApp() {
     GetListMessageByUniqueRoom(selectedRoom);
   console.log(listSelectedMessage);
 
+  const [messageRequest, setMessageRequest] = useState("");
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setMessageRequest(value);
+    setIsButtonDisabled(value.trim() === "");
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (messageRequest.trim() === "") {
+      return;
+    }
+    console.log("Message submitted:", messageRequest);
+    // Thực hiện các hành động khác sau khi gửi form
+    setMessageRequest(""); // Clear input
+    setIsButtonDisabled(true); // Disable button
+  };
+
   return (
     <div>
       <link
@@ -121,16 +141,22 @@ function ChatApp() {
                 )}
               </div>
               <div class="type_msg">
-                <div class="input_msg_write">
+                <form class="input_msg_write" onSubmit={handleSubmit}>
                   <input
                     type="text"
                     class="write_msg"
                     placeholder="Type a message"
+                    value={messageRequest}
+                    onChange={handleInputChange}
                   />
-                  <button class="msg_send_btn" type="button">
+                  <button
+                    class="msg_send_btn"
+                    type="submit"
+                    disabled={isButtonDisabled}
+                  >
                     <i class="fa fa-paper-plane-o" aria-hidden="true"></i>
                   </button>
-                </div>
+                </form>
               </div>
             </div>
           </div>

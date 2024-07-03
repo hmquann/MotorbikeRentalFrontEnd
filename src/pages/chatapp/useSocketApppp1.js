@@ -7,7 +7,7 @@ export const useSocket = (room, username) => {
   const [socketResponse, setSocketResponse] = useState({
     room: "",
     content: "",
-    userId: "",
+    username: "",
     messageType: "",
     createdDateTime: "",
   });

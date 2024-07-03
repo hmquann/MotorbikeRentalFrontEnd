@@ -10,12 +10,12 @@ export const MessageList = ({ userEmail, listSelectedMessage }) => {
   useEffect(scrollToBottom, [listSelectedMessage]);
 
   return (
-    <div className="message_list">
+    <>
       {listSelectedMessage.map((x, idx) => (
         <MessageItem key={idx} message={x} userEmail={userEmail} />
       ))}
       <div ref={messagesEndRef} />
-    </div>
+    </>
   );
 };
 

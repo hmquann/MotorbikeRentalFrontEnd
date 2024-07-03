@@ -75,6 +75,7 @@ img{ max-width:100%;}
   width: 92%;
  }
  .received_withd_msg p {
+  display: inline;
   background: #ebebeb none repeat scroll 0 0;
   border-radius: 3px;
   color: #646464;
@@ -97,6 +98,7 @@ img{ max-width:100%;}
 }
 
  .sent_msg p {
+  display: inline;
   background: #05728f none repeat scroll 0 0;
   border-radius: 3px;
   font-size: 14px;
@@ -108,6 +110,8 @@ img{ max-width:100%;}
 .sent_msg {
   float: right;
   width: 46%;
+  padding-right: 10px;
+  text-align: right;
 }
 .input_msg_write input {
   background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
@@ -116,6 +120,7 @@ img{ max-width:100%;}
   font-size: 15px;
   min-height: 48px;
   width: 100%;
+  outline: none;
 }
 
 .type_msg {border-top: 1px solid #c4c4c4;position: relative;}
@@ -131,6 +136,10 @@ img{ max-width:100%;}
   right: 0;
   top: 11px;
   width: 33px;
+}
+.msg_send_btn:disabled {
+  opacity: 0.5; /* Làm cho button nhạt đi khi bị disable */
+  cursor: not-allowed; /* Thay đổi con trỏ khi button bị disable */
 }
 .messaging { padding: 0 0 50px 0;}
 .msg_history {
