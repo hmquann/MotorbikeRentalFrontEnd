@@ -19,9 +19,6 @@ const MotorbikeList = () => {
             .then(response => setMotorbikeList((response.data)))
             .catch(error => console.error('Error fetching motorbikes:', error));
     }, motorbikeList);
-    if(motorbikeList.length>0){
-      console.log(motorbikeList[0].model.modelType)
-    }
     
     const getAddress = (inputString) => {
         if (typeof inputString !== 'string' || inputString.trim() === '') {
@@ -78,7 +75,7 @@ const MotorbikeList = () => {
               alt="User Avatar"
             />
             <div className="ml-2">
-              <span className="block text-sm font-semibold text-green-600 dark:text-green-400">5.0</span>
+              <span className="block text-sm font-semibold text-green-600 dark:text-green-400">{motorbike.model.modelName}</span>
               <span className="block text-xs text-zinc-500 dark:text-zinc-400"></span>
             </div>
           </div>
