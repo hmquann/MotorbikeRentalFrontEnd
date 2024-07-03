@@ -2,12 +2,16 @@ import React, { useState,useEffect } from "react";
 import { NavLink, Route, Routes, useNavigate } from "react-router-dom";
 import "./Menu.css";
 import Profile from "../profile/Profile";
-import ChatMessage from "../chatting/ChatMessage";
+
 import UserWallet from "../wallet/UserWallet";
 import ApproveMotorbikeRegistration from "../motorbike/ApproveMotorbikeRegistration ";
 import BrandList from "../brand/BrandList";
 import ModelList from "../modelMotorbike/ModelList";
+
+
+import { Message } from "../chatting/Message";
 import UserData from "../dashboard/UserData";
+
 const Menu = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const navigate = useNavigate();
@@ -20,6 +24,8 @@ const Menu = () => {
   }, []);
  
   const isAdmin = userRole.includes("ADMIN")
+  const [username, setUsername] = useState("");
+  const [room, setRoom] = useState("");
 
   const handleLogout = () => {
     setShowLogoutModal(true);
@@ -67,14 +73,18 @@ const Menu = () => {
           </li>
           <li>
             <NavLink
-              to="/menu/model"
+              to="/menu/message"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
-              Manage Model
+              Chatting
             </NavLink>
           </li>
           <li>
             <NavLink
+              to="/menu/model"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              Manage Model
               to="/menu/userData"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
@@ -109,7 +119,11 @@ const Menu = () => {
       </div>
       <div className="menu-right mt-4">
         <Routes>
-          <Route path="profile" element={<Profile />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route
+            path="/message"
+            element={<Message room={"room1"} userId={1} />}
+          />
           <Route path="/wallet" element={<UserWallet />} />
           {isAdmin && (
             <>

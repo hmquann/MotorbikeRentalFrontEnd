@@ -37,21 +37,21 @@ const Login = () => {
         },
       });
       const data = response.data;
-      
+
       console.log(response.data);
-      const userInfor={
-      // token: data.token,
-      userId:data.id,
-      roles:data.roles,
-      balance: data.balance,
-      gender:data.isGender,
-      email:data.email,
-      firstName:data.firstName,
-      lastName:data.lastName,
-      phone:data.phone
-      }
-      localStorage.setItem("user",JSON.stringify(userInfor))
-      const token = localStorage.setItem("token", data.token)
+      const userInfor = {
+        token: data.userToken,
+        userId: data.id,
+        roles: data.roles,
+        balance: data.balance,
+        gender: data.isGender,
+        email: data.email,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        phone: data.phone,
+      };
+      localStorage.setItem("user", JSON.stringify(userInfor));
+      const token = localStorage.setItem("token", data.token);
       if (data.roles && data.roles.length > 0) {
         localStorage.setItem("roles", JSON.stringify(data.roles));
       } else {
@@ -60,7 +60,7 @@ const Login = () => {
 
       if (data.roles.includes("ADMIN")) {
         navigate("/dashboard");
-      } else if (data.roles && data.roles.includes("USER","LESSOR")) {
+      } else if (data.roles && data.roles.includes("USER", "LESSOR")) {
         navigate("/homepage");
       }
     } catch (error) {
