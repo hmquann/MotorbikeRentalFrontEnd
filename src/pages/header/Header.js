@@ -22,7 +22,7 @@ const Header = () => {
     const userData = JSON.parse(userDataString);
 
     // Lấy ra username từ đối tượng userData
-    userData ? setUsername("Hi, " + userData.firstName) : setUsername("");
+    userData ? setUsername(userData.firstName+" "+ userData.lastName) : setUsername("");
     setIsLoggedIn(!!token);
   }, [location]);
 

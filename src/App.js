@@ -25,7 +25,7 @@ import UserWallet from "./pages/wallet/UserWallet";
 import PaymentSuccess from "./pages/wallet/PaymentSuccess";
 import PaymentFailed from "./pages/wallet/PaymentFailed";
 import BrandList from "./pages/brand/BrandList";
-
+import ApproveLicense from "./pages/license/ApproveLicense"
 import Profile from "./pages/profile/Profile";
 import VerifyChangeEmail from "./pages/profile/VerifyChangeEmail";
 import Message from "./pages/chatting/Message";
@@ -72,6 +72,7 @@ function App() {
         <Route path="/menu/brand" element={<BrandList />} />
         <Route path="/menu/model" element={<ModelList />} />
         <Route path="/menu/profile" element={<Profile />} />
+        <Route path="/menu/approveLicense" element={<ApproveLicense/>}/>
         <Route path="/menu/userData" element={<UserData />} />
 
         </Route>
