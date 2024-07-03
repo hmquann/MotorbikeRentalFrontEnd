@@ -24,6 +24,7 @@ const Menu = () => {
   }, []);
  
   const isAdmin = userRole.includes("ADMIN")
+  const isLessor = userRole.includes("LESSOR")
   const [username, setUsername] = useState("");
   const [room, setRoom] = useState("");
 
@@ -85,6 +86,10 @@ const Menu = () => {
               className={({ isActive }) => (isActive ? "active" : "")}
             >
               Manage Model
+              </NavLink>
+              </li>
+              <li>
+              <NavLink
               to="/menu/userData"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
@@ -93,6 +98,7 @@ const Menu = () => {
           </li>
             </>
           )}
+           {(isAdmin || isLessor) && (
           <li>
             <NavLink
               to="/menu/approveMotorbike"
@@ -101,6 +107,7 @@ const Menu = () => {
               Motorbike Status
             </NavLink>
           </li>
+           )}
 
           <li>
             <NavLink
