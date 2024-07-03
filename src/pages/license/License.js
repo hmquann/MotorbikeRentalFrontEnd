@@ -1,5 +1,6 @@
 import React, { useState,useEffect } from "react";
 import axios from "axios";
+
 const cardClasses =
   "bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-md max-w-4xl mx-auto border border-zinc-300 dark:border-zinc-700 mt-8";
 const textClasses = "text-zinc-900 dark:text-zinc-100";
@@ -17,11 +18,12 @@ const sharedClasses = {
     "bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-white px-4 py-2 rounded-lg",
   note: "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 p-4 rounded-lg",
   info: "text-sm",
-  image: "rounded-lg w-full",
+  image: "rounded-lg w-full object-contain h-48 w-96",
   label: "block text-sm font-medium text-zinc-700 dark:text-zinc-300",
   content:
     "bg-zinc-100 dark:bg-zinc-700 text-zinc-900 dark:text-white p-2 rounded-lg",
 };
+
 const License = () => {
   const user=JSON.parse(localStorage.getItem("user"));
   console.log(user.userId)
@@ -54,7 +56,7 @@ const License = () => {
     })
   .then((response) => {
     console.log("Data sent successfully:", response.data);
-
+    setChangeLicense(false);
 
   })
   .catch((error) => {
@@ -120,13 +122,15 @@ const License = () => {
         <div className="flex justify-between items-center mb-4">
           <h2 className={sharedClasses.title}>
             Driver's license{" "}
-            <span className="ml-2 bg-red-100 dark:bg-green-700 text-green-800 dark:text-green-300 text-xs px-2 py-1 rounded-full">
               {license
-                ? license.status === true
-                  ? "Verified"
-                  : "Not Verified"
+                ? license.status ==='APPROVED'
+                  ? <span className="ml-2 bg-green-100 dark:bg-green-700 text-green-800 dark:text-green-300 text-xs px-2 py-1 rounded-full">
+                  Verified
+                </span>
+                  :             <span className="ml-2 bg-red-100 dark:bg-green-700 text-green-800 dark:text-green-300 text-xs px-2 py-1 rounded-full">
+                  Not Verified</span>
                 : "Empty"}
-            </span>
+            
           </h2>
 
           <div className="flex items-center space-x-2">
@@ -143,7 +147,7 @@ const License = () => {
             Note: To avoid any issues during the rental process,{" "}
             <span className="font-semibold">the person booking</span> on
             MiMOTORBIKE (with verified driver's license){" "}
-            <span className="font-semibold">MUST ALSO</span> phải là{" "}
+            <span className="font-semibold">MUST ALSO</span>{" "}
             <span className="font-semibold">be the person receiving</span>.
           </p>
         </div>
@@ -153,7 +157,7 @@ const License = () => {
             <h3 className={sharedClasses.title}>Image</h3>
             {changeLicense ? (
               <>
-                <input
+                <input 
                   type="file"
                   name="licenseImageFile"
                   accept="image/*" // Chỉ chấp nhận tệp hình ảnh
@@ -174,7 +178,7 @@ const License = () => {
                 )}
               </>
             ) : (
-              <img
+              <img 
                 src={
                   license && license.licenseImageUrl
                     ? license.licenseImageUrl

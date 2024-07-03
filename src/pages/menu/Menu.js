@@ -8,9 +8,12 @@ import ApproveMotorbikeRegistration from "../motorbike/ApproveMotorbikeRegistrat
 import BrandList from "../brand/BrandList";
 import ModelList from "../modelMotorbike/ModelList";
 
+import ApproveLicense from "../license/ApproveLicense";
+
 
 import { Message } from "../chatting/Message";
 import UserData from "../dashboard/UserData";
+
 
 const Menu = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -82,18 +85,29 @@ const Menu = () => {
           </li>
           <li>
             <NavLink
+              to="/menu/approveLicense"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              Approve License
+              </NavLink>
+          </li>
+          <li>
+                <NavLink
               to="/menu/model"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
               Manage Model
               </NavLink>
+
               </li>
               <li>
               <NavLink
+
               to="/menu/userData"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
               User Management
+
             </NavLink>
           </li>
             </>
@@ -136,7 +150,9 @@ const Menu = () => {
             <>
                <Route path="/brand" element={<BrandList />} />
                <Route path="/model" element={<ModelList />} />
+               <Route path="/approveLicense" element={<ApproveLicense/>} />
                <Route path="/userData" element={<UserData />} />
+
             </>
           )}
           <Route path="/approveMotorbike" element={<ApproveMotorbikeRegistration />} />

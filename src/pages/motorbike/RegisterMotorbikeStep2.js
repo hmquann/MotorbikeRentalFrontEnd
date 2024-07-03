@@ -409,10 +409,10 @@ const RegisterMotorbikeStep2 = () => {
             <div className="flex items-center" >
               <input
                 type="text"
-                name="freeshipDistance"
+                name="freeshipLimit"
                 className="w-2/3 p-2 border rounded mr-2 focus:outline-none focus:ring-2 focus:ring-green-500"
                 placeholder="Enter fee" 
-                value={formData.freeshipDistance}
+                value={formData.freeshipLimit}
                 disabled={checkDelivery}
                 onChange={handleChange}
               />
@@ -429,10 +429,10 @@ const RegisterMotorbikeStep2 = () => {
             </label>
             <div className="flex items-center" >
               <input type="text"
-              name="deliveryFeePerKilometer"
+              name="deliveryFee"
             className="w-2/3 p-2 border rounded mr-2 focus:outline-none focus:ring-2 focus:ring-green-500"
                 placeholder="Enter fee"
-                value={formData.deliveryFeePerKilometer} 
+                value={formData.deliveryFee} 
                 disabled={checkDelivery}
                 onChange={handleChange}
               />
@@ -446,7 +446,7 @@ const RegisterMotorbikeStep2 = () => {
             Image
           </h2>
           <p className="text-zinc-600 dark:text-zinc-300 mt-2">
-            Post multiple pictures from different angles to increase information
+            Post 4 pictures from different angles to increase information
             about your vehicle.
           </p>
           <div className="mt-4">
