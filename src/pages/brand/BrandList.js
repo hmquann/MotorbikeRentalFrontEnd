@@ -14,7 +14,7 @@ const BrandList = () => {
   const [brands, setBrands] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(5);//page size khai bao thuong cx dc ma
   const [totalPages, setTotalPages] = useState(0);
   const [showEditModal, setShowEditModal] = useState(false); // State for Edit Modal
   const [brandToEdit, setBrandToEdit] = useState(null); // State for brand to edit

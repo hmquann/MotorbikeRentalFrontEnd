@@ -111,7 +111,7 @@ const Login = () => {
             onChange={handleChange}
           />
           <div className="flex justify-between text-sm text-zinc-600 dark:text-zinc-400">
-            <Link to="/register/form" className="hover:underline">
+            <Link to="/register" className="hover:underline">
               Register
             </Link>
             <Link to="/forgotpassword" className="hover:underline">
