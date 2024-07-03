@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Dropdown from './Dropdown';
 import useDebounce from '../../hooks/useDebounce';
+import qs from 'qs'
 
 const tableCellClasses = 'px-6 py-4 whitespace-nowrap text-base font-semibold text-amber-900 ';
 const buttonClasses = 'p-2 rounded-lg';
@@ -23,24 +24,32 @@ const ApproveMotorbikeRegistration = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [userId, setUserId] = useState('')
 
   const debouncedSearchTerm = useDebounce(searchTerm, 1000);
 
-  
-
-  
-
   useEffect(() => {
     const role = JSON.parse(localStorage.getItem('roles'));
+    const userId = JSON.parse(localStorage.getItem('user')).userId
     setUserRole(role);
-    fetchMotorbikes(currentPage, pageSize);
+    setUserId(userId)
+    fetchMotorbikes(currentPage, pageSize, userId,role);
   }, [currentPage, pageSize, statusFilter]);
 
-  const fetchMotorbikes = async (page, size) => {
+  const fetchMotorbikes = async (page, size, userId, roles) => {
     try {
       setIsLoading(true);
       // const status = statusFilter !== 'all' ? statusFilter : 'all';
-      const response = await axios.get(`http://localhost:8080/api/motorbike/allMotorbike/${page}/${size}`);
+      const response = await axios.get(`http://localhost:8080/api/motorbike/allMotorbike/${page}/${size}`,{
+        params:{
+          userId: userId,
+          role: roles.join(',')
+        },
+        paramsSerializer:params =>{
+          return qs.stringify(params,{arrayFormat:'repeat'});
+        }
+      });
+      console.log(response.data);
       if (response.data) {
         const totalElements = response.data.totalElements;
         const totalPages = Math.ceil(totalElements / size);
@@ -59,15 +68,21 @@ const ApproveMotorbikeRegistration = () => {
     } 
   };
 
-  const searchMotorbike = async (searchTerm, page, size) => {
+  const searchMotorbike = async (searchTerm,userId, roles, page, size) => {
     try {
       setIsLoading(true)
       const response = await axios.get(`http://localhost:8080/api/motorbike/search`, {
         params: {
           searchTerm,
+          userId : userId,
+          role :roles.join(","),
           page,
           size
-        }
+        },
+        paramsSerializer:params =>{
+          return qs.stringify(params,{arrayFormat:'repeat'});
+        },
+  
       });
 
       if (response.data) {
@@ -92,16 +107,16 @@ const ApproveMotorbikeRegistration = () => {
   useEffect(() => {
     if (debouncedSearchTerm !== null && typeof debouncedSearchTerm === 'string' && debouncedSearchTerm.trim() !== '') {
       setIsSearching(true);
-      searchMotorbike(debouncedSearchTerm, currentPage, pageSize);
+      searchMotorbike(debouncedSearchTerm,userId,userRole, currentPage, pageSize);
     } else {
       setIsSearching(false);
-      fetchMotorbikes(currentPage, pageSize);
+      fetchMotorbikes(currentPage, pageSize, userId, userRole);
     }
-  }, [debouncedSearchTerm, currentPage, pageSize, isSearching]);
+  }, [debouncedSearchTerm, currentPage, pageSize, isSearching, userId, userRole]);
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
-    setCurrentPage(0); // Reset page to 0 when searching
+    setCurrentPage(0); 
   };
 
   const handleAction = (motorbike, action) => {
@@ -122,14 +137,11 @@ const ApproveMotorbikeRegistration = () => {
     axios.put(url)
       .then(response => {
         if (response.data) {
-          // Update motorbikes list with updated motorbike
           setMotorbikes(filteredMotorbikes.map(motorbike => (motorbike.id === selectedMotorbike.id ? response.data : motorbike)));
           setIsModalOpen(false);
-          fetchMotorbikes(currentPage, pageSize);
+          fetchMotorbikes(currentPage, pageSize, userId, userRole);
         } else {
           console.error(`Error ${actionType}ing motorbike: Empty response data`);
-          // Handle empty response data scenario
-          // Possibly show an error message to the user
         }
       })
       .catch(error => console.error(`Error ${actionType}ing motorbike:`, error));
@@ -145,10 +157,10 @@ const ApproveMotorbikeRegistration = () => {
   const isLessor = userRole.includes('LESSOR');
 
   const filteredMotorbikes = motorbikes.filter(motorbike => {
-    if (isAdmin) return statusFilter === 'all' || motorbike.status === statusFilter;
+    if (isAdmin) return statusFilter === 'all' || motorbike.motorbikeStatus === statusFilter;
     if (isLessor) {
-      const lessorUserId = parseInt(localStorage.getItem('userId'), 10); // Lấy userId của lessor từ localStorage
-      return (statusFilter === 'all' || motorbike.status === statusFilter) && motorbike.user && motorbike.user.id === lessorUserId;
+      const lessorUserId = JSON.parse(localStorage.getItem("user")).userId; 
+      return (statusFilter === 'all' || motorbike.motorbikeStatus === statusFilter) && motorbike.user && motorbike.user.id === lessorUserId;
     }
   });
   const handleStatusFilterChange = (motorbikeStatus) => {
