@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 const inputClasses =
-  "mt-1 block w-full p-2 border border-zinc-300 rounded-md dark:text-green-800 font-semibold";
-const labelClasses = "block text-sm font-bold dark:text-neutral-300";
+  "mt-1 block w-full p-2 border border-zinc-300 rounded-md dark:text-green-800 font-medium";
+const labelClasses = "block text-md font-bold text-slate-500 dark:text-neutral-300";
 
 const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
   const [formData, setFormData] = useState({
@@ -22,7 +22,6 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
   const [errors, setErrors] = useState({});
   const [errorsMess, setErrorsMess] = useState("");
 
-  // Fetch danh sách các Brand từ API khi component được render
   useEffect(() => {
     const fetchBrands = async () => {
       try {
@@ -37,7 +36,6 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
 
     fetchBrands();
   }, []);
-  // Fetch danh sách các loại nhiên liệu từ API khi component được render
   useEffect(() => {
     const fetchFuelTypes = async () => {
       try {
@@ -53,7 +51,6 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
     fetchFuelTypes();
   }, []);
 
-  // Fetch danh sách các loại mô hình từ API khi component được render
   useEffect(() => {
     const fetchModelTypes = async () => {
       try {
@@ -69,10 +66,8 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
     fetchModelTypes();
   }, []);
 
-  // Xử lý thay đổi trường dữ liệu trong form
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // Kiểm tra giá trị của trường và chỉ cập nhật state lỗi khi cần thiết
     const newErrors = { ...errors };
     if (!value.trim()) {
       newErrors[name] = `${
@@ -97,7 +92,7 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
       });
     }
   };
-  //validate du lieu
+
   const validate = () => {
     const newErrors = {};
     if (!formData.modelName) newErrors.modelName = "Model Name is required";
@@ -111,7 +106,7 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
     return newErrors;
   };
 
-  // Xử lý gửi form để tạo Model mới
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const formErrors = validate();
@@ -131,7 +126,6 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
         },
       })
       .then((response) => {
-        // Reset form data after creating the model
         setFormData({
           modelName: "",
           cylinderCapacity: "",
@@ -158,8 +152,8 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 ">
-      <div className="bg-gradient-to-r from-cyan-800 from-40% to-zinc-500 p-4 rounded-lg shadow-lg max-w-4xl mx-auto">
-        <div className="bg-gradient-to-r from-cyan-700 from-40% to-zinc-500 text-lime-400 p-2 rounded-t-lg">
+      <div className="bg-gray-200 to-zinc-500 p-4 rounded-lg shadow-lg max-w-4xl mx-auto">
+        <div className="bg-zinc-300 text-slate-600 p-2 rounded-t-lg">
           <h2 className="text-lg-lg font-bold">Model Details</h2>
         </div>
         <form className="space-y-4 p-4" onSubmit={handleSubmit}>
@@ -284,7 +278,7 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
               onClick={() => setShowModal(false)}
               className="hover:bg-red-700 bg-red-600 text-white px-4 py-2 rounded-lg"
             >
-              Cancel
+              Close
             </button>
             <button
               type="submit"

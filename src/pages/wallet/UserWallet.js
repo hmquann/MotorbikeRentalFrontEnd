@@ -32,7 +32,7 @@ const UserWallet = () => {
   }, []);
 
   const fetchUserBalance = async () => {
-    const userId = localStorage.getItem("userId");
+    const userId = JSON.parse(localStorage.getItem("user")).userId;
     const token = localStorage.getItem("token");
 
     try {
@@ -57,7 +57,7 @@ const UserWallet = () => {
   };
 
   const fetchTransactions = async () => {
-    const userId = localStorage.getItem("userId");
+    const userId = JSON.parse(localStorage.getItem("user")).userId;
     const token = localStorage.getItem("token");
 
     try {
@@ -84,7 +84,7 @@ const UserWallet = () => {
 
   const handlePayment = async (amount) => {
     const token = localStorage.getItem("token");
-    const userId = localStorage.getItem("userId");
+    const userId = JSON.parse(localStorage.getItem("user")).userId;
     const apiPayment = `http://localhost:8080/api/payment/create_payment?id=${userId}&amount=${amount}`;
 
     try {
@@ -113,7 +113,7 @@ const UserWallet = () => {
 
   const handleWithdraw = async (amount) => {
     const token = localStorage.getItem("token");
-    const userId = localStorage.getItem("userId");
+    const userId = JSON.parse(localStorage.getItem("user")).userId;
     try {
       const response = await axios.post(`http://localhost:8080/api/payment/withdraw`, null, {
         params: {

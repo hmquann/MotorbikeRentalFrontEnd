@@ -21,7 +21,6 @@ import Booking from "./pages/booking/Booking";
 import Layout from "./pages/test-layout/Layout";
 import DetailBooking from "./pages/booking/detail/DetailBooking";
 import Address from "./pages/booking/address/Address";
-import ChatMessage from "./pages/chatting/ChatMessage";
 import UserWallet from "./pages/wallet/UserWallet";
 import PaymentSuccess from "./pages/wallet/PaymentSuccess";
 import PaymentFailed from "./pages/wallet/PaymentFailed";
@@ -29,9 +28,10 @@ import BrandList from "./pages/brand/BrandList";
 import ApproveLicense from "./pages/license/ApproveLicense"
 import Profile from "./pages/profile/Profile";
 import VerifyChangeEmail from "./pages/profile/VerifyChangeEmail";
-
+import Message from "./pages/chatting/Message";
 import ModelList from "./pages/modelMotorbike/ModelList";
 import ApproveMotorbikeRegistration from "./pages/motorbike/ApproveMotorbikeRegistration ";
+import ChatApp from "./pages/chatapp/ChatApp";
 import RegisterMotorbikeStep1 from "./pages/motorbike/RegisterMotorbikeStep1";
 import RegisterMotorbikeStep2 from "./pages/motorbike/RegisterMotorbikeStep2";
 
@@ -64,7 +64,6 @@ function App() {
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/privacyList" element={<PrivacyList />} />
         <Route path="/userInformation" element={<UserInformation />} />
-        <Route path="/userData" element={<UserData />} />
       
 
         <Route path="/menu" element={<Menu />} >
@@ -74,6 +73,8 @@ function App() {
         <Route path="/menu/model" element={<ModelList />} />
         <Route path="/menu/profile" element={<Profile />} />
         <Route path="/menu/approveLicense" element={<ApproveLicense/>}/>
+        <Route path="/menu/userData" element={<UserData />} />
+
         </Route>
 
         <Route path="/booking" element={<Booking />} />
@@ -85,11 +86,11 @@ function App() {
         <Route path="/layout" element={<Layout />} />
         <Route path="/detailbooking" element={<DetailBooking />} />
         <Route path="/booking/address" element={<Address />} />
-        <Route path="/chatmessage" element={<ChatMessage />} />
         <Route
           path="/updateEmail/:token/:newEmail"
           element={<VerifyChangeEmail />}
         />
+        <Route path="/chatapp" element={<ChatApp />} />
       </Routes>
     </>
   );

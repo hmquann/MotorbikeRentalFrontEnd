@@ -4,11 +4,11 @@ import axios from "axios";
 const modalOverlayClasses =
   "fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 dark:bg-opacity-70 z-50";
 const modalContentClasses =
-  " dark:bg-zinc-500 rounded-lg p-4 max-w-md w-full bg-gradient-to-r from-cyan-700 from-40% to-zinc-600";
-const closeButtonClasses = "text-zinc-500 dark:text-zinc-300";
+  " dark:bg-zinc-500 rounded-lg p-4 max-w-md w-full bg-gray-300 from-40% to-zinc-600";
+const closeButtonClasses = "text-white hover:bg-red-700 bg-red-600 py-2 px-4 rounded-lg ";
 const inputClasses = "p-1 rounded mb-2";
 const buttonClasses =
-  "hover:bg-blue-700 bg-blue-600 text-white dark:text-zinc-900 py-2 px-4 rounded-lg text-right";
+  "hover:bg-blue-700 bg-blue-600 text-white dark:text-zinc-900 py-2 px-4 rounded-lg text-right ml-2";
 
 const AddBrand = ({ showModal, setShowModal, onBrandCreated }) => {
   const [brandName, setBrandName] = useState("");
@@ -73,13 +73,7 @@ const AddBrand = ({ showModal, setShowModal, onBrandCreated }) => {
           <h2 className="text-lg-lg  font-semibold text-zinc-800 dark:text-zinc-200">
             Create Brand
           </h2>
-          <button
-            id="closeModal"
-            className={closeButtonClasses}
-            onClick={handleModalClose}
-          >
-            &times;
-          </button>
+
         </div>
         <div className="flex flex-col mb-2">
           <label
@@ -91,6 +85,7 @@ const AddBrand = ({ showModal, setShowModal, onBrandCreated }) => {
           <input
             type="text"
             id="brand-name"
+            placeholder="Brand Name"
             className={`${inputClasses} bg dark:bg-white-300  `}
             value={brandName}
             onChange={(e) => setBrandName(e.target.value)}
@@ -106,15 +101,22 @@ const AddBrand = ({ showModal, setShowModal, onBrandCreated }) => {
           <input
             type="text"
             id="brand-origin"
+            placeholder="Brand Origin"
             className={`${inputClasses} bg dark:bg-white-300 `}
             value={brandOrigin}
             onChange={(e) => setBrandOrigin(e.target.value)}
           />
         </div>
         {error && <div className="text-red-500 mb-2 font-bold text-center">{error}</div>}
-        <button className={buttonClasses} onClick={handleCreateBrand}>
-          Create
+        <div className="flex justify-end">
+        <button className={closeButtonClasses} onClick={handleModalClose}>
+          Close
         </button>
+        <button className={buttonClasses} onClick={handleCreateBrand}>
+          Save
+        </button>
+        </div>
+      
       </div>
     </div>
   );
