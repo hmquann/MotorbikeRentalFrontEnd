@@ -139,17 +139,15 @@ const RegisterMotorbikeStep1 = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     motorbikePlate: "",
-    brand:{ brandId: "",brandName:"",origin:""},
-    model: {id: "",modelName:"",cylinderCapacity:"",fuelType:"",fuelConsumption:"",modelType:"",brand:{}},
-    yearOfManuFacture: "",
-    description: "",
+    model: {modelId: "",modelName:"",cylinderCapacity:"",fuelType:"",fuelConsumption:"",modelType:"",brandDto:{brandId:"",brandName:"",brandOrigin:""}},
+    yearOfManufacture: "",
     constraintMotorbike: "",
     price:"",
     overtimeFee:"",
     overtimeLimit:"",
     delivery:"",
-    freeshipDistance:"",
-    deliveryFeePerKilometer:"",
+    freeshipLimit:"",
+    deliveryFee:"",
     motorbikeAddress:""
   });
   const [models, setModels] = useState([]);
@@ -167,7 +165,7 @@ const RegisterMotorbikeStep1 = () => {
       axios.get('http://localhost:8080/api/model/getAllModel')
           .then(response => setModels(response.data))
           .catch(error => console.error('Error fetching models:', error));
-
+         
       axios.get('http://localhost:8080/api/brand/getAllBrand')
           .then(response => setBrands(response.data))
           .catch(error => console.error('Error fetching other entities 1:', error));
@@ -180,20 +178,18 @@ const RegisterMotorbikeStep1 = () => {
     const regex=/^\d{4}$/;
     return (regex.test(manufacture)&&manufacture>2000&&manufacture<2030)
   }
+  
   useEffect(() => {  
     if (selectedBrand && selectedBrand.brandId) {
       console.log(selectedBrand)
+      
       setNewModels(models.filter((model)=>model.brand.brandId==selectedBrand.brandId))
     }
   }, [selectedBrand]);
   const handleBrandsChange=(e)=>{
     const {name,value}=e.target
     setSelectedBrand(brands.find((brand) => brand.brandName == e.target.value)); 
-    if(value==""){
-      setMotorbikeBrandError("Not be empty")
-    }else{
-      setMotorbikeBrandError("")
-    }
+  
    }
  
 useEffect(() => {
@@ -202,20 +198,16 @@ useEffect(() => {
     console.log("Brand:"+selectedBrand+"Model:"+selectedModel)
     setFormData(prevFormData => ({
       ...prevFormData,
-    
-        brand: {
-          brandId: selectedBrand.brandId,
-          brandName: selectedBrand.brandName,
-          origin: selectedBrand.origin
-        },
       model: {
-        id: selectedModel.modelId,
+        modelId: selectedModel.modelId,
         modelName:selectedModel.modelName,
         cylinderCapacity:selectedModel.cylinderCapacity,
         fuelType:selectedModel.fuelType,
-        fuelConsumption:selectedModel.fuelConsumption,
-        brand:selectedModel.brand,
-        modelType:selectedModel.modelType
+        fuelConsumption:selectedModel.fuelConsumption,       
+        modelType:selectedModel.modelType,
+        brand:{brandId:selectedModel.brand.brandId,
+          brandName:selectedModel.brand.brandName,
+          brandOrigin:selectedModel.brand.brandOrigin}
       }
     }));
   }
@@ -243,7 +235,7 @@ const handleChange=(e)=>{
     }
   }
 
-  if (name === "yearOfManuFacture") {
+  if (name === "yearOfManufacture") {
     if (!value) {
       setManufactureYearError( "Manufacture cannot be empty.");
     }else if(checkManufactureYear(value)==false){
@@ -265,7 +257,7 @@ const handleReturnNavigate=()=>{
   console.log(formData)
   e.preventDefault();
   setError(null);
-  if (    motorbikeBrandError || motorbikeModelError ||
+  if ( 
           motorbikePlateError || manufactureYearError) {
     setError("Please enter correct  before submitting.");
   }else{
@@ -299,17 +291,11 @@ const handleReturnNavigate=()=>{
         {motorbikeModelError && <div className="text-red-500">{motorbikeModelError}</div>}
         <h2 className={`${sharedClasses.textLg} ${sharedClasses.fontSemibold}`}>Manufacture Year</h2>
         <input  type="text"
-            name="yearOfManuFacture"
+            name="yearOfManufacture"
             placeholder="enter manufacture year"
-            value={formData.yearOfManuFacture}
+            value={formData.yearOfManufacture}
             onChange={handleChange}  className={`${sharedClasses.wFull} mt-2 p-2 ${sharedClasses.border} ${sharedClasses.borderZinc300} ${sharedClasses.roundedLG}`}  />
         {manufactureYearError && <div className="text-red-500">{manufactureYearError}</div>}
-        <h2 className={`${sharedClasses.textLg} ${sharedClasses.fontSemibold}`}>Description</h2>
-        <input  type="text"
-            name="description"
-            placeholder="Description"
-            value={formData.description}
-            onChange={handleChange}  className={`${sharedClasses.wFull} mt-2 p-2 ${sharedClasses.border} ${sharedClasses.borderZinc300} ${sharedClasses.roundedLG}`}  />
         <h2 className={`${sharedClasses.textLg} ${sharedClasses.fontSemibold}`}>Constraint Motorbike</h2>
         <input  type="text"
             name="constraintMotorbike"
@@ -318,9 +304,12 @@ const handleReturnNavigate=()=>{
             onChange={handleChange}  className={`${sharedClasses.wFull} mt-2 p-2 ${sharedClasses.border} ${sharedClasses.borderZinc300} ${sharedClasses.roundedLG}`}  />
 
         <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.mt4}`}>
+          
           <button type="button" onClick={handleReturnNavigate} className={`${sharedClasses.bgGreen} ${sharedClasses.textWhite} px-4 py-2 ${sharedClasses.roundedLG}`}>Back</button>
-          <button type="submit" onClick={handleSunbmit}className={`${sharedClasses.bgGreen} ${sharedClasses.textWhite} px-4 py-2 ${sharedClasses.roundedLG}`} >
+          {error && <div className="text-red-500">{error}</div>}
+          <button type="submit" onClick={handleSunbmit}className={`${sharedClasses.bgGreen} ${sharedClasses.textWhite} px-4 py-2 ${sharedClasses.roundedLG}`} >        
           {loading ? "Continue..." : "Continue"}</button>
+          
         </div>
       </div>
       <Footer />

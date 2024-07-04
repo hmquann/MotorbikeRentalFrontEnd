@@ -91,7 +91,7 @@ const Booking = () => {
   const [pickupDate, setPickupDate] = useState("");
   const [returnDate, setReturnDate] = useState("");
   const [promoCode, setPromoCode] = useState("");
-  const [totalPrice, setTotalPrice] = useState("745000");
+  const [totalPrice, setTotalPrice] = useState("");
   const [rentalDays, setRentalDays] = useState(1);
   const handleClosePopup = () => {
     setShowPopUp(false);
