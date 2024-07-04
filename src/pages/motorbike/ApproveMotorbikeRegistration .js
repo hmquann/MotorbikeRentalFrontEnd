@@ -43,7 +43,8 @@ const ApproveMotorbikeRegistration = () => {
       const response = await axios.get(`http://localhost:8080/api/motorbike/allMotorbike/${page}/${size}`,{
         params:{
           userId: userId,
-          role: roles.join(',')
+          role: roles.join(','),
+          status : statusFilter
         },
         paramsSerializer:params =>{
           return qs.stringify(params,{arrayFormat:'repeat'});
@@ -74,6 +75,7 @@ const ApproveMotorbikeRegistration = () => {
       const response = await axios.get(`http://localhost:8080/api/motorbike/search`, {
         params: {
           searchTerm,
+          status:statusFilter,
           userId : userId,
           role :roles.join(","),
           page,
@@ -165,6 +167,7 @@ const ApproveMotorbikeRegistration = () => {
   });
   const handleStatusFilterChange = (motorbikeStatus) => {
     setStatusFilter(motorbikeStatus);
+    setCurrentPage(0)
   };
 
 
