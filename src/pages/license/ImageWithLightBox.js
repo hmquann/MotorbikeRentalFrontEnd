@@ -10,7 +10,7 @@
 //             <img
 //                 src={imageSrc}
 //                 alt="Thumbnail"
-//                 style={{ cursor: 'pointer', width: '200px' }}
+//                 style={{ cursor: 'pointer', width: '200px' }} 
 //                 onClick={() => setIsOpen(true)}
 //             />
 //             {isOpen && (
