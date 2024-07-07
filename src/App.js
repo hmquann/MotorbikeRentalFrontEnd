@@ -34,6 +34,7 @@ import ApproveMotorbikeRegistration from "./pages/motorbike/ApproveMotorbikeRegi
 import ChatApp from "./pages/chatapp/ChatApp";
 import RegisterMotorbikeStep1 from "./pages/motorbike/RegisterMotorbikeStep1";
 import RegisterMotorbikeStep2 from "./pages/motorbike/RegisterMotorbikeStep2";
+import CreateVoucherModal from "./pages/voucher/CreateVoucherModal";
 
 
 
@@ -84,6 +85,7 @@ function App() {
 
         <Route path="*" element={<NoMatch />} />
         <Route path="/layout" element={<Layout />} />
+        <Route path="/createVoucher" element={<CreateVoucherModal />} />
         <Route path="/detailbooking" element={<DetailBooking />} />
         <Route path="/booking/address" element={<Address />} />
         <Route
