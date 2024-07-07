@@ -23,7 +23,7 @@ const ViewModel = ({ showModal, setShowModal, modelId }) => {
       const fetchModelDetails = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:8080/api/model/${modelId}`
+            `https://rentalmotorbikebe.azurewebsites.net/api/model/${modelId}`
           );
           setModelData(response.data);
         } catch (error) {

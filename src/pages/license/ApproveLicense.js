@@ -25,7 +25,7 @@ const ApproveLicense = () => {
   const fetchLicenses = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/license/getAllLicense/${currentPage}/${pageSize}`
+        `https://rentalmotorbikebe.azurewebsites.net/api/license/getAllLicense/${currentPage}/${pageSize}`
       );
       const totalElements = response.data.totalElements;
       const totalPages = Math.ceil(totalElements / pageSize);

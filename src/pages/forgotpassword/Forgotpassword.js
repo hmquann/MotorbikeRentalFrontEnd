@@ -42,7 +42,7 @@ const Forgotpassword = () => {
     setLoading(true);
 
     axios
-      .post("http://localhost:8080/password/forgot", null, {
+      .post("https://rentalmotorbikebe.azurewebsites.net/password/forgot", null, {
         params: { email: email },
         headers: {
           "Content-Type": "application/json",

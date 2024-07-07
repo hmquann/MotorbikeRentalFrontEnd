@@ -15,7 +15,7 @@ const MotorbikeList = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get('http://localhost:8080/api/motorbike/activeMotorbikeList')
+        axios.get('https://rentalmotorbikebe.azurewebsites.net/api/motorbike/activeMotorbikeList')
             .then(response => setMotorbikeList((response.data)))
             .catch(error => console.error('Error fetching motorbikes:', error));
     }, motorbikeList);

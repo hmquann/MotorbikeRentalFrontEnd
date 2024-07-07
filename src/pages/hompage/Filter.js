@@ -11,11 +11,11 @@ const [brands, setBrands] = useState([]);
 const [models, setModels] = useState([]);
 const[filterBrands,setFilterBrands]=useState([]);
 useEffect(() => {
-    axios.get('http://localhost:8080/api/model/getAllModel')
+    axios.get('https://rentalmotorbikebe.azurewebsites.net/api/model/getAllModel')
         .then(response => setModels(response.data))
         .catch(error => console.error('Error fetching models:', error));
 
-    axios.get('http://localhost:8080/api/brand/getAllBrand')
+    axios.get('https://rentalmotorbikebe.azurewebsites.net/api/brand/getAllBrand')
         .then(response => setBrands(response.data))
         .catch(error => console.error('Error fetching other entities 1:', error));
 }, []);

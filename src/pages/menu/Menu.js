@@ -13,6 +13,7 @@ import ApproveLicense from "../license/ApproveLicense";
 
 import { Message } from "../chatting/Message";
 import UserData from "../dashboard/UserData";
+import ChatApp from "../chatapp/ChatApp";
 
 
 const Menu = () => {
@@ -59,6 +60,14 @@ const Menu = () => {
           </li>
           <li>
             <NavLink
+              to="/menu/profile"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              My Profile
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
               to="/menu/wallet"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
@@ -77,7 +86,7 @@ const Menu = () => {
           </li>
           <li>
             <NavLink
-              to="/menu/message"
+              to="/menu/chatApp"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
               Chatting
@@ -123,14 +132,7 @@ const Menu = () => {
           </li>
            )}
 
-          <li>
-            <NavLink
-              to="/menu/profile"
-              className={({ isActive }) => (isActive ? "active" : "")}
-            >
-              Profile
-            </NavLink>
-          </li>
+          
           <li>
             <NavLink onClick={handleLogout} className="nav-link">
               Logout
@@ -141,10 +143,7 @@ const Menu = () => {
       <div className="menu-right mt-4">
         <Routes>
           <Route path="/profile" element={<Profile />} />
-          <Route
-            path="/message"
-            element={<Message room={"room1"} userId={1} />}
-          />
+          <Route path="/chatApp" element={<ChatApp   />} />
           <Route path="/wallet" element={<UserWallet />} />
           {isAdmin && (
             <>

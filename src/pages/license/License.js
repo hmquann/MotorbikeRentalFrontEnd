@@ -33,7 +33,7 @@ const License = () => {
   const[license,setLicense]=useState();
   const[error,setError]=useState("");
   useEffect(() => {
-    axios.get(`http://localhost:8080/api/license/getLicenseByUserId/${user.userId}`)
+    axios.get(`https://rentalmotorbikebe.azurewebsites.net/api/license/getLicenseByUserId/${user.userId}`)
         .then(response => setLicense((response.data)))
         .catch(error => console.error('Error fetching motorbikes:', error));
 },[]);
@@ -49,7 +49,7 @@ const License = () => {
     formData.append("licenseImageFile", formLicenseData.licenseImageFile);
     
     axios
-    .post("http://localhost:8080/api/license/uploadLicense", formData, {
+    .post("https://rentalmotorbikebe.azurewebsites.net/api/license/uploadLicense", formData, {
       headers: {
        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },

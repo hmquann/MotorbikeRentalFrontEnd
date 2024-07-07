@@ -40,9 +40,9 @@ const ChangeEmail = ({ onClose, isOpen }) => {
     console.log("123123213");
     axios
       .post(
-        "http://localhost:8080/api/auth/changeEmail",
+        "https://rentalmotorbikebe.azurewebsites.net/api/auth/changeEmail",
         {
-          userId: userData.id,
+          userId: userData.userId,
           newEmail: email,
         },
         {

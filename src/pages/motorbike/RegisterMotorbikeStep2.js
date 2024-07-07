@@ -193,7 +193,7 @@ const RegisterMotorbikeStep2 = () => {
     })
     console.log(formData)
     axios
-      .post("http://localhost:8080/api/motorbike/register", formData, {
+      .post("https://rentalmotorbikebe.azurewebsites.net/api/motorbike/register", formData, {
         headers: {
          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },

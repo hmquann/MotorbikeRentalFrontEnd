@@ -36,7 +36,7 @@ const UserInformation = ({
   const confirmToggleUserStatus = async (id) => {
     setIsLoading(true)
     try {
-      await axios.patch(`http://localhost:8080/api/user/${id}/toggle`);
+      await axios.patch(`https://rentalmotorbikebe.azurewebsites.net/api/user/${id}/toggle`);
 
       const updatedUsers = users.map((user) =>
         user.id === id ? { ...user, active: !user.active } : user
