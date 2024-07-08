@@ -139,7 +139,7 @@ const RegisterMotorbikeStep1 = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     motorbikePlate: "",
-    model: {modelId: "",modelName:"",cylinderCapacity:"",fuelType:"",fuelConsumption:"",modelType:"",brandDto:{brandId:"",brandName:"",brandOrigin:""}},
+    modelId:"",
     yearOfManufacture: "",
     constraintMotorbike: "",
     price:"",
@@ -148,7 +148,6 @@ const RegisterMotorbikeStep1 = () => {
     delivery:"",
     freeshipLimit:"",
     deliveryFee:"",
-    motorbikeAddress:""
   });
   const [models, setModels] = useState([]);
   const [newModels,setNewModels]=useState([]);
@@ -197,18 +196,8 @@ useEffect(() => {
   if (selectedModel) {
     console.log("Brand:"+selectedBrand+"Model:"+selectedModel)
     setFormData(prevFormData => ({
-      ...prevFormData,
-      model: {
+      ...prevFormData, 
         modelId: selectedModel.modelId,
-        modelName:selectedModel.modelName,
-        cylinderCapacity:selectedModel.cylinderCapacity,
-        fuelType:selectedModel.fuelType,
-        fuelConsumption:selectedModel.fuelConsumption,       
-        modelType:selectedModel.modelType,
-        brand:{brandId:selectedModel.brand.brandId,
-          brandName:selectedModel.brand.brandName,
-          brandOrigin:selectedModel.brand.brandOrigin}
-      }
     }));
   }
 }, [selectedModel]);
@@ -257,8 +246,7 @@ const handleReturnNavigate=()=>{
   console.log(formData)
   e.preventDefault();
   setError(null);
-  if ( 
-          motorbikePlateError || manufactureYearError) {
+  if ( motorbikePlateError || manufactureYearError||!selectedModel) {
     setError("Please enter correct  before submitting.");
   }else{
     setLoading(true)

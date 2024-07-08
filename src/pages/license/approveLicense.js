@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import ImageWithLightbox from "./ImageWithLightBox";
+import ImageWithLightbox from "./ImageWithLightBox"
 const tableCellClasses =
   "px-6 py-4 whitespace-nowrap text-base font-semibold text-amber-900 ";
 const buttonClasses = "p-2 rounded-lg";
@@ -120,7 +120,7 @@ const ApproveLicense = () => {
         console.error("Error:", error);
       });
     }
-    await fetchLicenses(currentPage,pageSize);
+    licenses.pop(selectedLicense);
     setIsModalOpen(false)
   };
   const handleClick=(license)=>{
@@ -195,9 +195,8 @@ const ApproveLicense = () => {
                     </td>
                     <td className={tableCellClasses}>{license.birthOfDate}</td>
                     <td className={tableCellClasses}>
-                      <ImageWithLightbox
-                        imageSrc={license.licenseImageUrl}/>
-
+                    <ImageWithLightbox imageSrc={license.licenseImageUrl}
+                        />
                     </td>
                     <td className={tableCellClasses} onClick={()=>handleClick(license)}>
                       <>
