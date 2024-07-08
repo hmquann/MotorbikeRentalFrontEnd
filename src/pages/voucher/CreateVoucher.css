@@ -1,0 +1,15 @@
+.form-container {
+    position: fixed;
+    top: 50%; /* Đưa form vào giữa theo chiều dọc */
+    left: 50%; /* Đưa form vào giữa theo chiều ngang */
+    transform: translate(-50%, -50%); /* Dịch chuyển form lùi lại 50% của kích thước của chính nó để nó được căn giữa */
+    z-index: 1000; /* Đảm bảo form nằm trên cùng */
+    background-color: #ffffff; /* Màu nền cho form */
+    padding: 20px; /* Khoảng cách lề bên trong form */
+    border: 1px solid #dddddd; /* Viền xung quanh form */
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); /* Đổ bóng để làm nổi bật form */
+    max-width: 80%; /* Chiều rộng tối đa của form */
+    max-height: 80%; /* Chiều cao tối đa của form */
+    overflow-y: auto; /* Cho phép cuộn nếu form quá dài */
+  }
+  
