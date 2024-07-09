@@ -34,6 +34,8 @@ import ApproveMotorbikeRegistration from "./pages/motorbike/ApproveMotorbikeRegi
 import ChatApp from "./pages/chatapp/ChatApp";
 import RegisterMotorbikeStep1 from "./pages/motorbike/RegisterMotorbikeStep1";
 import RegisterMotorbikeStep2 from "./pages/motorbike/RegisterMotorbikeStep2";
+import CreateVoucherModal from "./pages/voucher/CreateVoucherModal";
+import VoucherList from "./pages/voucher/VoucherList"
 
 
 
@@ -71,6 +73,7 @@ function App() {
         <Route path="/menu/approveMotorbike" element={<ApproveMotorbikeRegistration />} />
         <Route path="/menu/brand" element={<BrandList />} />
         <Route path="/menu/model" element={<ModelList />} />
+        <Route path="/menu/voucher" element={<VoucherList />} />
         <Route path="/menu/profile" element={<Profile />} />
         <Route path="/menu/approveLicense" element={<ApproveLicense/>}/>
         <Route path="/menu/userData" element={<UserData />} />
@@ -84,6 +87,7 @@ function App() {
 
         <Route path="*" element={<NoMatch />} />
         <Route path="/layout" element={<Layout />} />
+        <Route path="/createVoucher" element={<CreateVoucherModal />} />
         <Route path="/detailbooking" element={<DetailBooking />} />
         <Route path="/booking/address" element={<Address />} />
         <Route
