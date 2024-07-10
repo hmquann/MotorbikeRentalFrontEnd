@@ -10,6 +10,7 @@ const infoImageClasses = 'ml-2';
 const [brands, setBrands] = useState([]);
 const [models, setModels] = useState([]);
 const[filterBrands,setFilterBrands]=useState([]);
+
 useEffect(() => {
     axios.get('http://localhost:8080/api/model/getAllModel')
         .then(response => setModels(response.data))
