@@ -1,11 +1,11 @@
-import React ,{useEffect, useState} from "react";
-
-
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 const inputClasses =
   "mt-1 block w-full p-2 border border-zinc-300 rounded-md dark:text-green-800 font-medium";
 const labelClasses = "block text-md font-bold text-slate-500 dark:text-neutral-300";
-const DiscountDetailModal = ({ showModalDetail, setShowModalDetail, voucher, isDetailView }) => {
+
+const DiscountDetailModal = ({fetchVoucher, showModalDetail, setShowModalDetail, voucher, isDetailView }) => {
   const [formData, setFormData] = useState({
     name: "",
     code: "",
@@ -19,9 +19,12 @@ const DiscountDetailModal = ({ showModalDetail, setShowModalDetail, voucher, isD
     quantity: ""
   });
 
+  const [isEditing, setIsEditing] = useState(false);
+
   useEffect(() => {
     if (voucher) {
       setFormData({ ...voucher });
+      setIsEditing(false); // Reset editing state when a new voucher is loaded
     }
   }, [voucher]);
 
@@ -33,14 +36,37 @@ const DiscountDetailModal = ({ showModalDetail, setShowModalDetail, voucher, isD
     }));
   };
 
-  const handleSubmit = (e) => {
+ 
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isDetailView) {
+    if (isDetailView && !isEditing) {
       setShowModalDetail(false);
       return;
     }
+    if (isEditing) {
+      try {
+        
+        const response = await axios.patch(`http://localhost:8080/api/discounts/updateDiscount/${voucher.id}`, formData);
+        fetchVoucher();
+        setIsEditing(false); 
+      } catch (error) {
+        console.error('Failed to update discount:', error);
+      }
+      
+    } 
+    setShowModalDetail(false);
+  };
 
-    // Add or update discount logic
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
+
+  const handleClose = () => {
+    if (isEditing) {
+      setIsEditing(false); 
+    } else {
+      setShowModalDetail(false);
+    }
   };
 
   if (!showModalDetail) return null;
@@ -62,7 +88,7 @@ const DiscountDetailModal = ({ showModalDetail, setShowModalDetail, voucher, isD
                 value={formData.name}
                 onChange={handleChange}
                 className={inputClasses}
-                disabled={isDetailView} 
+                disabled={isDetailView && !isEditing} 
               />
             </div>
             <div>
@@ -74,7 +100,7 @@ const DiscountDetailModal = ({ showModalDetail, setShowModalDetail, voucher, isD
                 value={formData.code}
                 onChange={handleChange}
                 className={inputClasses}
-                disabled={isDetailView} // Disable input if in detail view
+                disabled={isDetailView && !isEditing} 
               />
             </div>
           </div>
@@ -87,7 +113,7 @@ const DiscountDetailModal = ({ showModalDetail, setShowModalDetail, voucher, isD
               value={formData.description}
               onChange={handleChange}
               className={inputClasses}
-              disabled={isDetailView} // Disable input if in detail view
+              disabled={isDetailView && !isEditing} 
             ></textarea>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -98,7 +124,7 @@ const DiscountDetailModal = ({ showModalDetail, setShowModalDetail, voucher, isD
                 value={formData.voucherType}
                 onChange={handleChange}
                 className={inputClasses}
-                disabled={isDetailView} // Disable input if in detail view
+                disabled={isDetailView && !isEditing} 
               >
                 <option value="PERCENTAGE">Percentage</option>
                 <option value="FIXED_MONEY">Fixed Amount</option>
@@ -113,33 +139,33 @@ const DiscountDetailModal = ({ showModalDetail, setShowModalDetail, voucher, isD
                   value={formData.discountPercent}
                   onChange={handleChange}
                   className={inputClasses}
-                  disabled={isDetailView} // Disable input if in detail view
+                  disabled={isDetailView && !isEditing} 
                 />
               </div>
             )}
             {formData.voucherType === "PERCENTAGE" && (
               <div>
-                <label className={labelClasses}>Max Discount Money</label>
+                <label className={labelClasses}>Max Discount Money (VND) </label>
                 <input
                   type="number"
                   name="maxDiscountMoney"
                   value={formData.maxDiscountMoney}
                   onChange={handleChange}
                   className={inputClasses}
-                  disabled={isDetailView} // Disable input if in detail view
+                  disabled={isDetailView && !isEditing} 
                 />
               </div>
             )}
             {formData.voucherType === "FIXED_MONEY" && (
               <div>
-                <label className={labelClasses}>Discount Money</label>
+                <label className={labelClasses}>Discount Money (VND) </label>
                 <input
                   type="number"
                   name="discountMoney"
                   value={formData.discountMoney}
                   onChange={handleChange}
                   className={inputClasses}
-                  disabled={isDetailView} // Disable input if in detail view
+                  disabled={isDetailView && !isEditing} 
                 />
               </div>
             )}
@@ -153,7 +179,7 @@ const DiscountDetailModal = ({ showModalDetail, setShowModalDetail, voucher, isD
                 value={formData.startDate}
                 onChange={handleChange}
                 className={inputClasses}
-                disabled={isDetailView} // Disable input if in detail view
+                disabled={isDetailView && !isEditing} 
               />
             </div>
             <div>
@@ -164,7 +190,7 @@ const DiscountDetailModal = ({ showModalDetail, setShowModalDetail, voucher, isD
                 value={formData.expirationDate}
                 onChange={handleChange}
                 className={inputClasses}
-                disabled={isDetailView} // Disable input if in detail view
+                disabled={isDetailView && !isEditing} 
               />
             </div>
           </div>
@@ -176,25 +202,34 @@ const DiscountDetailModal = ({ showModalDetail, setShowModalDetail, voucher, isD
               value={formData.quantity}
               onChange={handleChange}
               className={inputClasses}
-              disabled={isDetailView} // Disable input if in detail view
+              disabled={isDetailView && !isEditing} 
             />
           </div>
           <div className="flex justify-end space-x-4">
             <button
               type="button"
-              onClick={() => setShowModalDetail(false)}
+              onClick={handleClose}
               className="hover:bg-red-700 bg-red-600 text-white px-4 py-2 rounded-lg"
             >
               Close
             </button>
-            {!isDetailView && (
+            {isDetailView && !isEditing && (
+              <button
+                type="button"
+                onClick={handleEdit}
+                className="hover:bg-yellow-600 bg-yellow-500 text-white px-4 py-2 rounded-lg"
+              >
+                Edit
+              </button>
+            )}
+            {!isDetailView || isEditing ? (
               <button
                 type="submit"
                 className="hover:bg-blue-700 bg-blue-600 text-white px-4 py-2 rounded-lg"
               >
                 Save
               </button>
-            )}
+            ) : null}
           </div>
         </form>
       </div>

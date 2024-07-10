@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import axios from "axios";
 import './CreateVoucher.css'
 
@@ -21,6 +21,21 @@ const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
   });
   const [errors, setErrors] = useState({});
   const [errorsMess, setErrorsMess] = useState("");
+
+  useEffect(() => {
+    if (formData.voucherType === "PERCENTAGE") {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        discountMoney: ""
+      }));
+    } else if (formData.voucherType === "FIXED_MONEY") {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        discountPercent: "",
+        maxDiscountMoney: ""
+      }));
+    }
+  }, [formData.voucherType]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,9 +61,6 @@ const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
     if (!formData.expirationDate) newErrors.expirationDate = "Expiration Date is required";
     if (!formData.quantity) newErrors.quantity = "Quantity is required";
     if (formData.voucherType === "PERCENTAGE") {
-      if (formData.voucherType === "PERCENTAGE" && !formData.discountMoney){
-        newErrors.discountPercent = "Discount percent is required"
-      }
       const discountPercent = parseInt(formData.discountPercent);
       if (isNaN(discountPercent) || discountPercent < 0 || discountPercent > 100) {
         newErrors.discountPercent = "Discount Percent must be between 0 and 100";
@@ -169,11 +181,14 @@ const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
               <div>
                 <label className={labelClasses}>Discount Percent</label>
                 <input
+                  placeholder="Discount Percent"
                   type="number"
                   name="discountPercent"
                   value={formData.discountPercent}
                   onChange={handleChange}
                   className={inputClasses}
+                  min="1"
+                  max="100"
                 />
                 {errors.discountPercent && (
                   <p className="text-red-500 text-sm">{errors.discountPercent}</p>
@@ -182,8 +197,9 @@ const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
             )}
             {formData.voucherType === "PERCENTAGE" && (
               <div>
-                <label className={labelClasses}>Max Discount Money</label>
+                <label className={labelClasses}>Max Discount Money (VND)</label>
                 <input
+                  placeholder="Max Discount Money"
                   type="number"
                   name="maxDiscountMoney"
                   value={formData.maxDiscountMoney}
@@ -197,8 +213,9 @@ const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
             )}
             {formData.voucherType === "FIXED_MONEY" && (
               <div>
-                <label className={labelClasses}>Discount Money</label>
+                <label className={labelClasses}>Discount Money (VND)</label>
                 <input
+                   placeholder="Discount Money"
                   type="number"
                   name="discountMoney"
                   value={formData.discountMoney}
@@ -242,6 +259,7 @@ const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
           <div>
             <label className={labelClasses}>Quantity</label>
             <input
+              placeholder="Quantity" 
               type="number"
               name="quantity"
               value={formData.quantity}
