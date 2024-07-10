@@ -19,7 +19,7 @@ const MotorbikeList = () => {
             .then(response => setMotorbikeList((response.data)))
             .catch(error => console.error('Error fetching motorbikes:', error));
     }, motorbikeList);
-    
+    console.log(motorbikeList)
     const getAddress = (inputString) => {
         if (typeof inputString !== 'string' || inputString.trim() === '') {
             return '';
@@ -60,7 +60,7 @@ const MotorbikeList = () => {
         <div className="relative">
           <img
             className="w-full h-64 object-cover rounded-t-lg"
-            src="https://minhlongmoto.com/wp-content/uploads/2023/04/gia-air-blade-125-doi-moi.jpg"
+            src={motorbike.motorbikeImages[0].url}
             alt="Motorbike"
           />
           <div className="absolute top-2 left-2 space-y-1">
