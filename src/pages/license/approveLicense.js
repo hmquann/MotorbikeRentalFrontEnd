@@ -197,7 +197,6 @@ const ApproveLicense = () => {
                       {license.licenseNumber}
                     </td>
                     <td className={tableCellClasses}>{license.birthOfDate}</td>
-       </td>
 
                     {/* <td className={tableCellClasses}>
                       <ImageWithLightbox
