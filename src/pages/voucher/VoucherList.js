@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { MdOutlineAddCircleOutline } from "react-icons/md";
-import { FaRegEdit } from "react-icons/fa";
 import CreateVoucherModal from "./CreateVoucherModal";
 import DiscountDetailModal from "./DiscountDetailModal ";
 import qs from 'qs'
-import { IoEyeOutline } from "react-icons/io5";
+import { IoEyeOutline,IoTrashOutline } from "react-icons/io5";
 import { set } from "date-fns";
 
 const buttonClasses = "px-4 py-2 rounded-lg";
 const tableCellClasses = "px-6 py-4 whitespace-nowrap";
-const actionButtonClasses = "text-zinc-500 rounded-full hover:bg-white  px-3 py-2";
-const deleteButtonClasses = "text-red-500";
+const actionButtonClasses = "rounded-full hover:bg-zinc-100 px-3 py-2";
 
 const VoucherList = () => {
   const [vouchers, setVouchers] = useState([]);
@@ -20,12 +18,11 @@ const VoucherList = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [pageSize, setPageSize] = useState(5);
   const [totalPages, setTotalPages] = useState(0);
-  const [showEditModal, setShowEditModal] = useState(false); 
-  const [voucherToEdit, setVoucherToEdit] = useState(null); 
   const [isLoading, setIsLoading] = useState(false);
   const [userRole, setUserRole] = useState([]);
   const [userId, setUserId] = useState([]);
   const [selectedVoucher, setSelectedVoucher] = useState(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
 
   useEffect(() => {
@@ -59,7 +56,6 @@ const VoucherList = () => {
             return qs.stringify(params,{arrayFormat:'repeat'});
           }
     });
-    console.log(response.data);
       const totalElements = response.data.totalElements;
       const totalPages = Math.ceil(totalElements / pageSize);
       const validVoucher = response.data.content.filter(
@@ -75,7 +71,6 @@ const VoucherList = () => {
       console.error("Error fetching voucher:", error);
       setVouchers([]); 
     }
-    console.log(totalPages);
   };
 
   useEffect(() => {
@@ -131,10 +126,6 @@ const VoucherList = () => {
     return pages;
   };
   
-  const handleEdit = (voucher) => {
-    setVoucherToEdit(voucher);
-    setShowEditModal(true);
-  };
   const handleViewDetail = (discountId) => {
     setShowDetailModal(true);
     fetchDiscountDetails(discountId);
@@ -143,10 +134,39 @@ const VoucherList = () => {
     setShowCreateModal(false);
     setShowDetailModal(false);
   };
+
+  const handleDeleteClick = (voucherId) => {
+    setSelectedVoucher(voucherId);
+    setShowConfirmModal(true);
+  };
   const handleAddDiscount = () => {
     setSelectedVoucher(null);
     setShowCreateModal(true);
     setShowDetailModal(false);
+  };
+
+  const handleDelete = async () => {
+    try {
+      // Remove references
+      await axios.delete(`http://localhost:8080/api/discounts/${selectedVoucher}/remove-references`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
+      });
+      
+      // Delete discount
+      await axios.delete(`http://localhost:8080/api/discounts/delete/${selectedVoucher}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
+      });
+    fetchVoucher();
+    } catch (error) {
+      console.error('There was an error deleting the discount!', error);
+    }finally {
+      setShowConfirmModal(false);
+      setSelectedVoucher(null);
+    }
   };
 
   
@@ -167,23 +187,28 @@ const VoucherList = () => {
         <table className="min-w-full table-fixed divide-y divide-zinc-200">
           <thead className="bg-zinc-100 ">
             <tr>
+            <th
+                className={`${tableCellClasses} text-center text-x font-large text-zinc-500 uppercase tracking-wider w-1/5`}
+              >
+                Title
+              </th>
               <th
-                className={`${tableCellClasses} text-center text-x font-large text-zinc-500 uppercase tracking-wider w-1/3`}
+                className={`${tableCellClasses} text-center text-x font-large text-zinc-500 uppercase tracking-wider w-1/5`}
               >
                 CODE
               </th>
               <th
-                className={`${tableCellClasses} text-center text-x font-large text-zinc-500 uppercase tracking-wider w-1/3`}
+                className={`${tableCellClasses} text-center text-x font-large text-zinc-500 uppercase tracking-wider w-1/5`}
               >
                 Expiration date
               </th>
               <th
-                className={`${tableCellClasses} text-center text-x font-large text-zinc-500 uppercase tracking-wider w-1/3`}
+                className={`${tableCellClasses} text-center text-x font-large text-zinc-500 uppercase tracking-wider w-1/5`}
               >
                 Quantity
               </th>
               <th
-                className={`${tableCellClasses} text-center text-x font-large text-zinc-500 uppercase tracking-wider w-1/3`}
+                className={`${tableCellClasses} text-center text-x font-large text-zinc-500 uppercase tracking-wider w-1/5 `}
               >
                 Actions
               </th>
@@ -222,17 +247,24 @@ const VoucherList = () => {
                 key={voucher.id}
                 className={`text-center transition duration-300 ease-in-out hover:bg-slate-300 ${index % 2 === 0 ? 'bg-white-100' : 'bg-gray-100'}`}
               >
+                <td className={tableCellClasses}>{voucher.name}</td>
                 <td className={tableCellClasses}>{voucher.code}</td>
                 <td className={tableCellClasses}>{voucher.expirationDate}</td>
                 <td className={tableCellClasses}>{voucher.quantity}</td>
-                <td className={tableCellClasses}>
+                <td className="px-6 py-4 whitespace-nowrap">
                   <button
-                    className={`${actionButtonClasses} mr-2`}
+                    className={`${actionButtonClasses} `}
                     onClick={() => handleViewDetail(voucher.id)}
                   >
                      <IoEyeOutline/>
 
                   </button>
+                  <button
+                         className={`${actionButtonClasses} `}
+                        onClick={() => handleDeleteClick(voucher.id)}
+                      >
+                        <IoTrashOutline />
+                      </button>
                 </td>
               </tr>
             ))
@@ -279,8 +311,30 @@ const VoucherList = () => {
           setShowModalDetail={setShowDetailModal}
           voucher={selectedVoucher}
           onClose={handleCloseModal}
-          isDetailView={showDetailModal}      
+          isDetailView={showDetailModal}    
+          fetchVoucher={fetchVoucher}  
         />
+      )}
+      {showConfirmModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 backdrop-blur-sm">
+        <div className="bg-white p-4 rounded-lg shadow-lg">
+          <h2 className="text-lg font-bold mb-4">Are you sure to delete this Voucher?</h2>
+          <div className="flex justify-end space-x-4">
+            <button
+              onClick={() => setShowConfirmModal(false)}
+              className="hover:bg-gray-200 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleDelete}
+              className="hover:bg-red-700 bg-red-600 text-white px-4 py-2 rounded-lg"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
       )}
     </div>
   );
