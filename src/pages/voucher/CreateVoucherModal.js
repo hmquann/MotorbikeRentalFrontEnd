@@ -1,10 +1,11 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import './CreateVoucher.css'
+import "./CreateVoucher.css";
 
 const inputClasses =
   "mt-1 block w-full p-2 border border-zinc-300 rounded-md dark:text-green-800 font-medium";
-const labelClasses = "block text-md font-bold text-slate-500 dark:text-neutral-300";
+const labelClasses =
+  "block text-md font-bold text-slate-500 dark:text-neutral-300";
 
 const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
   const [formData, setFormData] = useState({
@@ -17,7 +18,7 @@ const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
     discountMoney: "",
     startDate: "",
     expirationDate: "",
-    quantity: ""
+    quantity: "",
   });
   const [errors, setErrors] = useState({});
   const [errorsMess, setErrorsMess] = useState("");
@@ -26,13 +27,13 @@ const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
     if (formData.voucherType === "PERCENTAGE") {
       setFormData((prevFormData) => ({
         ...prevFormData,
-        discountMoney: ""
+        discountMoney: "",
       }));
     } else if (formData.voucherType === "FIXED_MONEY") {
       setFormData((prevFormData) => ({
         ...prevFormData,
         discountPercent: "",
-        maxDiscountMoney: ""
+        maxDiscountMoney: "",
       }));
     }
   }, [formData.voucherType]);
@@ -41,14 +42,16 @@ const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
     const { name, value } = e.target;
     const newErrors = { ...errors };
     if (!value.trim()) {
-      newErrors[name] = `${name.charAt(0).toUpperCase() + name.slice(1)} is required`;
+      newErrors[name] = `${
+        name.charAt(0).toUpperCase() + name.slice(1)
+      } is required`;
     } else {
       delete newErrors[name];
     }
     setErrors(newErrors);
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
     });
   };
 
@@ -56,18 +59,16 @@ const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
     const newErrors = {};
     if (!formData.name) newErrors.name = "Name is required";
     if (!formData.code) newErrors.code = "Code is required";
-    if (!formData.voucherType) newErrors.voucherType = "Voucher Type is required";
+    if (!formData.voucherType)
+      newErrors.voucherType = "Voucher Type is required";
     if (!formData.startDate) newErrors.startDate = "Start Date is required";
-    if (!formData.expirationDate) newErrors.expirationDate = "Expiration Date is required";
+    if (!formData.expirationDate)
+      newErrors.expirationDate = "Expiration Date is required";
     if (!formData.quantity) newErrors.quantity = "Quantity is required";
-    if (formData.voucherType === "PERCENTAGE") {
-      const discountPercent = parseInt(formData.discountPercent);
-      if (isNaN(discountPercent) || discountPercent < 0 || discountPercent > 100) {
-        newErrors.discountPercent = "Discount Percent must be between 0 and 100";
-      }
-    }
-    if (formData.voucherType === "PERCENTAGE" && !formData.maxDiscountMoney) newErrors.maxDiscountMoney = "Max Discount Money is required";
-    if (formData.voucherType === "FIXED_MONEY" && !formData.discountMoney) newErrors.discountMoney = "Discount Money is required";
+    if (formData.voucherType === "PERCENTAGE" && !formData.discountPercent)
+      newErrors.discountPercent = "Discount Percent is required";
+    if (formData.voucherType === "FIXED_MONEY" && !formData.discountMoney)
+      newErrors.discountMoney = "Discount Money is required";
     return newErrors;
   };
 
@@ -79,10 +80,10 @@ const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
       return;
     }
     axios
-      .post("http://localhost:8080/api/discounts/addDiscount", formData,{
-        headers : {
-          Authorization :  `Bearer ${localStorage.getItem("token")}`
-        }
+      .post("http://localhost:8080/api/discounts/addDiscount", formData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       })
       .then((response) => {
         setFormData({
@@ -95,7 +96,7 @@ const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
           discountMoney: "",
           startDate: "",
           expirationDate: "",
-          quantity: ""
+          quantity: "",
         });
         setErrors({});
         setShowModal(false);
@@ -117,7 +118,7 @@ const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="form-container">
         <div className="bg-zinc-300 text-slate-600 p-2 rounded-t-lg">
-          <h2 className="text-lg font-bold">Discount Details</h2>
+          <h2 className="text-lg font-bold">Voucher Details</h2>
         </div>
         <form className="space-y-4 p-4" onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -191,7 +192,9 @@ const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
                   max="100"
                 />
                 {errors.discountPercent && (
-                  <p className="text-red-500 text-sm">{errors.discountPercent}</p>
+                  <p className="text-red-500 text-sm">
+                    {errors.discountPercent}
+                  </p>
                 )}
               </div>
             )}
@@ -207,7 +210,9 @@ const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
                   className={inputClasses}
                 />
                 {errors.maxDiscountMoney && (
-                  <p className="text-red-500 text-sm">{errors.maxDiscountMoney}</p>
+                  <p className="text-red-500 text-sm">
+                    {errors.maxDiscountMoney}
+                  </p>
                 )}
               </div>
             )}
@@ -215,7 +220,7 @@ const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
               <div>
                 <label className={labelClasses}>Discount Money (VND)</label>
                 <input
-                   placeholder="Discount Money"
+                  placeholder="Discount Money"
                   type="number"
                   name="discountMoney"
                   value={formData.discountMoney}
@@ -259,12 +264,13 @@ const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
           <div>
             <label className={labelClasses}>Quantity</label>
             <input
-              placeholder="Quantity" 
+              placeholder="Quantity"
               type="number"
               name="quantity"
               value={formData.quantity}
               onChange={handleChange}
               className={inputClasses}
+              min="1"
             />
             {errors.quantity && (
               <p className="text-red-500 text-sm">{errors.quantity}</p>
