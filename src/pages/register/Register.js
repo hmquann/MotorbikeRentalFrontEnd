@@ -137,7 +137,7 @@ const Register = () => {
     }
     axios
       .post(
-        "https://rentalmotorbikebe.azurewebsites.net/api/auth/signup",
+        "http://localhost:8080/api/auth/signup",
         formData,
         {
           headers: {

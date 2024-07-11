@@ -12,7 +12,7 @@ export const GetLastMessage = (uniqueRooms) => {
         console.log("send fetch last message request");
         setLoading(true);
         const response = await axios.get(
-          "https://rentalmotorbikebe.azurewebsites.net/message/getLastMessageByUniqueRoom/" +
+          "http://localhost:8080/message/getLastMessageByUniqueRoom/" +
             uniqueRooms.uniqueRooms
         );
         setResponseData(response.data.content);

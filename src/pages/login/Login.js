@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const Login = () => {
-  const apiLogin = "https://rentalmotorbikebe.azurewebsites.net/api/auth/signin";
+  const apiLogin = "http://localhost:8080/api/auth/signin";
   const containerClasses =
     "flex items-center justify-center min-h-screen bg-gray-100 light:bg-zinc-900";
   const contentClasses =

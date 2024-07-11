@@ -24,7 +24,7 @@ const BrandList = () => {
     setIsLoading(true)
     try {
       const response = await axios.get(
-        `https://rentalmotorbikebe.azurewebsites.net/api/brand/getAllBrand/${currentPage}/${pageSize}`
+        `http://localhost:8080/api/brand/getAllBrand/${currentPage}/${pageSize}`
       );
       const totalElements = response.data.totalElements;
       const totalPages = Math.ceil(totalElements / pageSize);

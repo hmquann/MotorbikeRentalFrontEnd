@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { NavLink, Route, Routes, useNavigate } from "react-router-dom";
 import "./Menu.css";
 import Profile from "../profile/Profile";
@@ -10,25 +10,24 @@ import ModelList from "../modelMotorbike/ModelList";
 
 import ApproveLicense from "../license/ApproveLicense";
 
-
 import { Message } from "../chatting/Message";
 import UserData from "../dashboard/UserData";
 import ChatApp from "../chatapp/ChatApp";
-
+import MyBooking from "../myBooking/MyBooking";
 
 const Menu = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const navigate = useNavigate();
-  const [userRole, setUserRole] = useState("")
+  const [userRole, setUserRole] = useState("");
 
   useEffect(() => {
-    const roles = localStorage.getItem('roles'); 
-    console.log(roles)
+    const roles = localStorage.getItem("roles");
+    console.log(roles);
     setUserRole(roles);
   }, []);
- 
-  const isAdmin = userRole.includes("ADMIN")
-  const isLessor = userRole.includes("LESSOR")
+
+  const isAdmin = userRole.includes("ADMIN");
+  const isLessor = userRole.includes("LESSOR");
   const [username, setUsername] = useState("");
   const [room, setRoom] = useState("");
 
@@ -68,20 +67,18 @@ const Menu = () => {
           </li>
           <li>
             <NavLink
+              to="/menu/myBooking"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              My Booking
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
               to="/menu/wallet"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
               Wallet
-            </NavLink>
-          </li>
-          {isAdmin && (
-            <>
-            <li>
-            <NavLink
-              to="/menu/brand"
-              className={({ isActive }) => (isActive ? "active" : "")}
-            >
-              Manage Brand
             </NavLink>
           </li>
           <li>
@@ -92,47 +89,53 @@ const Menu = () => {
               Chatting
             </NavLink>
           </li>
-          <li>
-            <NavLink
-              to="/menu/approveLicense"
-              className={({ isActive }) => (isActive ? "active" : "")}
-            >
-              Approve License
-              </NavLink>
-          </li>
-          <li>
+          {isAdmin && (
+            <>
+              <li>
                 <NavLink
-              to="/menu/model"
-              className={({ isActive }) => (isActive ? "active" : "")}
-            >
-              Manage Model
-              </NavLink>
-
+                  to="/menu/brand"
+                  className={({ isActive }) => (isActive ? "active" : "")}
+                >
+                  Manage Brand
+                </NavLink>
               </li>
               <li>
-              <NavLink
-
-              to="/menu/userData"
-              className={({ isActive }) => (isActive ? "active" : "")}
-            >
-              User Management
-
-            </NavLink>
-          </li>
+                <NavLink
+                  to="/menu/approveLicense"
+                  className={({ isActive }) => (isActive ? "active" : "")}
+                >
+                  Approve License
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/menu/model"
+                  className={({ isActive }) => (isActive ? "active" : "")}
+                >
+                  Manage Model
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/menu/userData"
+                  className={({ isActive }) => (isActive ? "active" : "")}
+                >
+                  User Management
+                </NavLink>
+              </li>
             </>
           )}
-           {(isAdmin || isLessor) && (
-          <li>
-            <NavLink
-              to="/menu/approveMotorbike"
-              className={({ isActive }) => (isActive ? "active" : "")}
-            >
-              Motorbike Status
-            </NavLink>
-          </li>
-           )}
+          {(isAdmin || isLessor) && (
+            <li>
+              <NavLink
+                to="/menu/approveMotorbike"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                My Motorbike
+              </NavLink>
+            </li>
+          )}
 
-          
           <li>
             <NavLink onClick={handleLogout} className="nav-link">
               Logout
@@ -143,18 +146,22 @@ const Menu = () => {
       <div className="menu-right mt-4">
         <Routes>
           <Route path="/profile" element={<Profile />} />
-          <Route path="/chatApp" element={<ChatApp   />} />
+          <Route path="/myBooking" element={<MyBooking />} />
+          <Route path="/chatApp" element={<ChatApp />} />
+          <Route path="/wallet" element={<UserWallet />} />
           <Route path="/wallet" element={<UserWallet />} />
           {isAdmin && (
             <>
-               <Route path="/brand" element={<BrandList />} />
-               <Route path="/model" element={<ModelList />} />
-               <Route path="/approveLicense" element={<ApproveLicense/>} />
-               <Route path="/userData" element={<UserData />} />
-
+              <Route path="/brand" element={<BrandList />} />
+              <Route path="/model" element={<ModelList />} />
+              <Route path="/approveLicense" element={<ApproveLicense />} />
+              <Route path="/userData" element={<UserData />} />
             </>
           )}
-          <Route path="/approveMotorbike" element={<ApproveMotorbikeRegistration />} />
+          <Route
+            path="/approveMotorbike"
+            element={<ApproveMotorbikeRegistration />}
+          />
           {/* code chatting room here */}
         </Routes>
       </div>

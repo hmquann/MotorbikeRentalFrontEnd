@@ -12,7 +12,7 @@ const RegisterSuccess = () => {
     console.log(token);
     if (token !== null) {
       axios
-        .get(`https://rentalmotorbikebe.azurewebsites.net/verify/${token}`)
+        .get(`http://localhost:8080/verify/${token}`)
         .then((response) => {
           console.log("User:", response.data);
           setShowPopup(true); // Hiển thị popup khi thành công

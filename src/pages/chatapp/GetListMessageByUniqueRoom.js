@@ -11,7 +11,7 @@ export const GetListMessageByUniqueRoom = (selectedRoom) => {
         console.log("send fetch list message request");
         setLoading(true);
         const response = await axios.get(
-          "https://rentalmotorbikebe.azurewebsites.net/message/getListMessageByUniqueRoom/" +
+          "http://localhost:8080/message/getListMessageByUniqueRoom/" +
             selectedRoom
         );
         setResponseData(response.data);

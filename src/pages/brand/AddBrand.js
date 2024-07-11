@@ -47,7 +47,7 @@ const AddBrand = ({ showModal, setShowModal, onBrandCreated }) => {
 
     try {
       const response = await axios.post(
-        "https://rentalmotorbikebe.azurewebsites.net/api/brand/createBrand",
+        "http://localhost:8080/api/brand/createBrand",
         {
           brandName,
           origin: brandOrigin,

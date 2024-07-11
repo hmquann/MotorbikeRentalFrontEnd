@@ -82,7 +82,7 @@ const PasswordResetForm = () => {
 
     axios
       .post(
-        `https://rentalmotorbikebe.azurewebsites.net/password/reset/${token}`,
+        `http://localhost:8080/password/reset/${token}`,
         {
           password: newPassword,
         },

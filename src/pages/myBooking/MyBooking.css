@@ -1,0 +1,38 @@
+/* .container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .bg-card {
+    background-color: #fff;
+  }
+  
+  .text-primary {
+    color: #4caf50;
+  }
+  
+
+  
+  .text-muted-foreground {
+    color: #888;
+  }
+  
+  .border-muted-foreground {
+    border-color: #888;
+  }
+  
+  .bg-gray-100 {
+    background-color: #f5f5f5;
+  }
+  
+  .border-gray-300 {
+    border-color: #e0e0e0;
+  } */
+
+  .border-green {
+    border-color: #4caf50;
+  }
+  .containerMyBooking {
+    max-width: 70%;
+    margin: 0 auto;
+  }

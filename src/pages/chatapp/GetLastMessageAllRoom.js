@@ -12,7 +12,7 @@ export const GetLastMessageAllRoom = (email) => {
         console.log("send fetch list message request");
         setLoading(true);
         const response = await axios.get(
-          "https://rentalmotorbikebe.azurewebsites.net/message/getLastMessageAllRoom/" + email
+          "http://localhost:8080/message/getLastMessageAllRoom/" + email
         );
         setResponseData(response.data.room);
       } catch (err) {

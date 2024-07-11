@@ -18,7 +18,7 @@ const UserData = () => {
     try {
       setIsLoading(true)
       const response = await axios.get(
-        `https://rentalmotorbikebe.azurewebsites.net/api/user/allUser/${currentPage}/${pageSize}`,
+        `http://localhost:8080/api/user/allUser/${currentPage}/${pageSize}`,
       
       );
 
@@ -37,7 +37,7 @@ const UserData = () => {
     try {
       setIsLoading(true);
       const response = await axios.get(
-        `https://rentalmotorbikebe.azurewebsites.net/api/user/search`,
+        `http://localhost:8080/api/user/search`,
         {
           params: {
             searchTerm: term,

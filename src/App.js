@@ -34,6 +34,7 @@ import ApproveMotorbikeRegistration from "./pages/motorbike/ApproveMotorbikeRegi
 import ChatApp from "./pages/chatapp/ChatApp";
 import RegisterMotorbikeStep1 from "./pages/motorbike/RegisterMotorbikeStep1";
 import RegisterMotorbikeStep2 from "./pages/motorbike/RegisterMotorbikeStep2";
+import MyBooking from "./pages/myBooking/MyBooking";
 
 function App() {
   return (
@@ -65,6 +66,7 @@ function App() {
 
         <Route path="/menu" element={<Menu />}>
           <Route path="/menu/chatApp" element={<ChatApp />} />
+          <Route path="/menu/myBooking" element={<MyBooking />} />
           <Route path="/menu/wallet" element={<UserWallet />} />
           <Route
             path="/menu/approveMotorbike"

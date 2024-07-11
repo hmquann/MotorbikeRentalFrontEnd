@@ -162,11 +162,11 @@ const RegisterMotorbikeStep1 = () => {
   const[motorbikeModelError,setMotorbikeModelError]=useState([]);
   const[manufactureYearError,setManufactureYearError]=useState([]);
   useEffect(() => {
-      axios.get('https://rentalmotorbikebe.azurewebsites.net/api/model/getAllModel')
+      axios.get('http://localhost:8080/api/model/getAllModel')
           .then(response => setModels(response.data))
           .catch(error => console.error('Error fetching models:', error));
          
-      axios.get('https://rentalmotorbikebe.azurewebsites.net/api/brand/getAllBrand')
+      axios.get('http://localhost:8080/api/brand/getAllBrand')
           .then(response => setBrands(response.data))
           .catch(error => console.error('Error fetching other entities 1:', error));
   }, []);

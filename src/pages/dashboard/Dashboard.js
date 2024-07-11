@@ -39,7 +39,7 @@ const Dashboard = () => {
 
   const fetchEmployees = async () => {
     try {
-      const response = await fetch("https://rentalmotorbikebe.azurewebsites.net/api/employees", {
+      const response = await fetch("http://localhost:8080/api/employees", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -60,7 +60,7 @@ const Dashboard = () => {
   const handleDelete = async (employeeId) => {
     try {
       const response = await fetch(
-        `https://rentalmotorbikebe.azurewebsites.net/api/employee/${employeeId}`,
+        `http://localhost:8080/api/employee/${employeeId}`,
         {
           method: "DELETE",
           headers: {

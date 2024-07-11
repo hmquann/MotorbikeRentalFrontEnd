@@ -11,7 +11,7 @@ export const GetUserNameByEmail = (email) => {
         try {
           console.log("send fetch userName request");
           setLoading(true);
-          const response = await axios.get("https://rentalmotorbikebe.azurewebsites.net/message/getUserNameByEmail/"+email.email);
+          const response = await axios.get("http://localhost:8080/message/getUserNameByEmail/"+email.email);
           setResponseData(response.data);
         } catch (err) {
           setError(err);

@@ -36,7 +36,7 @@ const EditBrand = ({
       };
   
       await axios.patch(
-        `https://rentalmotorbikebe.azurewebsites.net/api/brand/updateBrand/${brandToEdit.brandId}`,
+        `http://localhost:8080/api/brand/updateBrand/${brandToEdit.brandId}`,
         updatedBrand
       );
   

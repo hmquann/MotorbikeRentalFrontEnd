@@ -97,7 +97,7 @@ const UpdatePassword = ({ onClose, isOpen }) => {
 
     axios
       .post(
-        "https://rentalmotorbikebe.azurewebsites.net/password/change",
+        "http://localhost:8080/password/change",
         {
           oldPassword: oldPassword,
           newPassword: newPassword,

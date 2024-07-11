@@ -10,6 +10,12 @@ import React, { useState, useEffect } from "react";
 import RentalDocument from "./rentaldocument/RentalDocument";
 import PopUpLocation from "./popUpLocation/PopUpLocation";
 import MotorbikeSchedulePopUp from "./schedule/MotorbikeSchedulePopUp";
+import DateTimeRange from "./schedule/DateTimeRange";
+import PopUpLicense from "./popUpLicense/PopUpLicense";
+import dayjs from "dayjs";
+import axios from "axios";
+import PopUpBookingSuccess from "./PopUpBookingSuccess";
+import { format } from "date-fns";
 const sharedClasses = {
   rounded: "rounded",
   flex: "flex",
@@ -69,7 +75,7 @@ const FeatureItem = ({ icon, altText, title, description }) => (
       <p className="text-zinc-500 font-bold">{title}</p>
       <p className="text-lg">
         {description}
-        {title === "con"}l/100km
+        {title === "Fuel" ? "" : "l/100km"}
       </p>
     </div>
   </div>
@@ -85,116 +91,271 @@ const Booking = () => {
   const location = useLocation();
   const receiveData = location.state.selectedMotorbike;
   console.log(receiveData);
+
+  const userDataString = localStorage.getItem("user");
+  const userData = JSON.parse(userDataString);
+  const userId = userData.userId;
+
   const [selectedLocation, setSelectedLocation] = useState("");
   const [showPopUp, setShowPopUp] = useState(false);
-  const[schedulePopUp,setSchedulePopUp]=useState(false);
+  const navigate = useNavigate();
+  const [showPopUpLicense, setShowPopUpLicense] = useState(false);
+  const [schedulePopUp, setSchedulePopUp] = useState(false);
   const [pickupDate, setPickupDate] = useState("");
   const [returnDate, setReturnDate] = useState("");
   const [promoCode, setPromoCode] = useState("");
-  const [totalPrice, setTotalPrice] = useState("");
+  const [totalPrice, setTotalPrice] = useState(receiveData.price);
+  const [deliveryFee, setDeliveryFee] = useState(0);
   const [rentalDays, setRentalDays] = useState(1);
   const handleClosePopup = () => {
     setShowPopUp(false);
   };
-  const handleOpenPopup=()=>{
-    setShowPopUp(true)
-  }
-  const handleOpenSchedulePopup=()=>{
-    console.log("yes")
-    setSchedulePopUp(true)
-  }
-  const handleCloseSchedulePopup=()=>{
-    setSchedulePopUp(false)
-  }
+  const handleOpenPopup = () => {
+    setShowPopUp(true);
+  };
+  const handleOpenSchedulePopup = () => {
+    console.log("yes");
+    setSchedulePopUp(true);
+  };
+  const handleCloseSchedulePopup = () => {
+    setSchedulePopUp(false);
+  };
   const handleSelectLocation = (location) => {
     setSelectedLocation(location);
     setShowPopUp(false);
   };
 
-  const validateDates = () => {
-    const now = new Date();
-    const pickup = new Date(pickupDate);
-    const returnD = new Date(returnDate);
+  const [dateRange, setDateRange] = useState([null, null]);
+  const [receiveTime, setReceiveTime] = useState(null);
+  const [returnTime, setReturnTime] = useState(null);
 
-    if (pickup < now) {
-      alert("Ngày nhận xe không được nhỏ hơn ngày hiện tại.");
-      return false;
-    }
-
-    if (
-      pickup.toDateString() === now.toDateString() &&
-      pickup.getHours() < now.getHours()
-    ) {
-      alert("Giờ nhận xe không được nhỏ hơn giờ hiện tại.");
-      return false;
-    }
-
-    if (returnD <= pickup) {
-      alert("Ngày trả xe phải lớn hơn ngày nhận xe.");
-      return false;
-    }
-
-    return true;
+  const handleDateRangeChange = (newDateRange) => {
+    setDateRange(newDateRange);
   };
 
-  const calculateRentalDays = () => {
-    const pickup = new Date(pickupDate);
-    const returnD = new Date(returnDate);
-    const differenceInTime = returnD - pickup;
-    const differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24)); // Làm tròn lên
-    setRentalDays(differenceInDays);
-    return differenceInDays;
+  const handleReceiveTimeChange = (newReceiveTime) => {
+    setReceiveTime(newReceiveTime);
   };
 
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-
-    if (!validateDates()) {
-      return;
-    }
-
-    const days = calculateRentalDays();
-    const pricePerDay = 745000;
-    setTotalPrice(days * pricePerDay);
-
-    const formData = {
-      pickupDate,
-      returnDate,
-      selectedLocation,
-      promoCode,
-      totalPrice: days * pricePerDay,
-    };
-    console.log(formData);
+  const handleReturnTimeChange = (newReturnTime) => {
+    setReturnTime(newReturnTime);
   };
+
+  console.log(dateRange[0]?.format("DD/MM/YYYY"));
+  console.log(dateRange[1]?.format("DD/MM/YYYY"));
+  console.log(receiveTime?.format("HH:mm"));
+  console.log(returnTime?.format("HH:mm"));
 
   useEffect(() => {
-    if (pickupDate && returnDate) {
-      const days = calculateRentalDays();
-      const pricePerDay = 745000;
-      setTotalPrice(days * pricePerDay);
-    }
-  }, [pickupDate, returnDate]);
+    if (dateRange[0] && dateRange[1] && receiveTime && returnTime) {
+      const startDateTime = dayjs(dateRange[0])
+        .set("hour", receiveTime.hour())
+        .set("minute", receiveTime.minute());
+      const endDateTime = dayjs(dateRange[1])
+        .set("hour", returnTime.hour())
+        .set("minute", returnTime.minute());
+      const duration = endDateTime.diff(startDateTime, "minute");
 
-  const [gettedLocation, setGettedLocation] = useState(
-    getAddress(receiveData.motorbikeAddress)
-  );
+      // Tính số ngày thuê
+      const days = Math.ceil(duration / (24 * 60));
+      setRentalDays(days);
+    }
+  }, [dateRange, receiveTime, returnTime]);
+  const motorbikeAddress = receiveData.motorbikeAddress;
+  console.log(motorbikeAddress);
+
+  const [addressData, setAddressData] = useState([
+    { id: 1, address: receiveData.motorbikeAddress },
+    {
+      id: 2,
+      address: "",
+    },
+  ]);
+  const [gettedLocation, setGettedLocation] = useState();
   useEffect(() => {
     if (gettedLocation === null) {
       setGettedLocation("");
     } else {
       setGettedLocation(localStorage.getItem("location"));
+      setAddressData((prevAddressData) =>
+        prevAddressData.map((item) =>
+          item.id === 2
+            ? { ...item, address: localStorage.getItem("location") }
+            : item
+        )
+      );
     }
   }, [localStorage.getItem("location")]);
   console.log(gettedLocation);
 
-  const getCurrentDateTimeLocal = () => {
-    const now = new Date();
-    const offset = now.getTimezoneOffset();
-    now.setMinutes(now.getMinutes() - offset);
-    return now.toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
-  };
+  const [distance, setDistance] = useState();
+  const [newAddressData, setNewAddressData] = useState([]);
 
-  const minDateTime = getCurrentDateTimeLocal();
+  useEffect(() => {
+    const fetchGeocodeData = async () => {
+      try {
+        const promises = addressData.map(async (addressItem) => {
+          try {
+            const response = await axios.get(
+              `https://api.mapbox.com/search/geocode/v6/forward?q=${encodeURIComponent(
+                addressItem.address
+              )}&access_token=pk.eyJ1Ijoibmd1eWVua2llbjAyIiwiYSI6ImNseDNpem83bjByM3cyaXF4NTZqOWFhZWIifQ.pVT0I74tSdI290kImTlphQ`
+            );
+
+            if (response.status === 200 && response.data) {
+              const coordinates =
+                response.data.features[0].geometry.coordinates;
+
+              return {
+                ...addressItem,
+                longitude: coordinates[0],
+                latitude: coordinates[1],
+              };
+            } else {
+              console.error("Error: Invalid response status or data.");
+              return null;
+            }
+          } catch (error) {
+            console.error("Error making Axios request:", error);
+            return null;
+          }
+        });
+
+        const results = await Promise.all(promises);
+        const validResults = results.filter((address) => address !== null);
+
+        setNewAddressData(validResults); // Cập nhật `newAddressData`
+        console.log(validResults);
+      } catch (error) {
+        console.error("Error fetching geocode data:", error);
+      }
+    };
+
+    fetchGeocodeData();
+  }, [addressData]);
+  const checkDistance = (addressOne, addressTwo) => {
+    if (!addressOne || !addressTwo) {
+      console.error("Invalid addresses provided.");
+      return;
+    }
+
+    if (
+      addressOne.longitude === undefined ||
+      addressOne.latitude === undefined ||
+      addressTwo.longitude === undefined ||
+      addressTwo.latitude === undefined
+    ) {
+      console.error("Address coordinates are missing.");
+      return;
+    }
+
+    const apiKey =
+      "pk.eyJ1Ijoibmd1eWVua2llbjAyIiwiYSI6ImNseDNpem83bjByM3cyaXF4NTZqOWFhZWIifQ.pVT0I74tSdI290kImTlphQ";
+    const startCoord = `${addressOne.longitude},${addressOne.latitude}`;
+    const endCoord = `${addressTwo.longitude},${addressTwo.latitude}`;
+    const apiUrl = `https://api.mapbox.com/directions/v5/mapbox/driving/${startCoord};${endCoord}?approaches=unrestricted;curb&access_token=${apiKey}`;
+
+    axios
+      .get(apiUrl)
+      .then((response) => {
+        if (
+          response.status === 200 &&
+          response.data &&
+          response.data.routes &&
+          response.data.routes.length > 0
+        ) {
+          const distance = response.data.routes[0].distance / 1000; // Đổi đơn vị từ mét sang km
+          console.log(`Distance is: ${distance} km`);
+          setDistance(distance.toFixed(1));
+        } else {
+          console.error("Error: Invalid response or no routes found.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error making Axios request:", error);
+      });
+  };
+  useEffect(() => {
+    if (newAddressData.length >= 2) {
+      checkDistance(newAddressData[0], newAddressData[1]);
+    }
+  }, [newAddressData]);
+  console.log(distance);
+  useEffect(() => {
+    if (distance > receiveData.freeShipLimit) {
+      setDeliveryFee(distance * receiveData.deliveryFee);
+    }
+  }, [distance]);
+
+  useEffect(() => {
+    setTotalPrice(rentalDays * receiveData.price + deliveryFee);
+  }, [rentalDays, deliveryFee]);
+
+  const [showPopupBooking, setShowPopupBooking] = useState(false);
+
+  const [messageLicense, setMessageLicense] = useState("");
+  const [buttonLicense, setButtonLicense] = useState("");
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      // check license
+      const response1 = await axios.get(
+        `http://localhost:8080/api/license/getLicenseByUserId/${userId}`
+      );
+      console.log(response1);
+      // check api license thanh cong hay khong thanh cong
+      if (response1.status !== 200) {
+        throw new Error("API license failed");
+      }
+
+      if (response1.data === null || response1.data === "") {
+        setShowPopUpLicense(true);
+        setMessageLicense(
+          "You need to verify your driver's license to be able to book a motorbike!"
+        );
+        setButtonLicense("VERIFY");
+      } else {
+        //kiem tra xem giay phep lai xe co hop le hay khong
+        //truong hop khong hop le
+        if (
+          response1.data.licenseType === "A1" &&
+          receiveData.licenseType === "A2"
+        ) {
+          console.log(112312313131313131312313);
+          setShowPopUpLicense(true);
+          setMessageLicense(
+            "This motorbike requires an A2 license. Please update your driver's license."
+          );
+          setButtonLicense("UPDATE");
+        }
+        //truong hop hop le
+        else {
+          const response2 = await axios
+            .post("http://localhost:8080/api/booking/create", {
+              renterId: userId,
+              motorbikeId: receiveData.id,
+              startDate: dayjs(dateRange[0]).format("YYYY-MM-DDTHH:mm:ss"),
+              endDate: dayjs(dateRange[1]).format("YYYY-MM-DDTHH:mm:ss"),
+              totalPrice: totalPrice,
+              receiveLocation: gettedLocation,
+            })
+            .then((response2) => {
+              setShowPopupBooking(true); // Hiển thị popup khi thành công
+              setTimeout(() => {
+                setShowPopupBooking(false); // Ẩn popup sau 3 giây
+                navigate("/login"); //chuyển sang trang login sau khi thông báo
+              }, 3000);
+            });
+
+          if (response2.status !== 200) {
+            throw new Error("API booking failed");
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
   return (
     <div>
@@ -301,26 +462,20 @@ const Booking = () => {
               <p
                 className={`${sharedClasses.textZinc700} ${sharedClasses.mb4}`}
               >
-                Cho thuê xe Ciaz 2021 số tự động
-                <br />5 chỗ ngồi rộng rãi sạch sẽ
-                <br />
                 Trang bị camera hành trình trước sau
-                <br />
-                Màn hình giải trí android kết nối 4g
                 <br />
                 Có bảo hiểm đầy đủ
                 <br />
                 Chủ xe thân thiện hỗ trợ nhiệt tình
               </p>
             </div>
-
+            <RentalDocument />
             {/* Other amenities section */}
             <div
               className={`${sharedClasses.grid} ${sharedClasses.gridCols4} ${sharedClasses.gap4}`}
             >
               {/* Other amenities go here */}
             </div>
-            <RentalDocument />
           </div>
 
           {/* Right Column - 40% width */}
@@ -334,42 +489,17 @@ const Booking = () => {
               >
                 {receiveData.price / 1000}K /day
               </h2>
-              <div className={sharedClasses.mb4}>                       
-                <div className="grid grid-cols-2 gap-4 mb-4" >
-                  <div className="border border-red-500 p-4 rounded-lg" onClick={handleOpenSchedulePopup}>
-                    <p className="text-zinc-700 dark:text-zinc-300">Nhận xe</p>
-                    <p className="text-zinc-700 dark:text-zinc-300 text-zinc-900 dark:text-white font-semibold">
-                      20/06/2024
-                    </p>
-                    <p className="text-zinc-900 dark:text-white">21:00</p>
-                  </div>
-                  <div className="border border-red-500 p-4 rounded-lg" onClick={handleOpenSchedulePopup}>
-                    <p className="text-zinc-700 dark:text-zinc-300">Trả xe</p>
-                    <p className="text-zinc-700 dark:text-zinc-300 text-zinc-900 dark:text-white font-semibold">
-                      23/06/2024
-                    </p>
-                    <p className="text-zinc-900 dark:text-white">20:00</p>
-                  </div>
-                 
-                    <MotorbikeSchedulePopUp isOpen={schedulePopUp} onClose={() => setSchedulePopUp(false)} />
-                </div>
-              </div>
-              <div className={sharedClasses.mb4}>
-                <label
-                  className={`block text-sm font-medium ${sharedClasses.textZinc700}`}
-                >
-                  Vehicle return time
-                </label>
-                <input
-                  type="datetime-local"
-                  className={`mt-1 ${sharedClasses.block} w-full ${sharedClasses.borderZinc300} ${sharedClasses.rounded} ${sharedClasses.shadowSm}`}
-                  value={returnDate}
-                  onChange={(e) => setReturnDate(e.target.value)}
-                  min={pickupDate || minDateTime}
-                />
-              </div>
+
               <div className="mb-3">
-                <label className="block text-sm font-medium text-zinc-700 mb-1">
+                <DateTimeRange
+                  onDateRangeChange={handleDateRangeChange}
+                  onReceiveTimeChange={handleReceiveTimeChange}
+                  onReturnTimeChange={handleReturnTimeChange}
+                ></DateTimeRange>
+              </div>
+
+              <div className="mb-3">
+                <label className="block text-lg  text-zinc-700 mb-1">
                   Pick up location
                 </label>
                 <div className="relative">
@@ -381,40 +511,65 @@ const Booking = () => {
                     onClick={() => setShowPopUp(true)}
                   />
                   {showPopUp && (
-                    <PopUpLocation onClose={() => setShowPopUp(false)} />
+                    <PopUpLocation
+                      onClose={() => setShowPopUp(false)}
+                      onSelectLocation={motorbikeAddress}
+                    />
                   )}
                 </div>
               </div>
 
-              <div className={`flex justify-between ${sharedClasses.mb2}`}>
-                <span>Price:</span>
-                <span>{receiveData.price}đ/ ngày</span>
+              <div
+                className={`flex justify-between text-lg ${sharedClasses.mb2}`}
+              >
+                <span>Price</span>
+                <span>{receiveData.price} vnd/ day</span>
               </div>
-              <div className={`flex justify-between ${sharedClasses.mb2}`}>
-                <span>Total Price:</span>
+              <div
+                className={`flex justify-between text-lg ${sharedClasses.mb2}`}
+              >
+                <span>Total price</span>
                 <span>
-                  {receiveData.price}đ x {rentalDays} ngày
+                  {receiveData.price} vnd x {rentalDays} day
                 </span>
               </div>
               <div
-                className={`flex justify-between ${sharedClasses.mb4} hover:${sharedClasses.cursorPointer}`}
+                className={`flex justify-between text-lg ${sharedClasses.mb2}`}
               >
-                <span>Mã khuyến mãi</span>
+                <span>Delivery fee</span>
+                <span>{deliveryFee} vnd</span>
+              </div>
+              <div
+                className={`flex justify-between text-lg ${sharedClasses.mb4} hover:${sharedClasses.cursorPointer}`}
+              >
+                <span>Voucher</span>
                 <span>
                   <FontAwesomeIcon icon={faArrowRight} />
                 </span>
               </div>
-              <div className={`flex justify-between ${sharedClasses.mb1}`}>
-                <span>Total:</span>
-                <span>{totalPrice}đ</span>
+              <div
+                className={`flex justify-between text-lg ${sharedClasses.mb1}`}
+              >
+                <span>Total</span>
+                <span>{totalPrice} vnd</span>
               </div>
               <button
                 type="submit"
-                className={`${sharedClasses.mt4} ${sharedClasses.wFull} ${sharedClasses.bgGreen500} ${sharedClasses.textWhite} ${sharedClasses.py2} ${sharedClasses.rounded}`}
+                className={`text-lg ${sharedClasses.mt4} ${sharedClasses.wFull} ${sharedClasses.bgGreen500} ${sharedClasses.textWhite} ${sharedClasses.py2} ${sharedClasses.rounded}`}
               >
                 RENT
               </button>
             </form>
+            {showPopUpLicense && (
+              <PopUpLicense
+                onClose={() => setShowPopUpLicense(false)}
+                messageLicense={messageLicense}
+                buttonLicense={buttonLicense}
+              />
+            )}
+            {showPopupBooking && (
+              <PopUpBookingSuccess message="Your request booking sent successfully!" />
+            )}
           </div>
         </div>
       </div>
