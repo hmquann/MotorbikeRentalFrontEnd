@@ -37,7 +37,7 @@ const Dropdown = ({selectedStatus, onStatusChange }) => {
         <div id="dropdownMenu" className={dropdownMenuClasses}>
           <div className="py-" role="menu" aria-orientation="vertical" aria-labelledby="dropdownButton">
           {Object.keys(statusOptions).map((status) => (
-              <a key={status} className={menuItemClasses} role="menuitem" onClick={() => handleStatusChange(status)}>
+              <a  key={status} className={menuItemClasses} role="menuitem" onClick={() => handleStatusChange(status)}>
                 {statusOptions[status]}
               </a>
             ))}

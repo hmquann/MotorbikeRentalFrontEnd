@@ -1,12 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import { format, addDays } from 'date-fns';
 import MotorbikeSchedulePopUp from '../booking/schedule/MotorbikeSchedulePopUp';
+const formatDateTime = (dateTimeString) => {
+  const date = new Date(dateTimeString);
 
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+
+  return `${hours}:${minutes}, ${day}/${month}/${year}`;
+};
 const SearchMotorbike = () => {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [rentalStartTime, setRentalStartTime] = useState(new Date());
     const [rentalEndTime, setRentalEndTime] = useState(addDays(new Date(), 1));
     const[schedulePopUp,setSchedulePopUp]=useState(false);
+    const handleOpenSchedulePopup=()=>{
+      console.log("yes")
+      setSchedulePopUp(true)
+    }
+    const handleCloseSchedulePopup=()=>{
+      setSchedulePopUp(false)
+    }
+
     useEffect(() => {
       const getCurrentTime = () => {
         const now = new Date();
@@ -19,13 +37,16 @@ const SearchMotorbike = () => {
     
       getCurrentTime();
     }, []);
-    const handleOpenSchedulePopup=()=>{
-      setSchedulePopUp(true)
-    }
-  const handleDateChange = (e) => {
-    const date = new Date(e.target.value);
-    setSelectedDate(date);
+
+
+  const handlePopUpSubmit = (data) => {
+    // Handle data submission to destination page
+    setRentalStartTime(data.startDateTime);
+    setRentalEndTime(data.endDateTime);
+
+    // Perform any further actions here
   };
+
   const handleSearchMotor=()=>{
 
   }
@@ -63,8 +84,8 @@ const SearchMotorbike = () => {
           </div>
         </div>
 
-        <div className="flex items-center space-x-2" onClick={handleOpenSchedulePopup}>
-          <div>
+        <div className="flex items-center space-x-2" >
+          <div onClick={(handleOpenSchedulePopup)}>
             <span className="text-zinc-600 dark:text-zinc-300">
               Thời gian thuê
             </span>
@@ -89,10 +110,10 @@ const SearchMotorbike = () => {
               </span>
             </div>
           </div>
-          <MotorbikeSchedulePopUp isOpen={schedulePopUp} onClose={() => setSchedulePopUp(false)} />
+          <MotorbikeSchedulePopUp isOpen={schedulePopUp} onClose={() => setSchedulePopUp(false)} onSubmit={handlePopUpSubmit} />
         </div>
 
-        <button className="bg-green-500 text-white px-4 py-2 rounded-lg" onClick={handleSearchMotor}>
+        <button className="bg-green-500 text-white px-4 py-2 rounded-lg" onClick={handleSearchMotor} >
           Tìm Xe
         </button>
       </div>

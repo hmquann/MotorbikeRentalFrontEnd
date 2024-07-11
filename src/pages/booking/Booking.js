@@ -367,7 +367,7 @@ const Booking = () => {
                 <img
                   loading="lazy"
                   alt="Cho thuê xe tự lái HYUNDAI ACCENT 2023"
-                  src="https://n1-pstg.mioto.vn/cho_thue_xe_o_to_tu_lai_thue_xe_du_lich_hochiminh/hyundai_accent_2023/p/g/2023/08/15/10/9WcwKNkI5l_idM3Sc6mROA.jpg"
+                  src={receiveData.motorbikeImages[0].url}
                 />
               </div>
             </div>
@@ -375,21 +375,21 @@ const Booking = () => {
               <div class="cover-car-item">
                 <img
                   loading="lazy"
-                  src="https://n1-pstg.mioto.vn/cho_thue_xe_o_to_tu_lai_thue_xe_du_lich_hochiminh/hyundai_accent_2023/p/g/2023/08/15/10/Bh22riPP6nuyNg0fn1vEoQ.jpg"
+                  src={receiveData.motorbikeImages[1].url}
                   alt="Cho thuê xe tự lái HYUNDAI ACCENT 2023"
                 />
               </div>
               <div class="cover-car-item">
                 <img
                   loading="lazy"
-                  src="https://n1-pstg.mioto.vn/cho_thue_xe_o_to_tu_lai_thue_xe_du_lich_hochiminh/hyundai_accent_2023/p/g/2023/08/15/10/_0hT6bXTiGZE5REyYIaOuw.jpg"
+                  src={receiveData.motorbikeImages[2].url}
                   alt="Cho thuê xe tự lái HYUNDAI ACCENT 2023"
                 />
               </div>
               <div class="cover-car-item">
                 <img
                   loading="lazy"
-                  src="https://n1-pstg.mioto.vn/cho_thue_xe_o_to_tu_lai_thue_xe_du_lich_hochiminh/hyundai_accent_2023/p/g/2023/08/15/10/AoU8CbiPvkLutBOel1iVNA.jpg"
+                  src={receiveData.motorbikeImages[3].url}
                   alt="Cho thuê xe tự lái HYUNDAI ACCENT 2023"
                 />
               </div>

@@ -36,6 +36,9 @@ const sharedClasses = {
   textLg: 'text-lg',
   fontSemiBold: 'font-semibold',
   zinc500: 'text-zinc-500',
+  overlay: 'fixed inset-0 bg-black bg-opacity-50 z-50',
+  popupContainer: 'relative bg-white rounded-lg shadow p-4 max-w-[32rem] mx-auto',
+  closeButton: 'absolute top-2 right-2 text-black cursor-pointer',
 };
 
 const generateTimeSlots = () => {
@@ -82,7 +85,7 @@ const calculateDaysDifference = (startDate, receiveTime, endDate, returnTime) =>
   return Math.ceil(daysDiff); // Round up
 };
 
-const MotorbikeSchedulePopUp = ({ isOpen, onClose }) => {
+const MotorbikeSchedulePopUp = ({ isOpen, onClose, onSubmit }) => {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(null);
   const [receiveTime, setReceiveTime] = useState('10:00');
@@ -117,23 +120,32 @@ const MotorbikeSchedulePopUp = ({ isOpen, onClose }) => {
       setTimeError("Receive date must be less than return date");
       return;
     }
-
+    const startDateTime = parseDateTime(startDate, receiveTime);
+    
     const endDateTime = parseDateTime(endDate, returnTime);
+    console.log(startDateTime+endDateTime)
     if (!checkTimeDifference(endDateTime)) {
       setTimeError("Return date and time must be at least 6 hours from now.");
       return;
     }
-
+  
+    onSubmit({ startDateTime, endDateTime })
     setTimeError(""); // Clear any existing errors
     // Handle valid form submission logic here
+    // Close the pop-up after successful submission
+    onClose();
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className={`fixed inset-0 flex items-center justify-center ${sharedClasses.zinc200} bg-opacity-50`}>
-      <div className={`relative ${sharedClasses.doubleMaxWlg} ${sharedClasses.mxAuto} ${sharedClasses.bgWhite} ${sharedClasses.rounded} ${sharedClasses.shadow} ${sharedClasses.p4}`}>
-        <button className="absolute top-2 right-2 text-black" onClick={onClose}>X</button>
+    <div className={sharedClasses.overlay}>
+      <div className={sharedClasses.popupContainer}>
+        <button className={sharedClasses.closeButton} onClick={onClose}>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+           <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+          </svg>
+        </button>
         <h2 className={`text-center ${sharedClasses.textLg} ${sharedClasses.fontSemiBold} ${sharedClasses.mb4}`}>Rent Car Time</h2>
 
         <DatePicker
@@ -149,9 +161,9 @@ const MotorbikeSchedulePopUp = ({ isOpen, onClose }) => {
           <div className="flex-1">
             <label className={sharedClasses.zinc700}>Receive Time</label>
             <select name="receiveTime" onChange={handleTimeChange} value={receiveTime}
-              className={`${sharedClasses.block} ${sharedClasses.wFull} ${sharedClasses.m1} ${sharedClasses.borderZinc300} ${sharedClasses.rounded}`}>
+              className={`${sharedClasses.block} ${sharedClasses.wFull} ${sharedClasses.m1} ${sharedClasses.borderZinc300} ${sharedClasses.rounded} ${sharedClasses.zinc700}`}>
               {timePickUp.map((time, index) => (
-                <option key={index} value={time}>{time}</option> // Add key and value
+                <option key={index} value={time}>{time}</option>
               ))}
             </select>
           </div>
@@ -161,9 +173,9 @@ const MotorbikeSchedulePopUp = ({ isOpen, onClose }) => {
           <div className="flex-1">
             <label className={sharedClasses.zinc700}>Return Time</label>
             <select name="returnTime" onChange={handleTimeChange} value={returnTime}
-              className={`${sharedClasses.block} ${sharedClasses.wFull} ${sharedClasses.m1} ${sharedClasses.borderZinc300} ${sharedClasses.rounded}`}>
+              className={`${sharedClasses.block} ${sharedClasses.wFull} ${sharedClasses.m1} ${sharedClasses.borderZinc300} ${sharedClasses.rounded} ${sharedClasses.zinc700}`}>
               {timePickUp.map((time, index) => (
-                <option key={index} value={time}>{time}</option> // Add key and value
+                <option key={index} value={time}>{time}</option>
               ))}
             </select>
           </div>
@@ -171,7 +183,7 @@ const MotorbikeSchedulePopUp = ({ isOpen, onClose }) => {
 
         <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter}`}>
           <div>
-            <p>{receiveTime}, {startDate.toLocaleDateString()} - {returnTime}, {endDate ? endDate.toLocaleDateString() : ''}</p> {/* Convert date to string */}
+            <p>{receiveTime}, {startDate.toLocaleDateString()} - {returnTime}, {endDate ? endDate.toLocaleDateString() : ''}</p>
             <p className={sharedClasses.textZinc500}>Số ngày thuê: {calculateDaysDifference(startDate, receiveTime, endDate, returnTime)} days</p>
             {timeError && <p className={sharedClasses.red500}>{timeError}</p>}
           </div>

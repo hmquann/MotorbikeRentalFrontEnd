@@ -12,6 +12,7 @@ import ApproveLicense from "../license/ApproveLicense";
 
 import { Message } from "../chatting/Message";
 import UserData from "../dashboard/UserData";
+import VoucherList from "../voucher/VoucherList";
 import ChatApp from "../chatapp/ChatApp";
 import MyBooking from "../myBooking/MyBooking";
 
@@ -98,7 +99,7 @@ const Menu = () => {
                 >
                   Manage Brand
                 </NavLink>
-              </li>
+              </li>              
               <li>
                 <NavLink
                   to="/menu/approveLicense"
@@ -115,6 +116,7 @@ const Menu = () => {
                   Manage Model
                 </NavLink>
               </li>
+
               <li>
                 <NavLink
                   to="/menu/userData"
@@ -126,14 +128,24 @@ const Menu = () => {
             </>
           )}
           {(isAdmin || isLessor) && (
-            <li>
-              <NavLink
-                to="/menu/approveMotorbike"
-                className={({ isActive }) => (isActive ? "active" : "")}
-              >
-                My Motorbike
-              </NavLink>
-            </li>
+            <>
+              <li>
+                <NavLink
+                  to="/menu/approveMotorbike"
+                  className={({ isActive }) => (isActive ? "active" : "")}
+                >
+                  Motorbike Status
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/menu/voucher"
+                  className={({ isActive }) => (isActive ? "active" : "")}
+                >
+                  Manage Voucher
+                </NavLink>
+              </li>
+            </>
           )}
 
           <li>
@@ -154,14 +166,21 @@ const Menu = () => {
             <>
               <Route path="/brand" element={<BrandList />} />
               <Route path="/model" element={<ModelList />} />
+
               <Route path="/approveLicense" element={<ApproveLicense />} />
               <Route path="/userData" element={<UserData />} />
             </>
           )}
-          <Route
-            path="/approveMotorbike"
-            element={<ApproveMotorbikeRegistration />}
-          />
+          {(isAdmin || isLessor) && (
+            <>
+              <Route
+                path="/approveMotorbike"
+                element={<ApproveMotorbikeRegistration />}
+              />
+              <Route path="/voucher" element={<VoucherList />} />
+            </>
+          )}
+
           {/* code chatting room here */}
         </Routes>
       </div>

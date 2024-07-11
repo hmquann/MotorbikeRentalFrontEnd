@@ -3,12 +3,13 @@ import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import ImageUploader from './ImageUploader';
 const inputClasses =
   "w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500";
 const buttonClasses =
   "bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500";
 const labelClasses = "block text-sm font-medium text-zinc-700 mb-2";
-const RegisterMotorbikeStep2 = () => {
+const RegisterMotorbikeStep2 = (files) => {
   const navigate = useNavigate();
   const [selectedProvince, setSelectedProvince] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
@@ -21,21 +22,25 @@ const RegisterMotorbikeStep2 = () => {
   const [error, setError] = useState(null);
   const location = useLocation();
   const receiveData = location.state.formData;
-
-  const [checkDelivery, setCheckDelivery] = useState(true);
-  const [checkLocation, setCheckLocation] = useState(true);
-  const [formData, setFormData] = useState(receiveData);
-  const [overtimeFeeError, setOvertimeFeeError] = useState();
-  const [priceError, setPriceError] = useState();
-  const [overtimeLimitError, setOvertimeLimitError] = useState();
-  const [deliveryFeeError, setDeliveryFeeError] = useState();
-  const [freeshipError, setFreeshipError] = useState();
+  const [checkDelivery,setCheckDelivery]=useState(true);
+  const[checkLocation,setCheckLocation]=useState(true);
+  const[formData,setFormData]=useState(receiveData);
+  const[overtimeFeeError,setOvertimeFeeError]=useState();
+  const[priceError,setPriceError]=useState();
+  const[overtimeLimitError,setOvertimeLimitError]=useState();
+  const[deliveryFeeError,setDeliveryFeeError]=useState();
+  const[freeshipError,setFreeshipError]=useState();
+  const [uploadedImages, setUploadedImages] = useState([]);
+  const handleImageUpload = (files) => {
+    setUploadedImages(files);
+    console.log('Received images:', files);
+};
 
   useEffect(() => {
     fetch("https://vapi.vnappmob.com/api/province/")
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("API response:", data);
+      .then(response => response.json())
+      .then(data => {
+        console.log('API response:', data); 
         if (data && data.results) {
           setProvinces(data.results); // Điều chỉnh theo cấu trúc dữ liệu thực tế
         } else {
@@ -114,61 +119,65 @@ const RegisterMotorbikeStep2 = () => {
     return regex.test(input);
   };
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "overtimeFee") {
-      if (!regexValueInput(value)) {
-        setOvertimeFeeError("Must be number");
+    const {name,value}=e.target;
+    console.log(formData)
+      if(name==="overtimeFee"){
+        if(!regexValueInput(value)){
+          setOvertimeFeeError("Must be number")
+        }
+        if(value===""){
+          setOvertimeFeeError("Not null")
+        }
+        else{
+          setOvertimeFeeError("")
+        }     
       }
-      if (value === "") {
-        setOvertimeFeeError("Not null");
-      } else {
-        setOvertimeFeeError("");
+      if(name==="price"){
+        if(!regexValueInput(value)){
+          setPriceError("Must be number")
+        }
+        if(value===""){
+          setPriceError("Not null")
+        }
+        else{
+          setPriceError("")
+        }     
       }
-    }
-    if (name === "price") {
-      if (!regexValueInput(value)) {
-        setPriceError("Must be number");
+      if(name==="overtimeLimit"){
+        if(!regexValueInput(value)){
+          setOvertimeLimitError("Must be number")
+        } if(value===""){
+          setOvertimeLimitError("Not null")
+        }
+        else{
+          setOvertimeLimitError("")
+        }     
       }
-      if (value === "") {
-        setPriceError("Not null");
-      } else {
-        setPriceError("");
+      if(name==="freeshipDistance"){
+        if(!regexValueInput(value)){
+          setFreeshipError("Must be number")
+        }if(value===""){
+          setFreeshipError("Not null")
+        }
+        else{
+          setFreeshipError("")
+        }     
       }
-    }
-    if (name === "overtimeLimit") {
-      if (!regexValueInput(value)) {
-        setOvertimeLimitError("Must be number");
+      if(name==="deliveryFeePerKilometer"){
+        if(!regexValueInput(value)){
+          setDeliveryFeeError("Must be number")
+        }if(value===""){
+          setDeliveryFeeError("Not null")
+        }
+        else{
+          setDeliveryFeeError("")
+        }     
       }
-      if (value === "") {
-        setOvertimeLimitError("Not null");
-      } else {
-        setOvertimeLimitError("");
-      }
-    }
-    if (name === "freeshipDistance") {
-      if (!regexValueInput(value)) {
-        setFreeshipError("Must be number");
-      }
-      if (value === "") {
-        setFreeshipError("Not null");
-      } else {
-        setFreeshipError("");
-      }
-    }
-    if (name === "deliveryFeePerKilometer") {
-      if (!regexValueInput(value)) {
-        setDeliveryFeeError("Must be number");
-      }
-      if (value === "") {
-        setDeliveryFeeError("Not null");
-      } else {
-        setDeliveryFeeError("");
-      }
-    }
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+      setFormData({
+        ...formData,
+        [name]: value,
+      })
+ 
   };
   const handleAddressChange = (e) => {
     setAddressDetail(e.target.value);
@@ -185,39 +194,50 @@ const RegisterMotorbikeStep2 = () => {
     ) {
       setError("Please enter correct  before submitting.");
     }
-    const province = provinces.find(
-      (d) => d.province_id === selectedProvince
-    ).province_name;
-    const district = districts.find(
-      (d) => d.district_id === selectedDistrict
-    ).district_name;
-    const ward = wards.find((d) => d.ward_id === selectedWard).ward_name;
-    const address =
-      addressDetail + "," + ward + "," + district + "," + province;
-    setFormData({
-      ...formData,
-      motorbikeAddress: address,
-    });
+    const province = provinces.find(d => d.province_id === selectedProvince).province_name;
+    const district = districts.find(d => d.district_id === selectedDistrict).district_name;
+    const ward = wards.find(d => d.ward_id === selectedWard).ward_name;
+    const address=addressDetail+","+ward+","+district+","+province
+
     console.log(formData);
+    console.log(JSON.parse(localStorage.getItem("user")).userId)
+    const newFormData = new FormData();
+    
+    newFormData.append('motorbikePlate', formData.motorbikePlate);
+    newFormData.append('yearOfManufacture', formData.yearOfManufacture);
+    newFormData.append('constraintMotorbike', formData.constraintMotorbike);
+    newFormData.append('price', formData.price);
+    newFormData.append('overtimeFee', formData.overtimeFee);
+    newFormData.append('overtimeLimit', formData.overtimeLimit);
+    newFormData.append('delivery', formData.delivery);
+    newFormData.append('freeShipLimit', formData.freeshipLimit);
+    newFormData.append('deliveryFee', formData.deliveryFee);
+    newFormData.append('modelId',formData.modelId) 
+    newFormData.append("motorbikeAddress", address);
+    newFormData.append("userId",JSON.parse(localStorage.getItem("user")).userId)
+    uploadedImages.forEach((image, index) => {
+      newFormData.append('motorbikeImages', image, `image-${index}.jpg`);
+
+  });
+    setFormData(newFormData);
     axios
-      .post("http://localhost:8080/api/motorbike/register", formData, {
+      .post("http://localhost:8080/api/motorbike/register", newFormData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       })
-      .then((response) => {
-        console.log("Data sent successfully:", response.data);
-        navigate("/homepage");
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.log(formData);
-        if (error.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
-          console.error("Error response:", error.response);
-          console.error("Status code:", error.response.status);
-          console.error("Data:", error.response.data);
+    .then((response) => {
+      console.log("Data sent successfully:", response.data);
+      navigate("/homepage")
+      setLoading(false);
+    })
+    .catch((error) => {
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.error("Error response:", error.response);
+        console.error("Status code:", error.response.status);
+        console.error("Data:", error.response.data);
 
           if (error.response.status === 404) {
             setError(
@@ -404,22 +424,15 @@ const RegisterMotorbikeStep2 = () => {
 
         <div className="flex flex-wrap mb-6">
           <div className="w-full sm:w-1/2 pr-3 mb-6 sm:mb-0">
-            <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-              Car delivery to your location
-            </h2>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                value={checkDelivery}
-                className="sr-only peer"
-                onClick={handleCheckDelivery}
-              />
-              <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 dark:peer-focus:ring-green-800 rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-zinc-600 peer-checked:bg-green-600"></div>
-            </label>
-          </div>
-        </div>
-        <div className="flex flex-wrap justify-between mb-6 space-y-4">
-          <div className="w-full md:w-1/2 pr-2">
+         <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Car delivery to user's location</h2>
+         <label className="relative inline-flex items-center cursor-pointer">
+           <input type="checkbox" value={checkDelivery} className="sr-only peer" onClick={handleCheckDelivery} />
+          <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 dark:peer-focus:ring-green-800 rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-zinc-600 peer-checked:bg-green-600"></div>
+         </label>
+      </div>
+      </div>
+        <div className="flex flex-wrap justify-between mb-6 space-y-4"  >
+          <div className="w-full md:w-1/2 pr-2" >
             <label className="block text-sm font-medium text-zinc-700 mb-1">
               Free Ship Distance
             </label>
@@ -462,22 +475,9 @@ const RegisterMotorbikeStep2 = () => {
             )}
           </div>
         </div>
-        <div className="p-6 bg-white dark:bg-zinc-800 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">
-            Image
-          </h2>
-          <p className="text-zinc-600 dark:text-zinc-300 mt-2">
-            Post 4 pictures from different angles to increase information about
-            your vehicle.
-          </p>
-          <div className="mt-4">
-            <div className="w-full h-64 bg-zinc-100 dark:bg-zinc-700 rounded-lg flex items-center justify-center">
-              <button className="bg-teal-500 text-white py-2 px-4 rounded-lg">
-                Choose image
-              </button>
-            </div>
-          </div>
-        </div>
+        <ImageUploader sendDataToParent={handleImageUpload} />
+            
+            
 
         <div className="flex justify-between mt-4">
           <button onClick={handleReturnClick} className={buttonClasses}>
