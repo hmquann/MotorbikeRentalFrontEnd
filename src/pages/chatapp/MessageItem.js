@@ -10,6 +10,8 @@ export const MessageItem = ({ message, username }) => {
   const self = message.userId === userId ? "_self" : "";
   console.log(message);
   const time = timeStampConverter(message.timestamp);
+  console.log(message.timestamp);
+  console.log(time);
 
   return (
     <>

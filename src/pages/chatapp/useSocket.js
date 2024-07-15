@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { SOCKET_BASE_URL } from "./apiConstants";
 
-export const useSocket = (room, username) => {
+export const useSocket = (room, userId) => {
   const [socket, setSocket] = useState();
   const [socketResponse, setSocketResponse] = useState({
     room: "",
@@ -17,7 +17,7 @@ export const useSocket = (room, username) => {
       socket.emit("send_message", {
         room: room,
         content: payload.content,
-        username: username,
+        userId: userId,
         messageType: "CLIENT",
       });
     },
@@ -26,7 +26,7 @@ export const useSocket = (room, username) => {
   useEffect(() => {
     const s = io(SOCKET_BASE_URL, {
       reconnection: false,
-      query: `room=${room}&username=${username}`, //"room=" + room+",username="+username,
+      query: `room=${room}&username=${userId}`, //"room=" + room+",username="+username,
     });
     setSocket(s);
     s.on("connect", () => setConnected(true));
@@ -35,7 +35,7 @@ export const useSocket = (room, username) => {
       setSocketResponse({
         room: res.room,
         content: res.content,
-        username: res.username,
+        userId: res.userId,
         messageType: res.messageType,
         createdDateTime: res.createdDateTime,
       });

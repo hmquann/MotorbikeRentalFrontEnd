@@ -3,8 +3,8 @@ import 'lightbox.js-react/dist/index.css'; // Import CSS cho lightbox
 
 import {SlideshowLightbox} from 'lightbox.js-react'; 
 
-function ImageWithLightbox({ imageSrc }) {
-    const [isOpen, setIsOpen] = useState(false);
+// function ImageWithLightbox({ imageSrc }) {
+//     const [isOpen, setIsOpen] = useState(false);
 
     return (
         <div>
@@ -28,6 +28,6 @@ function ImageWithLightbox({ imageSrc }) {
             )}
         </div>
     );
-}
+
 
 export default ImageWithLightbox;

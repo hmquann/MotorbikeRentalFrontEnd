@@ -172,7 +172,7 @@ const DetailBooking = () => {
   const minDateTime = getCurrentDateTimeLocal();
 
   return (
-   < div className={`${sharedClasses.p4} ${sharedClasses.maxW7xl} mx-auto`}>
+    <div className={`${sharedClasses.p4} ${sharedClasses.maxW7xl} mx-auto`}>
       <div className="flex justify-between">
         {/* Left Column - 60% width */}
         <div

@@ -13,6 +13,8 @@ import ApproveLicense from "../license/ApproveLicense";
 import { Message } from "../chatting/Message";
 import UserData from "../dashboard/UserData";
 import VoucherList from "../voucher/VoucherList";
+import ChatApp from "../chatapp/ChatApp";
+import MyBooking from "../myBooking/MyBooking";
 
 const Menu = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -58,10 +60,34 @@ const Menu = () => {
           </li>
           <li>
             <NavLink
+              to="/menu/profile"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              My Profile
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/menu/myBooking"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              My Booking
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
               to="/menu/wallet"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
               Wallet
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/menu/chatApp"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              Chatting
             </NavLink>
           </li>
           {isAdmin && (
@@ -73,15 +99,7 @@ const Menu = () => {
                 >
                   Manage Brand
                 </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/menu/message"
-                  className={({ isActive }) => (isActive ? "active" : "")}
-                >
-                  Chatting
-                </NavLink>
-              </li>
+              </li>              
               <li>
                 <NavLink
                   to="/menu/approveLicense"
@@ -131,14 +149,6 @@ const Menu = () => {
           )}
 
           <li>
-            <NavLink
-              to="/menu/profile"
-              className={({ isActive }) => (isActive ? "active" : "")}
-            >
-              Profile
-            </NavLink>
-          </li>
-          <li>
             <NavLink onClick={handleLogout} className="nav-link">
               Logout
             </NavLink>
@@ -148,10 +158,9 @@ const Menu = () => {
       <div className="menu-right mt-4">
         <Routes>
           <Route path="/profile" element={<Profile />} />
-          <Route
-            path="/message"
-            element={<Message room={"room1"} userId={1} />}
-          />
+          <Route path="/myBooking" element={<MyBooking />} />
+          <Route path="/chatApp" element={<ChatApp />} />
+          <Route path="/wallet" element={<UserWallet />} />
           <Route path="/wallet" element={<UserWallet />} />
           {isAdmin && (
             <>

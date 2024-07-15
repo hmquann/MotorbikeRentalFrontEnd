@@ -4,7 +4,8 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import "./Header.css";
 import Avatar from "./Avatar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCaretDown, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faBell, faCaretDown, faUser } from "@fortawesome/free-solid-svg-icons";
+import NotificationDropdown from "./NotificationDropdown";
 
 const Header = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -22,7 +23,9 @@ const Header = () => {
     const userData = JSON.parse(userDataString);
 
     // Lấy ra username từ đối tượng userData
-    userData ? setUsername(userData.firstName+" "+ userData.lastName) : setUsername("");
+    userData
+      ? setUsername(userData.firstName + " " + userData.lastName)
+      : setUsername("");
     setIsLoggedIn(!!token);
   }, [location]);
 
@@ -48,8 +51,8 @@ const Header = () => {
     <>
       <header className="flex justify-between items-center p-4">
         <div className="flex items-center">
-          <Nav.Link as={Link} to="/homepage" >
-          <img className={avatarClasses} src="./image/logo.jpg" alt="Logo" />
+          <Nav.Link as={Link} to="/homepage">
+            <img className={avatarClasses} src="./image/logo.jpg" alt="Logo" />
           </Nav.Link>
         </div>
         <nav className="flex space-x-4">
@@ -63,6 +66,7 @@ const Header = () => {
             <Nav.Link as={Link} to="/registermotorbike" className="nav-link">
               Become Lessor
             </Nav.Link>
+            <NotificationDropdown />
             {isLoggedIn ? (
               // <Nav.Link onClick={handleLogout} className="nav-link">
               //   Logout
@@ -71,7 +75,11 @@ const Header = () => {
                 className="flex items-center cursor-pointer"
                 onClick={handleAccount}
               >
-                          <img className={avatarClasses} src="https://kenhmuabanxehoi.net/uploads/truong-the-vinh_1680594107/halinh2.jpg" alt="User Avatar" />
+                <img
+                  className={avatarClasses}
+                  src="https://kenhmuabanxehoi.net/uploads/truong-the-vinh_1680594107/halinh2.jpg"
+                  alt="User Avatar"
+                />
                 <span className="text-green-500 mr-2">{username}</span>
                 <FontAwesomeIcon
                   icon={faCaretDown}

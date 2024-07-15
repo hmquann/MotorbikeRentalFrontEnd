@@ -8,6 +8,7 @@ import GetLastMessage from "./GetLastMessage";
 import MessageList from "./MessageList";
 import { GetListMessageByUniqueRoom } from "./GetListMessageByUniqueRoom";
 import GetLastMessageAllRoom from "./GetLastMessageAllRoom";
+import useSocket from "./useSocket";
 
 function ChatApp() {
   const [listMessage, setListMessage] = useState();
@@ -17,13 +18,16 @@ function ChatApp() {
   const email = userData.email;
   console.log(email);
   const [selectedRoom, setSelectedRoom] = useState();
-
+  const { isConnected, socketResponse, sendData } = useSocket(
+    selectedRoom,
+    userData.userId
+  );
   const {
     responseData: message,
     error,
     loading,
-  } = useFetch("/message/getAllMessageByUser/" + email); // Fetch rooms
-
+  } = useFetch("/message/getAllMessageByUser/" + email); 
+  console.log(message);
   useEffect(() => {
     setUniqueRooms([
       ...new Set((message || []).map((message) => message.room)),
@@ -52,8 +56,10 @@ function ChatApp() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (messageRequest.trim() === "") {
-      return;
+    if (messageRequest.trim() !== "") {
+      sendData({
+        content: messageRequest,
+      });
     }
     console.log("Message submitted:", messageRequest);
     // Thực hiện các hành động khác sau khi gửi form

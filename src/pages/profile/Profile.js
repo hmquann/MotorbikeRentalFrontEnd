@@ -5,6 +5,7 @@ import UpdatePassword from "./UpdatePassword";
 import ChangeEmail from "./ChangeEmail";
 import License from "../license/License";
 import axios from "axios";
+import { useLocation } from "react-router-dom";
 
 const cardClasses =
   "bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-md max-w-4xl mx-auto border border-zinc-300 dark:border-zinc-700 mt-8";
@@ -30,11 +31,22 @@ const sharedClasses = {
 };
 
 const Profile = () => {
-  const user=JSON.parse(localStorage.getItem("user"))
+  const user = JSON.parse(localStorage.getItem("user"));
 
   const [showPopUpPassword, setShowPopUpPassword] = useState(false);
   const [showPopUpEmail, setShowPopUpEmail] = useState(false);
-  
+
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash) {
+      const element = document.getElementById(location.hash.substring(1));
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  }, [location]);
+
   return (
     <div>
       <div className={cardClasses}>
@@ -122,8 +134,9 @@ const Profile = () => {
           </div>
         </div>
       </div>
-
-       <License/>
+      <div id="license">
+        <License />
+      </div>
     </div>
   );
 };
