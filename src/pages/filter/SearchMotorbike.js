@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { format, addDays } from 'date-fns';
 import MotorbikeSchedulePopUp from '../booking/schedule/MotorbikeSchedulePopUp';
 import axios from 'axios';
+import dayjs from 'dayjs';
 import { useNavigate } from "react-router-dom";
 const formatDateTime = (dateTimeString) => {
   const date = new Date(dateTimeString);
@@ -102,8 +103,8 @@ const SearchMotorbike = () => {
     const handleSearchMotor = async () => {
       
       const filterList = {
-        startDate: rentalStartTime.toISOString(),
-        endDate: rentalEndTime.toISOString(),
+        startDate:dayjs(rentalStartTime).format('YYYY-MM-DDTHH:mm:ss'),
+        endDate: dayjs(rentalEndTime).format('YYYY-MM-DDTHH:mm:ss'),
         address: rentalAddress,
       };
   
