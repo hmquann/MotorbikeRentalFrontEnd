@@ -134,7 +134,7 @@ const Menu = () => {
                   to="/menu/approveMotorbike"
                   className={({ isActive }) => (isActive ? "active" : "")}
                 >
-                  Motorbike Status
+                 {isAdmin?" Motorbike Status":"My registered motorbike"}
                 </NavLink>
               </li>
               <li>
