@@ -1,7 +1,7 @@
 import React from "react";
-import Filter from "./Filter";
+import Filter from "../filter/Filter";
 import MotorbikeList from "./MotorbikeList";
-import SearchMotorbike from "./SearchMotorbike";
+import SearchMotorbike from "../filter/SearchMotorbike";
 const Homepage = () => {
   const buttonClasses =
     "px-4 py-2 rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105";
@@ -46,21 +46,13 @@ const Homepage = () => {
     </button>
   </div>
 
-  {/* Đây là nơi chèn component SearchMotorbike */}
   <div className="flex justify-center mt-8">
     <div style={{ width: '100%' }}>
       <SearchMotorbike />
     </div>
   </div>
 </div>
-
-    </div>
-    <div className="flex justify-center">
-      <div style={{ width: '95%' }}>
-      <MotorbikeList/>
-      </div>
-    </div>
-       
+    </div>     
     </section>
   );
 };

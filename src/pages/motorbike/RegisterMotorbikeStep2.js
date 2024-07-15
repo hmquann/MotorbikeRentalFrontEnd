@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useLocation } from "react-router-dom";
 import ImageUploader from './ImageUploader';
 const inputClasses =
   "w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500";

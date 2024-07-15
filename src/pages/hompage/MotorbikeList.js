@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import Filter from './Filter';
+import { useNavigate,useLocation } from "react-router-dom";
+import Filter from '../filter/Filter';
 
 // Define CSS classes
 const cardClasses = "max-w-lg mx-auto bg-white dark:bg-zinc-800 rounded-xl shadow-md overflow-hidden";
@@ -10,16 +10,23 @@ const buttonClasses = "bg-white bg-opacity-50 p-1 rounded-full";
 const avatarClasses = "w-10 h-10 rounded-full border-2 border-yellow-400";
 
 const MotorbikeList = () => {
+  
     const [motorbikeList, setMotorbikeList] = useState([]);
     const [selectedMotorbike, setSelectedMotorbike] = useState(null);
     const navigate = useNavigate();
-
+    const location = useLocation();
     useEffect(() => {
-        axios.get('http://localhost:8080/api/motorbike/activeMotorbikeList')
-            .then(response => setMotorbikeList((response.data)))
-            .catch(error => console.error('Error fetching motorbikes:', error));
-    }, motorbikeList);
-    console.log(motorbikeList)
+      if (location.state && location.state.listMotor) {
+        setMotorbikeList(location.state.listMotor);
+      }
+    }, [location.state]);
+    function formatNumber(numberString) {
+      // Convert the string to a number, in case it isn't already
+      const number = parseInt(numberString, 10);
+    
+      // Convert the number back to a string and use regex to format it with dots
+      return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
     const getAddress = (inputString) => {
         if (typeof inputString !== 'string' || inputString.trim() === '') {
             return '';
@@ -40,19 +47,15 @@ const MotorbikeList = () => {
 
     return (
         <div>
-            <div className="p-8">
-                <div className="flex justify-center mt-8">
-                    <Filter />
-                </div>
-                
+            <div className="p-8">             
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-  {motorbikeList.length === 0 ? (
-    <div className="col-span-full text-center text-zinc-500 dark:text-zinc-400">
-      No motorbikes available.
-    </div>
-  ) : (
-    motorbikeList.map((motorbike) => (
-      <div
+          {motorbikeList.length === 0 ? (
+          <div className="col-span-full text-center text-zinc-500 dark:text-zinc-400">
+          No motorbikes available.
+         </div>
+         ) : (
+         motorbikeList.map((motorbike) => (
+         <div
         key={motorbike.id}
         className="relative p-4 bg-white rounded-lg shadow-md dark:bg-zinc-800"
         onClick={() => handleViewDetail(motorbike.id)}
@@ -129,7 +132,7 @@ const MotorbikeList = () => {
               <span>{motorbike.tripCount} trips</span>
             </div>
             <div>
-              <span className="text-green-500 font-semibold">{motorbike.price}</span> VND/day
+              <span className="text-green-500 font-semibold">{formatNumber(motorbike.price)}</span> VND/day
             </div>
           </div>
         </div>

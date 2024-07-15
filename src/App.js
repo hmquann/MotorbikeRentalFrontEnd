@@ -36,6 +36,7 @@ import RegisterMotorbikeStep1 from "./pages/motorbike/RegisterMotorbikeStep1";
 import RegisterMotorbikeStep2 from "./pages/motorbike/RegisterMotorbikeStep2";
 import CreateVoucherModal from "./pages/voucher/CreateVoucherModal";
 import VoucherList from "./pages/voucher/VoucherList"
+import Filter from "./pages/filter/Filter";
 
 
 
@@ -56,14 +57,12 @@ function App() {
         <Route path="/register" element={<Register />} />
 
         <Route path="/verify/:token" element={<RegisterSuccess />} />
-        <Route
-          path="/registermotorbike"
-          element={<RegisterMotorbikeStep1 />}
-        />
+        <Route path="/registermotorbike"element={<RegisterMotorbikeStep1 />}/>
         <Route path="/registermotorbike/step2"element={<RegisterMotorbikeStep2/>}/>
         <Route path="/" element={<Navigate to="/homepage" />} />
         <Route path="/homepage" element={<Homepage />} />
         <Route path="/privacy" element={<Privacy />} />
+        <Route path="/filter" element={<Filter/>}/>
         <Route path="/privacyList" element={<PrivacyList />} />
         <Route path="/userInformation" element={<UserInformation />} />
       
