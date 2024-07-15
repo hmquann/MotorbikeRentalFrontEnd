@@ -13,7 +13,7 @@ const RegisterMotorbikeStep2 = (files) => {
   const [selectedProvince, setSelectedProvince] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedWard, setSelectedWard] = useState("");
-  const[addressDetail,setAddressDetail]=useState("");
+  const [addressDetail, setAddressDetail] = useState("");
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
@@ -43,11 +43,11 @@ const RegisterMotorbikeStep2 = (files) => {
         if (data && data.results) {
           setProvinces(data.results); // Điều chỉnh theo cấu trúc dữ liệu thực tế
         } else {
-          throw new Error('Invalid data format');
+          throw new Error("Invalid data format");
         }
         setLoading(false);
       })
-      .catch(error => {
+      .catch((error) => {
         setError(error);
         setLoading(false);
       });
@@ -56,24 +56,23 @@ const RegisterMotorbikeStep2 = (files) => {
     setCheckDelivery(!event.target.checked);
     setFormData({
       ...formData,
-      delivery:checkDelivery
-    })
+      delivery: checkDelivery,
+    });
   };
-  const handleCheckLocation=(event)=>{
-    setCheckLocation(!event.target.checked)
-
-  }
+  const handleCheckLocation = (event) => {
+    setCheckLocation(!event.target.checked);
+  };
   const handleProvinceChange = (event) => {
     const provinceId = event.target.value;
-    const selectedProvince = provinces.find(d => d.province_id === provinceId);
+    const selectedProvince = provinces.find(
+      (d) => d.province_id === provinceId
+    );
     setSelectedProvince(provinceId);
     // Fetch districts based on selected province
     fetch(`https://vapi.vnappmob.com/api/province/district/${provinceId}`)
       .then((response) => response.json())
       .then((data) => {
-
         if (data && data.results) {
-          
           setDistricts(data.results);
           setWards([]);
         } else {
@@ -87,13 +86,14 @@ const RegisterMotorbikeStep2 = (files) => {
 
   const handleDistrictChange = (event) => {
     const districtId = event.target.value;
-    const selectedDistrict = districts.find(d => d.district_id === districtId);
+    const selectedDistrict = districts.find(
+      (d) => d.district_id === districtId
+    );
     setSelectedDistrict(districtId);
     // Fetch wards based on selected district
     fetch(`https://vapi.vnappmob.com/api/province/ward/${districtId}`)
       .then((response) => response.json())
       .then((data) => {
-
         if (data.results.length === 0) {
           console.log("No wards available");
           setWards([]); // Clear wards if no wards are available
@@ -110,13 +110,13 @@ const RegisterMotorbikeStep2 = (files) => {
   };
   const handleWardChange = (event) => {
     const wardId = event.target.value;
-    const selectedWard = wards.find(d => d.ward_id === wardId);
-    setSelectedWard(wardId);   
+    const selectedWard = wards.find((d) => d.ward_id === wardId);
+    setSelectedWard(wardId);
   };
-  const regexValueInput=(input)=>{
-    const regex=/^(?:[0-9]|[1-9][0-9]{0,5}|1000000)$/
-      return regex.test(input);
-  }
+  const regexValueInput = (input) => {
+    const regex = /^(?:[0-9]|[1-9][0-9]{0,5}|1000000)$/;
+    return regex.test(input);
+  };
   const handleChange = (e) => {
     const {name,value}=e.target;
     console.log(formData)
@@ -178,14 +178,19 @@ const RegisterMotorbikeStep2 = (files) => {
       })
  
   };
-  const handleAddressChange=(e)=>{
-        setAddressDetail(e.target.value);
-  }
-  const handleReturnClick = () => {
-    navigate("/registermotorbike", { state: { receiveData} });
+  const handleAddressChange = (e) => {
+    setAddressDetail(e.target.value);
   };
-  const handleSubmitClick=()=>{
-    if(deliveryFeeError||overtimeFeeError||overtimeLimitError||freeshipError){
+  const handleReturnClick = () => {
+    navigate("/registermotorbike", { state: { receiveData } });
+  };
+  const handleSubmitClick = () => {
+    if (
+      deliveryFeeError ||
+      overtimeFeeError ||
+      overtimeLimitError ||
+      freeshipError
+    ) {
       setError("Please enter correct  before submitting.");
     }
     const province = provinces.find(d => d.province_id === selectedProvince).province_name;
@@ -217,7 +222,7 @@ const RegisterMotorbikeStep2 = (files) => {
     axios
       .post("http://localhost:8080/api/motorbike/register", newFormData, {
         headers: {
-         Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       })
     .then((response) => {
@@ -233,30 +238,29 @@ const RegisterMotorbikeStep2 = (files) => {
         console.error("Status code:", error.response.status);
         console.error("Data:", error.response.data);
 
-        if (error.response.status === 404) {
+          if (error.response.status === 404) {
+            setError(
+              "Error 404: Not Found. The requested resource could not be found."
+            );
+          } else if (error.response.status === 409) {
+            setError(error.response.data);
+          } else {
+            setError(
+              `Error ${error.response.status}: ${
+                error.response.data.message || "An error occurred."
+              }`
+            );
+          }
+        } else if (error.request) {
+          // The request was made but no response was received
+          console.error("Error request:", error.request);
           setError(
-            "Error 404: Not Found. The requested resource could not be found."
-          );
-        } else if (error.response.status === 409) {
-          setError(error.response.data);
-        } else {
-          setError(
-            `Error ${error.response.status}: ${
-              error.response.data.message || "An error occurred."
-            }`
+            "No response received. Please check your network connection."
           );
         }
-      } else if (error.request) {
-        // The request was made but no response was received
-        console.error("Error request:", error.request);
-        setError(
-          "No response received. Please check your network connection."
-        );
-      }
-      setLoading(false);
-    });
-};
-
+        setLoading(false);
+      });
+  };
 
   return (
     <div className="min-h-screen bg-zinc-50 p-6 flex items-center justify-center">
@@ -293,7 +297,7 @@ const RegisterMotorbikeStep2 = (files) => {
               className="mr-2 focus:ring-green-500"
               onClick={handleCheckLocation}
             />
-            
+
             <label htmlFor="defaultAddress" className="text-sm text-zinc-700">
               Your default address
             </label>
@@ -301,7 +305,7 @@ const RegisterMotorbikeStep2 = (files) => {
           <div className="pl-6 mb-4 text-sm text-zinc-700">
             Royal City, Nguyễn Trãi, Thanh Xuân, Hà Nội
           </div>
-          <div className="flex items-center mb-3"  >
+          <div className="flex items-center mb-3">
             <input
               type="radio"
               name="address"
@@ -314,7 +318,7 @@ const RegisterMotorbikeStep2 = (files) => {
             </label>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"  >
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <select
               className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
               id="provinces"
@@ -367,7 +371,7 @@ const RegisterMotorbikeStep2 = (files) => {
               onChange={handleAddressChange}
               disabled={checkLocation}
               type="text"
-                className="w-2/3 p-2 border rounded mr-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-2/3 p-2 border rounded mr-2 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
           </div>
         </div>
@@ -387,10 +391,12 @@ const RegisterMotorbikeStep2 = (files) => {
                 value={formData.overtimeFee}
                 onChange={handleChange}
               />
-              
+
               <span className="text-sm text-zinc-700">VND/hour</span>
             </div>
-            {overtimeFeeError && <div className="text-red-500">{overtimeFeeError}</div>}
+            {overtimeFeeError && (
+              <div className="text-red-500">{overtimeFeeError}</div>
+            )}
           </div>
 
           {/* Overtime limit section */}
@@ -406,13 +412,15 @@ const RegisterMotorbikeStep2 = (files) => {
                 placeholder="Enter limit"
                 value={formData.overtimeLimit}
                 onChange={handleChange}
-              />             
+              />
               <span className="text-sm text-zinc-700">hour</span>
             </div>
-            {overtimeLimitError && <div className="text-red-500">{overtimeLimitError}</div>}
+            {overtimeLimitError && (
+              <div className="text-red-500">{overtimeLimitError}</div>
+            )}
           </div>
         </div>
-       
+
         <div className="flex flex-wrap mb-6">
           <div className="w-full sm:w-1/2 pr-3 mb-6 sm:mb-0">
          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Car delivery to user's location</h2>
@@ -427,39 +435,43 @@ const RegisterMotorbikeStep2 = (files) => {
             <label className="block text-sm font-medium text-zinc-700 mb-1">
               Free Ship Distance
             </label>
-            <div className="flex items-center" >
+            <div className="flex items-center">
               <input
                 type="text"
                 name="freeshipLimit"
                 className="w-2/3 p-2 border rounded mr-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-                placeholder="Enter fee" 
+                placeholder="Enter fee"
                 value={formData.freeshipLimit}
                 disabled={checkDelivery}
                 onChange={handleChange}
               />
-              
+
               <span className="text-sm text-zinc-700">km</span>
             </div>
-            {freeshipError && <div className="text-red-500">{freeshipError}</div>}
+            {freeshipError && (
+              <div className="text-red-500">{freeshipError}</div>
+            )}
           </div>
-          
 
-          <div className="w-full md:w-1/2 pr-2" >
-            <label className="block text-sm font-medium text-zinc-700 mb-1" >
+          <div className="w-full md:w-1/2 pr-2">
+            <label className="block text-sm font-medium text-zinc-700 mb-1">
               Delivery Fee
             </label>
-            <div className="flex items-center" >
-              <input type="text"
-              name="deliveryFee"
-            className="w-2/3 p-2 border rounded mr-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+            <div className="flex items-center">
+              <input
+                type="text"
+                name="deliveryFee"
+                className="w-2/3 p-2 border rounded mr-2 focus:outline-none focus:ring-2 focus:ring-green-500"
                 placeholder="Enter fee"
-                value={formData.deliveryFee} 
+                value={formData.deliveryFee}
                 disabled={checkDelivery}
                 onChange={handleChange}
               />
               <span className="text-sm text-zinc-700">VND/km</span>
             </div>
-            {deliveryFeeError && <div className="text-red-500">{deliveryFeeError}</div>}
+            {deliveryFeeError && (
+              <div className="text-red-500">{deliveryFeeError}</div>
+            )}
           </div>
         </div>
         <ImageUploader sendDataToParent={handleImageUpload} />
@@ -470,7 +482,9 @@ const RegisterMotorbikeStep2 = (files) => {
           <button onClick={handleReturnClick} className={buttonClasses}>
             Back
           </button>
-          <button onClick={handleSubmitClick} className={buttonClasses}>Continue</button>
+          <button onClick={handleSubmitClick} className={buttonClasses}>
+            Continue
+          </button>
         </div>
       </div>
     </div>

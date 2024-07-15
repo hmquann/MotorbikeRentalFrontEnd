@@ -12,7 +12,10 @@ export const MessageList = ({ userEmail, listSelectedMessage }) => {
   return (
     <>
       {listSelectedMessage.map((x, idx) => (
-        <MessageItem key={idx} message={x} userEmail={userEmail} />
+        <>
+          {console.log(x)};
+          <MessageItem key={idx} message={x} userEmail={userEmail} />
+        </>
       ))}
       <div ref={messagesEndRef} />
     </>

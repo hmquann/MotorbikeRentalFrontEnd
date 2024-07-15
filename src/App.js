@@ -25,7 +25,7 @@ import UserWallet from "./pages/wallet/UserWallet";
 import PaymentSuccess from "./pages/wallet/PaymentSuccess";
 import PaymentFailed from "./pages/wallet/PaymentFailed";
 import BrandList from "./pages/brand/BrandList";
-import ApproveLicense from "./pages/license/ApproveLicense"
+import ApproveLicense from "./pages/license/ApproveLicense";
 import Profile from "./pages/profile/Profile";
 import VerifyChangeEmail from "./pages/profile/VerifyChangeEmail";
 import Message from "./pages/chatting/Message";
@@ -37,8 +37,7 @@ import RegisterMotorbikeStep2 from "./pages/motorbike/RegisterMotorbikeStep2";
 import CreateVoucherModal from "./pages/voucher/CreateVoucherModal";
 import VoucherList from "./pages/voucher/VoucherList"
 import Filter from "./pages/filter/Filter";
-
-
+import MyBooking from "./pages/myBooking/MyBooking";
 
 function App() {
   return (
@@ -57,7 +56,10 @@ function App() {
         <Route path="/register" element={<Register />} />
 
         <Route path="/verify/:token" element={<RegisterSuccess />} />
-        <Route path="/registermotorbike"element={<RegisterMotorbikeStep1 />}/>
+        <Route
+          path="/registermotorbike"
+          element={<RegisterMotorbikeStep1 />}
+        />
         <Route path="/registermotorbike/step2"element={<RegisterMotorbikeStep2/>}/>
         <Route path="/" element={<Navigate to="/homepage" />} />
         <Route path="/homepage" element={<Homepage />} />
@@ -65,18 +67,21 @@ function App() {
         <Route path="/filter" element={<Filter/>}/>
         <Route path="/privacyList" element={<PrivacyList />} />
         <Route path="/userInformation" element={<UserInformation />} />
-      
 
-        <Route path="/menu" element={<Menu />} >
-        <Route path="/menu/wallet" element={<UserWallet />} />
-        <Route path="/menu/approveMotorbike" element={<ApproveMotorbikeRegistration />} />
-        <Route path="/menu/brand" element={<BrandList />} />
-        <Route path="/menu/model" element={<ModelList />} />
+        <Route path="/menu" element={<Menu />}>
+          <Route path="/menu/chatApp" element={<ChatApp />} />
+          <Route path="/menu/myBooking" element={<MyBooking />} />
+          <Route path="/menu/wallet" element={<UserWallet />} />
+          <Route
+            path="/menu/approveMotorbike"
+            element={<ApproveMotorbikeRegistration />}
+          />
+          <Route path="/menu/brand" element={<BrandList />} />
+          <Route path="/menu/model" element={<ModelList />} />
         <Route path="/menu/voucher" element={<VoucherList />} />
-        <Route path="/menu/profile" element={<Profile />} />
-        <Route path="/menu/approveLicense" element={<ApproveLicense/>}/>
-        <Route path="/menu/userData" element={<UserData />} />
-
+          <Route path="/menu/profile" element={<Profile />} />
+          <Route path="/menu/approveLicense" element={<ApproveLicense />} />
+          <Route path="/menu/userData" element={<UserData />} />
         </Route>
 
         <Route path="/booking" element={<Booking />} />

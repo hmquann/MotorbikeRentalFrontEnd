@@ -181,9 +181,7 @@ const UpdatePassword = ({ onClose, isOpen }) => {
             <div className="text-red-500 text-center mt-4">{error}</div>
           )}
         </form>
-        {showPopup && (
-          <Popup message="Your request sent successfully! Please check your email!" />
-        )}
+        {showPopup && <Popup message="Your password has been successfully changed!" />}
       </div>
     </div>
   );
