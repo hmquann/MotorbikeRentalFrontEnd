@@ -42,7 +42,7 @@ const ChangeEmail = ({ onClose, isOpen }) => {
       .post(
         "http://localhost:8080/api/auth/changeEmail",
         {
-          userId: userData.id,
+          userId: userData.userId,
           newEmail: email,
         },
         {

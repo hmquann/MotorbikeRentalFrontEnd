@@ -12,13 +12,14 @@ const sharedClasses = {
 };
 
 const PopUpLocation = ({ onClose, onSelectLocation }) => {
+  console.log(onSelectLocation);
   const [selectedOption, setSelectedOption] = useState("pickup-location");
   const [customLocation, setCustomLocation] = useState(""); // State to store custom location input
   const handleSubmitForm = (e) => {
     e.preventDefault();
     let location;
     if (selectedOption === "pickup-location") {
-      location = "Quận Bình Thạnh, TP. Hồ Chí Minh";
+      location = onSelectLocation;
     } else if (selectedOption === "map-location") {
       location = customLocation;
     } else if (selectedOption === "airport-location") {
@@ -38,7 +39,7 @@ const PopUpLocation = ({ onClose, onSelectLocation }) => {
         >
           <div className="flex justify-between items-center mb-4">
             <h2 className={`text-xl font-semibold ${sharedClasses.textZinc}`}>
-              Địa điểm giao nhận xe
+              Vehicle Pickup Locations
             </h2>
             <button
               type="button"
@@ -78,17 +79,18 @@ const PopUpLocation = ({ onClose, onSelectLocation }) => {
                       className={sharedClasses.textZinc}
                       style={{ fontWeight: "bold" }}
                     >
-                      Nhận xe tại vị trí xe
+                      Pick Up at Vehicle Location
                     </p>
                     <p className={sharedClasses.textZincLight}>
-                      Quận Bình Thạnh, TP. Hồ Chí Minh
+                      {onSelectLocation}
                     </p>
                     <p
                       className={sharedClasses.textZincLighter}
                       style={{ fontStyle: "italic", opacity: 0.7 }}
                     >
-                      Bạn sẽ nhận và trả xe tại vị trí xe (địa chỉ cụ thể sẽ
-                      được hiển thị sau khi đặt cọc)
+                      You will pick up and return the car at the vehicle
+                      location (specific address will be provided after
+                      deposit).
                     </p>
                   </div>
                 </label>
