@@ -1,5 +1,6 @@
 import "./Booking.css";
 import { useLocation, useNavigate } from "react-router-dom";
+import { FaMotorcycle } from "react-icons/fa";
 import {
   faArrowRight,
   faGasPump,
@@ -10,6 +11,7 @@ import React, { useState, useEffect } from "react";
 import RentalDocument from "./rentaldocument/RentalDocument";
 import PopUpLocation from "./popUpLocation/PopUpLocation";
 import MotorbikeSchedulePopUp from "./schedule/MotorbikeSchedulePopUp";
+import FeedbackList from './FeedbackList';
 const sharedClasses = {
   rounded: "rounded",
   flex: "flex",
@@ -60,6 +62,9 @@ const sharedClasses = {
   textGreen700: "text-green-700",
   textZinc300: "text-zinc-300",
   cursorPointer: "cursor-pointer",
+  textZincLight: 'text-zinc-600 dark:text-zinc-400',
+  textZincDark: 'text-zinc-900 dark:text-zinc-100',
+  flexItemsCenter: 'flex items-center',
 };
 
 const FeatureItem = ({ icon, altText, title, description }) => (
@@ -84,6 +89,7 @@ const Booking = () => {
   };
   const location = useLocation();
   const receiveData = location.state.selectedMotorbike;
+  const motorbikeId = receiveData ? receiveData.id : null;
   console.log(receiveData);
   const [selectedLocation, setSelectedLocation] = useState("");
   const [showPopUp, setShowPopUp] = useState(false);
@@ -321,11 +327,29 @@ const Booking = () => {
               {/* Other amenities go here */}
             </div>
             <RentalDocument />
+            <hr className="my-3 border-gray-800"></hr>
+            <div className="p-4 bg-white dark:bg-zinc-800  flex items-center space-x-4">
+            <div className="flex flex-col items-center mb-4">
+          <h2 className="text-sm font-semibold mb-2">Motorbike Owner</h2>
+          <img src="https://n1-cstg.mioto.vn/m/avatars/avatar-2.png" alt="User profile picture" className="w-16 h-16 rounded-full" />
+        </div>
+      <div className="flex-1">
+        <h2 className={`text-lg font-semibold ${sharedClasses.textZincDark}`}>{receiveData.user.firstName +' ' + receiveData.user.lastName}</h2>
+        <div className={`${sharedClasses.flexItemsCenter} space-x-2 ${sharedClasses.textZincLight}`}>
+          <span className={sharedClasses.flexItemsCenter}>
+          <FaMotorcycle className="w-6 h-6" />
+          
+            <span className="ml-2">{receiveData.user.totalTripCount} trips</span>
+          </span>
+        </div>
+      </div>
+    </div>
+            {motorbikeId && <FeedbackList motorbikeId={motorbikeId} />}
           </div>
 
           {/* Right Column - 40% width */}
           <div
-            className={`${sharedClasses.w1_3} bg-zinc-100 ${sharedClasses.p4} ${sharedClasses.rounded}`}
+            className={`${sharedClasses.w1_3} bg-white-100 ${sharedClasses.p4} ${sharedClasses.rounded}` }
           >
             <form onSubmit={handleFormSubmit}>
               {/* Rental Section */}
@@ -417,7 +441,9 @@ const Booking = () => {
             </form>
           </div>
         </div>
+
       </div>
+      
     </div>
   );
 };
