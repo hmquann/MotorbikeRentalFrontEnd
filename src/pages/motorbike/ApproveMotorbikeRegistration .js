@@ -3,12 +3,9 @@ import axios from 'axios';
 import Dropdown from './Dropdown';
 import useDebounce from '../../hooks/useDebounce';
 import qs from 'qs'
-import { ImSwitch } from "react-icons/im";
 import MotorbikeDetails from './MotorbikeDetails'
-import { IoIosInformationCircleOutline } from "react-icons/io";
-import { GrCircleInformation } from "react-icons/gr";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCheck, faCheckCircle, faInfoCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faInfoCircle, faTimesCircle, faToggleOff, faToggleOn } from '@fortawesome/free-solid-svg-icons';
 
 const tableCellClasses = 'px-6 py-4 whitespace-nowrap text-base font-semibold text-amber-900 ';
 const buttonClasses = 'py-1 px-2 rounded-lg';
@@ -366,16 +363,17 @@ const ApproveMotorbikeRegistration = () => {
             motorbike.motorbikeStatus === 'ACTIVE' ? (
               <>
                   <button
-                className={`hover:bg-red-600 bg-red-500 text-white ${buttonClasses}`}
+                className={`hover:bg-red-600 bg-red-500 text-white  ${buttonClasses}`}
                 onClick={() => handleAction(motorbike, 'deactivate')}
               >
-               <ImSwitch />
+               {/* <ImSwitch /> */}
+               <FontAwesomeIcon icon={faToggleOn} />
               </button>
               <button
               className={`hover:bg-blue-600 bg-blue-500 text-white ml-2 ${buttonClasses}`}
               onClick={() => handleViewDetail(motorbike.id)}
             >
-            <FontAwesomeIcon icon={faInfoCircle} />
+            <FontAwesomeIcon icon={faInfoCircle}  />
             </button>
             </>
             ) : (
@@ -384,7 +382,7 @@ const ApproveMotorbikeRegistration = () => {
                 className={`hover:bg-green-600 bg-green-500 text-white ${buttonClasses}`}
                 onClick={() => handleAction(motorbike, 'activate')}
               >
-                <ImSwitch />
+               <FontAwesomeIcon icon={faToggleOff} />
               </button>
                 <button
                 className={`hover:bg-blue-600 bg-blue-500 text-white ml-2 ${buttonClasses}`}

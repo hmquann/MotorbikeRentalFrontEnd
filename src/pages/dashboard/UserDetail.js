@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { format } from 'date-fns';
 
 const UserDetail = ({ user, onClose }) => {
   const cardClass =
@@ -19,6 +20,7 @@ const UserDetail = ({ user, onClose }) => {
     setShowMotorbikes(false);
     setActiveButton("bookings");
   };
+  
 
   return (
     <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
@@ -124,7 +126,7 @@ const UserDetail = ({ user, onClose }) => {
               {showMotorbikes ? (
                 <div>
                   {user.motorbikes && (
-                    <i className="flex justify-end text-blue-600 text-lg font-bold mb-3">
+                    <i className="flex justify-end text-blue-600 text-lg font-bold mb-3 mr-3">
                       Total of motorbikes: {user.motorbikes.length}
                     </i>
                   )}
@@ -155,16 +157,29 @@ const UserDetail = ({ user, onClose }) => {
                 </div>
               ) : (
                 <div>
+                {user.bookings && (
+                  <i className="flex justify-end text-blue-600 text-lg font-bold mb-3 mr-3">
+                    Total of booking: {user.bookings.length}
+                  </i>
+                )}
+                <div>
                   <h3 className="text-lg font-bold mb-3">Bookings</h3>
                   {user.bookings && user.bookings.length > 0 ? (
+                    
                     <ul className="mt-2">
                       {user.bookings.map((booking) => (
                         <li key={booking.id}>
                           <p>
-                            <strong>Booking ID:</strong> {booking.id}
+                            <strong>Start Date:</strong> {format(new Date(booking.startDate), 'dd-MM-yyyy HH:mm:ss')}
                           </p>
                           <p>
-                            <strong>Booking Date:</strong> {booking.bookingDate}
+                            <strong>End Date:</strong> {format(new Date(booking.endTime), 'dd-MM-yyyy HH:mm:ss')}
+                          </p>
+                          <p>
+                            <strong>Price:</strong> {booking.totalPrice} VND
+                          </p>
+                          <p>
+                            <strong>Status:</strong> {booking.status}
                           </p>
                           {/* Add more booking details as needed */}
                         </li>
@@ -175,6 +190,7 @@ const UserDetail = ({ user, onClose }) => {
                       No bookings found.
                     </p>
                   )}
+                </div>
                 </div>
               )}
             </div>
