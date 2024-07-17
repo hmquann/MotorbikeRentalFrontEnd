@@ -146,9 +146,9 @@ const MotorbikeSchedulePopUp = ({ isOpen, onClose, onSubmit }) => {
            <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
           </svg>
         </button>
-        <h2 className={`text-center ${sharedClasses.textLg} ${sharedClasses.fontSemiBold} ${sharedClasses.mb4}`}>Rent Car Time</h2>
+        <h2 className={`text-center ${sharedClasses.textLg} ${sharedClasses.fontSemiBold} ${sharedClasses.mb4}`}>Chọn thời gian thuê xe</h2>
 
-        <DatePicker
+        <DatePicker class="justify-content"
           selected={startDate}
           onChange={onChange}
           startDate={startDate}
@@ -159,7 +159,7 @@ const MotorbikeSchedulePopUp = ({ isOpen, onClose, onSubmit }) => {
 
         <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.mb4}`}>
           <div className="flex-1">
-            <label className={sharedClasses.zinc700}>Receive Time</label>
+            <label className={sharedClasses.zinc700}>Thời gian nhận xe</label>
             <select name="receiveTime" onChange={handleTimeChange} value={receiveTime}
               className={`${sharedClasses.block} ${sharedClasses.wFull} ${sharedClasses.m1} ${sharedClasses.borderZinc300} ${sharedClasses.rounded} ${sharedClasses.zinc700}`}>
               {timePickUp.map((time, index) => (
@@ -171,7 +171,7 @@ const MotorbikeSchedulePopUp = ({ isOpen, onClose, onSubmit }) => {
             <img aria-hidden="true" alt="arrow" src="https://placehold.co/24x24" />
           </div>
           <div className="flex-1">
-            <label className={sharedClasses.zinc700}>Return Time</label>
+            <label className={sharedClasses.zinc700}>Thời gian trả xe</label>
             <select name="returnTime" onChange={handleTimeChange} value={returnTime}
               className={`${sharedClasses.block} ${sharedClasses.wFull} ${sharedClasses.m1} ${sharedClasses.borderZinc300} ${sharedClasses.rounded} ${sharedClasses.zinc700}`}>
               {timePickUp.map((time, index) => (
@@ -183,8 +183,10 @@ const MotorbikeSchedulePopUp = ({ isOpen, onClose, onSubmit }) => {
 
         <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter}`}>
           <div>
-            <p>{receiveTime}, {startDate.toLocaleDateString()} - {returnTime}, {endDate ? endDate.toLocaleDateString() : ''}</p>
-            <p className={sharedClasses.textZinc500}>Số ngày thuê: {calculateDaysDifference(startDate, receiveTime, endDate, returnTime)} days</p>
+            <p  class="justify-content text-center text-black">Thời gian thuê</p>
+            <p class="text-black">{receiveTime}, {startDate.toLocaleDateString()} - {returnTime}, {endDate ? endDate.toLocaleDateString() : ''}</p>
+            <p className={sharedClasses.textZinc500}>
+            {endDate ? `Số ngày thuê: ${calculateDaysDifference(startDate, receiveTime, endDate, returnTime)} ngày` : " Số ngày thuê: 0 ngày"}</p>
             {timeError && <p className={sharedClasses.red500}>{timeError}</p>}
           </div>
         </div>
