@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
+import { FaStar } from "react-icons/fa";
+import StarRatings from 'react-star-ratings';
+import { Rating } from '@mui/material';
 
 const modalOverlayClasses =
   "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 ";
@@ -16,6 +19,10 @@ const FeedbackList = ({ motorbikeId }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [feedbackToDelete, setFeedbackToDelete] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingContent, setEditingContent] = useState('');
+  const [editingRate, setEditingRate] = useState(0);
+  const [editingFeedbackId, setEditingFeedbackId] = useState(null);
 
   useEffect(() => {
     const fetchFeedbacks = async () => {
@@ -48,12 +55,11 @@ const FeedbackList = ({ motorbikeId }) => {
 
   const getFullName = (user) => `${user.firstName} ${user.lastName}`;
 
-  
-
   const formatDate = (dateString) => {
     const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
     return new Date(dateString).toLocaleDateString('vi-VN', options);
   };
+
   const calculateAverageRating = () => {
     if (feedbacks.length === 0) return 0;
     const totalRating = feedbacks.reduce((sum, feedback) => sum + feedback.rate, 0);
@@ -61,7 +67,6 @@ const FeedbackList = ({ motorbikeId }) => {
   };
 
   const averageRating = calculateAverageRating();
-
 
   const openModal = (feedback) => {
     setFeedbackToDelete(feedback);
@@ -73,7 +78,6 @@ const FeedbackList = ({ motorbikeId }) => {
     setIsModalOpen(false);
   };
 
-  
   const handleDelete = async () => {
     try {
       const response = await axios.delete(`http://localhost:8080/api/feedback/delete/${feedbackToDelete.id}`);
@@ -95,6 +99,41 @@ const FeedbackList = ({ motorbikeId }) => {
       closeModal();
     }
   };
+
+  const handleEdit = (feedback) => {
+    setIsEditing(true);
+    setEditingContent(feedback.feedbackContent);
+    setEditingRate(feedback.rate);
+    setEditingFeedbackId(feedback.id);
+  };
+
+  const handleUpdate = async () => {
+    try {
+      const response = await axios.patch(`http://localhost:8080/api/feedback/update/${editingFeedbackId}`, {
+        feedbackContent: editingContent,
+        rate: editingRate
+      },
+      { 
+        headers :{
+          Authorization : `Bearer ${localStorage.getItem("token")}`
+        }
+
+     });
+      if (response.status === 200) {
+        const updatedFeedback = response.data;
+      setFeedbacks(feedbacks.map(feedback =>
+        feedback.id === editingFeedbackId ? updatedFeedback : feedback
+      ));
+        setIsEditing(false);
+        setEditingContent('');
+        setEditingRate(0);
+        setEditingFeedbackId(null);
+      }
+    } catch (error) {
+      console.error('Error updating feedback:', error);
+    }
+  };
+
   return (
     <div className="p-4">
       <div className="flex items-center  mb-4">
@@ -106,28 +145,57 @@ const FeedbackList = ({ motorbikeId }) => {
       <div className="space-y-4">
         {feedbacks.map((feedback) => (
           <div key={feedback.id} className="bg-card p-4 rounded-lg shadow-sm border border-border">
-          <div className="flex justify-between items-start">
-            <div className="flex items-start">
-              <img src="https://n1-cstg.mioto.vn/m/avatars/avatar-0.png" alt={`${feedback.renterName} Avatar`} className="w-16 h-16 rounded-full mr-4" />
+           {isEditing && editingFeedbackId === feedback.id ? (
               <div>
+                <div className='flex justify-start items-center mb-3'>
+                <img src="https://n1-cstg.mioto.vn/m/avatars/avatar-0.png" alt={`${feedback.renterName} Avatar`} className="w-16 h-16 rounded-full mr-4" />
                 <div className="font-semibold text-lg text-foreground">{feedback.renterName}</div>
-                <div className="flex items-center text-yellow-500 mt-1">
-                  {Array.from({ length: feedback.rate }, (_, index) => (
-                    <span key={index}>⭐</span>
-                  ))}
+                </div>
+                <textarea
+                  value={editingContent}
+                  onChange={(e) => setEditingContent(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded"
+                />
+                <div className="flex items-center mt-2">
+                  <Rating
+                    value={editingRate}
+                    onChange={(event, newValue) => setEditingRate(newValue)}
+                    max={5}
+                    precision={1}
+                    // size="small"
+                  />
+                </div>
+                <div className="flex justify-end mt-2">
+                  <button onClick={handleUpdate} className="bg-green-500 text-white px-4 py-2 rounded-lg mr-2">Save</button>
+                  <button onClick={() => setIsEditing(false)} className="bg-red-500 text-white px-4 py-2 rounded-lg">Cancel</button>
                 </div>
               </div>
-            </div>
-            <div className="text-muted-foreground text-zinc-500">{formatDate(feedback.feedbackTime)}</div>
-          </div>
-          <p className="text-muted-foreground mt-4 font-base text-zinc-500">{feedback.feedbackContent}</p>
-          {currentUser && getFullName(currentUser) === feedback.renterName && (
-              <div className="flex justify-end mt-2">
-                <button  className="text-blue-500 mr-2"><FaEdit /></button>
-                <button onClick={() => openModal(feedback)} className="text-red-500"><MdDelete /></button>
+            ) : (
+              <div>
+                <div className="flex justify-between items-start">
+                  <div className="flex items-start">
+                    <img src="https://n1-cstg.mioto.vn/m/avatars/avatar-0.png" alt={`${feedback.renterName} Avatar`} className="w-16 h-16 rounded-full mr-4" />
+                    <div>
+                      <div className="font-semibold text-lg text-foreground">{feedback.renterName}</div>
+                      <div className="flex items-center text-yellow-500 mt-1">
+                        {Array.from({ length: feedback.rate }, (_, index) => (
+                          <span key={index}>⭐</span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-muted-foreground text-zinc-500">{formatDate(feedback.feedbackTime)}</div>
+                </div>
+                <p className="text-muted-foreground mt-4 font-base text-zinc-500">{feedback.feedbackContent}</p>
+                {currentUser && getFullName(currentUser) === feedback.renterName && (
+                  <div className="flex justify-end mt-2">
+                    <button onClick={() => handleEdit(feedback)} className="text-blue-500 mr-2"><FaEdit /></button>
+                    <button onClick={() => openModal(feedback)} className="text-red-500"><MdDelete /></button>
+                  </div>
+                )}
               </div>
             )}
-        </div>
+          </div>
         ))}
       </div>
       {isModalOpen && (
