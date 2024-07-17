@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from "axios";
+import { Range } from 'react-range';
+import { format, addDays } from 'date-fns';
 import { useNavigate,useLocation } from "react-router-dom";
 import MotorbikeList from '../hompage/MotorbikeList';
-import SearchMotorbike from './SearchMotorbike';
+import MotorbikeSchedulePopUp from '../booking/schedule/MotorbikeSchedulePopUp';
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
 const buttonClasses =
 "px-4 py-2 rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105";
 const textClasses = "text-zinc-600 dark:text-zinc-300";
@@ -15,19 +19,158 @@ const buttonClasses1 =
 "bg-white text-zinc-700 py-1 px-2 rounded-full shadow hover:bg-zinc-100 dark:bg-zinc-600 dark:hover:bg-zinc-500";
 const buttonClassesPrimary =
 "bg-green-500 text-white px-4 py-2 rounded-full shadow-lg transform transition duration-300 hover:scale-105";
+
+
+function SetPriceRangeModal({ minValueProp, maxValueProp, modelTypeProp, onUpdateValues, onUpdateModelType, ...props }) {
+  const sharedClasses = {
+    label: 'block text-lg font-semibold text-foreground',
+    input: 'block appearance-none w-full bg-card border border-border text-foreground py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:ring focus:border-primary',
+    selectContainer: 'relative',
+    selectIcon: 'pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-foreground',
+    priceLabel: 'block text-muted-foreground mb-1',
+    priceContainer: 'border border-border rounded p-2 text-center text-foreground',
+  };
+
+  const [values, setValues] = useState([minValueProp, maxValueProp]);
+  const [modelType, setModelType] = useState(modelTypeProp);
+
+  const handleChange = (newValues) => {
+    setValues(newValues);
+    onUpdateValues(newValues);
+  };
+
+  const handleModelTypeChange = (event) => {
+    const newModelType = event.target.value;
+    setModelType(newModelType);
+    onUpdateModelType(newModelType);
+  };
+
+  const getFillWidth = () => {
+    const rangeWidth = values[1] - values[0];
+    const totalWidth = 100000; // max value of the range
+    return (rangeWidth / totalWidth) * 100;
+  };
+
+  return (
+    <Modal {...props} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
+      <Modal.Header closeButton>
+        <Modal.Title id="contained-modal-title-vcenter">
+          Bộ lọc nâng cao
+        </Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <div className="p-4 space-y-4">
+          <div>
+            <label className={sharedClasses.label}>Sắp xếp</label>
+            <div className={sharedClasses.selectContainer}>
+              <select className={sharedClasses.input}>
+                <option>Tối ưu</option>
+              </select>
+              <div className={sharedClasses.selectIcon}>
+                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                  <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div>
+            <label className={sharedClasses.label}>Loại xe</label>
+            <div className={sharedClasses.selectContainer}>
+              <select 
+                id="modelType" 
+                className="mt-2 px-4 py-2 rounded-lg border border-gray-300 text-zinc-700" 
+                onChange={handleModelTypeChange} 
+                value={modelType}
+              >
+                <option value="">Chọn loại xe</option>
+                <option value="XeSo">Xe số</option>
+                <option value="XeTayGa">Xe tay ga</option>
+                <option value="XeConTay">Xe côn tay</option>
+                <option value="XeDien">Xe điện</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label className={sharedClasses.label}>Mức giá</label>
+            <Range
+              step={10000}
+              min={0}
+              max={100000}
+              values={values}
+              onChange={handleChange}
+              renderTrack={({ props, children }) => (
+                <div
+                  {...props}
+                  className="w-full h-2 bg-gray-300 rounded-lg cursor-pointer relative"
+                >
+                  {children}
+                  <div
+                    className="absolute bg-primary h-2 rounded-lg"
+                    style={{
+                      left: `${values[0] / 100000 * 100}%`,
+                      width: `${getFillWidth()}%`
+                    }}
+                  />
+                </div>
+              )}
+              renderThumb={({ props }) => (
+                <div
+                  {...props}
+                  className="w-6 h-6 bg-primary rounded-full cursor-pointer"
+                />
+              )}
+            />
+            <div className="flex justify-between mt-4">
+              <div className="w-1/2">
+                <label className={sharedClasses.priceLabel}>Giá thấp nhất</label>
+                <div className={sharedClasses.priceContainer}>{values[0]}K</div>
+              </div>
+              <div className="flex items-center justify-center w-1/12 text-muted-foreground">-</div>
+              <div className="w-1/2">
+                <label className={sharedClasses.priceLabel}>Giá cao nhất</label>
+                <div className={sharedClasses.priceContainer}>{values[1]}K</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Modal.Body>
+      <Modal.Footer>
+        <button onClick={props.onHide} className="btn btn-primary">Đóng</button>
+      </Modal.Footer>
+    </Modal>
+  );
+}
+
+
 const Filter = () => {
   const navigate = useNavigate();
+  const[addressPopUp,setAddressPopUp]=useState(false);
   const [selectedButtons, setSelectedButtons] = useState([]);
   const [brands, setBrands] = useState([]);
   const [models, setModels] = useState();
   const [filterBrands, setFilterBrands] = useState([]);
+  const[schedulePopUp,setSchedulePopUp]=useState(false);
   const [showBrandPopup, setShowBrandPopup] = useState(false);
   const [showModelPopup, setShowModelPopup] = useState(false);
   const [selectedBrand, setSelectedBrand] = useState(null);
   const[loading,setLoading]=useState(false);
   const [error, setError] = useState(null);
+  const [provinces, setProvinces] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [selectedProvince, setSelectedProvince] = useState("");
+  const [selectedDistrict, setSelectedDistrict] = useState("");
+  const [modalShow, setModalShow] = useState(false);
   const location=useLocation();
   const filterAddressAndTime=location.state.filterList;
+  const handleUpdateValues = (newValues) => {
+    setFilterList({...filterList,minPrice:newValues[0]})
+    setFilterList({...filterList,maxPrice:newValues[1]})
+    console.log(newValues)
+    console.log(filterList)
+  };
+  const handleUpdateModelType = (newModelType) => {
+    setFilterList({...filterList,modelType:newModelType});
+  };
   const [filterList,setFilterList]=useState({
     startDate:filterAddressAndTime.startDate,
     endDate:filterAddressAndTime.endDate,
@@ -35,11 +178,14 @@ const Filter = () => {
     brandId:"",
     modelType:"",
     isDelivery:"",
-    minPrice:"",
-    maxPrice:"",
+    minPrice:0,
+    maxPrice:100000,
     isFiveStar:""
 }
   );
+  const handleOpenSchedulePopup=()=>{
+    setSchedulePopUp(true)
+  }
   useEffect(() => {
     axios.get('http://localhost:8080/api/brand/getAllBrand')
       .then(response => setBrands(response.data))
@@ -78,8 +224,9 @@ const Filter = () => {
     });
     if (buttonName === 'brand') {
        setShowBrandPopup(true);
-    } else if (buttonName === 'modelType') {
-      setShowModelPopup(true); // Show model dropdown
+    } 
+    else if(buttonName=='filter'){
+      setModalShow(true);
     }
     handleSearchMotor()
     console.log(selectedButtons);
@@ -87,10 +234,6 @@ const Filter = () => {
   };
 
   const buttons = [
-    {name:'modelType',label:'Loại xe',svg:(<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
-    <path fillRule="evenodd" d="M5.25 2.25a3 3 0 0 0-3 3v4.318a3 3 0 0 0 .879 2.121l9.58 9.581c.92.92 2.39 1.186 3.548.428a18.849 18.849 0 0 0 5.441-5.44c.758-1.16.492-2.629-.428-3.548l-9.58-9.581a3 3 0 0 0-2.122-.879H5.25ZM6.375 7.5a1.125 1.125 0 1 0 0-2.25 1.125 1.125 0 0 0 0 2.25Z" clipRule="evenodd" />
-  </svg>
-  )},
     {name:'brand',label:'Hãng xe',svg:(<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
     <path d="M21.721 12.752a9.711 9.711 0 0 0-.945-5.003 12.754 12.754 0 0 1-4.339 2.708 18.991 18.991 0 0 1-.214 4.772 17.165 17.165 0 0 0 5.498-2.477ZM14.634 15.55a17.324 17.324 0 0 0 .332-4.647c-.952.227-1.945.347-2.966.347-1.021 0-2.014-.12-2.966-.347a17.515 17.515 0 0 0 .332 4.647 17.385 17.385 0 0 0 5.268 0ZM9.772 17.119a18.963 18.963 0 0 0 4.456 0A17.182 17.182 0 0 1 12 21.724a17.18 17.18 0 0 1-2.228-4.605ZM7.777 15.23a18.87 18.87 0 0 1-.214-4.774 12.753 12.753 0 0 1-4.34-2.708 9.711 9.711 0 0 0-.944 5.004 17.165 17.165 0 0 0 5.498 2.477ZM21.356 14.752a9.765 9.765 0 0 1-7.478 6.817 18.64 18.64 0 0 0 1.988-4.718 18.627 18.627 0 0 0 5.49-2.098ZM2.644 14.752c1.682.971 3.53 1.688 5.49 2.099a18.64 18.64 0 0 0 1.988 4.718 9.765 9.765 0 0 1-7.478-6.816ZM13.878 2.43a9.755 9.755 0 0 1 6.116 3.986 11.267 11.267 0 0 1-3.746 2.504 18.63 18.63 0 0 0-2.37-6.49ZM12 2.276a17.152 17.152 0 0 1 2.805 7.121c-.897.23-1.837.353-2.805.353-.968 0-1.908-.122-2.805-.353A17.151 17.151 0 0 1 12 2.276ZM10.122 2.43a18.629 18.629 0 0 0-2.37 6.49 11.266 11.266 0 0 1-3.746-2.504 9.754 9.754 0 0 1 6.116-3.985Z" />
   </svg>)},
@@ -131,9 +274,59 @@ const Filter = () => {
   const handleModelPopupClose = () => {
     setShowModelPopup(false);
   };
-  const handleSearchMotor = async () => {
-      
+  const handlePopUpSubmit = (data) => {
+    // Handle data submission to destination page
+    setFilterList({...filterList,startDate:data.startDateTime,endDate:data.endDateTime});
+ 
 
+    // Perform any further actions here
+  };
+  useEffect(() => {
+    fetch("https://vapi.vnappmob.com/api/province/")
+      .then(response => response.json())
+      .then(data => {
+        console.log('API response:', data); 
+        if (data && data.results) {
+          setProvinces(data.results); // Điều chỉnh theo cấu trúc dữ liệu thực tế
+        } else {
+          throw new Error('Invalid data format');
+        } 
+      })
+      .catch(error => {
+        setError(error);
+      });
+  }, []);
+  const handleProvinceChange = (event) => {
+    const provinceId = event.target.value;
+    setSelectedProvince(provinceId);
+    // Fetch districts based on selected province
+    fetch(`https://vapi.vnappmob.com/api/province/district/${provinceId}`)
+      .then((response) => response.json())
+      .then((data) => {
+
+        if (data && data.results) {           
+          setDistricts(data.results);
+        } else {
+          throw new Error("Invalid data format");
+        }
+      })
+      .catch((error) => {
+        setError(error);
+      });
+  };
+  const handleDistrictChange=(event)=>{
+    const districtId = event.target.value;
+    setSelectedDistrict(districtId);
+  }
+  const handleAddressSubmit=()=>{
+    console.log(selectedDistrict)
+    console.log(selectedProvince);
+    const province = provinces.find(d => d.province_id === selectedProvince).province_name;
+    const district = districts.find(d => d.district_id === selectedDistrict).district_name;
+  setFilterList({...filterList,address:district+","+province});
+  setAddressPopUp(false)
+  }
+  const handleSearchMotor = async () => {
     setLoading(true);
     try {
       const response = await axios.post('http://localhost:8080/api/motorbike/filter', filterList, {
@@ -203,17 +396,81 @@ const Filter = () => {
     </button>
   </div>
 
-  {/* Đây là nơi chèn component SearchMotorbike */}
-  <div className="flex justify-center mt-8">
-    <div style={{ width: '100%' }}>
-      <SearchMotorbike />
+    </div>
+   
+</div>
+<div className="flex justify-center items-center mt-8" >
+  <div style={{ width: '100%' }}>
+    <div className="flex items-center justify-center space-x-4 text-foreground">
+      <div className='flex items-center space-x-2' onClick={()=>setAddressPopUp(true)}>
+      <svg class="h-6 w-6 text-green-500"  width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">  
+      <path stroke="none" d="M0 0h24v24H0z"/>  <circle cx="12" cy="11" r="3" />  
+      <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 0 1 -2.827 0l-4.244-4.243a8 8 0 1 1 11.314 0z" /></svg>
+        <span>{filterList.address}</span>
+      </div>
+      <div className='flex items-center space-x-2' onClick={(handleOpenSchedulePopup)}>
+      <svg class="h-6 w-6 text-green-500"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"> 
+       <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />  <line x1="16" y1="2" x2="16" y2="6" /> 
+       <line x1="8" y1="2" x2="8" y2="6" />  <line x1="3" y1="10" x2="21" y2="10" /></svg>
+        <span>{format(filterList.startDate, 'HH:mm, dd/MM/yyyy')} - {format(filterList.endDate, 'HH:mm, dd/MM/yyyy')}</span>
+      </div>
     </div>
   </div>
-</div>
-
+</div>           
+{addressPopUp && (
+  <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div className="bg-white p-6 rounded-lg shadow-lg">
+      <div className="p-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div name="province"
+              value={selectedProvince}
+              onChange={handleProvinceChange}>
+            <label className="block text-sm font-medium text-gray-700">Thành phố</label>
+            <select className="mt-1 block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 sm:text-sm ">
+            <option value="" className="text-gray-700 bg-white">Chọn thành phố</option>
+              {provinces.map((province) => (
+                <option  className="text-gray-700 bg-white" key={province.province_id} value={province.province_id}>
+                  {province.province_name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div  name="district"
+              value={selectedDistrict}
+              onChange={handleDistrictChange}
+              >
+            <label className="block text-sm font-medium text-gray-700">Quận / Huyện</label>
+            <select className="mt-1 block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 sm:text-sm">
+            <option className="text-gray-700 bg-white" value="">Chọn quận/huyện</option>
+              {districts.map((district) => (
+                <option className="text-gray-700 bg-white" key={district.district_id} value={district.district_id}>
+                  {district.district_name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div className="mt-4 flex justify-end space-x-2">
+          <button
+            className="bg-gray-500 text-white rounded px-3 py-1"
+            onClick={() => setAddressPopUp(false)}
+          >
+            Hủy
+          </button>
+          <button
+            className="bg-blue-500 text-white rounded px-3 py-1"
+            onClick={handleAddressSubmit}
+          >
+            Xác nhận
+          </button>
+        </div>
+      </div>
     </div>
-
-       
+  </div>
+)}
+          <div className="flex justify-center mt-8" >
+          <MotorbikeSchedulePopUp isOpen={schedulePopUp} onClose={() => setSchedulePopUp(false)} onSubmit={handlePopUpSubmit} />
+          </div>    
  
     <div className="flex justify-center mt-8">
     
@@ -262,31 +519,14 @@ const Filter = () => {
     </div>
   </div>
 )}
-
-{showModelPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-8 rounded-lg shadow-lg">
-            <h2 className="text-lg font-semibold mb-4">Chọn loại xe</h2>
-            <div className="grid grid-cols-1 gap-4">
-              <label htmlFor="modelType" className="text-zinc-700 font-semibold">Loại xe</label>
-              <select
-                id="modelType"
-                className="mt-2 px-4 py-2 rounded-lg border border-gray-300 text-zinc-700"
-                onChange={(e) => setFilterList({ ...filterList, modelType: e.target.value })}
-              >
-                <option value="">Chọn loại xe</option>
-                  <option value="XeSo">Xe số</option>
-                  <option value="XeTayGa">Xe tay ga</option>
-                  <option value="XeConTay">Xe côn tay</option>
-                  <option value="XeDien">Xe điện</option>
-              </select>
-              </div>
-            <div className="mt-4 flex justify-end">
-              <button className={`${buttonClassesPrimary} ml-2`} onClick={handleModelPopupClose}>Đóng</button>
-            </div>
-          </div>
-        </div>
-      )}
+       <SetPriceRangeModal
+        show={modalShow}
+        onHide={() => setModalShow(false)}
+          minValueProp={filterList.minPrice}
+          maxValueProp={filterList.maxPrice}
+          onUpdateValues={handleUpdateValues}
+          onUpdateModelType={handleUpdateModelType}
+      />
     </div>
   );
 };
