@@ -32,7 +32,7 @@ const ApproveMotorbikeRegistration = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [userId, setUserId] = useState('')
   const [showDetailModal, setShowDetailModal] = useState(false);
-
+  const [isUpdate,setIsUpdate]=useState(false);
   const debouncedSearchTerm = useDebounce(searchTerm, 1000);
 
   useEffect(() => {
@@ -79,6 +79,7 @@ const ApproveMotorbikeRegistration = () => {
   const fetchDetailMotorbike = async (motorbikeId) => {
     try {
       const response = await axios.get(`http://localhost:8080/api/motorbike/${motorbikeId}`);
+      console.log(response.data)
       setSelectedMotorbike(response.data);
     } catch (error) {
       console.error("Error fetching discount details", error);

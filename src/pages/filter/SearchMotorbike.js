@@ -186,7 +186,7 @@ const SearchMotorbike = () => {
               value={selectedProvince}
               onChange={handleProvinceChange}>
             <label className="block text-sm font-medium text-gray-700">Thành phố</label>
-            <select className="mt-1 block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 sm:text-sm ">
+            <select className="mt-1 block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 sm:text-sm text-gray-700">
             <option value="" className="text-gray-700 bg-white">Chọn thành phố</option>
               {provinces.map((province) => (
                 <option  className="text-gray-700 bg-white" key={province.province_id} value={province.province_id}>
@@ -200,7 +200,7 @@ const SearchMotorbike = () => {
               onChange={handleDistrictChange}
               >
             <label className="block text-sm font-medium text-gray-700">Quận / Huyện</label>
-            <select className="mt-1 block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 sm:text-sm">
+            <select className="mt-1 block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 sm:text-sm text-gray-700">
             <option className="text-gray-700 bg-white" value="">Chọn quận/huyện</option>
               {districts.map((district) => (
                 <option className="text-gray-700 bg-white" key={district.district_id} value={district.district_id}>

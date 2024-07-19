@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
 import axios from "axios";
-import { useNavigate,useLocation } from "react-router-dom";
 import Filter from '../filter/Filter';
+import { useNavigate } from 'react-router';
 
 // Define CSS classes
 const cardClasses = "max-w-lg mx-auto bg-white dark:bg-zinc-800 rounded-xl shadow-md overflow-hidden";
@@ -10,17 +10,16 @@ const badgeClasses = "bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounde
 const buttonClasses = "bg-white bg-opacity-50 p-1 rounded-full";
 const avatarClasses = "w-10 h-10 rounded-full border-2 border-yellow-400";
 
-const MotorbikeList = () => {
-  
-    const [motorbikeList, setMotorbikeList] = useState([]);
-    const [selectedMotorbike, setSelectedMotorbike] = useState(null);
+const MotorbikeList = (listMotor) => {
     const navigate = useNavigate();
-    const location = useLocation();
+    console.log(listMotor)
+    const [motorbikeList, setMotorbikeList] = useState(listMotor.listMotor);
+    const [selectedMotorbike, setSelectedMotorbike] = useState(null);
     useEffect(() => {
-      if (location.state && location.state.listMotor) {
-        setMotorbikeList(location.state.listMotor);
+      if (listMotor.listMotor) {
+        setMotorbikeList(listMotor.listMotor);
       }
-    }, [location.state]);
+    }, [listMotor.listMotor]);
     function formatNumber(numberString) {
       // Convert the string to a number, in case it isn't already
       const number = parseInt(numberString, 10);
