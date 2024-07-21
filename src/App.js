@@ -38,6 +38,7 @@ import CreateVoucherModal from "./pages/voucher/CreateVoucherModal";
 import VoucherList from "./pages/voucher/VoucherList"
 import Filter from "./pages/filter/Filter";
 import MyBooking from "./pages/myBooking/MyBooking";
+import FeedbackModal from "./pages/booking/FeedbackModal";
 
 function App() {
   return (
@@ -60,6 +61,7 @@ function App() {
           path="/registermotorbike"
           element={<RegisterMotorbikeStep1 />}
         />
+        <Route path="/sendFeedback" element={<FeedbackModal />} />
         <Route path="/registermotorbike/step2"element={<RegisterMotorbikeStep2/>}/>
         <Route path="/" element={<Navigate to="/homepage" />} />
         <Route path="/homepage" element={<Homepage />} />
