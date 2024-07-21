@@ -1,14 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-
-const modalOverlayClasses =
-  "fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 dark:bg-opacity-70 z-50";
-const modalContentClasses =
-  " dark:bg-zinc-500 rounded-lg p-4 max-w-md w-full bg-gray-300 from-40% to-zinc-600";
-const closeButtonClasses = "text-white hover:bg-red-700 bg-red-600 py-2 px-4 rounded-lg ";
-const inputClasses = "p-1 rounded mb-2";
-const buttonClasses =
-  "hover:bg-blue-700 bg-blue-600 text-white dark:text-zinc-900 py-2 px-4 rounded-lg text-right ml-2";
+import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
+import FloatingLabel from 'react-bootstrap/FloatingLabel';
+import Form from 'react-bootstrap/Form';
 
 const AddBrand = ({ showModal, setShowModal, onBrandCreated }) => {
   const [brandName, setBrandName] = useState("");
@@ -37,11 +32,10 @@ const AddBrand = ({ showModal, setShowModal, onBrandCreated }) => {
     setBrandOrigin("");
     setError("");
   };
-  
 
   const handleCreateBrand = async () => {
     if (!brandName.trim() || !brandOrigin.trim()) {
-      setError("Both fields are required.");
+      setError("Hãy điền đủ thông tin.");
       return;
     }
 
@@ -58,67 +52,53 @@ const AddBrand = ({ showModal, setShowModal, onBrandCreated }) => {
         handleModalClose();
       }
     } catch (error) {
-      setError(
-        "Brand name already existed" 
-      );
+      setError("Thương hiệu đã tồn tại");
     }
   };
 
-  if (!showModal) return null;
-
   return (
-    <div className={modalOverlayClasses}>
-      <div className={modalContentClasses}>
-        <div className="flex justify-between items-center mb-4 ">
-          <h2 className="text-lg-lg  font-semibold text-zinc-800 dark:text-zinc-200">
-            Create Brand
-          </h2>
-
-        </div>
-        <div className="flex flex-col mb-2">
-          <label
-            className="block text-lg font-medium text-gray-700 mb-1"
-            htmlFor="brand-name"
+    <Modal show={showModal} onHide={handleModalClose} backdrop="static" keyboard={false}>
+      <Modal.Header closeButton>
+        <Modal.Title>Thêm thương hiệu</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <form>
+          <FloatingLabel
+            controlId="floatingBrandName"
+            label="Tên thương hiệu"
+            className="mb-3"
           >
-            Brand Name
-          </label>
-          <input
-            type="text"
-            id="brand-name"
-            placeholder="Brand Name"
-            className={`${inputClasses} bg dark:bg-white-300  `}
-            value={brandName}
-            onChange={(e) => setBrandName(e.target.value)}
-          />
-        </div>
-        <div className="flex flex-col mb-2">
-          <label
-            className="block text-lg font-medium text-gray-700 mb-1"
-            htmlFor="brand-origin"
+            <Form.Control
+              type="text"
+              placeholder="Tên thương hiệu"
+              value={brandName}
+              onChange={(e) => setBrandName(e.target.value)}
+            />
+          </FloatingLabel>
+          <FloatingLabel
+            controlId="floatingBrandOrigin"
+            label="Xuất xứ"
+            className="mb-3"
           >
-            Brand Origin
-          </label>
-          <input
-            type="text"
-            id="brand-origin"
-            placeholder="Brand Origin"
-            className={`${inputClasses} bg dark:bg-white-300 `}
-            value={brandOrigin}
-            onChange={(e) => setBrandOrigin(e.target.value)}
-          />
-        </div>
-        {error && <div className="text-red-500 mb-2 font-bold text-center">{error}</div>}
-        <div className="flex justify-end">
-        <button className={closeButtonClasses} onClick={handleModalClose}>
-          Close
+            <Form.Control
+              type="text"
+              placeholder="Xuất xứ"
+              value={brandOrigin}
+              onChange={(e) => setBrandOrigin(e.target.value)}
+            />
+          </FloatingLabel>
+          {error && <div className="text-red-500 mb-2 font-bold text-center">{error}</div>}
+        </form>
+      </Modal.Body>
+      <Modal.Footer>
+      <button  className="px-4 py-2 hover:bg-red-700 bg-red-600 text-white rounded-lg mr-2" onClick={handleModalClose}>
+          Đóng
         </button>
-        <button className={buttonClasses} onClick={handleCreateBrand}>
-          Save
+        <button  className="px-4 py-2 hover:bg-blue-700 bg-blue-600 text-white rounded-lg" onClick={handleCreateBrand}>
+          Lưu
         </button>
-        </div>
-      
-      </div>
-    </div>
+      </Modal.Footer>
+    </Modal>
   );
 };
 
