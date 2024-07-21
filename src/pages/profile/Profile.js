@@ -73,9 +73,9 @@ const Profile = () => {
             <FontAwesomeIcon icon={faMotorcycle} />
             <br />
             <span className={`text-lg font-semibold ${greenTextClasses}`}>
-              0{" "}
+            {user.totalTrip} 
             </span>
-            <span className={smallTextClasses}>trip</span>
+            <span className={smallTextClasses}> trip</span>
           </div>
         </div>
 
