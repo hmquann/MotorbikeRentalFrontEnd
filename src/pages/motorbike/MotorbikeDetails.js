@@ -1,17 +1,73 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ModalImage from "react-modal-image";
-
+import axios from 'axios';
 const inputClasses =
   "w-full px-3 py-2 mt-1 rounded-md bg-input text-primary-foreground";
 const labelClasses = "block text-sm font-medium";
 
 const MotorbikeDetails = ({ motorbike, onClose }) => {
-  if (!motorbike) return null;
+  const [updateForm, setUpdateForm] = useState({
+    price:'',
+    overtimeFee: '',
+    overtimeLimit: '',
+    delivery: '',
+    freeShipLimit: '',
+    deliveryFee: '',
+    constraintMotorbike: ''
+  });
 
+  useEffect(() => {
+    if (motorbike) {
+      setUpdateForm({
+        price:motorbike.price,
+        overtimeFee: motorbike.overtimeFee,
+        overtimeLimit: motorbike.overtimeLimit,
+        delivery: motorbike.delivery,
+        freeShipLimit: motorbike.freeShipLimit,
+        deliveryFee: motorbike.deliveryFee,
+        constraintMotorbike: motorbike.constraintMotorbike
+      });
+    }
+  }, [motorbike]);
+const [isUpdate,setIsUpdate]=useState(false);
+const handleChange=(e)=>{
+  const{name,value}=e.target;
+  setUpdateForm({...updateForm,
+  [name]:value})
+}
+const handleSubmit = async () => {
+  try {
+    const response = await axios.post(`http://localhost:8080/api/motorbike/updateMotorbike/${motorbike.id}`, updateForm);
+    console.log('Data sent successfully', response.data);
+    // You can handle success actions here
+  } catch (error) {
+    console.error('Error sending data', error);
+    // You can handle error actions here
+  }
+};
+  if (!motorbike) return null;
+  
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 backdrop-blur-sm">
       <div className="bg-zinc-200 text-primary-foreground p-4 rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] overflow-auto">
-        <h2 className="text-2xl font-bold mb-4">Motorbike Details</h2>
+      <div className="flex items-center justify-between mb-4">
+          <h2 className="text-2xl font-bold">Motorbike Details</h2>
+          <svg onClick={()=>setIsUpdate(!isUpdate)}
+            className="h-10 w-10 text-blue-500"
+            viewBox="0 0 24 24"
+            strokeWidth="2"
+            stroke="currentColor"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" />
+            <path d="M9 7h-3a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-3" />
+            <path d="M9 15h3l8.5 -8.5a1.5 1.5 0 0 0 -3 -3l-8.5 8.5v3" />
+            <line x1="16" y1="5" x2="19" y2="8" />
+           
+          </svg>
+        </div>        
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label htmlFor="name" className={labelClasses}>
@@ -42,6 +98,21 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
             />
           </div>
           <div>
+            <label htmlFor="price" className={labelClasses}>
+              Price/day
+            </label>
+            <input
+              type="text"
+              id="price"
+              name="price"
+              placeholder="Enterprice"
+              className={inputClasses}
+              value={updateForm.price}
+              readOnly={!isUpdate}
+              onChange={handleChange}
+            />
+          </div>
+          <div>
             <label htmlFor="overtimeFee" className={labelClasses}>
               Overtime Fee
             </label>
@@ -51,8 +122,9 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
               name="overtimeFee"
               placeholder="Enter overtime fee"
               className={inputClasses}
-              value={motorbike.overtimeFee}
-              readOnly
+              value={updateForm.overtimeFee}
+              readOnly={!isUpdate}
+              onChange={handleChange}
             />
           </div>
           <div>
@@ -65,8 +137,9 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
               name="overtimeLimit"
               placeholder="Enter overtime limit"
               className={inputClasses}
-              value={motorbike.overtimeLimit}
-              readOnly
+              value={updateForm.overtimeLimit}
+              readOnly={!isUpdate}
+              onChange={handleChange}
             />
           </div>
           <div>
@@ -93,8 +166,9 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
               name="delivery"
               placeholder="Enter delivery status"
               className={inputClasses}
-              value={motorbike.delivery ? "Yes" : "No"}
-              readOnly
+              value={updateForm.delivery ? "Yes" : "No"}
+              readOnly={!isUpdate}
+              onChange={handleChange}
             />
           </div>
           <div>
@@ -107,8 +181,9 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
               name="deliveryFee"
               placeholder="Enter delivery fee"
               className={inputClasses}
-              value={motorbike.deliveryFee}
-              readOnly
+              value={updateForm.deliveryFee}
+              readOnly={!isUpdate}
+              onChange={handleChange}
             />
           </div>
           <div>
@@ -121,8 +196,9 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
               name="constraintMotorbike"
               placeholder="Enter motorbike constraints"
               className={inputClasses}
-              value={motorbike.constraintMotorbike}
-              readOnly
+              value={updateForm.constraintMotorbike}
+              readOnly={!isUpdate}
+              onChange={handleChange}
             />
           </div>
           <div>
@@ -156,17 +232,24 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
             </div>
           </div>
         </div>
-        <div className="flex justify-end">
-          <button
-            onClick={onClose}
-            className="mt-4 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg"
-          >
-            Close
-          </button>
-        </div>
+        <div className="flex justify-end space-x-2">
+  {isUpdate && (
+    <button
+      onClick={handleSubmit}
+      className="mt-4 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg"
+    >
+      Update
+    </button>
+  )}
+  <button
+    onClick={onClose}
+    className="mt-4 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg"
+  >
+    Close
+  </button>
+</div>
       </div>
     </div>
   );
 };
-
 export default MotorbikeDetails;

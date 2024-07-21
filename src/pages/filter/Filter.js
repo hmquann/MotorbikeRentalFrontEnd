@@ -116,7 +116,7 @@ function SetPriceRangeModal({ minValueProp, maxValueProp, modelTypeProp, onUpdat
               renderThumb={({ props }) => (
                 <div
                   {...props}
-                  className="w-6 h-6 bg-primary rounded-full cursor-pointer"
+                  className="w-4 h-4 bg-primary rounded-full cursor-pointer"
                 />
               )}
             />
@@ -162,6 +162,7 @@ const Filter = () => {
   const [modalShow, setModalShow] = useState(false);
   const location=useLocation();
   const filterAddressAndTime=location.state.filterList;
+  const [listMotor,setListMotor]=useState(location.state.listMotor);
   const handleUpdateValues = (newValues) => {
     setFilterList({...filterList,minPrice:newValues[0]})
     setFilterList({...filterList,maxPrice:newValues[1]})
@@ -194,44 +195,38 @@ const Filter = () => {
   
   const handleButtonClick = (buttonName) => {
     setSelectedButtons(prevSelectedButtons => {
-      const isSelected = prevSelectedButtons.includes(buttonName);
+        const isSelected = prevSelectedButtons.includes(buttonName);
+        const updatedButtons = isSelected 
+            ? prevSelectedButtons.filter(name => name !== buttonName) 
+            : [...prevSelectedButtons, buttonName];
 
-      const updatedButtons = isSelected
-        ? prevSelectedButtons.filter(name => name !== buttonName)
-        : [...prevSelectedButtons, buttonName];
+        setFilterList(prevFilterList => {
+            const updatedFilterList = { ...prevFilterList };
+            switch (buttonName) {
+                case 'delivery':
+                    updatedFilterList.isDelivery = isSelected ? "": true;
+                    break;
+                case 'rate':
+                    updatedFilterList.isFiveStar = isSelected ? "": true;
+                    break;
+                default:
+                    break;
+            }
+            return updatedFilterList;
+        });
 
-      setFilterList(prevFilterList => {
-        const updatedFilterList = { ...prevFilterList };
-
-        switch (buttonName) {
-          case 'delivery':
-            updatedFilterList.isDelivery = !isSelected;
-            break;
-          case 'rate':
-            updatedFilterList.isFiveStar = !isSelected;
-            break;
-          case 'electric':
-            updatedFilterList.electric = !isSelected;
-            break;
-          default:
-            break;
-        }
-
-        return updatedFilterList;
-      });
-
-      return updatedButtons;
+        return updatedButtons;
     });
+
     if (buttonName === 'brand') {
-       setShowBrandPopup(true);
-    } 
-    else if(buttonName=='filter'){
-      setModalShow(true);
+        setShowBrandPopup(true);
+    } else if (buttonName === 'filter') {
+        setModalShow(true);
     }
-    handleSearchMotor()
+
     console.log(selectedButtons);
-    console.log(filterList); 
-  };
+    console.log(filterList);
+};
 
   const buttons = [
     {name:'brand',label:'Hãng xe',svg:(<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
@@ -252,11 +247,7 @@ const Filter = () => {
 </svg>
 
     ) },
-   ,
-    {name:'electric',label:'Xe Điện',svg:(<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-    <path fill-rule="evenodd" d="M14.615 1.595a.75.75 0 0 1 .359.852L12.982 9.75h7.268a.75.75 0 0 1 .548 1.262l-10.5 11.25a.75.75 0 0 1-1.272-.71l1.992-7.302H3.75a.75.75 0 0 1-.548-1.262l10.5-11.25a.75.75 0 0 1 .913-.143Z" clip-rule="evenodd" />
-  </svg>
-  )},
+
     { name: 'filter', label: 'Bộ lọc', svg: (
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
   <path fillRule="evenodd" d="M3.792 2.938A49.069 49.069 0 0 1 12 2.25c2.797 0 5.54.236 8.209.688a1.857 1.857 0 0 1 1.541 1.836v1.044a3 3 0 0 1-.879 2.121l-6.182 6.182a1.5 1.5 0 0 0-.439 1.061v2.927a3 3 0 0 1-1.658 2.684l-1.757.878A.75.75 0 0 1 9.75 21v-5.818a1.5 1.5 0 0 0-.44-1.06L3.13 7.938a3 3 0 0 1-.879-2.121V4.774c0-.897.64-1.683 1.542-1.836Z" clipRule="evenodd" />
@@ -327,22 +318,28 @@ const Filter = () => {
   setAddressPopUp(false)
   }
   const handleSearchMotor = async () => {
+    const { modelType, ...newFilterList } = filterList;
+    if (modelType) {
+      newFilterList.modelType = modelType;
+    }
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:8080/api/motorbike/filter', filterList, {
+      const response = await axios.post('http://localhost:8080/api/motorbike/filter', newFilterList, {
         headers: {
           'Content-Type': 'application/json',
         },
       });
       console.log('Data sent successfully:', response.data);
-      const listMotor=response.data;
-      navigate('/filter', { state: { filterList,listMotor } });
+      setListMotor(response.data);
     } catch (error) {
       handleRequestError(error);
     } finally {
       setLoading(false);
     }
   };
+  useEffect(() => {
+    handleSearchMotor(filterList);
+  }, [filterList]);
   const handleRequestError = (error) => {
     if (error.response) {
       console.error('Error response:', error.response);
@@ -496,7 +493,7 @@ const Filter = () => {
     </div>
     <div className="flex justify-center">
       <div style={{ width: '95%' }}>
-      <MotorbikeList/>
+      <MotorbikeList listMotor={listMotor}/>
       </div>
     </div>
     {showBrandPopup && (
