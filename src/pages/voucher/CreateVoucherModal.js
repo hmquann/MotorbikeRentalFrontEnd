@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./CreateVoucher.css";
-
-const inputClasses =
-  "mt-1 block w-full p-2 border border-zinc-300 rounded-md dark:text-green-800 font-medium";
-const labelClasses =
-  "block text-md font-bold text-slate-500 dark:text-neutral-300";
+import Modal from "react-bootstrap/Modal";
+import FloatingLabel from "react-bootstrap/FloatingLabel";
+import Form from "react-bootstrap/Form";
 
 const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
   const [formData, setFormData] = useState({
@@ -42,9 +40,34 @@ const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
     const { name, value } = e.target;
     const newErrors = { ...errors };
     if (!value.trim()) {
-      newErrors[name] = `${
-        name.charAt(0).toUpperCase() + name.slice(1)
-      } is required`;
+      switch (name) {
+        case "name":
+          newErrors[name] = "Hãy điền tên";
+          break;
+        case "code":
+          newErrors[name] = "Hãy điền mã khuyến mãi";
+          break;
+        case "discountPercent":
+          newErrors[name] = "Hãy điền phần trăm khuyến mãi";
+          break;
+        case "maxDiscountMoney":
+          newErrors[name] = "Hãy điền số tiền khuyến mãi";
+          break;
+        case "discountMoney":
+          newErrors[name] = "Hãy điền số tiền khuyến mãi";
+          break;
+        case "startDate":
+          newErrors[name] = "Hãy điền ngày bắt đầu";
+          break;
+        case "expirationDate":
+          newErrors[name] = "Hãy điền ngày hết hạn";
+          break;
+        case "quantity":
+          newErrors[name] = "Hãy điền số lượng";
+          break;
+        default:
+          newErrors[name] = `Hãy điền ${name}`;
+      }
     } else {
       delete newErrors[name];
     }
@@ -57,18 +80,61 @@ const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
 
   const validate = () => {
     const newErrors = {};
-    if (!formData.name) newErrors.name = "Name is required";
-    if (!formData.code) newErrors.code = "Code is required";
-    if (!formData.voucherType)
-      newErrors.voucherType = "Voucher Type is required";
-    if (!formData.startDate) newErrors.startDate = "Start Date is required";
-    if (!formData.expirationDate)
-      newErrors.expirationDate = "Expiration Date is required";
-    if (!formData.quantity) newErrors.quantity = "Quantity is required";
-    if (formData.voucherType === "PERCENTAGE" && !formData.discountPercent)
-      newErrors.discountPercent = "Discount Percent is required";
-    if (formData.voucherType === "FIXED_MONEY" && !formData.discountMoney)
-      newErrors.discountMoney = "Discount Money is required";
+
+    if (!formData.name) {
+      newErrors.name = "Hãy điền tên";
+    }
+
+    if (!formData.code) {
+      newErrors.code = "Hãy điền mã code";
+    }
+
+    if (!formData.voucherType) {
+      newErrors.voucherType = "Hãy chọn loại khuyến mãi";
+    }
+
+    if (!formData.startDate) {
+      newErrors.startDate = "Hãy chọn ngày bắt đầu";
+    } else if (
+      new Date(formData.startDate) > new Date(formData.expirationDate)
+    ) {
+      newErrors.startDate = "Ngày bắt đầu phải trước ngày hết hạn";
+    }
+
+    if (!formData.expirationDate) {
+      newErrors.expirationDate = "Hãy chọn ngày hết hạn";
+    }
+
+    if (!formData.quantity) {
+      newErrors.quantity = "Hãy điền số lượng";
+    } else if (formData.quantity <= 0) {
+      newErrors.quantity = "Số lưọng phải lớn hơn 0";
+    }
+
+    if (formData.voucherType === "PERCENTAGE") {
+      if (!formData.discountPercent) {
+        newErrors.discountPercent = "Hãy điền phần trăm khuyến mãi";
+      } else if (
+        formData.discountPercent < 0 ||
+        formData.discountPercent > 100
+      ) {
+        newErrors.discountPercent = "Phần trăm khuyến mãi chỉ từ 0 đến 100";
+      }
+      if (!formData.maxDiscountMoney) {
+        newErrors.maxDiscountMoney = "Hãy điền số tiền khuyến mãi";
+      } else if (formData.maxDiscountMoney < 0) {
+        newErrors.maxDiscountMoney = "Số tiền khuyến mãi phải lớn hơn 0";
+      }
+    }
+
+    if (formData.voucherType === "FIXED_MONEY") {
+      if (!formData.discountMoney) {
+        newErrors.discountMoney = "Hãy điền số tiền khuyến mãi";
+      } else if (formData.discountMoney < 0) {
+        newErrors.discountMoney = "Số tiền khuyến mãi phải lớn hơn 0";
+      }
+    }
+
     return newErrors;
   };
 
@@ -104,7 +170,7 @@ const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
       })
       .catch((error) => {
         if (error.response.status === 400) {
-          setErrorsMess("Discount has been existed");
+          setErrorsMess("Mã khuyến mãi đã tồn tại");
         }
         console.error("There was an error creating the discount!", error);
       });
@@ -115,190 +181,222 @@ const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
   }
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="form-container">
-        <div className="bg-zinc-300 text-slate-600 p-2 rounded-t-lg">
-          <h2 className="text-lg font-bold">Voucher Details</h2>
-        </div>
+    <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+      <Modal.Header closeButton>
+        <Modal.Title>Thêm khuyến mãi</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
         <form className="space-y-4 p-4" onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="input-wrapper">
-              <label className={labelClasses}>Name</label>
-              <input
-                type="text"
-                placeholder="Name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                className={inputClasses}
-              />
+              <FloatingLabel controlId="floatingName" label="Tên">
+                <Form.Control
+                  type="text"
+                  placeholder="Tên"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                  isInvalid={!!errors.name}
+                />
+              </FloatingLabel>
               {errors.name && (
                 <span className="text-red-500 text-sm">{errors.name}</span>
               )}
+              <Form.Control.Feedback type="invalid">
+                {errors.name}
+              </Form.Control.Feedback>
             </div>
             <div>
-              <label className={labelClasses}>Code</label>
-              <input
-                type="text"
-                placeholder="Code"
-                name="code"
-                value={formData.code}
-                onChange={handleChange}
-                className={inputClasses}
-              />
+              <FloatingLabel controlId="floatingCode" label="Code">
+                <Form.Control
+                  type="text"
+                  placeholder="Code"
+                  name="code"
+                  value={formData.code}
+                  onChange={handleChange}
+                  isInvalid={!!errors.code}
+                />
+              </FloatingLabel>
               {errors.code && (
                 <span className="text-red-500 text-sm">{errors.code}</span>
               )}
             </div>
           </div>
           <div>
-            <label className={labelClasses}>Description</label>
-            <textarea
-              placeholder="Description"
-              name="description"
-              rows="3"
-              value={formData.description}
-              onChange={handleChange}
-              className={inputClasses}
-            ></textarea>
+            <FloatingLabel controlId="floatingDescription" label="Mô tả">
+              <Form.Control
+                as="textarea"
+                placeholder="Description"
+                name="description"
+                rows="3"
+                value={formData.description}
+                onChange={handleChange}
+              />
+            </FloatingLabel>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className={labelClasses}>Voucher Type</label>
-              <select
-                name="voucherType"
-                value={formData.voucherType}
-                onChange={handleChange}
-                className={inputClasses}
+              <FloatingLabel
+                controlId="floatingVoucherType"
+                label="Loại khuyến mãi"
               >
-                <option value="PERCENTAGE">Percentage</option>
-                <option value="FIXED_MONEY">Fixed Amount</option>
-              </select>
-              {errors.voucherType && (
-                <p className="text-red-500 text-sm">{errors.voucherType}</p>
-              )}
+                <Form.Select
+                  name="voucherType"
+                  value={formData.voucherType}
+                  onChange={handleChange}
+                >
+                  <option value="PERCENTAGE">Phần trăm</option>
+                  <option value="FIXED_MONEY">Khoản tiền cố định</option>
+                </Form.Select>
+              </FloatingLabel>
             </div>
             {formData.voucherType === "PERCENTAGE" && (
               <div>
-                <label className={labelClasses}>Discount Percent</label>
-                <input
-                  placeholder="Discount Percent"
-                  type="number"
-                  name="discountPercent"
-                  value={formData.discountPercent}
-                  onChange={handleChange}
-                  className={inputClasses}
-                  min="1"
-                  max="100"
-                />
+                <FloatingLabel
+                  controlId="floatingDiscountPercent"
+                  label="Phần trăm khuyến mãi"
+                >
+                  <Form.Control
+                    type="number"
+                    placeholder="Discount Percent"
+                    name="discountPercent"
+                    value={formData.discountPercent}
+                    onChange={handleChange}
+                    min="1"
+                    max="100"
+                    isInvalid={!!errors.discountPercent}
+                  />
+                </FloatingLabel>
                 {errors.discountPercent && (
-                  <p className="text-red-500 text-sm">
+                  <span className="text-red-500 text-sm">
                     {errors.discountPercent}
-                  </p>
+                  </span>
                 )}
               </div>
             )}
             {formData.voucherType === "PERCENTAGE" && (
               <div>
-                <label className={labelClasses}>Max Discount Money (VND)</label>
-                <input
-                  placeholder="Max Discount Money"
-                  type="number"
-                  name="maxDiscountMoney"
-                  value={formData.maxDiscountMoney}
-                  onChange={handleChange}
-                  className={inputClasses}
-                />
+                <FloatingLabel
+                  controlId="floatingMaxDiscountMoney"
+                  label="Số tiền khuyến mãi"
+                >
+                  <Form.Control
+                    placeholder="Max Discount Money"
+                    type="number"
+                    name="maxDiscountMoney"
+                    value={formData.maxDiscountMoney}
+                    onChange={handleChange}
+                    isInvalid={!!errors.maxDiscountMoney}
+                  />
+                </FloatingLabel>
                 {errors.maxDiscountMoney && (
-                  <p className="text-red-500 text-sm">
+                  <span className="text-red-500 text-sm">
                     {errors.maxDiscountMoney}
-                  </p>
+                  </span>
                 )}
               </div>
             )}
             {formData.voucherType === "FIXED_MONEY" && (
               <div>
-                <label className={labelClasses}>Discount Money (VND)</label>
-                <input
-                  placeholder="Discount Money"
-                  type="number"
-                  name="discountMoney"
-                  value={formData.discountMoney}
-                  onChange={handleChange}
-                  className={inputClasses}
-                />
+                <FloatingLabel
+                  controlId="floatingDiscountMoney"
+                  label="Số tiền khuyến mãi"
+                >
+                  <Form.Control
+                    placeholder="Discount Money"
+                    type="number"
+                    name="discountMoney"
+                    value={formData.discountMoney}
+                    onChange={handleChange}
+                    isInvalid={!!errors.discountMoney}
+                  />
+                </FloatingLabel>
                 {errors.discountMoney && (
-                  <p className="text-red-500 text-sm">{errors.discountMoney}</p>
+                  <span className="text-red-500 text-sm">
+                    {errors.discountMoney}
+                  </span>
                 )}
               </div>
             )}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className={labelClasses}>Start Date</label>
-              <input
-                type="date"
-                name="startDate"
-                value={formData.startDate}
-                onChange={handleChange}
-                className={inputClasses}
-              />
+              <FloatingLabel controlId="floatingStartDate" label="Ngày bắt đầu">
+                <Form.Control
+                  type="date"
+                  name="startDate"
+                  value={formData.startDate}
+                  onChange={handleChange}
+                  isInvalid={!!errors.startDate}
+                />
+              </FloatingLabel>
               {errors.startDate && (
-                <p className="text-red-500 text-sm">{errors.startDate}</p>
+                <span className="text-red-500 text-sm">{errors.startDate}</span>
               )}
             </div>
             <div>
-              <label className={labelClasses}>Expiration Date</label>
-              <input
-                type="date"
-                name="expirationDate"
-                value={formData.expirationDate}
-                onChange={handleChange}
-                className={inputClasses}
-              />
+              <FloatingLabel
+                controlId="floatingExpirationDate"
+                label="Ngày hết hạn"
+              >
+                <Form.Control
+                  type="date"
+                  name="expirationDate"
+                  value={formData.expirationDate}
+                  onChange={handleChange}
+                  isInvalid={!!errors.expirationDate}
+                />
+              </FloatingLabel>
               {errors.expirationDate && (
-                <p className="text-red-500 text-sm">{errors.expirationDate}</p>
+                <span className="text-red-500 text-sm">
+                  {errors.expirationDate}
+                </span>
               )}
             </div>
           </div>
           <div>
-            <label className={labelClasses}>Quantity</label>
-            <input
-              placeholder="Quantity"
-              type="number"
-              name="quantity"
-              value={formData.quantity}
-              onChange={handleChange}
-              className={inputClasses}
-              min="1"
-            />
+            <FloatingLabel controlId="floatingQuantity" label="Số lượng">
+              <Form.Control
+                placeholder="Quantity"
+                type="number"
+                name="quantity"
+                value={formData.quantity}
+                onChange={handleChange}
+                min="1"
+                isInvalid={!!errors.quantity}
+              />
+            </FloatingLabel>
             {errors.quantity && (
-              <p className="text-red-500 text-sm">{errors.quantity}</p>
+              <span className="text-red-500 text-sm">{errors.quantity}</span>
             )}
           </div>
           {errorsMess && (
-            <div className="text-red-500 mb-2 font-bold text-center">
+            <div className="text-red-500 font-bold text-center">
               {errorsMess}
             </div>
           )}
-          <div className="flex justify-end space-x-4">
-            <button
-              type="button"
-              onClick={() => setShowModal(false)}
-              className="hover:bg-red-700 bg-red-600 text-white px-4 py-2 rounded-lg"
-            >
-              Close
-            </button>
-            <button
-              type="submit"
-              className="hover:bg-blue-700 bg-blue-600 text-white px-4 py-2 rounded-lg"
-            >
-              Save
-            </button>
-          </div>
         </form>
-      </div>
-    </div>
+      </Modal.Body>
+      <Modal.Footer>
+        <div className="flex justify-end space-x-4">
+          <button
+            type="button"
+            onClick={() => setShowModal(false)}
+            className="hover:bg-red-700 bg-red-600 text-white px-4 py-2 rounded-lg"
+          >
+            Đóng
+          </button>
+          <button
+            type="submit"
+            onClick={handleSubmit}
+            className="hover:bg-blue-700 bg-blue-600 text-white px-4 py-2 rounded-lg"
+          >
+            Lưu
+          </button>
+        </div>
+      </Modal.Footer>
+    </Modal>
   );
 };
 
