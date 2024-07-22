@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+import { Form } from "react-bootstrap";
 
 const inputClasses =
   "mt-1 block w-full p-2 border border-zinc-300 rounded-md text-black font-medium";
-const labelClasses = "block text-md font-bold text-slate-500 dark:text-neutral-300";
+const labelClasses = "block text-md text-slate-500 ";
 
 const ViewModel = ({ showModal, setShowModal, modelId }) => {
   const [modelData, setModelData] = useState({
@@ -34,22 +37,24 @@ const ViewModel = ({ showModal, setShowModal, modelId }) => {
       fetchModelDetails();
     }
   }, [modelId, showModal]);
-
-  if (!showModal) {
-    return null;
-  }
+  const modelTypeMap = {
+    'XeSo': 'Xe Số',
+    'XeTayGa': 'Xe Tay Ga',
+    'XeConTay': 'Xe Côn Tay',
+    'XeDien': 'Xe Điện'
+  };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 ">
-      <div className="bg-gray-100 p-4 rounded-lg shadow-lg max-w-4xl mx-auto">
-        <div className="bg-zinc-200 text-slate-600 p-2 rounded-t-lg">
-          <h2 className="text-lg-lg font-bold">Model Details</h2>
-        </div>
-        <form className="space-y-4 p-4">
+    <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" >
+      <Modal.Header closeButton>
+        <Modal.Title>Chi tiết mẫu xe</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <form className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="input-wrapper">
-              <label className={labelClasses}>Model Name</label>
-              <input
+              <label className={labelClasses}>Tên mẫu</label>
+              <Form.Control
                 type="text"
                 name="modelName"
                 value={modelData.modelName}
@@ -58,8 +63,8 @@ const ViewModel = ({ showModal, setShowModal, modelId }) => {
               />
             </div>
             <div>
-              <label className={labelClasses}>Cylinder Capacity</label>
-              <input
+              <label className={labelClasses}>Dung tích xi lanh</label>
+              <Form.Control
                 type="text"
                 name="cylinderCapacity"
                 value={modelData.cylinderCapacity}
@@ -68,8 +73,8 @@ const ViewModel = ({ showModal, setShowModal, modelId }) => {
               />
             </div>
             <div>
-              <label className={labelClasses}>Fuel Consumption</label>
-              <input
+              <label className={labelClasses}>Nhiên liệu tiêu hao</label>
+              <Form.Control
                 type="text"
                 name="fuelConsumption"
                 value={modelData.fuelConsumption}
@@ -81,8 +86,8 @@ const ViewModel = ({ showModal, setShowModal, modelId }) => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className={labelClasses}>Fuel Type</label>
-              <input
+              <label className={labelClasses}>Loại nhiên liệu</label>
+              <Form.Control
                 type="text"
                 name="fuelType"
                 value={modelData.fuelType}
@@ -91,11 +96,11 @@ const ViewModel = ({ showModal, setShowModal, modelId }) => {
               />
             </div>
             <div>
-              <label className={labelClasses}>Model Type</label>
-              <input
+              <label className={labelClasses}>Loại xe</label>
+              <Form.Control
                 type="text"
                 name="modelType"
-                value={modelData.modelType}
+                value={modelTypeMap[modelData.modelType]}
                 readOnly
                 className={inputClasses}
               />
@@ -103,8 +108,8 @@ const ViewModel = ({ showModal, setShowModal, modelId }) => {
           </div>
 
           <div>
-            <label className={labelClasses}>Brand</label>
-            <input
+            <label className={labelClasses}>Thương hiệu</label>
+            <Form.Control
               type="text"
               name="brandName"
               value={modelData.brand?.brandName}
@@ -112,19 +117,14 @@ const ViewModel = ({ showModal, setShowModal, modelId }) => {
               className={inputClasses}
             />
           </div>
-
-          <div className="flex justify-end space-x-4">
-            <button
-              type="button"
-              onClick={() => setShowModal(false)}
-              className="hover:bg-red-700 bg-red-600 text-white px-4 py-2 rounded-lg"
-            >
-              Close
-            </button>
-          </div>
         </form>
-      </div>
-    </div>
+      </Modal.Body>
+      <Modal.Footer>
+        <button onClick={() => setShowModal(false)} className="px-4 py-2 hover:bg-red-700 bg-red-600 text-white rounded-lg mr-2">
+          Đóng
+        </button>
+      </Modal.Footer>
+    </Modal>
   );
 };
 
