@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import ConfirmModal from './ConfirmModal';
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
 
-const containerClasses = "max-w-sm mx-auto p-4 bg-white dark:bg-zinc-800 rounded-lg shadow-md";
+const containerClasses = "max-w-sm mx-auto p-4 bg-white dark:bg-zinc-800 rounded-lg shadow-lg";
 const titleClasses = "text-center text-md font-bold text-zinc-900 dark:text-zinc-100";
 const textClasses = "text-center text-zinc-700 dark:text-zinc-300 mt-2";
 const inputClasses = "w-full p-2 border border-zinc-300 dark:border-zinc-700 rounded-md";
@@ -16,9 +17,9 @@ const TopUp = ({ onClose, onConfirm, setError }) => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleConfirm = async () => {
+  const handleConfirm = () => {
     if (!amount) {
-      setLocalError("Please enter an amount.");
+      setLocalError("Hãy nhập số tiền bạn muốn.");
       return;
     }
 
@@ -27,79 +28,90 @@ const TopUp = ({ onClose, onConfirm, setError }) => {
       setLocalError("Please enter a valid positive amount.");
       return;
     }
-    setShowConfirmModal(true)
-  }
-    const handleTopUpConfirm = async () =>{
-      setIsLoading(true)
-      setShowConfirmModal(false)
-      setTimeout(async () => {
+    setShowConfirmModal(true);
+  };
+
+  const handleTopUpConfirm = async () => {
+    setIsLoading(true);
+    setShowConfirmModal(false);
+    setTimeout(async () => {
       try {
-        await onConfirm(amount); 
-        setIsLoading(false) 
-        onClose();         
+        await onConfirm(amount);
+        setIsLoading(false);
+        onClose();
       } catch (error) {
-        setIsLoading(false)
-        setError("Failed to initiate payment."); 
+        setIsLoading(false);
+        setError("Failed to initiate payment.");
       }
-    },2000)
-    }
-  
+    }, 2000);
+  };
 
   const handleChange = (e) => {
-    const value = e.target.value.replace(/\D/g, ""); 
+    const value = e.target.value.replace(/\D/g, "");
     setAmount(value);
 
     if (value === "") {
-      setFormattedAmount(""); 
+      setFormattedAmount("");
     } else {
       const numberValue = parseFloat(value);
       setFormattedAmount(numberValue.toLocaleString());
     }
 
-    setLocalError(""); 
+    setLocalError("");
   };
 
   return (
     <div className={containerClasses}>
-      <h2 className={titleClasses}>Top-up</h2>
+      <h2 className={titleClasses}>Nạp tiền</h2>
       <p className={textClasses}>
-        Please enter the amount to top-up your wallet.
+        Hãy nhập số tiền bạn muốn nạp.
       </p>
       <div className="mt-4">
         <input
           type="text"
           className={inputClasses}
-          placeholder="Enter amount"
+          placeholder="Nhập số tiền"
           value={formattedAmount}
           onChange={handleChange}
         />
       </div>
       {localError && <div className="text-red-500 mt-2">{localError}</div>}
       <div className={buttonContainerClasses}>
-        <button 
-          className={`${buttonClasses} hover:bg-red-500 text-zinc-700 dark:text-zinc-300`} 
-          onClick={onClose}>
-          Cancel
+        <button
+          className={`${buttonClasses} hover:bg-red-500 text-zinc-700 dark:text-zinc-300`}
+          onClick={onClose}
+        >
+          Hủy
         </button>
-        <button 
-          className={`${buttonLastClasses} hover:bg-green-500 text-blue-600 dark:text-blue-400`} 
-          onClick={handleConfirm}>
-          OK
+        <button
+          className={`${buttonLastClasses} hover:bg-green-500 text-blue-600 dark:text-blue-400`}
+          onClick={handleConfirm}
+        >
+          Nạp
         </button>
       </div>
       {isLoading && (
         <div className="mt-4 text-center">
           <div className="loader" />
-          <p className="text-green-700 dark:text-zinc-300">Processing your request...</p>
+          <p className="text-green-700 dark:text-zinc-300">Đang xử lý...</p>
         </div>
       )}
-      {showConfirmModal && (
-        <ConfirmModal
-          message={`Are you sure you want to top up ${formattedAmount} VND?`}
-          onConfirm={handleTopUpConfirm}
-          onCancel={() => setShowConfirmModal(false)}
-        />
-      )}
+      <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Xác nhận</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Bạn có chắc muốn nạp {formattedAmount} VND?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowConfirmModal(false)}>
+            Hủy
+          </Button>
+          <Button variant="primary" onClick={handleTopUpConfirm}>
+            Đồng ý
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
