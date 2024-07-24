@@ -57,7 +57,7 @@ export default function Widget() {
     const fetchMotorbike = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/motorbike/getMotorbikeById/${booking.motorbikeId}`
+          `http://localhost:8080/api/motorbike/${booking.motorbikeId}`
         );
         console.log(response.data);
         setMotorbikeName(
