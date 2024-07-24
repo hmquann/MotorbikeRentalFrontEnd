@@ -59,14 +59,13 @@ export default function Widget() {
   const [showPopup, setShowPopup] = useState(false);
   const [popupContent, setPopupContent] = useState("");
   const [action, setAction] = useState("");
-  const [showPopupSuccess, setShowPopupSuccess] = useState(false); // Add this state
-  const navigate = useNavigate(); // Add this hook
-
+  const [showPopupSuccess, setShowPopupSuccess] = useState(false); 
+  const navigate = useNavigate(); 
   useEffect(() => {
     const fetchMotorbike = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/motorbike/getMotorbikeById/${booking.motorbikeId}`
+          `http://localhost:8080/api/motorbike/${booking.motorbikeId}`
         );
         console.log(response.data);
         setMotorbikeName(
@@ -97,7 +96,11 @@ export default function Widget() {
     setPopupContent(
       actionType === "accept"
         ? "Bạn có chắc chắn muốn duyệt chuyến này?"
-        : "Bạn có chắc chắn muốn từ chối chuyến này?"
+        : actionType === "reject"
+        ? "Bạn có chắc chắn muốn từ chối chuyến này?"
+        : actionType === "deliver"
+        ? "Bạn có chắc chắn muốn giao xe cho chuyến này?"
+        : "Bạn có chắc chắn muốn hoàn thành chuyến này?"
     );
     setAction(actionType);
     setShowPopup(true);
@@ -105,7 +108,16 @@ export default function Widget() {
 
   const handleConfirm = async () => {
     try {
-      const status = action === "accept" ? "PENDING_DEPOSIT" : "REJECTED";
+      let status;
+      if (action === "accept") {
+        status = "PENDING_DEPOSIT";
+      } else if (action === "reject") {
+        status = booking.status === "PENDING_DEPOSIT" ? "REJECTED" : "REJECTED";
+      } else if (action === "deliver") {
+        status = "RENTING";
+      } else if (action === "complete") {
+        status = "DONE";
+      }
       const url = `http://localhost:8080/api/booking/changeStatus/${booking.bookingId}/${status}`;
       await axios.put(url);
       setShowPopup(false);
@@ -291,22 +303,57 @@ export default function Widget() {
               <h4 className="text-gray-500">Lời nhắn riêng:</h4>
               <p className="text-gray-700">Không có lời nhắn</p>
             </div>
-            <div className="flex p-1 mt-6">
-              <button
-                className="bg-green-500 text-white py-2 px-4 rounded mb-2 mr-4 w-full text-center"
-                style={{ backgroundColor: "rgb(240, 68, 56)" }}
-                onClick={() => handleAction("reject")}
-              >
-                Từ chối
-              </button>
-              <button
-                className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center"
-                style={{ backgroundColor: "#5fcf86" }}
-                onClick={() => handleAction("accept")}
-              >
-                Chấp nhận
-              </button>
+            <div className="flex p-1 mt-6 justify-center">
+              {booking.status === "PENDING" && (
+                <>
+                  <button
+                    className="bg-red-500 text-white py-2 px-4 rounded mb-2 mr-4 w-full text-center"
+                    onClick={() => handleAction("reject")}
+                  >
+                    Từ chối
+                  </button>
+                  <button
+                    className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center"
+                    onClick={() => handleAction("accept")}
+                  >
+                    Chấp nhận
+                  </button>
+                </>
+              )}
+              {booking.status === "PENDING_DEPOSIT" && (
+                <button
+                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center"
+                  onClick={() => handleAction("reject")}
+                >
+                  Hủy chuyến
+                </button>
+              )}
+              {booking.status === "DEPOSIT_MADE" && (
+                <>
+                  <button
+                    className="bg-red-500 text-white py-2 px-4 rounded mb-2 mr-4 w-full text-center"
+                    onClick={() => handleAction("reject")}
+                  >
+                    Hủy chuyến
+                  </button>
+                  <button
+                    className="bg-blue-500 text-white py-2 px-4 rounded mb-2 w-full text-center"
+                    onClick={() => handleAction("deliver")}
+                  >
+                    Giao xe
+                  </button>
+                </>
+              )}
+              {booking.status === "RENTING" && (
+                <button
+                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center"
+                  onClick={() => handleAction("complete")}
+                >
+                  Hoàn thành
+                </button>
+              )}
             </div>
+
             {showPopup && (
               <PopUpConfirm
                 message={popupContent}
