@@ -184,14 +184,33 @@ const License = () => {
             </button>
           </div>
         </div>
-        <div className={sharedClasses.note}>
-          <p className={sharedClasses.info}>
-            Note: To avoid any issues during the rental process,{" "}
-            <span className="font-semibold">the person booking</span> on
-            MiMOTORBIKE (with verified driver's license){" "}
-            <span className="font-semibold">MUST ALSO</span>{" "}
-            <span className="font-semibold">be the person receiving</span>.
-          </p>
+        <div>
+          {license ? (
+            license.status === "APPROVED" ? (
+              ""
+            ) : (
+              <div className={sharedClasses.note}>
+                <p className={sharedClasses.info}>
+                  Note: To avoid any issues during the rental process,{" "}
+                  <span className="font-semibold">the person booking</span> on
+                  MiMOTORBIKE (with verified driver's license){" "}
+                  <span className="font-semibold">MUST ALSO</span>{" "}
+                  <span className="font-semibold">be the person receiving</span>
+                  .
+                </p>
+              </div>
+            )
+          ) : (
+            <div className={sharedClasses.note}>
+              <p className={sharedClasses.info}>
+                Note: To avoid any issues during the rental process,{" "}
+                <span className="font-semibold">the person booking</span> on
+                MiMOTORBIKE (with verified driver's license){" "}
+                <span className="font-semibold">MUST ALSO</span>{" "}
+                <span className="font-semibold">be the person receiving</span>.
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

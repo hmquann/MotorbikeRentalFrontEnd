@@ -26,7 +26,7 @@ function ChatApp() {
     responseData: message,
     error,
     loading,
-  } = useFetch("/message/getAllMessageByUser/" + email); 
+  } = useFetch("/message/getAllMessageByUser/" + email);
   console.log(message);
   useEffect(() => {
     setUniqueRooms([
@@ -43,7 +43,6 @@ function ChatApp() {
 
   const { responseData: listSelectedMessage } =
     GetListMessageByUniqueRoom(selectedRoom);
-  console.log(listSelectedMessage);
 
   const [messageRequest, setMessageRequest] = useState("");
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);

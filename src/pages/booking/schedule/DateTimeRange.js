@@ -68,17 +68,17 @@ const DateTimeRange = ({
         <DateRangePicker
           value={dateRange}
           onChange={handleDateRangeChange}
-          localeText={{ start: "Receive Date", end: "Return Date" }}
+          localeText={{ start: "Ngày nhận", end: "Ngày trả" }}
           minDate={minDate}
         />
         <div style={{ display: "flex", gap: "16px" }}>
           <TimePicker
-            label="Receive Time"
+            label="Giờ nhận"
             value={dateTimeReceive.time}
             onChange={handleReceiveTimeChange}
           />
           <TimePicker
-            label="Return Time"
+            label="Giờ trả"
             value={dateTimeReturn.time}
             onChange={handleReturnTimeChange}
           />

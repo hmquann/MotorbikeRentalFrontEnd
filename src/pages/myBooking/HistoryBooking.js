@@ -1,22 +1,46 @@
-import React, { useEffect, useState } from 'react';
-import BookingCard from './BookingCard'; // Reuse the BookingCard component
+import React, { useState, useEffect } from "react";
+import BookingCard from "./BookingCard";
+import axios from "axios";
+import NoBooking from "./NoBooking";
 
-const HistoryBooking = () => {
+const HistoryBooking = ({ filters }) => {
   const [bookings, setBookings] = useState([]);
+  const userDataString = localStorage.getItem("user");
+  const userData = JSON.parse(userDataString);
 
   useEffect(() => {
-    // Replace with your API call to get trip history
-    fetch('/api/trip-history')
-      .then((response) => response.json())
-      .then((data) => setBookings(data))
-      .catch((error) => console.error('Error fetching trip history:', error));
-  }, []);
+    const fetchBookings = async () => {
+      try {
+        const response = await axios.post(
+          "http://localhost:8080/api/booking/filter",
+          {
+            tripType: filters.tripType,
+            userId: filters.userId,
+            status: filters.status,
+            sort: filters.sort,
+            startTime: filters.startTime,
+            endTime: filters.endTime,
+          }
+        );
+        const pastBookings = response.data.filter(booking =>
+          ["REJECTED", "DONE", "CANCELED"].includes(booking.status)
+        );
+        setBookings(pastBookings);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    fetchBookings();
+  }, [filters]);
 
   return (
     <div>
-      {bookings.map((booking) => (
-        <BookingCard key={booking.id} booking={booking} />
-      ))}
+      {bookings.length === 0 ? (
+        <NoBooking />
+      ) : (
+        bookings.map((booking) => <BookingCard key={booking.id} booking={booking} />)
+      )}
     </div>
   );
 };
