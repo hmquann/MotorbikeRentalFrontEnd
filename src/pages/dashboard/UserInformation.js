@@ -1,14 +1,18 @@
 import React, { useState } from "react";
 import axios from "axios";
 import UserDetail from "./UserDetail";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleInfo, faToggleOff, faToggleOn } from "@fortawesome/free-solid-svg-icons";
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
 
 const BUTTON_CLASS = "px-4 py-2 rounded w-28 flex items-center justify-center";
 const GREEN_BUTTON_CLASS =
-  "bg-green-500 text-white  hover:bg-green-600 " + BUTTON_CLASS;
+  "py-1 px-2 rounded-lg bg-green-500 text-white  hover:bg-green-600 " 
 const RED_BUTTON_CLASS =
-  "bg-red-500 text-white  hover:bg-red-600 " + BUTTON_CLASS;
-const HEADER_CLASS = "py-3 px-4 font-semibold text-uppercase text-md";
-const CELL_CLASS = "py-3 px-4";
+  "py-1 px-2 rounded-lg bg-red-500 text-white  hover:bg-red-600 "
+const HEADER_CLASS = "py-3 px-4 font-semibold text-uppercase text-gray-500";
+const CELL_CLASS = "py-3 px-4 text-md";
 
 const UserInformation = ({
   users,
@@ -107,14 +111,14 @@ const UserInformation = ({
       <div className="bg-white shadow rounded-lg overflow-hidden">
         <div className="p-4 text-center bg-gradient-to-r from-slate-500 from-60% to-zinc-500">
           <h1 className="text-4xl font-bold text-white flex text-start">
-            User Information
+            Quản lý người dùng
           </h1>
         </div>
         <div className="mt-1 mb-1 flex justify-end flex-wrap mx-auto">
-          <div className="p-2 w-1/4">
+          <div className="p-2 w-3/12">
             <input
               type="text"
-              placeholder="Search By Email or Phone"
+              placeholder="Tìm theo email hoặc số điện thoại"
               value={searchTerm}
               onChange={handleSearch}
               className="p-2 border border-gray-300 rounded-md w-full"
@@ -125,13 +129,13 @@ const UserInformation = ({
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white">
             <thead>
-              <tr className="bg-zinc-200 text-center">
-                <th className={HEADER_CLASS}>User Name</th>
+              <tr className="bg-gray-100 text-center">
+                <th className={HEADER_CLASS}>Tên</th>
                 <th className={HEADER_CLASS}>Email</th>
-                <th className={HEADER_CLASS}>Phone</th>
+                <th className={HEADER_CLASS}>Điện thoại</th>
                 {/* <th className={HEADER_CLASS}>Roles</th> */}
-                <th className={HEADER_CLASS}>Status</th>
-                <th className={HEADER_CLASS}>Actions</th>
+                <th className={HEADER_CLASS}>Trạng thái</th>
+                <th className={HEADER_CLASS}>Hành động</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-400">
@@ -173,10 +177,7 @@ const UserInformation = ({
                     key={user.id}
                     className=" text-center transition duration-300 ease-in-out hover:bg-neutral-200"
                   >
-                    <td
-                      className="font-semibold"
-                      
-                    >
+                    <td className="font-semibold">
                       {user.firstName} {user.lastName}
                     </td>
                     <td className={CELL_CLASS}>{user.email}</td>
@@ -191,23 +192,32 @@ const UserInformation = ({
                     </td> */}
 
                     <td className={CELL_CLASS}>
-                      {user.active ? "Active" : "Not Active"}
+                      <span
+                        className={`px-2 inline-flex text-sm leading-7 font-semibold rounded-full ${
+                          user.active
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {user.active ? "Hoạt động" : "Không hoạt động"}
+                      </span>
                     </td>
                     <td className={CELL_CLASS}>
-                      <div className="flex space-x-4">
+                      <div className="flex justify-center space-x-4">
                         <button
-                          className={`px-4 py-2 rounded ${
+                          className={`${
                             user.active ? RED_BUTTON_CLASS : GREEN_BUTTON_CLASS
                           }`}
                           onClick={() => toggleUserStatus(user.id)}
                         >
-                          {user.active ? "Deactivate" : "Activate"}
+                          {/* <FontAwesomeIcon icon={faToggleOn} /> */}
+                          {user.active ? <FontAwesomeIcon icon={faToggleOn} /> : <FontAwesomeIcon icon={faToggleOff} />}
                         </button>
                         <button
-                          className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+                          className="py-1 px-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600"
                           onClick={() => handleUserClick(user)}
                         >
-                          View
+                          <FontAwesomeIcon icon={faCircleInfo} />
                         </button>
                       </div>
                     </td>
@@ -218,8 +228,8 @@ const UserInformation = ({
           </table>
           <div className="px-6 py-3 bg-zinc-50 flex justify-between items-center">
             <div className="text-sm text-zinc-700">
-              Showing <span className="font-medium">{users.length}</span> out of{" "}
-              <span className="font-medium">{users.length}</span> entries
+              Đang hiển thị <span className="font-medium">{users.length}</span> trên{" "}
+              <span className="font-medium">{users.length}</span> bản ghi
             </div>
             <div className="flex space-x-1">
               {currentPage > 0 && (
@@ -227,7 +237,7 @@ const UserInformation = ({
                   className="px-3 py-1 border border-zinc-300 text-zinc-500 rounded-md bg-zinc-200 hover:bg-zinc-300"
                   onClick={handlePreviousPage}
                 >
-                  Previous
+                  Trước
                 </button>
               )}
 
@@ -237,41 +247,36 @@ const UserInformation = ({
                   className="px-3 py-1 border border-zinc-300 text-zinc-500 rounded-md bg-zinc-200 hover:bg-zinc-300"
                   onClick={handleNextPage}
                 >
-                  Next
+                  Tiếp
                 </button>
               )}
             </div>
           </div>
         </div>
       </div>
-      {showConfirmation && (
-        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
-          <div className="bg-white text-lg p-6 rounded-lg">
-            <p>
-              Are you sure you want to{" "}
-              {statusUser?.active ? "deactivate" : "activate"}{" "}
-              <strong>
-                {" "}
-                {statusUser?.firstName} {statusUser?.lastName}?
-              </strong>
-            </p>
-            <div className="flex justify-end space-x-4 mt-4">
-              <button
-                className="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded"
-                onClick={() => setShowConfirmation(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded"
-                onClick={() => confirmToggleUserStatus(selectedUserId)}
-              >
-                Confirm
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <Modal show={showConfirmation} onHide={() => setShowConfirmation(false)} >
+      <Modal.Body>
+        <p>
+         Bạn có chắc muốn{" "}
+          {statusUser?.active ? "bỏ kích hoạt" : "kích hoạt"}{" người dùng  "}
+          <strong>
+            {statusUser?.firstName} {statusUser?.lastName}
+          </strong>
+          ?
+        </p>
+      </Modal.Body>
+      <Modal.Footer>
+      <Button variant="secondary" onClick={() => setShowConfirmation(false)}>
+          Cancel
+        </Button>
+        <Button
+          variant="primary"
+          onClick={() => confirmToggleUserStatus(selectedUserId)}
+        >
+          Confirm
+        </Button>
+      </Modal.Footer>
+    </Modal>
       {isModalOpen && <UserDetail user={selectedUser} onClose={closeModal} />}
     </div>
   );
