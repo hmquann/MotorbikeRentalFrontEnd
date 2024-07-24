@@ -35,10 +35,17 @@ import ChatApp from "./pages/chatapp/ChatApp";
 import RegisterMotorbikeStep1 from "./pages/motorbike/RegisterMotorbikeStep1";
 import RegisterMotorbikeStep2 from "./pages/motorbike/RegisterMotorbikeStep2";
 import CreateVoucherModal from "./pages/voucher/CreateVoucherModal";
-import VoucherList from "./pages/voucher/VoucherList"
-import Filter from "./pages/filter/Filter";
+
+import VoucherList from "./pages/voucher/VoucherList";
 import MyBooking from "./pages/myBooking/MyBooking";
+import BookingDetail from "./pages/myBooking/BookingDetail";
+import ManageBooking from "./pages/myBooking/ManageBooking";
+import BlogEditor from "./pages/blog/BlogEditor";
+import BlogList from "./pages/blog/BlogList";
+import BlogDetail from "./pages/blog/BlogDetail";
+import Filter from "./pages/filter/Filter";
 import FeedbackModal from "./pages/booking/FeedbackModal";
+
 
 function App() {
   return (
@@ -55,7 +62,7 @@ function App() {
           element={<ResetNewPassword />}
         />
         <Route path="/register" element={<Register />} />
-
+        <Route path="/blog/:id" element={<BlogDetail />} />
         <Route path="/verify/:token" element={<RegisterSuccess />} />
         <Route
           path="/registermotorbike"
@@ -69,7 +76,8 @@ function App() {
         <Route path="/filter" element={<Filter/>}/>
         <Route path="/privacyList" element={<PrivacyList />} />
         <Route path="/userInformation" element={<UserInformation />} />
-
+        <Route path="/bookingDetail" element={<BookingDetail />} />
+        <Route path="/manageBooking" element={<ManageBooking />} />
         <Route path="/menu" element={<Menu />}>
           <Route path="/menu/chatApp" element={<ChatApp />} />
           <Route path="/menu/myBooking" element={<MyBooking />} />
@@ -79,8 +87,9 @@ function App() {
             element={<ApproveMotorbikeRegistration />}
           />
           <Route path="/menu/brand" element={<BrandList />} />
+          <Route path="/menu/blogList" element={<BlogList />} />
           <Route path="/menu/model" element={<ModelList />} />
-        <Route path="/menu/voucher" element={<VoucherList />} />
+          <Route path="/menu/voucher" element={<VoucherList />} />
           <Route path="/menu/profile" element={<Profile />} />
           <Route path="/menu/approveLicense" element={<ApproveLicense />} />
           <Route path="/menu/userData" element={<UserData />} />
