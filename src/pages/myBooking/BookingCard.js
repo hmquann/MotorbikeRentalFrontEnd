@@ -11,6 +11,7 @@ import axios from "axios";
 import { format } from "date-fns";
 import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
+import FeedbackModal from "../booking/FeedbackModal";
 
 const BookingCard = ({ booking }) => {
   const [motorbikeName, setMotorbikeName] = useState();
@@ -18,6 +19,8 @@ const BookingCard = ({ booking }) => {
   const [urlImage, setUrlImage] = useState();
   const userDataString = localStorage.getItem("user");
   const userData = JSON.parse(userDataString);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [feedbackSent, setFeedbackSent] = useState(false);
 
   const statusDetails = {
     PENDING: { text: "Chờ duyệt", icon: faClock, color: "text-orange-500" },
@@ -52,13 +55,21 @@ const BookingCard = ({ booking }) => {
       color: "text-red-500",
     },
   };
+  const openFeedback = () => {
+    setShowFeedbackModal(true);
+  };
+
+  const closeFeedback = () => {
+    setShowFeedbackModal(false);
+  };
+
 
   const [motorbike, setMotorbike] = useState();
   useEffect(() => {
     const fetcMotorbike = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/motorbike/getMotorbikeById/${booking.motorbikeId}`
+          `http://localhost:8080/api/motorbike/${booking.motorbikeId}`
         );
         setMotorbikeName(
           `${response.data.model.modelName} ${response.data.yearOfManufacture}`
@@ -78,7 +89,7 @@ const BookingCard = ({ booking }) => {
     };
 
     fetcMotorbike();
-  }, [booking.motorbikeId]);
+  }, [booking.motorbikeId, userData.userId]);
 
   const openBookingDetail = () => {
     localStorage.setItem("booking", JSON.stringify(booking));
@@ -147,13 +158,15 @@ const BookingCard = ({ booking }) => {
           </div>
         </div>
         <div className="flex flex-col justify-center items-start ml-4">
-          <button
-            className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center hover:scale-105"
-            style={{ backgroundColor: "#5fcf86" }}
-            onClick={openManageBooking}
-          >
-            Đánh giá
-          </button>
+          {booking.status === "DONE" && (
+            <button
+              className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center hover:scale-105"
+              style={{ backgroundColor: "#5fcf86" }}
+              onClick={openFeedback}
+            >
+              Đánh giá
+            </button>
+          )}
           {motorbike ? (
             <>
               <button
@@ -173,12 +186,14 @@ const BookingCard = ({ booking }) => {
             </>
           ) : (
             <>
-              <button
-                className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center hover:scale-105"
-                style={{ backgroundColor: "#5fcf86" }}
-              >
-                Đặt cọc
-              </button>
+              {booking.status !== "DONE" && (
+                <button
+                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center hover:scale-105"
+                  style={{ backgroundColor: "#5fcf86" }}
+                >
+                  Đặt cọc
+                </button>
+              )}
               <button
                 className="bg-green-500 text-white py-2 px-4 rounded w-full text-center hover:scale-105"
                 style={{ backgroundColor: "#5fcf86" }}
@@ -188,6 +203,12 @@ const BookingCard = ({ booking }) => {
               </button>
             </>
           )}
+           <FeedbackModal 
+        show={showFeedbackModal} 
+        onHide={closeFeedback} 
+        bookingId={booking.bookingId} 
+        onFeedbackSubmitted={() => setFeedbackSent(true)}
+      />
         </div>
       </div>
     </div>
