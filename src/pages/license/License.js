@@ -23,7 +23,25 @@ const sharedClasses = {
   content:
     "bg-zinc-100 dark:bg-zinc-700 text-zinc-900 dark:text-white p-2 rounded-lg",
 };
+function isValidLicenseNumber(str) {
+  const regex = /^0\d{11}$/;
+  return regex.test(str);
+}
+function isEnoughtEighteenYear(bod) {
 
+  const birthDate = new Date(bod);
+  if (isNaN(birthDate)) {
+      throw new Error("Invalid date format");
+  }
+  const currentDate = new Date();
+  let age = currentDate.getFullYear() - birthDate.getFullYear();
+  const monthDifference = currentDate.getMonth() - birthDate.getMonth();
+  const dayDifference = currentDate.getDate() - birthDate.getDate();
+  if (monthDifference < 0 || (monthDifference === 0 && dayDifference < 0)) {
+      age--;
+  }
+  return age >= 18;
+}
 const License = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   console.log(user.userId);
@@ -32,6 +50,8 @@ const License = () => {
   const [previewImage, setPreviewImage] = useState();
   const [license, setLicense] = useState();
   const [error, setError] = useState("");
+  const [licenseNumberError,setLicenseNumberError]=useState("")
+  const [birthDateError,setBirthOfDateError]=useState("")
   useEffect(() => {
     axios
       .get(
@@ -112,6 +132,22 @@ const License = () => {
   };
   const handleChangeValue = (e) => {
     const { name, value } = e.target;
+    if(name=='licenseNumber'){
+      if(!isValidLicenseNumber(value)){
+       setLicenseNumberError("Chưa đúng định dạng bằng lái xe máy")
+      }
+      else{
+       setLicenseNumberError("")
+      }
+    }
+    if(name='birthOfDate'){
+      if(!isEnoughtEighteenYear(value)){
+        setBirthOfDateError("Bạn chưa đủ 18 tuổi")
+      }
+      else{
+        setBirthOfDateError("");
+      }
+    }
     setFormLicenseData((prevState) => ({
       ...prevState,
       [name]: value,

@@ -3,9 +3,12 @@ import axios from 'axios';
 import Dropdown from './Dropdown';
 import useDebounce from '../../hooks/useDebounce';
 import qs from 'qs'
+import MotorbikeDetails from './MotorbikeDetails'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCheck, faInfoCircle, faTimesCircle, faToggleOff, faToggleOn } from '@fortawesome/free-solid-svg-icons';
 
 const tableCellClasses = 'px-6 py-4 whitespace-nowrap text-base font-semibold text-amber-900 ';
-const buttonClasses = 'p-2 rounded-lg';
+const buttonClasses = 'py-1 px-2 rounded-lg';
 const modalOverlayClasses = 'fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 backdrop-blur-sm';
 const modalContentClasses = 'bg-white p-4 rounded-lg shadow-lg max-w-md w-full';
 const cancelButtonClasses = 'hover:bg-red-600 bg-red-500 text-white px-3 py-2 rounded-lg';
@@ -25,7 +28,8 @@ const ApproveMotorbikeRegistration = () => {
   const [searchTerm, setSearchTerm] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [userId, setUserId] = useState('')
-
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [isUpdate,setIsUpdate]=useState(false);
   const debouncedSearchTerm = useDebounce(searchTerm, 1000);
 
   useEffect(() => {
@@ -67,6 +71,25 @@ const ApproveMotorbikeRegistration = () => {
       console.error('Error fetching motorbikes:', error);
       setMotorbikes([]);
     } 
+  };
+
+  const fetchDetailMotorbike = async (motorbikeId) => {
+    try {
+      const response = await axios.get(`http://localhost:8080/api/motorbike/${motorbikeId}`);
+      console.log(response.data)
+      setSelectedMotorbike(response.data);
+    } catch (error) {
+      console.error("Error fetching discount details", error);
+    }
+  };
+  const handleViewDetail = (motorbikeId) => {
+    fetchDetailMotorbike(motorbikeId);
+    setShowDetailModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowDetailModal(false);
+    setSelectedMotorbike(null);
   };
 
   const searchMotorbike = async (searchTerm,userId, roles, page, size) => {
@@ -320,34 +343,62 @@ const ApproveMotorbikeRegistration = () => {
                 className={`hover:bg-green-600 bg-green-500 text-white mr-2 ${buttonClasses}`}
                 onClick={() => handleAction(motorbike, 'approve')}
               >
-                Approve
+                <FontAwesomeIcon icon={faCheck} />
               </button>
               <button
-                className={`hover:bg-red-600 bg-red-500 text-white ${buttonClasses}`}
+                className={`hover:bg-red-600 bg-red-500 text-white mr-2 ${buttonClasses}`}
                 onClick={() => handleAction(motorbike, 'reject')}
               >
-                Reject
+               <FontAwesomeIcon icon={faTimesCircle} />
+              </button>
+              <button
+                className={`hover:bg-blue-600 bg-blue-500 text-white ${buttonClasses}`}
+                onClick={() => handleViewDetail(motorbike.id)}
+              >
+           <FontAwesomeIcon icon={faInfoCircle} />
               </button>
             </>
           ) : isLessor &&
             (motorbike.motorbikeStatus === 'ACTIVE' ||
               motorbike.motorbikeStatus === 'DEACTIVE') ? (
             motorbike.motorbikeStatus === 'ACTIVE' ? (
-              <button
-                className={`hover:bg-red-600 bg-red-500 text-white ${buttonClasses}`}
+              <>
+                  <button
+                className={`hover:bg-red-600 bg-red-500 text-white  ${buttonClasses}`}
                 onClick={() => handleAction(motorbike, 'deactivate')}
               >
-                Deactivate
+               {/* <ImSwitch /> */}
+               <FontAwesomeIcon icon={faToggleOn} />
               </button>
-            ) : (
               <button
+              className={`hover:bg-blue-600 bg-blue-500 text-white ml-2 ${buttonClasses}`}
+              onClick={() => handleViewDetail(motorbike.id)}
+            >
+            <FontAwesomeIcon icon={faInfoCircle}  />
+            </button>
+            </>
+            ) : (
+              <>
+                            <button
                 className={`hover:bg-green-600 bg-green-500 text-white ${buttonClasses}`}
                 onClick={() => handleAction(motorbike, 'activate')}
               >
-                Activate
+               <FontAwesomeIcon icon={faToggleOff} />
               </button>
+                <button
+                className={`hover:bg-blue-600 bg-blue-500 text-white ml-2 ${buttonClasses}`}
+                onClick={() => handleViewDetail(motorbike.id)}
+              >
+            <FontAwesomeIcon icon={faInfoCircle} />
+              </button>
+              </>  
             )
-          ) : null}
+          ) : <button
+          className={`hover:bg-blue-600 bg-blue-500 text-white ${buttonClasses}`}
+          onClick={() => handleViewDetail(motorbike.id)}
+        >
+        <FontAwesomeIcon icon={faInfoCircle} />
+        </button>}
         </td>
       </tr>
     ))}
@@ -398,6 +449,12 @@ const ApproveMotorbikeRegistration = () => {
             </div>
           </div>
         </div>
+      )}
+       {showDetailModal && (
+        <MotorbikeDetails
+          motorbike={selectedMotorbike}
+          onClose={handleCloseModal}
+        />
       )}
     </div>
   );

@@ -6,6 +6,7 @@ import DiscountDetailModal from "./DiscountDetailModal ";
 import qs from 'qs'
 import { IoEyeOutline,IoTrashOutline } from "react-icons/io5";
 import { set } from "date-fns";
+import Modal from "react-bootstrap/Modal";
 
 const buttonClasses = "px-4 py-2 rounded-lg";
 const tableCellClasses = "px-6 py-4 whitespace-nowrap";
@@ -168,12 +169,16 @@ const VoucherList = () => {
       setSelectedVoucher(null);
     }
   };
+  const formatDate = (dateString) => {
+    const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+    return new Date(dateString).toLocaleDateString('vi-VN', options);
+  };
 
   
   return (
     <div className="max-w-5xl mx-auto p-4 bg-zinc-100">
       <div className="bg-gradient-to-r from-slate-500 from-60% to-zinc-500 text-white p-4 rounded-t-lg flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Manage Voucher</h2>
+        <h2 className="text-2xl font-bold">Quản lý khuyến mãi</h2>
         <div>
           <button
             className={`${buttonClasses} hover:bg-blue-700 bg-blue-600 text-white rounded-full `}
@@ -190,7 +195,7 @@ const VoucherList = () => {
             <th
                 className={`${tableCellClasses} text-center text-x font-large text-zinc-500 uppercase tracking-wider w-1/5`}
               >
-                Title
+                Tiêu đề
               </th>
               <th
                 className={`${tableCellClasses} text-center text-x font-large text-zinc-500 uppercase tracking-wider w-1/5`}
@@ -200,17 +205,17 @@ const VoucherList = () => {
               <th
                 className={`${tableCellClasses} text-center text-x font-large text-zinc-500 uppercase tracking-wider w-1/5`}
               >
-                Expiration date
+                Ngày hết hạn
               </th>
               <th
                 className={`${tableCellClasses} text-center text-x font-large text-zinc-500 uppercase tracking-wider w-1/5`}
               >
-                Quantity
+                Số lượng
               </th>
               <th
                 className={`${tableCellClasses} text-center text-x font-large text-zinc-500 uppercase tracking-wider w-1/5 `}
               >
-                Actions
+                Hành động
               </th>
             </tr>
           </thead>
@@ -249,18 +254,18 @@ const VoucherList = () => {
               >
                 <td className={tableCellClasses}>{voucher.name}</td>
                 <td className={tableCellClasses}>{voucher.code}</td>
-                <td className={tableCellClasses}>{voucher.expirationDate}</td>
+                <td className={tableCellClasses}>{formatDate(voucher.expirationDate)}</td>
                 <td className={tableCellClasses}>{voucher.quantity}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <button
-                    className={`${actionButtonClasses} `}
+                    className={`${actionButtonClasses} text-blue-600`}
                     onClick={() => handleViewDetail(voucher.id)}
                   >
                      <IoEyeOutline/>
 
                   </button>
                   <button
-                         className={`${actionButtonClasses} `}
+                         className={`${actionButtonClasses} text-red-600 `}
                         onClick={() => handleDeleteClick(voucher.id)}
                       >
                         <IoTrashOutline />
@@ -274,8 +279,8 @@ const VoucherList = () => {
         </table>
         <div className="px-6 py-3 bg-zinc-50 flex justify-between items-center">
           <div className="text-sm text-zinc-700">
-            Showing <span className="font-medium">{vouchers.length}</span> out of{" "}
-            <span className="font-medium">{vouchers.length}</span> entries
+            Đang hiển thị <span className="font-medium">{vouchers.length}</span> trên{" "}
+            <span className="font-medium">{vouchers.length}</span> bản ghi
           </div>
           <div className="flex space-x-1">
             {currentPage > 0 && (
@@ -283,7 +288,7 @@ const VoucherList = () => {
                 className="px-3 py-1 border border-zinc-300 text-zinc-500 rounded-md bg-zinc-200 hover:bg-zinc-300"
                 onClick={handlePreviousPage}
               >
-                Previous
+                Trước
               </button>
             )}
 
@@ -293,7 +298,7 @@ const VoucherList = () => {
                 className="px-3 py-1 border border-zinc-300 text-zinc-500 rounded-md bg-zinc-200 hover:bg-zinc-300"
                 onClick={handleNextPage}
               >
-                Next
+                Sau
               </button>
             )}
           </div>
@@ -316,25 +321,28 @@ const VoucherList = () => {
         />
       )}
       {showConfirmModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 backdrop-blur-sm">
-        <div className="bg-white p-4 rounded-lg shadow-lg">
-          <h2 className="text-lg font-bold mb-4">Are you sure to delete this Voucher?</h2>
-          <div className="flex justify-end space-x-4">
+         <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)}>
+         <Modal.Header closeButton>
+           <Modal.Title>Bạn có chắc muốn xóa khuyến mãi này?</Modal.Title>
+         </Modal.Header>
+         <Modal.Footer>
+         <div className="flex justify-end space-x-4">
             <button
               onClick={() => setShowConfirmModal(false)}
               className="hover:bg-gray-200 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg"
             >
-              Cancel
+              Hủy
             </button>
             <button
               onClick={handleDelete}
               className="hover:bg-red-700 bg-red-600 text-white px-4 py-2 rounded-lg"
             >
-              Delete
+              Xóa
             </button>
           </div>
-        </div>
-      </div>
+         </Modal.Footer>
+         
+      </Modal>
       )}
     </div>
   );

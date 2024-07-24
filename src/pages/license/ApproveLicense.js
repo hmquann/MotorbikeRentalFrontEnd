@@ -98,35 +98,37 @@ const ApproveLicense = () => {
     setActionType(action);
     setIsModalOpen(true);
   };
-  const handleSubmit = async (e) => {
+  const 
+  handleSubmit = async(e) => {
     e.preventDefault();
     const action =
       actionType === "approve"
         ? "http://localhost:8080/api/license/approve"
         : "http://localhost:8080/api/license/reject";
-    if (e.target.name === "approve") {
-      fetch(action, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({ licenseNumber: selectedLicense.licenseNumber }),
+        if(e.target.name==="approve"){
+    fetch(action,{
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({ licenseNumber: selectedLicense.licenseNumber }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+         
       })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log("Success:", data);
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-        });
+      .catch((error) => {
+        console.error("Error:", error);
+      });
     }
     licenses.pop(selectedLicense);
     setIsModalOpen(false)
   };
-  const handleClick = (license) => {
+  const handleClick=(license)=>{
     setSelectedLicense(license);
-  };
+  }
   return (
     <div className="bg-zinc-300  p-6 rounded-lg shadow-md max-w-5xl mx-auto">
       <div className="bg-gradient-to-r from-slate-500 from-60% to-zinc-500 text-white p-4 rounded-t-lg flex justify-between items-center">
@@ -195,6 +197,7 @@ const ApproveLicense = () => {
                       {license.licenseNumber}
                     </td>
                     <td className={tableCellClasses}>{license.birthOfDate}</td>
+     
 
                     {/* <td className={tableCellClasses}>
                       <ImageWithLightbox
@@ -284,5 +287,6 @@ const ApproveLicense = () => {
     </div>
   );
 };
+
 
 export default ApproveLicense;

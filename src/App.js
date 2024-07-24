@@ -35,6 +35,7 @@ import ChatApp from "./pages/chatapp/ChatApp";
 import RegisterMotorbikeStep1 from "./pages/motorbike/RegisterMotorbikeStep1";
 import RegisterMotorbikeStep2 from "./pages/motorbike/RegisterMotorbikeStep2";
 import CreateVoucherModal from "./pages/voucher/CreateVoucherModal";
+
 import VoucherList from "./pages/voucher/VoucherList";
 import MyBooking from "./pages/myBooking/MyBooking";
 import BookingDetail from "./pages/myBooking/BookingDetail";
@@ -42,6 +43,9 @@ import ManageBooking from "./pages/myBooking/ManageBooking";
 import BlogEditor from "./pages/blog/BlogEditor";
 import BlogList from "./pages/blog/BlogList";
 import BlogDetail from "./pages/blog/BlogDetail";
+import Filter from "./pages/filter/Filter";
+import FeedbackModal from "./pages/booking/FeedbackModal";
+
 
 function App() {
   return (
@@ -60,14 +64,16 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/blog/:id" element={<BlogDetail />} />
         <Route path="/verify/:token" element={<RegisterSuccess />} />
-        <Route path="/registermotorbike" element={<RegisterMotorbikeStep1 />} />
         <Route
-          path="/registermotorbike/step2"
-          element={<RegisterMotorbikeStep2 />}
+          path="/registermotorbike"
+          element={<RegisterMotorbikeStep1 />}
         />
+        <Route path="/sendFeedback" element={<FeedbackModal />} />
+        <Route path="/registermotorbike/step2"element={<RegisterMotorbikeStep2/>}/>
         <Route path="/" element={<Navigate to="/homepage" />} />
         <Route path="/homepage" element={<Homepage />} />
         <Route path="/privacy" element={<Privacy />} />
+        <Route path="/filter" element={<Filter/>}/>
         <Route path="/privacyList" element={<PrivacyList />} />
         <Route path="/userInformation" element={<UserInformation />} />
         <Route path="/bookingDetail" element={<BookingDetail />} />

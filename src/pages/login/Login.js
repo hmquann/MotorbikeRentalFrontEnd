@@ -49,6 +49,7 @@ const Login = () => {
         firstName: data.firstName,
         lastName: data.lastName,
         phone: data.phone,
+        totalTrip: data.totalTripCount
       };
       localStorage.setItem("user", JSON.stringify(userInfor));
       const token = localStorage.setItem("token", data.token);
