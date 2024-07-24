@@ -4,6 +4,9 @@ import axios from "axios";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import RentalDocument from "../booking/rentaldocument/RentalDocument";
+import PopUpConfirm from "./PopUpConfirm";
+import { useNavigate } from "react-router-dom";
+import PopUpSuccess from "./PopUpSuccess";
 
 const statusStyles = {
   PENDING: {
@@ -52,6 +55,11 @@ export default function Widget() {
   const [urlImage, setUrlImage] = useState();
   const [lessorId, setLessorId] = useState();
   const [pricePerDay, setPricePerDay] = useState();
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupContent, setPopupContent] = useState("");
+  const [action, setAction] = useState("");
+  const [showPopupSuccess, setShowPopupSuccess] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMotorbike = async () => {
@@ -77,6 +85,45 @@ export default function Widget() {
   }, [booking.motorbikeId]);
 
   const statusStyle = statusStyles[booking.status];
+
+  const handleAction = (actionType) => {
+    setPopupContent(
+      actionType === "accept"
+        ? "Bạn có chắc chắn muốn duyệt chuyến này?"
+        : actionType === "canceled"
+        ? "Bạn có chắc chắn muốn từ chối chuyến này?"
+        : actionType === "deliver"
+        ? "Bạn có chắc chắn muốn giao xe cho chuyến này?"
+        : "Bạn có chắc chắn muốn hoàn thành chuyến này?"
+    );
+    setAction(actionType);
+    setShowPopup(true);
+  };
+
+  const handleConfirm = async () => {
+    try {
+      let status;
+      if (action === "accept") {
+        status = "PENDING_DEPOSIT";
+      } else if (action === "reject") {
+        status = booking.status === "PENDING_DEPOSIT" ? "REJECTED" : "REJECTED";
+      } else if (action === "deliver") {
+        status = "RENTING";
+      } else if (action === "complete") {
+        status = "DONE";
+      }
+      const url = `http://localhost:8080/api/booking/changeStatus/${booking.bookingId}/${status}`;
+      await axios.put(url);
+      setShowPopup(false);
+      setShowPopupSuccess(true); // Show success popup
+      setTimeout(() => {
+        setShowPopupSuccess(false); // Hide success popup after 3 seconds
+        navigate("/menu/myBooking"); // Navigate to myBooking page
+      }, 3000);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
   return (
     <div className="p-12 bg-gray">
@@ -251,36 +298,49 @@ export default function Widget() {
               <h4 className="text-gray-500">Lời nhắn riêng:</h4>
               <p className="text-gray-700">Không có lời nhắn</p>
             </div>
-            {userData.id === lessorId ? (
-              <div className="flex p-1 mt-6">
-                <button
-                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 mr-4 w-full text-center"
-                  style={{ backgroundColor: "rgb(240, 68, 56)" }}
-                >
-                  Hủy chuyến
+            <div className="flex p-1 mt-6 justify-center">
+              {booking.status === "PENDING" && (
+                <>
+                  <button
+                    className="bg-red-500 text-white py-2 px-4 rounded mb-2 mr-4 w-full text-center"
+                    onClick={() => handleAction("canceled")}
+                  >
+                    Hủy chuyến
+                  </button>
+                </>
+              )}
+              {booking.status === "PENDING_DEPOSIT" && (
+                <>
+                  <button
+                    className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center"
+                    onClick={() => handleAction("canceled")}
+                  >
+                    Hủy chuyến
+                  </button>
+                  <button
+                    className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center"
+                    onClick={() => handleAction("deposit_made")}
+                  >
+                    Đặt cọc
+                  </button>
+                </>
+              )}
+
+              {booking.status === "DONE" && (
+                <button className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center">
+                  Đánh giá
                 </button>
-                <button
-                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center"
-                  style={{ backgroundColor: "#5fcf86" }}
-                >
-                  Đặt cọc
-                </button>
-              </div>
-            ) : (
-              <div className="flex p-1 mt-6">
-                <button
-                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 mr-4 w-full text-center"
-                  style={{ backgroundColor: "rgb(240, 68, 56)" }}
-                >
-                  Từ chối
-                </button>
-                <button
-                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center"
-                  style={{ backgroundColor: "#5fcf86" }}
-                >
-                  Chấp nhận
-                </button>
-              </div>
+              )}
+            </div>
+            {showPopup && (
+              <PopUpConfirm
+                message={popupContent}
+                onConfirm={handleConfirm}
+                onCancel={() => setShowPopup(false)}
+              />
+            )}
+            {showPopupSuccess && (
+              <PopUpSuccess message="Bạn đã cập nhật thành công trạng thái chuyến!"></PopUpSuccess>
             )}
           </div>
           <div className="bg-white p-6 rounded-lg shadow-lg">

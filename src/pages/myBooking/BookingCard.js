@@ -5,13 +5,18 @@ import {
   faMoneyBillTransfer,
   faMotorcycle,
   faCircleXmark,
+  faCircleCheck,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import { format } from "date-fns";
 import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
+import PopUpConfirm from "./PopUpConfirm";
+import PopUpSuccess from "./PopUpSuccess";
+import { useNavigate } from "react-router-dom";
 import FeedbackModal from "../booking/FeedbackModal";
+
 
 const BookingCard = ({ booking }) => {
   const [motorbikeName, setMotorbikeName] = useState();
@@ -19,9 +24,14 @@ const BookingCard = ({ booking }) => {
   const [urlImage, setUrlImage] = useState();
   const userDataString = localStorage.getItem("user");
   const userData = JSON.parse(userDataString);
+
+  const [messageConfirm, setMessageConfirm] = useState();
+  const [showPopUp, setShowPopUp] = useState(false);
+  const [showPopupSuccess, setShowPopupSuccess] = useState(false);
+  const [action, setAction] = useState("");
+  const navigate = useNavigate();
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [feedbackSent, setFeedbackSent] = useState(false);
-
   const statusDetails = {
     PENDING: { text: "Chờ duyệt", icon: faClock, color: "text-orange-500" },
     PENDING_DEPOSIT: {
@@ -36,7 +46,7 @@ const BookingCard = ({ booking }) => {
     },
     DONE: {
       text: "Đã hoàn thành",
-      icon: faMoneyBillTransfer,
+      icon: faCircleCheck,
       color: "text-green-500",
     },
     RENTING: {
@@ -101,6 +111,45 @@ const BookingCard = ({ booking }) => {
     window.open("/manageBooking", "_blank");
   };
 
+  const handleAction = (actionType) => {
+    switch (actionType) {
+      case "accept":
+        setMessageConfirm("Bạn có chắc chắn muốn duyệt chuyến này?");
+        setAction("PENDING_DEPOSIT");
+        break;
+      case "renting":
+        setMessageConfirm("Bạn có chắc chắn muốn giao xe?");
+        setAction("RENTING");
+        break;
+      case "done":
+        setMessageConfirm("Bạn có chắc chắn chuyến đi đã hoàn thành?");
+        setAction("DONE");
+        break;
+      case "deposit_made":
+        setMessageConfirm("Bạn có chắc chắn muốn đặt cọc?");
+        setAction("DEPOSIT_MADE");
+        break;
+      default:
+        return;
+    }
+    setShowPopUp(true);
+  };
+
+  const handleConfirm = async () => {
+    try {
+      const url = `http://localhost:8080/api/booking/changeStatus/${booking.bookingId}/${action}`;
+      await axios.put(url);
+      setShowPopUp(false);
+      setShowPopupSuccess(true); // Show success popup
+      setTimeout(() => {
+        setShowPopupSuccess(false); // Hide success popup after 3 seconds
+        window.location.reload(); // Navigate to myBooking page
+      }, 3000);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   const { text, icon, color } = statusDetails[booking.status] || {};
 
   return booking.userId === 1 ? null : (
@@ -158,24 +207,35 @@ const BookingCard = ({ booking }) => {
           </div>
         </div>
         <div className="flex flex-col justify-center items-start ml-4">
-          {booking.status === "DONE" && (
-            <button
-              className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center hover:scale-105"
-              style={{ backgroundColor: "#5fcf86" }}
-              onClick={openFeedback}
-            >
-              Đánh giá
-            </button>
-          )}
           {motorbike ? (
             <>
-              <button
-                className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center hover:scale-105"
-                style={{ backgroundColor: "#5fcf86" }}
-                onClick={openManageBooking}
-              >
-                Chấp nhận
-              </button>
+              {booking.status === "PENDING" && (
+                <button
+                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center hover:scale-105"
+                  style={{ backgroundColor: "#5fcf86" }}
+                  onClick={() => handleAction("accept")}
+                >
+                  Chấp nhận
+                </button>
+              )}
+              {booking.status === "DEPOSIT_MADE" && (
+                <button
+                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center hover:scale-105"
+                  style={{ backgroundColor: "#5fcf86" }}
+                  onClick={() => handleAction("renting")}
+                >
+                  Giao xe
+                </button>
+              )}
+              {booking.status === "RENTING" && (
+                <button
+                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center hover:scale-105"
+                  style={{ backgroundColor: "#5fcf86" }}
+                  onClick={() => handleAction("done")}
+                >
+                  Hoàn thành
+                </button>
+              )}
               <button
                 className="bg-green-500 text-white py-2 px-4 rounded w-full text-center hover:scale-105"
                 style={{ backgroundColor: "#5fcf86" }}
@@ -186,10 +246,20 @@ const BookingCard = ({ booking }) => {
             </>
           ) : (
             <>
-              {booking.status !== "DONE" && (
+              {booking.status === "DONE" && (
                 <button
                   className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center hover:scale-105"
                   style={{ backgroundColor: "#5fcf86" }}
+                  onClick={openManageBooking}
+                >
+                  Đánh giá
+                </button>
+              )}
+              {booking.status === "PENDING_DEPOSIT" && (
+                <button
+                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center hover:scale-105"
+                  style={{ backgroundColor: "#5fcf86" }}
+                  onClick={() => handleAction("deposit_made")}
                 >
                   Đặt cọc
                 </button>
@@ -211,6 +281,16 @@ const BookingCard = ({ booking }) => {
       />
         </div>
       </div>
+      {showPopUp && (
+        <PopUpConfirm
+          message={messageConfirm}
+          onConfirm={handleConfirm}
+          onCancel={() => setShowPopUp(false)}
+        />
+      )}
+      {showPopupSuccess && (
+        <PopUpSuccess message="Bạn đã cập nhật thành công trạng thái chuyến!"></PopUpSuccess>
+      )}
     </div>
   );
 };
