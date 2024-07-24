@@ -16,6 +16,7 @@ import dayjs from "dayjs";
 import axios from "axios";
 import PopUpBookingSuccess from "./PopUpBookingSuccess";
 import { format } from "date-fns";
+import PopUpConfirmBooking from "./popUpConfirm/PopUpConfirmBooking";
 const sharedClasses = {
   rounded: "rounded",
   flex: "flex",
@@ -100,6 +101,7 @@ const Booking = () => {
   const [showPopUp, setShowPopUp] = useState(false);
   const navigate = useNavigate();
   const [showPopUpLicense, setShowPopUpLicense] = useState(false);
+  const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [schedulePopUp, setSchedulePopUp] = useState(false);
   const [pickupDate, setPickupDate] = useState("");
   const [returnDate, setReturnDate] = useState("");
@@ -171,7 +173,7 @@ const Booking = () => {
       address: "",
     },
   ]);
-  const [gettedLocation, setGettedLocation] = useState();
+  const [gettedLocation, setGettedLocation] = useState(motorbikeAddress);
   useEffect(() => {
     if (gettedLocation === null) {
       setGettedLocation("");
@@ -188,7 +190,7 @@ const Booking = () => {
   }, [localStorage.getItem("location")]);
   console.log(gettedLocation);
 
-  const [distance, setDistance] = useState();
+  const [distance, setDistance] = useState(0);
   const [newAddressData, setNewAddressData] = useState([]);
 
   useEffect(() => {
@@ -302,7 +304,10 @@ const Booking = () => {
       const response1 = await axios.get(
         `http://localhost:8080/api/license/getLicenseByUserId/${userId}`
       );
-      console.log(response1);
+      console.log(response1.data.licenseType);
+
+      console.log(receiveData);
+
       // check api license thanh cong hay khong thanh cong
       if (response1.status !== 200) {
         throw new Error("API license failed");
@@ -330,26 +335,27 @@ const Booking = () => {
         }
         //truong hop hop le
         else {
-          const response2 = await axios
-            .post("http://localhost:8080/api/booking/create", {
-              renterId: userId,
-              motorbikeId: receiveData.id,
-              startDate: dayjs(dateRange[0]).format("YYYY-MM-DDTHH:mm:ss"),
-              endDate: dayjs(dateRange[1]).format("YYYY-MM-DDTHH:mm:ss"),
-              totalPrice: totalPrice,
-              receiveLocation: gettedLocation,
-            })
-            .then((response2) => {
-              setShowPopupBooking(true); // Hiển thị popup khi thành công
-              setTimeout(() => {
-                setShowPopupBooking(false); // Ẩn popup sau 3 giây
-                navigate("/login"); //chuyển sang trang login sau khi thông báo
-              }, 3000);
-            });
+          // const response2 = await axios
+          //   .post("http://localhost:8080/api/booking/create", {
+          //     renterId: userId,
+          //     motorbikeId: receiveData.id,
+          //     startDate: dayjs(dateRange[0]).format("YYYY-MM-DDTHH:mm:ss"),
+          //     endDate: dayjs(dateRange[1]).format("YYYY-MM-DDTHH:mm:ss"),
+          //     bookingTime: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
+          //     totalPrice: totalPrice,
+          //     receiveLocation: gettedLocation,
+          //   })
+          //   .then(() => {
+          //     setShowPopupBooking(true); // Hiển thị popup khi thành công
+          //     setTimeout(() => {
+          //       setShowPopupBooking(false); // Ẩn popup sau 3 giây
+          //       navigate("/login"); //chuyển sang trang login sau khi thông báo
+          //     }, 3000);
+          //     console.log(response1.data.licenseType);
 
-          if (response2.status !== 200) {
-            throw new Error("API booking failed");
-          }
+          //     console.log(receiveData);
+          //   });
+          setShowConfirmPopup(true);
         }
       }
     } catch (error) {
@@ -357,40 +363,66 @@ const Booking = () => {
     }
   };
 
+  const handleConfirmBooking = async (e) => {
+    e.preventDefault();
+    const response2 = await axios
+      .post("http://localhost:8080/api/booking/create", {
+        renterId: userId,
+        motorbikeId: receiveData.id,
+        startDate: dayjs(dateRange[0]).format("YYYY-MM-DDTHH:mm:ss"),
+        endDate: dayjs(dateRange[1]).format("YYYY-MM-DDTHH:mm:ss"),
+        bookingTime: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
+        totalPrice: totalPrice,
+        receiveLocation: gettedLocation,
+      })
+      .then(() => {
+        setShowPopupBooking(true); // Hiển thị popup khi thành công
+        setTimeout(() => {
+          setShowPopupBooking(false); // Ẩn popup sau 3 giây
+          navigate("/menu/myBooking"); //chuyển sang trang mybooking sau khi thông báo
+        }, 3000);
+      });
+    console.log("okeee");
+  };
+
+  const handleCancelBooking = () => {
+    setShowConfirmPopup(false);
+  };
+
   return (
     <div>
       <div class="cover-car">
-        <div class="m-container">
+        <div class="m-container p-9 ">
           <div class="cover-car-container">
             <div class="main-img">
               <div class="cover-car-item">
                 <img
                   loading="lazy"
-                  alt="Cho thuê xe tự lái HYUNDAI ACCENT 2023"
+                  alt={receiveData.model.modelName}
                   src={receiveData.motorbikeImages[0].url}
                 />
               </div>
             </div>
-            <div class="sub-img">
+            <div class="sub-img ">
               <div class="cover-car-item">
                 <img
                   loading="lazy"
                   src={receiveData.motorbikeImages[1].url}
-                  alt="Cho thuê xe tự lái HYUNDAI ACCENT 2023"
+                  alt={receiveData.model.modelName}
                 />
               </div>
               <div class="cover-car-item">
                 <img
                   loading="lazy"
                   src={receiveData.motorbikeImages[2].url}
-                  alt="Cho thuê xe tự lái HYUNDAI ACCENT 2023"
+                  alt={receiveData.model.modelName}
                 />
               </div>
               <div class="cover-car-item">
                 <img
                   loading="lazy"
                   src={receiveData.motorbikeImages[3].url}
-                  alt="Cho thuê xe tự lái HYUNDAI ACCENT 2023"
+                  alt={receiveData.model.modelName}
                 />
               </div>
             </div>
@@ -410,7 +442,9 @@ const Booking = () => {
             >
               <div>
                 <h1 className={`text-2xl ${sharedClasses.fontBold}`}>
-                  {receiveData.model.modelName}
+                  {receiveData.model.modelName +
+                    " " +
+                    receiveData.yearOfManufacture}
                 </h1>
                 <div
                   className={`flex ${sharedClasses.itemsCenter} ${sharedClasses.textSm} ${sharedClasses.textZinc500} ${sharedClasses.mb2}`}
@@ -441,13 +475,13 @@ const Booking = () => {
               <FeatureItem
                 icon={faGasPump}
                 altText="fuel"
-                title="Fuel"
+                title="Nhiên liệu"
                 description={receiveData.model.fuelType}
               />
               <FeatureItem
                 icon={faOilCan}
                 altText="consumption"
-                title="Fuel consumption"
+                title="NL tiêu hao"
                 description={receiveData.model.fuelConsumption}
               />
             </div>
@@ -457,7 +491,7 @@ const Booking = () => {
               <h2
                 className={`text-xl ${sharedClasses.fontSemibold} ${sharedClasses.mb2}`}
               >
-                Description
+                Mô tả
               </h2>
               <p
                 className={`${sharedClasses.textZinc700} ${sharedClasses.mb4}`}
@@ -487,7 +521,7 @@ const Booking = () => {
               <h2
                 className={`text-xl ${sharedClasses.fontSemibold} ${sharedClasses.mb4}`}
               >
-                {receiveData.price / 1000}K /day
+                {receiveData.price / 1000}K/ngày
               </h2>
 
               <div className="mb-3">
@@ -500,7 +534,7 @@ const Booking = () => {
 
               <div className="mb-3">
                 <label className="block text-lg  text-zinc-700 mb-1">
-                  Pick up location
+                  Địa điểm giao nhận xe
                 </label>
                 <div className="relative">
                   <input
@@ -522,27 +556,28 @@ const Booking = () => {
               <div
                 className={`flex justify-between text-lg ${sharedClasses.mb2}`}
               >
-                <span>Price</span>
-                <span>{receiveData.price} vnd/ day</span>
+                <span>Đơn giá</span>
+                <span>{receiveData.price.toLocaleString("vi-VN")}đ/ ngày</span>
               </div>
               <div
                 className={`flex justify-between text-lg ${sharedClasses.mb2}`}
               >
-                <span>Total price</span>
+                <span>Tổng cộng</span>
                 <span>
-                  {receiveData.price} vnd x {rentalDays} day
+                  {receiveData.price.toLocaleString("vi-VN")}đ x {rentalDays}{" "}
+                  ngày
                 </span>
               </div>
               <div
                 className={`flex justify-between text-lg ${sharedClasses.mb2}`}
               >
-                <span>Delivery fee</span>
-                <span>{deliveryFee} vnd</span>
+                <span>Phí giao nhận xe</span>
+                <span>{deliveryFee.toLocaleString("vi-VN")}đ</span>
               </div>
               <div
                 className={`flex justify-between text-lg ${sharedClasses.mb4} hover:${sharedClasses.cursorPointer}`}
               >
-                <span>Voucher</span>
+                <span>Mã khuyến mãi</span>
                 <span>
                   <FontAwesomeIcon icon={faArrowRight} />
                 </span>
@@ -550,16 +585,29 @@ const Booking = () => {
               <div
                 className={`flex justify-between text-lg ${sharedClasses.mb1}`}
               >
-                <span>Total</span>
-                <span>{totalPrice} vnd</span>
+                <span>Thành tiền</span>
+                <span>{totalPrice.toLocaleString("vi-VN")}đ</span>
               </div>
               <button
                 type="submit"
                 className={`text-lg ${sharedClasses.mt4} ${sharedClasses.wFull} ${sharedClasses.bgGreen500} ${sharedClasses.textWhite} ${sharedClasses.py2} ${sharedClasses.rounded}`}
               >
-                RENT
+                CHỌN THUÊ
               </button>
             </form>
+            {showConfirmPopup && (
+              <PopUpConfirmBooking
+                motorbikeDetails={receiveData}
+                bookingDetails={{
+                  startDate: dayjs(dateRange[0]).format("YYYY-MM-DDTHH:mm:ss"),
+                  endDate: dayjs(dateRange[1]).format("YYYY-MM-DDTHH:mm:ss"),
+                  receiveLocation: gettedLocation,
+                  totalPrice: totalPrice,
+                }}
+                onConfirm={handleConfirmBooking}
+                onCancel={handleCancelBooking}
+              />
+            )}
             {showPopUpLicense && (
               <PopUpLicense
                 onClose={() => setShowPopUpLicense(false)}
