@@ -15,6 +15,8 @@ import React, { useEffect, useState } from "react";
 import PopUpConfirm from "./PopUpConfirm";
 import PopUpSuccess from "./PopUpSuccess";
 import { useNavigate } from "react-router-dom";
+import FeedbackModal from "../booking/FeedbackModal";
+
 
 const BookingCard = ({ booking }) => {
   const [motorbikeName, setMotorbikeName] = useState();
@@ -22,11 +24,14 @@ const BookingCard = ({ booking }) => {
   const [urlImage, setUrlImage] = useState();
   const userDataString = localStorage.getItem("user");
   const userData = JSON.parse(userDataString);
+
   const [messageConfirm, setMessageConfirm] = useState();
   const [showPopUp, setShowPopUp] = useState(false);
   const [showPopupSuccess, setShowPopupSuccess] = useState(false);
   const [action, setAction] = useState("");
   const navigate = useNavigate();
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [feedbackSent, setFeedbackSent] = useState(false);
   const statusDetails = {
     PENDING: { text: "Chờ duyệt", icon: faClock, color: "text-orange-500" },
     PENDING_DEPOSIT: {
@@ -60,6 +65,14 @@ const BookingCard = ({ booking }) => {
       color: "text-red-500",
     },
   };
+  const openFeedback = () => {
+    setShowFeedbackModal(true);
+  };
+
+  const closeFeedback = () => {
+    setShowFeedbackModal(false);
+  };
+
 
   const [motorbike, setMotorbike] = useState();
   useEffect(() => {
@@ -86,7 +99,7 @@ const BookingCard = ({ booking }) => {
     };
 
     fetcMotorbike();
-  }, [booking.motorbikeId]);
+  }, [booking.motorbikeId, userData.userId]);
 
   const openBookingDetail = () => {
     localStorage.setItem("booking", JSON.stringify(booking));
@@ -260,6 +273,12 @@ const BookingCard = ({ booking }) => {
               </button>
             </>
           )}
+           <FeedbackModal 
+        show={showFeedbackModal} 
+        onHide={closeFeedback} 
+        bookingId={booking.bookingId} 
+        onFeedbackSubmitted={() => setFeedbackSent(true)}
+      />
         </div>
       </div>
       {showPopUp && (
