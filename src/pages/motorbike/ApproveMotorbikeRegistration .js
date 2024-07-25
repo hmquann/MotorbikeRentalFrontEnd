@@ -5,7 +5,8 @@ import useDebounce from '../../hooks/useDebounce';
 import qs from 'qs'
 import MotorbikeDetails from './MotorbikeDetails'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCheck, faInfoCircle, faTimesCircle, faToggleOff, faToggleOn } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faCheckCircle, faInfoCircle, faTimesCircle,faCalendarDay, faToggleOff, faToggleOn } from '@fortawesome/free-solid-svg-icons';
+
 
 const tableCellClasses = 'px-6 py-4 whitespace-nowrap text-base font-semibold text-amber-900 ';
 const buttonClasses = 'py-1 px-2 rounded-lg';
@@ -370,6 +371,7 @@ const ApproveMotorbikeRegistration = () => {
                {/* <ImSwitch /> */}
                <FontAwesomeIcon icon={faToggleOn} />
               </button>
+          
               <button
               className={`hover:bg-blue-600 bg-blue-500 text-white ml-2 ${buttonClasses}`}
               onClick={() => handleViewDetail(motorbike.id)}
@@ -398,9 +400,11 @@ const ApproveMotorbikeRegistration = () => {
           onClick={() => handleViewDetail(motorbike.id)}
         >
         <FontAwesomeIcon icon={faInfoCircle} />
-        </button>}
+        </button>
+        }
         </td>
       </tr>
+      
     ))}
   </>
 )}

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-
+import './CustomDatePicker.css';
 const sharedClasses = {
   flex: 'flex',
   justifyBetween: 'justify-between',
@@ -109,7 +109,22 @@ const MotorbikeSchedulePopUp = ({ isOpen, onClose, onSubmit }) => {
       setReturnTime(value);
     }
   };
+  const disableDates = [
+    new Date(2024, 6, 22), 
+    new Date(2024, 6, 23), 
+  ];
+  const isDateDisabled = (date) => {
+    return disableDates.some(
+      (disableDate) =>
+        date.getDate() === disableDate.getDate() &&
+        date.getMonth() === disableDate.getMonth() &&
+        date.getFullYear() === disableDate.getFullYear()
+    );
+  };
 
+  const dayClassName = (date) => {
+    return isDateDisabled(date) ? 'disabled-day' : undefined;
+  };
   const handleSubmit = () => {
     if (!endDate) {
       setTimeError("End date is required.");
@@ -128,14 +143,14 @@ const MotorbikeSchedulePopUp = ({ isOpen, onClose, onSubmit }) => {
       setTimeError("Return date and time must be at least 6 hours from now.");
       return;
     }
-  
+    
     onSubmit({ startDateTime, endDateTime })
     setTimeError(""); // Clear any existing errors
     // Handle valid form submission logic here
     // Close the pop-up after successful submission
     onClose();
   };
-
+  
   if (!isOpen) return null;
 
   return (
@@ -148,14 +163,17 @@ const MotorbikeSchedulePopUp = ({ isOpen, onClose, onSubmit }) => {
         </button>
         <h2 className={`text-center ${sharedClasses.textLg} ${sharedClasses.fontSemiBold} ${sharedClasses.mb4}`}>Chọn thời gian thuê xe</h2>
 
-        <DatePicker class="justify-content"
-          selected={startDate}
-          onChange={onChange}
-          startDate={startDate}
-          endDate={endDate}
-          selectsRange
-          inline
-        />
+        <DatePicker
+      className="justify-content"
+      selected={startDate}
+      onChange={onChange}
+      startDate={startDate}
+      endDate={endDate}
+      selectsRange
+      inline
+      dayClassName={dayClassName}
+      filterDate={(date) => !isDateDisabled(date)} // Disable các ngày cụ thể
+    />
 
         <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.mb4}`}>
           <div className="flex-1">

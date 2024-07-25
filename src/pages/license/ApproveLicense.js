@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-
+import ModalImage from "react-modal-image";
 
 // import ImageWithLightbox from "./ImageWithLightBox";
 
@@ -199,11 +199,14 @@ const ApproveLicense = () => {
                     <td className={tableCellClasses}>{license.birthOfDate}</td>
      
 
-                    {/* <td className={tableCellClasses}>
-                      <ImageWithLightbox
-                        imageSrc={license.licenseImageUrl}/>
+                    <td className={tableCellClasses}>
+                       <ModalImage
+                  small={license.licenseImageUrl}
+                  large={license.licenseImageUrl}
+                  className=" object-cover rounded-md mr-2 mb-2"
+                />
 
-                    </td> */}
+                    </td>
 
                     <td className={tableCellClasses} onClick={()=>handleClick(license)}>
                       <>
