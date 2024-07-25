@@ -14,11 +14,11 @@ const Header = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState(""); // Khai báo state cho username
   const avatarClasses = "w-10 h-10 rounded-full border-2 border-yellow-400";
-
+  
   useEffect(() => {
     const token = localStorage.getItem("token");
     const userDataString = localStorage.getItem("user");
-
+  
     // Chuyển đổi chuỗi JSON thành đối tượng JavaScript
     const userData = JSON.parse(userDataString);
 

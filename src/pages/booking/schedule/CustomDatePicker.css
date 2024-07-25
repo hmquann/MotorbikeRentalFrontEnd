@@ -1,0 +1,22 @@
+.disabled-day {
+  background-color: #f0f0f0 !important;
+  color: #d0d0d0 !important;
+  pointer-events: none;
+}
+.disabled-day:hover::after {
+  content: "Xe đã có lịch booking";
+  position: absolute;
+  background: #333;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  z-index: 1000;
+}
+.selected-day-range {
+  background-color: #e6f7ff !important;
+  color: #1890ff !important;
+}
