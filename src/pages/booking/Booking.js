@@ -3,15 +3,17 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { FaMotorcycle } from "react-icons/fa";
 import {
   faArrowRight,
+  faCircleXmark,
   faGasPump,
   faOilCan,
+  faX,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState, useEffect } from "react";
 import RentalDocument from "./rentaldocument/RentalDocument";
 import PopUpLocation from "./popUpLocation/PopUpLocation";
 import MotorbikeSchedulePopUp from "./schedule/MotorbikeSchedulePopUp";
-import FeedbackList from './FeedbackList';
+import FeedbackList from "./FeedbackList";
 import DateTimeRange from "./schedule/DateTimeRange";
 import PopUpLicense from "./popUpLicense/PopUpLicense";
 import dayjs from "dayjs";
@@ -19,7 +21,7 @@ import axios from "axios";
 import PopUpBookingSuccess from "./PopUpBookingSuccess";
 import { format } from "date-fns";
 import PopUpConfirmBooking from "./popUpConfirm/PopUpConfirmBooking";
-
+import PopUpVoucher from "./popUpVoucher/PopUpVoucher";
 const sharedClasses = {
   rounded: "rounded",
   flex: "flex",
@@ -70,9 +72,9 @@ const sharedClasses = {
   textGreen700: "text-green-700",
   textZinc300: "text-zinc-300",
   cursorPointer: "cursor-pointer",
-  textZincLight: 'text-zinc-600 dark:text-zinc-400',
-  textZincDark: 'text-zinc-900 dark:text-zinc-100',
-  flexItemsCenter: 'flex items-center',
+  textZincLight: "text-zinc-600 dark:text-zinc-400",
+  textZincDark: "text-zinc-900 dark:text-zinc-100",
+  flexItemsCenter: "flex items-center",
 };
 
 const FeatureItem = ({ icon, altText, title, description }) => (
@@ -96,7 +98,7 @@ const Booking = () => {
     return parts.length > 2 ? parts.slice(2).join(", ") : parts.join(", ");
   };
   const location = useLocation();
-  const receiveData = location.state.selectedMotorbike;
+  const receiveData = JSON.parse(localStorage.getItem("selectedMotorbike"));
   const motorbikeId = receiveData ? receiveData.id : null;
   console.log(receiveData);
 
@@ -181,21 +183,14 @@ const Booking = () => {
     },
   ]);
   const [gettedLocation, setGettedLocation] = useState(motorbikeAddress);
-  useEffect(() => {
-    if (gettedLocation === null) {
-      setGettedLocation("");
-    } else {
-      setGettedLocation(localStorage.getItem("location"));
-      setAddressData((prevAddressData) =>
-        prevAddressData.map((item) =>
-          item.id === 2
-            ? { ...item, address: localStorage.getItem("location") }
-            : item
-        )
-      );
-    }
-  }, [localStorage.getItem("location")]);
-  console.log(gettedLocation);
+  const handleChangeLocation = (location) => {
+    setGettedLocation(location);
+    setAddressData((prevAddressData) =>
+      prevAddressData.map((item) =>
+        item.id === 2 ? { ...item, address: location } : item
+      )
+    );
+  };
 
   const [distance, setDistance] = useState(0);
   const [newAddressData, setNewAddressData] = useState([]);
@@ -293,18 +288,76 @@ const Booking = () => {
   useEffect(() => {
     if (distance > receiveData.freeShipLimit) {
       setDeliveryFee(distance * receiveData.deliveryFee);
+    } else {
+      setDeliveryFee(0);
     }
   }, [distance]);
 
+  const [showPopUpVoucher, setShowPopUpVoucher] = useState(false);
+  const [discounts, setDiscounts] = useState([]);
+  useEffect(() => {
+    const fetchDiscounts = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8080/api/discounts/getListDiscountByUser/${userId}`
+        );
+        setDiscounts(response.data);
+      } catch (error) {
+        console.error("Error fetching discounts:", error);
+      }
+    };
+
+    fetchDiscounts();
+  }, [userId]);
+
+  const handleVoucher = () => {
+    setShowPopUpVoucher(true);
+  };
+
+  const handleCloseVoucher = () => {
+    setShowPopUpVoucher(false);
+  };
+  const [discount, setDiscount] = useState();
+  const handleDiscountValue = (value) => {
+    setDiscount(value);
+  };
+  const formatDiscountMoney = (discountMoney) => {
+    if (typeof discountMoney === "number") {
+      return "-" + discountMoney.toLocaleString("vi-VN") + "đ";
+    }
+    return discountMoney; // giữ nguyên nếu không phải là số
+  };
+
+  const handleCancelDiscount = () => {
+    setDiscount(null);
+  };
+
   useEffect(() => {
     setTotalPrice(rentalDays * receiveData.price + deliveryFee);
-  }, [rentalDays, deliveryFee]);
+    if (discount) {
+      if (typeof discount.discountMoney === "number") {
+        setTotalPrice(
+          rentalDays * receiveData.price + deliveryFee - discount.discountMoney
+        );
+        console.log(totalPrice, discount.discountMoney);
+      } else {
+        setTotalPrice(
+          ((rentalDays * receiveData.price + deliveryFee) *
+            (100 - discount.discountMoney)) /
+            100
+        );
+      }
+    }
+  }, [rentalDays, deliveryFee, discount]);
 
   const [showPopupBooking, setShowPopupBooking] = useState(false);
 
   const [messageLicense, setMessageLicense] = useState("");
   const [buttonLicense, setButtonLicense] = useState("");
   const handleFormSubmit = async (e) => {
+    if (!userId) {
+      navigate("/login");
+    }
     e.preventDefault();
     try {
       // check license
@@ -342,26 +395,6 @@ const Booking = () => {
         }
         //truong hop hop le
         else {
-          // const response2 = await axios
-          //   .post("http://localhost:8080/api/booking/create", {
-          //     renterId: userId,
-          //     motorbikeId: receiveData.id,
-          //     startDate: dayjs(dateRange[0]).format("YYYY-MM-DDTHH:mm:ss"),
-          //     endDate: dayjs(dateRange[1]).format("YYYY-MM-DDTHH:mm:ss"),
-          //     bookingTime: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
-          //     totalPrice: totalPrice,
-          //     receiveLocation: gettedLocation,
-          //   })
-          //   .then(() => {
-          //     setShowPopupBooking(true); // Hiển thị popup khi thành công
-          //     setTimeout(() => {
-          //       setShowPopupBooking(false); // Ẩn popup sau 3 giây
-          //       navigate("/login"); //chuyển sang trang login sau khi thông báo
-          //     }, 3000);
-          //     console.log(response1.data.licenseType);
-
-          //     console.log(receiveData);
-          //   });
           setShowConfirmPopup(true);
         }
       }
@@ -372,6 +405,11 @@ const Booking = () => {
 
   const handleConfirmBooking = async (e) => {
     e.preventDefault();
+    if (discount) {
+      const deleteDiscount = axios.delete(
+        `http://localhost:8080/api/discounts/deleteDiscountByIdAndUserId/${userId}/${discount.id}`
+      );
+    }
     const response2 = await axios
       .post("http://localhost:8080/api/booking/create", {
         renterId: userId,
@@ -521,28 +559,39 @@ const Booking = () => {
             <RentalDocument />
             <hr className="my-3 border-gray-800"></hr>
             <div className="p-4 bg-white dark:bg-zinc-800  flex items-center space-x-4">
-            <div className="flex flex-col items-center mb-4">
-          <h2 className="text-sm font-semibold mb-2">Motorbike Owner</h2>
-          <img src="https://n1-cstg.mioto.vn/m/avatars/avatar-2.png" alt="User profile picture" className="w-16 h-16 rounded-full" />
-        </div>
-      <div className="flex-1">
-        <h2 className={`text-lg font-semibold ${sharedClasses.textZincDark}`}>{receiveData.user.firstName +' ' + receiveData.user.lastName}</h2>
-        <div className={`${sharedClasses.flexItemsCenter} space-x-2 ${sharedClasses.textZincLight}`}>
-          <span className={sharedClasses.flexItemsCenter}>
-          <FaMotorcycle className="w-6 h-6" />
-          
-            <span className="ml-2">{receiveData.user.totalTripCount} trips</span>
-          </span>
-        </div>
-      </div>
-    </div>
-            {motorbikeId && <FeedbackList motorbikeId={motorbikeId} />}
+              <div className="flex flex-col items-center mb-4">
+                <h2 className="text-sm font-semibold mb-2">Motorbike Owner</h2>
+                <img
+                  src="https://n1-cstg.mioto.vn/m/avatars/avatar-2.png"
+                  alt="User profile picture"
+                  className="w-16 h-16 rounded-full"
+                />
+              </div>
+              <div className="flex-1">
+                <h2
+                  className={`text-lg font-semibold ${sharedClasses.textZincDark}`}
+                >
+                  {receiveData.user.firstName + " " + receiveData.user.lastName}
+                </h2>
+                <div
+                  className={`${sharedClasses.flexItemsCenter} space-x-2 ${sharedClasses.textZincLight}`}
+                >
+                  <span className={sharedClasses.flexItemsCenter}>
+                    <FaMotorcycle className="w-6 h-6" />
 
+                    <span className="ml-2">
+                      {receiveData.user.totalTripCount} trips
+                    </span>
+                  </span>
+                </div>
+              </div>
+            </div>
+            {motorbikeId && <FeedbackList motorbikeId={motorbikeId} />}
           </div>
 
           {/* Right Column - 40% width */}
           <div
-            className={`${sharedClasses.w1_3} bg-white-100 ${sharedClasses.p4} ${sharedClasses.rounded}` }
+            className={`${sharedClasses.w1_3} bg-white-100 ${sharedClasses.p4} ${sharedClasses.rounded}`}
           >
             <form onSubmit={handleFormSubmit}>
               {/* Rental Section */}
@@ -572,12 +621,6 @@ const Booking = () => {
                     readOnly
                     onClick={() => setShowPopUp(true)}
                   />
-                  {showPopUp && (
-                    <PopUpLocation
-                      onClose={() => setShowPopUp(false)}
-                      onSelectLocation={motorbikeAddress}
-                    />
-                  )}
                 </div>
               </div>
 
@@ -585,13 +628,15 @@ const Booking = () => {
                 className={`flex justify-between text-lg ${sharedClasses.mb2}`}
               >
                 <span>Đơn giá</span>
-                <span>{receiveData.price.toLocaleString("vi-VN")}đ/ ngày</span>
+                <span className="font-semibold">
+                  {receiveData.price.toLocaleString("vi-VN")}đ/ ngày
+                </span>
               </div>
               <div
                 className={`flex justify-between text-lg ${sharedClasses.mb2}`}
               >
                 <span>Tổng cộng</span>
-                <span>
+                <span className="font-semibold">
                   {receiveData.price.toLocaleString("vi-VN")}đ x {rentalDays}{" "}
                   ngày
                 </span>
@@ -600,16 +645,43 @@ const Booking = () => {
                 className={`flex justify-between text-lg ${sharedClasses.mb2}`}
               >
                 <span>Phí giao nhận xe</span>
-                <span>{deliveryFee.toLocaleString("vi-VN")}đ</span>
-              </div>
-              <div
-                className={`flex justify-between text-lg ${sharedClasses.mb4} hover:${sharedClasses.cursorPointer}`}
-              >
-                <span>Mã khuyến mãi</span>
-                <span>
-                  <FontAwesomeIcon icon={faArrowRight} />
+                <span className="font-semibold">
+                  {deliveryFee.toLocaleString("vi-VN")}đ
                 </span>
               </div>
+              {discount ? (
+                <div
+                  className={`flex justify-between text-lg ${sharedClasses.mb2}`}
+                >
+                  <span>
+                    Mã{" "}
+                    <span className="font-semibold text-green-300">
+                      {discount.name}
+                    </span>
+                    &nbsp;
+                    <FontAwesomeIcon
+                      className="text-red-600 cursor-pointer"
+                      icon={faCircleXmark}
+                      onClick={handleCancelDiscount}
+                    ></FontAwesomeIcon>
+                  </span>
+                  <span className="font-semibold">
+                    {formatDiscountMoney(discount.discountMoney)}
+                  </span>
+                </div>
+              ) : (
+                <div
+                  className={`flex justify-between text-lg ${sharedClasses.mb4} hover:${sharedClasses.cursorPointer}`}
+                  style={{ cursor: "pointer" }}
+                  onClick={handleVoucher}
+                >
+                  <span>Mã khuyến mãi</span>
+                  <span>
+                    <FontAwesomeIcon icon={faArrowRight} />
+                  </span>
+                </div>
+              )}
+
               <div
                 className={`flex justify-between text-lg ${sharedClasses.mb1}`}
               >
@@ -646,11 +718,23 @@ const Booking = () => {
             {showPopupBooking && (
               <PopUpBookingSuccess message="Your request booking sent successfully!" />
             )}
+            {showPopUp && (
+              <PopUpLocation
+                onClose={() => setShowPopUp(false)}
+                onSelectLocation={motorbikeAddress}
+                onChangeLocation={handleChangeLocation}
+              />
+            )}
+            {showPopUpVoucher && (
+              <PopUpVoucher
+                onCloseVoucher={handleCloseVoucher}
+                discounts={discounts}
+                discountValue={handleDiscountValue}
+              ></PopUpVoucher>
+            )}
           </div>
         </div>
-
       </div>
-      
     </div>
   );
 };

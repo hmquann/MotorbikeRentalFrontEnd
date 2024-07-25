@@ -8,6 +8,16 @@ import PopUpConfirm from "./PopUpConfirm";
 import { useNavigate } from "react-router-dom";
 import PopUpSuccess from "./PopUpSuccess";
 
+const statusTranslations = {
+  PENDING: "Chờ duyệt",
+  PENDING_DEPOSIT: "Chờ đặt cọc",
+  DEPOSIT_MADE: "Đã đặt cọc",
+  DONE: "Hoàn thành",
+  RENTING: "Đang trong chuyến",
+  CANCELED: "Đã hủy",
+  REJECTED: "Đã từ chối",
+};
+
 const statusStyles = {
   PENDING: {
     bg: "bg-orange-200",
@@ -59,8 +69,8 @@ export default function Widget() {
   const [showPopup, setShowPopup] = useState(false);
   const [popupContent, setPopupContent] = useState("");
   const [action, setAction] = useState("");
-  const [showPopupSuccess, setShowPopupSuccess] = useState(false); 
-  const navigate = useNavigate(); 
+  const [showPopupSuccess, setShowPopupSuccess] = useState(false);
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchMotorbike = async () => {
       try {
@@ -137,7 +147,7 @@ export default function Widget() {
         className={`${statusStyle.bg} ${statusStyle.text} p-4 rounded-lg flex items-center mb-6`}
       >
         <FontAwesomeIcon icon={statusStyle.icon} className="mr-2" />
-        <span>{booking.status}</span>
+        <span>{statusTranslations[booking.status]}</span>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="col-span-2 bg-white p-6 rounded-lg shadow-lg">

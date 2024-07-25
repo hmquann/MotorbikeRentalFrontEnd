@@ -17,7 +17,6 @@ import PopUpSuccess from "./PopUpSuccess";
 import { useNavigate } from "react-router-dom";
 import FeedbackModal from "../booking/FeedbackModal";
 
-
 const BookingCard = ({ booking }) => {
   const [motorbikeName, setMotorbikeName] = useState();
   const [lessorName, setLessorName] = useState();
@@ -72,7 +71,6 @@ const BookingCard = ({ booking }) => {
   const closeFeedback = () => {
     setShowFeedbackModal(false);
   };
-
 
   const [motorbike, setMotorbike] = useState();
   useEffect(() => {
@@ -273,12 +271,12 @@ const BookingCard = ({ booking }) => {
               </button>
             </>
           )}
-           <FeedbackModal 
-        show={showFeedbackModal} 
-        onHide={closeFeedback} 
-        bookingId={booking.bookingId} 
-        onFeedbackSubmitted={() => setFeedbackSent(true)}
-      />
+          <FeedbackModal
+            show={showFeedbackModal}
+            onHide={closeFeedback}
+            bookingId={booking.bookingId}
+            onFeedbackSubmitted={() => setFeedbackSent(true)}
+          />
         </div>
       </div>
       {showPopUp && (

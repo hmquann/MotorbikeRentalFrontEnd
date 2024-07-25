@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import "./PopUpLocation.css";
+import React, { useState, useEffect } from "react";
+// import "./PopUpLocation.css";
 
 const sharedClasses = {
   textZinc: "text-zinc-900 dark:text-zinc-100",
@@ -11,23 +11,106 @@ const sharedClasses = {
   bgGreenHover: "hover:bg-green-600",
 };
 
-const PopUpLocation = ({ onClose, onSelectLocation }) => {
-  console.log(onSelectLocation);
+const PopUpLocation = ({ onClose, onSelectLocation, onChangeLocation }) => {
   const [selectedOption, setSelectedOption] = useState("pickup-location");
   const [customLocation, setCustomLocation] = useState(""); // State to store custom location input
+
+  // State management for location selection
+  const [selectedLocation, setSelectedLocation] = useState(onSelectLocation);
+  const [selectedProvince, setSelectedProvince] = useState("");
+  const [selectedDistrict, setSelectedDistrict] = useState("");
+  const [selectedWard, setSelectedWard] = useState("");
+  const [addressDetail, setAddressDetail] = useState("");
+  const [provinces, setProvinces] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [wards, setWards] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch("https://vapi.vnappmob.com/api/province/")
+      .then((response) => response.json())
+      .then((data) => {
+        if (data && data.results) {
+          setProvinces(data.results);
+        } else {
+          throw new Error("Invalid data format");
+        }
+      })
+      .catch((error) => {
+        setError(error);
+      });
+  }, []);
+
+  const handleProvinceChange = (event) => {
+    const provinceId = event.target.value;
+    setSelectedProvince(provinceId);
+    fetch(`https://vapi.vnappmob.com/api/province/district/${provinceId}`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data && data.results) {
+          setDistricts(data.results);
+          setWards([]);
+        } else {
+          throw new Error("Invalid data format");
+        }
+      })
+      .catch((error) => {
+        setError(error);
+      });
+  };
+
+  const handleDistrictChange = (event) => {
+    const districtId = event.target.value;
+    setSelectedDistrict(districtId);
+    fetch(`https://vapi.vnappmob.com/api/province/ward/${districtId}`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.results.length === 0) {
+          setWards([]); // Clear wards if no wards are available
+        }
+        if (data && data.results) {
+          setWards(data.results);
+        } else {
+          throw new Error("Invalid data format");
+        }
+      })
+      .catch((error) => {
+        setError(error);
+      });
+  };
+
+  const handleWardChange = (event) => {
+    const wardId = event.target.value;
+    setSelectedWard(wardId);
+  };
+
+  const handleAddressChange = (e) => {
+    setAddressDetail(e.target.value);
+  };
+
   const handleSubmitForm = (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevent the default form submission behavior
     let location;
+
     if (selectedOption === "pickup-location") {
-      location = onSelectLocation;
+      location = selectedLocation; // Use onSelectLocation directly
+      console.log("cáoidjoqie18u398u12039u1023u123");
     } else if (selectedOption === "map-location") {
-      location = customLocation;
+      const province = provinces.find(
+        (d) => d.province_id === selectedProvince
+      )?.province_name;
+      const district = districts.find(
+        (d) => d.district_id === selectedDistrict
+      )?.district_name;
+      const ward = wards.find((d) => d.ward_id === selectedWard)?.ward_name;
+      location = `${addressDetail}, ${ward}, ${district}, ${province}`;
     } else if (selectedOption === "airport-location") {
-      location = "Tân Sơn Nhất";
+      location = "aaaaaaaaaaaaaaaa";
     }
 
-    localStorage.setItem("location", location);
-    onClose();
+    // Call the onSelectLocation callback to send location data
+    onChangeLocation(location);
+    onClose(); // Close the popup after selection
   };
 
   return (
@@ -39,27 +122,14 @@ const PopUpLocation = ({ onClose, onSelectLocation }) => {
         >
           <div className="flex justify-between items-center mb-4">
             <h2 className={`text-xl font-semibold ${sharedClasses.textZinc}`}>
-              Vehicle Pickup Locations
+              Chọn địa điểm giao nhận xe
             </h2>
             <button
               type="button"
               onClick={onClose}
               className={`${sharedClasses.green} ${sharedClasses.greenHover}`}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
+              {/* Optional: Add close icon or text here */}X
             </button>
           </div>
           <div className="flex flex-col md:flex-row">
@@ -79,18 +149,10 @@ const PopUpLocation = ({ onClose, onSelectLocation }) => {
                       className={sharedClasses.textZinc}
                       style={{ fontWeight: "bold" }}
                     >
-                      Pick Up at Vehicle Location
+                      Giao nhận tại vị trí xe
                     </p>
                     <p className={sharedClasses.textZincLight}>
                       {onSelectLocation}
-                    </p>
-                    <p
-                      className={sharedClasses.textZincLighter}
-                      style={{ fontStyle: "italic", opacity: 0.7 }}
-                    >
-                      You will pick up and return the car at the vehicle
-                      location (specific address will be provided after
-                      deposit).
                     </p>
                   </div>
                 </label>
@@ -103,49 +165,97 @@ const PopUpLocation = ({ onClose, onSelectLocation }) => {
                     checked={selectedOption === "map-location"}
                     onChange={() => setSelectedOption("map-location")}
                   />
-                  <div className="ml-3">
+                  <div className="ml-3 w-full">
                     <p
                       className={sharedClasses.textZinc}
                       style={{ fontWeight: "bold" }}
                     >
                       Nhận xe tại vị trí của bạn
                     </p>
-                    <input
-                      type="text"
-                      value={customLocation}
-                      onChange={(e) => setCustomLocation(e.target.value)}
-                      className="w-full px-3 py-2 mt-1 border border-zinc-300 rounded shadow-sm focus:outline-none focus:border-green-500"
-                    />
-                  </div>
-                </label>
-                <label className="flex items-center p-4 border rounded-lg cursor-pointer">
-                  <input
-                    type="radio"
-                    name="pickup-location"
-                    value="airport-location"
-                    className={`form-radio ${sharedClasses.green}`}
-                    checked={selectedOption === "airport-location"}
-                    onChange={() => setSelectedOption("airport-location")}
-                  />
-                  <div className="ml-3">
-                    <p
-                      className={sharedClasses.textZinc}
-                      style={{ fontWeight: "bold" }}
-                    >
-                      Giao xe sân bay
-                    </p>
-                    <p className={sharedClasses.textZincLight}>Tân Sơn Nhất</p>
+                    <div className="flex flex-wrap gap-6 mb-6">
+                      <div className="flex-1">
+                        <select
+                          className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                          id="provinces"
+                          name="province"
+                          value={selectedProvince}
+                          onChange={handleProvinceChange}
+                        >
+                          <option value="">Tỉnh/ Thành phố</option>
+                          {provinces.map((province) => (
+                            <option
+                              key={province.province_id}
+                              value={province.province_id}
+                            >
+                              {province.province_name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="flex-1">
+                        <select
+                          className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                          value={selectedDistrict}
+                          name="district"
+                          onChange={handleDistrictChange}
+                          disabled={!selectedProvince}
+                        >
+                          <option value="">Quận/ Huyện</option>
+                          {districts.map((district) => (
+                            <option
+                              key={district.district_id}
+                              value={district.district_id}
+                            >
+                              {district.district_name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="flex-1">
+                        <select
+                          className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                          value={selectedWard}
+                          name="ward"
+                          onChange={handleWardChange}
+                          disabled={!selectedDistrict}
+                          id="wards"
+                        >
+                          <option value="">Phường/ Xã</option>
+                          {wards.map((ward) => (
+                            <option key={ward.ward_id} value={ward.ward_id}>
+                              {ward.ward_name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <input
+                        type="text"
+                        name="addressDetail"
+                        value={addressDetail}
+                        onChange={handleAddressChange}
+                        className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                        placeholder="VD: Số 1 đường A"
+                      />
+                    </div>
                   </div>
                 </label>
               </div>
-              <button
-                type="button"
-                onClick={handleSubmitForm}
-                className={`w-full ${sharedClasses.bgGreen} text-white py-2 rounded-lg ${sharedClasses.bgGreenHover}`}
-              >
-                Thay đổi
-              </button>
             </div>
+          </div>
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={onClose}
+              className={`px-4 py-2 mr-2 ${sharedClasses.textZincLighter} rounded hover:${sharedClasses.textZincLight}`}
+            >
+              Hủy
+            </button>
+            <button
+              type="submit"
+              className={`px-4 py-2 ${sharedClasses.bgGreen} ${sharedClasses.bgGreenHover} text-white rounded`}
+            >
+              Xác nhận
+            </button>
           </div>
         </form>
       </div>
