@@ -6,7 +6,31 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCalendarDay } from "@fortawesome/free-solid-svg-icons";
+import ManageSchedulePopUp from '../booking/schedule/ManageSchedulePopUp';
+const inputClasses = "w-full px-3 py-2 mt-1 rounded-md bg-input text-primary-foreground";
+const labelClasses = "block text-sm font-medium";
+const buttonClasses = "px-4 py-2 rounded";
+
+
 const MotorbikeDetails = ({ motorbike, onClose }) => {
+  const [userRole, setUserRole] = useState([]);
+  const [userId, setUserId] = useState('');
+  const [schedulePopUp, setSchedulePopUp] = useState(false);
+
+  const handleOpenSchedulePopup = () => {
+    setSchedulePopUp(true);
+  };
+
+  useEffect(() => {
+    const role = JSON.parse(localStorage.getItem('roles'));
+    const userId = JSON.parse(localStorage.getItem('user')).userId;
+    setUserRole(role);
+    setUserId(userId);
+  }, []);
+
+  const isLessor = userRole.includes('LESSOR');
   const [updateForm, setUpdateForm] = useState({
     price: '',
     overtimeFee: '',
@@ -34,7 +58,10 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
   const [isUpdate, setIsUpdate] = useState(false);
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUpdateForm({ ...updateForm, [name]: value });
+    setUpdateForm({
+      ...updateForm,
+      [name]: value
+    });
   };
 
   const handleSubmit = async () => {
@@ -68,6 +95,11 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
           <path d="M9 15h3l8.5 -8.5a1.5 1.5 0 0 0 -3 -3l-8.5 8.5v3" />
           <line x1="16" y1="5" x2="19" y2="8" />
         </svg>
+        <svg onClick={handleOpenSchedulePopup}
+              class="h-10 w-10 text-green-500"  width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"> 
+               <path stroke="none" d="M0 0h24v24H0z"/>  <rect x="4" y="5" width="16" height="16" rx="2" />
+                <line x1="16" y1="3" x2="16" y2="7" />  <line x1="8" y1="3" x2="8" y2="7" />  
+              <line x1="4" y1="11" x2="20" y2="11" />  <rect x="8" y="15" width="2" height="2" /></svg>
       </Modal.Header>
       <Modal.Body>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -81,6 +113,7 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
               value={motorbike.model.modelName}
               readOnly
             />
+
           </Form.Group>
           <Form.Group>
             <Form.Label>Biển xe</Form.Label>
@@ -92,9 +125,10 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
               value={motorbike.motorbikePlate}
               readOnly
             />
+
           </Form.Group>
           <Form.Group>
-            <Form.Label>Tiền thuê (1 ngày)</Form.Label>
+            <Form.Label>Giá thuê theo ngày</Form.Label>
             <Form.Control
               type="text"
               id="price"
@@ -106,7 +140,7 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
             />
           </Form.Group>
           <Form.Group>
-            <Form.Label>Overtime Fee</Form.Label>
+            <Form.Label>Phí vượt thời gian</Form.Label>
             <Form.Control
               type="text"
               id="overtimeFee"
@@ -118,7 +152,7 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
             />
           </Form.Group>
           <Form.Group>
-            <Form.Label>Overtime Limit</Form.Label>
+            <Form.Label>Giới hạn vượt thời gian</Form.Label>
             <Form.Control
               type="text"
               id="overtimeLimit"
@@ -141,7 +175,7 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
             />
           </Form.Group>
           <Form.Group>
-            <Form.Label>Vận chuyển</Form.Label>
+            <Form.Label>Giao xe tận nơi</Form.Label>
             <Form.Control
               type="text"
               id="delivery"
@@ -165,7 +199,7 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
             />
           </Form.Group>
           <Form.Group>
-            <Form.Label>Điều kiện ràng buộc của xe</Form.Label>
+            <Form.Label>Điều kiện ràng buộc thuê xe</Form.Label>
             <Form.Control
               type="text"
               id="constraintMotorbike"
@@ -195,7 +229,7 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
             </FloatingLabel>
           </Form.Group>
           <Form.Group className="col-span-1 sm:col-span-2">
-            <Form.Label>Motorbike Images</Form.Label>
+            <Form.Label>Hình ảnh</Form.Label>
             <div className="flex flex-wrap items-center mt-1">
               {motorbike.motorbikeImages.map((image, index) => (
                 <ModalImage

@@ -1,137 +1,165 @@
-import { useEffect, useState } from "react";
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Table from "react-bootstrap/Table";
-import Button from "react-bootstrap/Button";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, LineChart, ResponsiveContainer, Line, PieChart, Pie, Cell } from 'recharts';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowTrendUp, faArrowTrendDown } from '@fortawesome/free-solid-svg-icons';
+import "./Dashboard.css";
 
 const Dashboard = () => {
-  const [employees, setEmployees] = useState([]);
-  const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState("true");
-
-  const decodeToken = (token) => {
-    const base64Url = token.split(".")[1];
-    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split("")
-        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-        .join("")
-    );
-    return JSON.parse(jsonPayload);
-  };
-
+  const [monthlyRevenue, setMonthlyRevenue] = useState([]);
+  const [locationPercentage, setLocationPercentage] = useState({});
+  const [twoRecentMonthBookingCount, setTwoMonthBookingCount] = useState([]);
+  
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login");
-    } else {
-      const decodedToken = decodeToken(token);
-      if (decodedToken.roles && decodedToken.roles.includes("ADMIN")) {
-        fetchEmployees();
-      } else {
-        navigate("/login");
-      }
-    }
+    axios.get('http://localhost:8080/dashboard/sixMonthRevenue')
+      .then(response => setMonthlyRevenue(response.data))
+      .catch(error => console.error('Error fetching revenue:', error));
+
+    axios.get('http://localhost:8080/dashboard/mainLocationCount')
+      .then(response => setLocationPercentage(response.data))
+      .catch(error => console.error('Error fetching location data:', error));
+
+    axios.get('http://localhost:8080/dashboard/twoRecentMonthBookingCount')
+      .then(response => setTwoMonthBookingCount(response.data))
+      .catch(error => console.error('Error fetching booking count data:', error));
   }, []);
 
-  const fetchEmployees = async () => {
-    try {
-      const response = await fetch("http://localhost:8080/api/employees", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setEmployees(data);
+  const topModels = [
+    { modelName: "SH350i", bookingCount: 50 }, 
+    { modelName: "Wave", bookingCount: 30 }, 
+    { modelName: "Vision", bookingCount: 60 }, 
+    { modelName: "AirBlade", bookingCount: 20 }, 
+    { modelName: "Vespa", bookingCount: 80 }
+  ];
+  const colors = ['#AEC6CF', '#FFB347', '#77DD77', '#F49AC2', '#CFCFC4'];
 
-        console.log(data);
-      } else {
-        navigate("/login");
-      }
-    } catch (error) {
-      console.error("Error fetching employees : ", error.message);
-    }
+  const dataModel = topModels.map((model, index) => ({
+    name: model.modelName,
+    bookings: model.bookingCount,
+    fill: colors[index % colors.length],
+  }));
+
+  const dataRevenue = monthlyRevenue.map((item) => ({
+    month: `${item.month}/${item.year}`,
+    totalRevenue: item.totalRevenue
+  }));
+
+  const pieData = Object.entries(locationPercentage).map(([key, value], index) => ({
+    name: key,
+    value: value,
+    fill: colors[index % colors.length]
+  }));
+
+  const getRevenueChange = () => {
+    if (monthlyRevenue.length < 2) return null;
+    const lastMonth = monthlyRevenue[monthlyRevenue.length - 1].totalRevenue;
+    const previousMonth = monthlyRevenue[monthlyRevenue.length - 2].totalRevenue;
+    const change = lastMonth - previousMonth;
+    const percentageChange = ((change / previousMonth) * 100).toFixed(2);
+
+    return {
+      change,
+      percentageChange,
+      isIncrease: change > 0
+    };
+  };
+  const getTwoMonthBookingChange = () => {
+    if (twoRecentMonthBookingCount.length < 2) return null;
+    const lastMonth = twoRecentMonthBookingCount[twoRecentMonthBookingCount.length - 2].bookingCount;
+    const previousMonth = twoRecentMonthBookingCount[twoRecentMonthBookingCount.length - 1].bookingCount;
+    const change = lastMonth - previousMonth;
+    const percentageChange = ((change / previousMonth) * 100).toFixed(2);
+
+    return {
+      change,
+      percentageChange,
+      isIncrease: change > 0
+    };
   };
 
-  const handleDelete = async (employeeId) => {
-    try {
-      const response = await fetch(
-        `http://localhost:8080/api/employee/${employeeId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      if (response.ok) {
-        setEmployees((preEmployees) =>
-          preEmployees.filter((employee) => employee.id !== employeeId)
-        );
-        console.log(`Employee with ID ${employeeId} deleted successfully`);
-      } else {
-        console.error("Delete unsuccessfully", response.statusText);
-      }
-    } catch (error) {
-      console.error("Delete unsuccessfully", error.message);
-    }
-  };
-
-  const handleUpdate = (employeeId) => {
-    navigate(`/employee/${employeeId}`);
-  };
-
-
-
+  const revenueChange = getRevenueChange();
+  const bookingChange=getTwoMonthBookingChange();
   return (
-    <>
-      <Container className="mt-5">
-        <Row>
-          <Col>
-            <h1 className="text-center">Employees</h1>
-            <Table striped border hover responsive>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Phone</th>
-                  <th>Department</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {employees.map((employee) => (
-                  <tr key={employee.id}>
-                    <td>{employee.name}</td>
-                    <td>{employee.email}</td>
-                    <td>{employee.phone}</td>
-                    <td>{employee.department}</td>
-                    <td>
-                      <Button
-                        variant="outline-secondary"
-                        onClick={() => handleUpdate(employee.id)}
-                      >
-                        Update
-                      </Button>{" "}
-                      <Button
-                        variant="outline-danger"
-                        onClick={() => handleDelete(employee.id)}
-                      >
-                        Delete
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          </Col>
-        </Row>
-      </Container>
-    </>
+    <div className="dashboard-container">
+      <div className="top-container">
+        <div className="rectangle">
+          <h6>Doanh thu tháng này</h6>
+          {monthlyRevenue.length > 0 && (
+            <>
+              {revenueChange && (
+                <div className="revenue-change">
+                  <FontAwesomeIcon 
+                    icon={revenueChange.isIncrease ? faArrowTrendUp : faArrowTrendDown} 
+                    style={{ color: revenueChange.isIncrease ? "#63E6BE" : "#d70f37" }} 
+                  />
+                  <span>{Math.abs(revenueChange.percentageChange)}%</span>
+                </div>
+              )}
+              <h7><b>{monthlyRevenue[monthlyRevenue.length - 1].totalRevenue}</b> VND</h7>
+            </>
+          )}
+        </div>
+        <div className="rectangle">
+          <h6>Số lượt booking tháng này</h6>
+          {twoRecentMonthBookingCount.length > 0 && (
+            <>
+              {bookingChange && (
+                <div className="revenue-change">
+                  <FontAwesomeIcon 
+                    icon={bookingChange.isIncrease ? faArrowTrendUp : faArrowTrendDown} 
+                    style={{ color: bookingChange.isIncrease ? "#63E6BE" : "#d70f37" }} 
+                  />
+                  <span>{Math.abs(bookingChange.percentageChange)}%</span>
+                </div>
+              )}
+              <h7><b>{twoRecentMonthBookingCount[twoRecentMonthBookingCount.length - 1].bookingCount}</b> chuyến</h7>
+            </>
+          )}
+        </div>
+        <div className="rectangle">3</div>
+        <div className="rectangle">4</div>
+      </div>
+      <div className="chart-container">
+        <div className="chart-box">
+          <h4 className="chart-title">Top 5 Mẫu Xe Được Thuê Nhiều Nhất Tháng</h4>
+          <ResponsiveContainer width="100%" height={280}>
+            <BarChart data={dataModel} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="bookings" fill="#82ca9d" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="chart-box">
+          <h4 className="chart-title">Doanh thu 6 tháng gần nhất</h4>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={dataRevenue}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="totalRevenue" stroke="#8884d8" activeDot={{ r: 8 }} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="chart-box">
+          <h4 className="chart-title">Số lượt đặt xe theo địa điểm</h4>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} fill="#82ca9d" label>
+                {pieData.map((entry, index) => <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />)}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    </div>
   );
 };
 
