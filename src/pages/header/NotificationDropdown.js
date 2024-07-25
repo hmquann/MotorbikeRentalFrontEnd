@@ -1,14 +1,14 @@
 import React, { useState } from "react";
-import IconButton from "@mui/material/IconButton";
-import Popover from "@mui/material/Popover";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
-import NotificationsIcon from "@mui/icons-material/Notifications";
+import { IconButton } from "@mui/material";
+import { Popover } from "@mui/material";
+import { Card } from "@mui/material";
+import { CardContent } from "@mui/material";
+import { Typography } from "@mui/material";
+import { Divider } from "@mui/material";
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import { styled } from "@mui/system";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
 dayjs.extend(relativeTime);
 

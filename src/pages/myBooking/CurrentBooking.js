@@ -1,30 +1,50 @@
 import React, { useState, useEffect } from "react";
 import BookingCard from "./BookingCard";
 import axios from "axios";
+import NoBooking from "./NoBooking";
 
-const CurrentBooking = () => {
+const CurrentBooking = ({ filters }) => {
   const [bookings, setBookings] = useState([]);
   const userDataString = localStorage.getItem("user");
-
-  // Chuyển đổi chuỗi JSON thành đối tượng JavaScript
   const userData = JSON.parse(userDataString);
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      // check license
-      const response = await axios.get(
-        `http://localhost:8080/api/license/getLicenseByUserId/${userData.userId}`
-      );
-      setBookings(response.data)
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
+
+  useEffect(() => {
+    const fetchBookings = async () => {
+      try {
+        const response = await axios.post(
+          "http://localhost:8080/api/booking/filter",
+          {
+            tripType: filters.tripType,
+            userId: filters.userId,
+            status: filters.status,
+            sort: filters.sort,
+            startTime: filters.startTime,
+            endTime: filters.endTime,
+          }
+        );
+        const currentBookings = response.data.filter((booking) =>
+          ["PENDING", "PENDING_DEPOSIT", "DEPOSIT_MADE", "RENTING"].includes(
+            booking.status
+          )
+        );
+        setBookings(currentBookings);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    fetchBookings();
+  }, [filters]);
+
   return (
     <div>
-      {bookings.map((booking) => (
-        <BookingCard key={booking.id} booking={booking} />
-      ))}
+      {bookings.length === 0 ? (
+        <NoBooking />
+      ) : (
+        bookings.map((booking) => (
+          <BookingCard key={booking.id} booking={booking} />
+        ))
+      )}
     </div>
   );
 };

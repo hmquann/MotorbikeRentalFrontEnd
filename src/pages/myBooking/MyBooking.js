@@ -1,18 +1,45 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CurrentBooking from "./CurrentBooking";
-import "./MyBooking.css"; // Import the CSS file
+import "./MyBooking.css";
 import HistoryBooking from "./HistoryBooking";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSliders } from "@fortawesome/free-solid-svg-icons";
+import PopUpFilter from "./PopUpFilter";
 
 const MyBooking = () => {
   const [activeTab, setActiveTab] = useState("current");
+  const userDataString = localStorage.getItem("user");
+  const userData = JSON.parse(userDataString);
+  const [showFilterPopup, setShowFilterPopup] = useState(false);
+  const [filters, setFilters] = useState({
+    tripType: "all",
+    userId: userData.userId,
+    status: "all",
+    sort: "sortByBookingTimeDesc",
+    startTime: null,
+    endTime: null,
+  });
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
   };
 
+  const handleApplyFilter = (appliedFilters) => {
+    console.log("Applied filters:", appliedFilters);
+    setFilters(appliedFilters);
+  };
+
+  useEffect(() => {
+    if (showFilterPopup) {
+      document.body.classList.add("no-scroll");
+    } else {
+      document.body.classList.remove("no-scroll");
+    }
+  }, [showFilterPopup]);
+
   return (
     <div className="containerMyBooking mx-auto my-8">
-      <h1 className="text-3xl font-bold mb-4 text-left">My Booking</h1>
+      <h1 className="text-3xl font-bold mb-4 text-left">Chuyến của tôi</h1>
       <div className="flex justify-between items-center mb-4">
         <div className="flex" style={{ color: "#767676" }}>
           <button
@@ -23,7 +50,7 @@ const MyBooking = () => {
             }`}
             onClick={() => handleTabClick("current")}
           >
-            Current Booking
+            Chuyến hiện tại
           </button>
           <button
             className={`pb-1 text-lg border-b-2 ${
@@ -33,22 +60,28 @@ const MyBooking = () => {
             }`}
             onClick={() => handleTabClick("past")}
           >
-            History Booking
+            Lịch sử chuyến
           </button>
         </div>
-        <button className="border border-muted-foreground rounded-lg px-4 py-2 flex items-center">
-          <img
-            alt="filter-icon"
-            src="https://openui.fly.dev/openui/24x24.svg?text=⚙️"
-            className="mr-2"
-          />
-          Bộ lọc
+        <button
+          className="border border-strong rounded-lg px-4 py-2 flex items-center text-lg"
+          onClick={() => setShowFilterPopup(true)}
+        >
+          <FontAwesomeIcon icon={faSliders}></FontAwesomeIcon>
+          &nbsp;&nbsp;Bộ lọc
         </button>
       </div>
       <div>
-        {activeTab === "current" && <CurrentBooking />}
-        {activeTab === "past" && <HistoryBooking />}
+        {activeTab === "current" && <CurrentBooking filters={filters} />}
+        {activeTab === "past" && <HistoryBooking filters={filters} />}
       </div>
+      {showFilterPopup && (
+        <PopUpFilter
+          onClose={() => setShowFilterPopup(false)}
+          onApply={handleApplyFilter}
+          activeTab={activeTab}
+        />
+      )}
     </div>
   );
 };

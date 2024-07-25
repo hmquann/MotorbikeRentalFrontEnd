@@ -70,13 +70,15 @@ const InfoSection = ({ title, infoText, children }) => (
 );
 
 const RentalDocument = () => (
-  <div className={sharedClasses.p4}>
+  <div>
     <InfoSection
       className={`${sharedClasses.mb4}`}
       title="Giấy tờ thuê xe"
       infoText="Chọn 1 trong 2 hình thức"
     >
-      <DocumentList />
+      <div className={sharedClasses.p4}>
+        <DocumentList />
+      </div>
     </InfoSection>
     <InfoSection
       title="Tài sản thế chấp"

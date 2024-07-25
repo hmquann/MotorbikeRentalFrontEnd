@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
+import FloatingLabel from "react-bootstrap/FloatingLabel";
+import Form from "react-bootstrap/Form";
 
 const EditBrand = ({
   showModal,
@@ -16,17 +20,17 @@ const EditBrand = ({
       setBrandName(brandToEdit.brandName || "");
       setOrigin(brandToEdit.origin || "");
     }
-  }, [brandToEdit, showModal]);
+  }, [brandToEdit]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (!brandName) {
-        setError("Brand name cannot be empty");
+      if (!brandName.trim()) {
+        setError("Vui lòng điền tên thương hiệu");
         return;
       }
-      if (!origin) {
-        setError("Origin cannot be empty");
+      if (!origin.trim()) {
+        setError("Vui lòng điền xuất xứ");
         return;
       }
       const updatedBrand = {
@@ -34,18 +38,18 @@ const EditBrand = ({
         brandName,
         origin,
       };
-  
+
       await axios.patch(
         `http://localhost:8080/api/brand/updateBrand/${brandToEdit.brandId}`,
         updatedBrand
       );
-  
+
       onBrandUpdated();
       setShowModal(false);
     } catch (error) {
       if (error.response) {
         if (error.response.status === 400) {
-          setError("Brand name already existed");
+          setError("Thương hiệu đã tồn tại");
           console.log(error.response);
         }
       } else if (error.request) {
@@ -55,60 +59,64 @@ const EditBrand = ({
       }
     }
   };
-  
+
+  const handleClose = () => setShowModal(false);
 
   return (
-    showModal && (
-      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 ">
-        <div className="bg-white p-4 rounded-lg w-1/3 bg-gradient-to-r from-cyan-700 from-40% to-zinc-600">
-          <h2 className="text-lg-lg mb-4 dark:text-zinc-200">Edit Brand</h2>
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label className="block text-lg font-medium text-gray-700 mb-1">
-                Brand Name
-              </label>
-              <input
-                type="text"
-                value={brandName}
-                onChange={(e) => setBrandName(e.target.value)}
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md"
-              />
+    <Modal show={showModal} onHide={handleClose} backdrop="static">
+      <Modal.Header closeButton>
+        <Modal.Title>Chỉnh sửa</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <form onSubmit={handleSubmit}>
+          <FloatingLabel
+            controlId="floatingBrandName"
+            label="Tên thương hiệu"
+            className="mb-3"
+          >
+            <Form.Control
+              type="text"
+              placeholder="Tên thương hiệu"
+              value={brandName}
+              onChange={(e) => setBrandName(e.target.value)}
+            />
+          </FloatingLabel>
+          <FloatingLabel
+            controlId="floatingBrandOrigin"
+            label="Xuất xứ"
+            className="mb-3"
+          >
+            <Form.Control
+              type="text"
+              placeholder="Xuất xứ"
+              value={origin}
+              onChange={(e) => setOrigin(e.target.value)}
+            />
+          </FloatingLabel>
+          {error && (
+            <div className="text-red-500 mb-2 font-bold text-center">
+              {error}
             </div>
-            <div className="mb-4">
-              <label className="block text-lg font-medium text-gray-700 mb-1">
-                Brand Origin
-              </label>
-              <input
-                type="text"
-                value={origin}
-                onChange={(e) => setOrigin(e.target.value)}
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md"
-              />
-            </div>
-            {error && (
-              <div className="text-red-500 mb-4 font-bold text-center">
-                {error}
-              </div>
-            )}
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={() => setShowModal(false)}
-                className="px-4 py-2 hover:bg-gray-600 bg-gray-500 text-white rounded-lg mr-2"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 hover:bg-blue-600 bg-blue-500 text-white rounded-lg"
-              >
-                Save
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    )
+          )}
+        </form>
+      </Modal.Body>
+      <Modal.Footer>
+        <button
+          type="button"
+          onClick={() => setShowModal(false)}
+          className="px-4 py-2 hover:bg-red-700 bg-red-600 text-white rounded-lg mr-2"
+        >
+          Hủy
+        </button>
+        <button
+          type="submit"
+          onClick={handleSubmit}
+          className="px-4 py-2 hover:bg-blue-700 bg-blue-600 text-white rounded-lg"
+        >
+          Lưu
+        </button>
+      </Modal.Footer>
+    </Modal>
   );
 };
 

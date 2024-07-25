@@ -15,6 +15,8 @@ import UserData from "../dashboard/UserData";
 import VoucherList from "../voucher/VoucherList";
 import ChatApp from "../chatapp/ChatApp";
 import MyBooking from "../myBooking/MyBooking";
+import BlogEditor from "../blog/BlogEditor";
+import BlogList from "../blog/BlogList";
 
 const Menu = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -99,7 +101,7 @@ const Menu = () => {
                 >
                   Manage Brand
                 </NavLink>
-              </li>              
+              </li>
               <li>
                 <NavLink
                   to="/menu/approveLicense"
@@ -123,6 +125,14 @@ const Menu = () => {
                   className={({ isActive }) => (isActive ? "active" : "")}
                 >
                   User Management
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/menu/blogList"
+                  className={({ isActive }) => (isActive ? "active" : "")}
+                >
+                  Quản lí blog
                 </NavLink>
               </li>
             </>
@@ -169,6 +179,7 @@ const Menu = () => {
 
               <Route path="/approveLicense" element={<ApproveLicense />} />
               <Route path="/userData" element={<UserData />} />
+              <Route path="/blogList" element={<BlogList />} />
             </>
           )}
           {(isAdmin || isLessor) && (

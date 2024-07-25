@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+import { Form, FloatingLabel } from "react-bootstrap";
 
-const inputClasses =
-  "mt-1 block w-full p-2 border border-zinc-300 rounded-md dark:text-green-800 font-medium";
+const inputClasses = "mt-1 block w-full p-2 border border-zinc-300 rounded-md dark:text-green-800 font-medium";
 const labelClasses = "block text-md font-bold text-slate-500 dark:text-neutral-300";
 
 const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
@@ -36,6 +38,7 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
 
     fetchBrands();
   }, []);
+  
   useEffect(() => {
     const fetchFuelTypes = async () => {
       try {
@@ -65,14 +68,18 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
 
     fetchModelTypes();
   }, []);
+  const modelTypeMap = {
+    'XeSo': 'Xe Số',
+    'XeTayGa': 'Xe Tay Ga',
+    'XeConTay': 'Xe Côn Tay',
+    'XeDien': 'Xe Điện'
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     const newErrors = { ...errors };
     if (!value.trim()) {
-      newErrors[name] = `${
-        name.charAt(0).toUpperCase() + name.slice(1)
-      } is required`;
+      newErrors[name] = `${name.charAt(0).toUpperCase() + name.slice(1)} is required`;
     } else {
       delete newErrors[name];
     }
@@ -93,25 +100,24 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
     }
   };
 
+
   const validate = () => {
     const newErrors = {};
     if (!formData.modelName) newErrors.modelName = "Model Name is required";
-    if (!formData.cylinderCapacity)
-      newErrors.cylinderCapacity = "Cylinder Capacity is required";
+    if (!formData.cylinderCapacity) newErrors.cylinderCapacity = "Cylinder Capacity is required";
     if (!formData.fuelType) newErrors.fuelType = "Fuel Type is required";
-    if (!formData.fuelConsumption)
-      newErrors.fuelConsumption = "Fuel Consumption is required";
+    if (!formData.fuelConsumption) newErrors.fuelConsumption = "Fuel Consumption is required";
     if (!formData.modelType) newErrors.modelType = "Model Type is required";
     if (!formData.brand.brandId) newErrors.brandId = "Brand is required";
     return newErrors;
   };
 
-
   const handleSubmit = (e) => {
     e.preventDefault();
     const formErrors = validate();
-    if (Object.keys(formErrors).length > 0) {
-      setErrors(formErrors);
+    if (!formData.modelName.trim() || !formData.modelType.trim() || !formData.brand || !formData.cylinderCapacity.trim() ||
+             !formData.fuelConsumption || !formData.fuelType) {
+      setErrorsMess("Hãy điền đủ thông tin.");
       return;
     }
     axios
@@ -132,7 +138,9 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
           fuelType: "",
           fuelConsumption: "",
           modelType: "",
-          brandId: "",
+          brand: {
+            brandId: "",
+          },
         });
         setErrors({});
         setShowModal(false);
@@ -146,150 +154,117 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
       });
   };
 
-  if (!showModal) {
-    return null;
-  }
-
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 ">
-      <div className="bg-gray-200 to-zinc-500 p-4 rounded-lg shadow-lg max-w-4xl mx-auto">
-        <div className="bg-zinc-300 text-slate-600 p-2 rounded-t-lg">
-          <h2 className="text-lg-lg font-bold">Model Details</h2>
-        </div>
-        <form className="space-y-4 p-4" onSubmit={handleSubmit}>
+    <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
+      <Modal.Header closeButton>
+        <Modal.Title>Thêm mẫu xe</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="input-wrapper">
-              <label className={labelClasses}>Model Name</label>
-              <input
-                type="text"
-                placeholder="Model Name"
-                name="modelName"
-                value={formData.modelName}
-                onChange={handleChange}
-                className={inputClasses}
-              />
-              {errors.modelName && (
-                <span className="text-red-500 text-sm">{errors.modelName}</span>
-              )}
+            <div>
+              <FloatingLabel label="Tên mẫu" className="mb-3">
+                <Form.Control
+                  type="text"
+                  placeholder="Model Name"
+                  name="modelName"
+                  value={formData.modelName}
+                  onChange={handleChange}
+                />
+              </FloatingLabel>
             </div>
             <div>
-              <label className={labelClasses}>Cylinder Capacity</label>
-              <input
-                type="text"
-                placeholder="Cylinder Capacity"
-                name="cylinderCapacity"
-                value={formData.cylinderCapacity}
-                onChange={handleChange}
-                className={inputClasses}
-              />
-              {errors.cylinderCapacity && (
-                <span className="text-red-500 text-sm">
-                  {errors.cylinderCapacity}
-                </span>
-              )}
+              <FloatingLabel label="Dung tích xi lanh" className="mb-3">
+                <Form.Control
+                  type="text"
+                  placeholder="Cylinder Capacity"
+                  name="cylinderCapacity"
+                  value={formData.cylinderCapacity}
+                  onChange={handleChange}
+                />
+              </FloatingLabel>
             </div>
             <div>
-              <label className={labelClasses}>Fuel Consumption</label>
-              <input
-                type="text"
-                placeholder="Fuel Consumption"
-                name="fuelConsumption"
-                value={formData.fuelConsumption}
-                onChange={handleChange}
-                className={inputClasses}
-              />
-              {errors.fuelConsumption && (
-                <span className="text-red-500 text-sm">
-                  {errors.fuelConsumption}
-                </span>
-              )}
+              <FloatingLabel label="Nhiên liệu tiêu hao" className="mb-3">
+                <Form.Control
+                  type="text"
+                  placeholder="Fuel Consumption"
+                  name="fuelConsumption"
+                  value={formData.fuelConsumption}
+                  onChange={handleChange}
+                  required
+                />
+              </FloatingLabel>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className={labelClasses}>Fuel Type</label>
-              <select
-                name="fuelType"
-                value={formData.fuelType}
-                onChange={handleChange}
-                className={inputClasses}
-              >
-                <option value="">Select Fuel Type</option>
-                {fuelTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
-                  </option>
-                ))}
-              </select>
-              {errors.fuelType && (
-                <p className="text-red-500 text-sm">{errors.fuelType}</p>
-              )}
+              <FloatingLabel label="Loại nhiên liệu" className="mb-3">
+                <Form.Select
+                  name="fuelType"
+                  value={formData.fuelType}
+                  onChange={handleChange}
+                >
+                  <option value="">Chọn loại nhiên liệu</option>
+                  {fuelTypes.map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                </Form.Select>
+              </FloatingLabel>
             </div>
             <div>
-              <label className={labelClasses}>Model Type</label>
-              <select
-                name="modelType"
-                value={formData.modelType}
-                onChange={handleChange}
-                className={inputClasses}
-              >
-                <option value="">Select Model Type</option>
-                {modelTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
-                  </option>
-                ))}
-              </select>
-              {errors.modelType && (
-                <p className="text-red-500 text-sm">{errors.modelType}</p>
-              )}
+              <FloatingLabel label="Loại xe" className="mb-3">
+                <Form.Select
+                  name="modelType"
+                  value={formData.modelType}
+                  onChange={handleChange}
+                >
+                  <option value="">Chọn loại xe</option>
+                  {modelTypes.map((type) => (
+                    <option key={type} value={type}>
+                     {modelTypeMap[type] || type}
+                    </option>
+                  ))}
+                </Form.Select>
+              </FloatingLabel>
             </div>
           </div>
 
           <div>
-            <label className={labelClasses}>Brand</label>
-            <select
-              name="brandId"
-              value={formData.brandId}
-              onChange={handleChange}
-              className={inputClasses}
-            >
-              <option value="">Select Brand</option>
-              {brands.map((brand) => (
-                <option key={brand.brandId} value={brand.brandId}>
-                  {brand.brandName}
-                </option>
-              ))}
-            </select>
-            {errors.brandId && (
-              <p className="text-red-500 text-sm">{errors.brandId}</p>
-            )}
+            <FloatingLabel label="Thương hiệu" className="mb-3">
+              <Form.Select
+                name="brandId"
+                value={formData.brand.brandId}
+                onChange={handleChange}
+              >
+                <option value="">Chọn thương hiệu</option>
+                {brands.map((brand) => (
+                  <option key={brand.brandId} value={brand.brandId}>
+                    {brand.brandName}
+                  </option>
+                ))}
+              </Form.Select>
+            </FloatingLabel>
           </div>
           {errorsMess && (
             <div className="text-red-500 mb-2 font-bold text-center">
               {errorsMess}
             </div>
           )}
-
-          <div className="flex justify-end space-x-4">
-            <button
-              type="button"
-              onClick={() => setShowModal(false)}
-              className="hover:bg-red-700 bg-red-600 text-white px-4 py-2 rounded-lg"
-            >
-              Close
-            </button>
-            <button
-              type="submit"
-              className="hover:bg-blue-700 bg-blue-600 text-white px-4 py-2 rounded-lg"
-            >
-              Save
-            </button>
-          </div>
         </form>
-      </div>
-    </div>
+      </Modal.Body>
+      <Modal.Footer>
+        <button className="px-4 py-2 hover:bg-red-700 bg-red-600 text-white rounded-lg mr-2" onClick={() => setShowModal(false)}>
+          Hủy
+        </button>
+        <button className="px-4 py-2 hover:bg-blue-700 bg-blue-600 text-white rounded-lg mr-2" onClick={handleSubmit}>
+          Lưu
+        </button>
+      </Modal.Footer>
+    </Modal>
   );
 };
 

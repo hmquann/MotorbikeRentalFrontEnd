@@ -9,7 +9,7 @@ import useDebounce from "../../hooks/useDebounce";
 const buttonClasses = "font-semibold px-4 py-2 rounded-lg";
 const tableCellClasses = " px-6 py-4 whitespace-nowrap text-md ";
 const actionButtonClasses =
-  "text-zinc-500 rounded-lg hover:bg-white  px-2 py-2";
+  "text-blue-500 rounded-lg hover:bg-white  px-2 py-2";
 
 const ModelList = () => {
   const [models, setModels] = useState([]);
@@ -155,7 +155,7 @@ const ModelList = () => {
   return (
     <div className="max-w-5xl mx-auto p-4 bg-zinc-100">
       <div className="bg-gradient-to-r from-slate-500 from-60% to-zinc-500 text-white p-4 rounded-t-lg flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Manage Models</h2>
+        <h2 className="text-2xl font-bold">Quản lý mẫu xe</h2>
         <div>
           <button
             className={`${buttonClasses}hover:from-zinc-700 hover:bg-blue-700 bg-blue-600 text-white rounded-full `}
@@ -170,7 +170,7 @@ const ModelList = () => {
       <div className="p-2 w-1/5">
           <input
             type="text"
-            placeholder="Search models"
+            placeholder="Tìm mẫu xe..."
             value={searchTerm}
             onChange={handleSearch}
             className="p-2 border border-gray-300 rounded-md w-full"
@@ -188,17 +188,17 @@ const ModelList = () => {
               <th
                 className={`px-6 py-4 text-center text-x font-large text-zinc-500 uppercase tracking-wider w-1/4`}
               >
-                Name
+                Tên
               </th>
               <th
                 className={`px-6 py-4 text-center text-x font-large text-zinc-500 uppercase tracking-wider w-1/4`}
               >
-                Brand
+                Thương hiệu
               </th>
               <th
                 className={`px-6 py-4 text-center text-x font-large text-zinc-500 uppercase tracking-wider w-1/4`}
               >
-                Actions
+                Hành động
               </th>
             </tr>
           </thead>
@@ -252,7 +252,7 @@ const ModelList = () => {
             ) : (
               <tr>
                 <td colSpan="3" className={tableCellClasses}>
-                  No models found.
+                  Không có mẫu xe nào.
                 </td>
               </tr>
             )}
@@ -261,8 +261,8 @@ const ModelList = () => {
         </table>
         <div className="px-6 py-3 bg-zinc-50 flex justify-between items-center">
           <div className="text-sm text-zinc-700">
-            Showing <span className="font-medium">{models.length}</span> out of{" "}
-            <span className="font-medium">{models.length}</span> entries
+            Đang hiển thị <span className="font-medium">{models.length}</span> trên{" "}
+            <span className="font-medium">{models.length}</span> bản ghi
           </div>
           <div className="flex space-x-1">
             {currentPage > 0 && (
@@ -270,7 +270,7 @@ const ModelList = () => {
                 className="px-3 py-1 border border-zinc-300 text-zinc-500 rounded-md bg-zinc-200 hover:bg-zinc-300"
                 onClick={handlePreviousPage}
               >
-                Previous
+                Trước
               </button>
             )}
 
@@ -280,7 +280,7 @@ const ModelList = () => {
                 className="px-3 py-1 border border-zinc-300 text-zinc-500 rounded-md bg-zinc-200 hover:bg-zinc-300"
                 onClick={handleNextPage}
               >
-                Next
+                Sau
               </button>
             )}
           </div>

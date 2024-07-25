@@ -5,9 +5,10 @@ import EditBrand from "./EditBrand";
 import { MdOutlineAddCircleOutline } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
 
+
 const buttonClasses = "px-4 py-2 rounded-lg";
 const tableCellClasses = "px-6 py-4 whitespace-nowrap";
-const actionButtonClasses = "text-zinc-500 rounded-full hover:bg-white  px-3 py-2";
+const actionButtonClasses = "text-blue-500 rounded-full hover:bg-white  px-3 py-2";
 const deleteButtonClasses = "text-red-500";
 
 const BrandList = () => {
@@ -102,7 +103,7 @@ const BrandList = () => {
   return (
     <div className="max-w-5xl mx-auto p-4 bg-zinc-100">
       <div className="bg-gradient-to-r from-slate-500 from-60% to-zinc-500 text-white p-4 rounded-t-lg flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Manage Brand</h2>
+        <h2 className="text-2xl font-bold">Quản lý thương hiệu xe</h2>
         <div>
           <button
             className={`${buttonClasses} hover:bg-blue-700 bg-blue-600 text-white rounded-full `}
@@ -119,17 +120,17 @@ const BrandList = () => {
               <th
                 className={`${tableCellClasses} text-center text-x font-large text-zinc-500 uppercase tracking-wider w-1/3`}
               >
-                Name
+                Tên
               </th>
               <th
                 className={`${tableCellClasses} text-center text-x font-large text-zinc-500 uppercase tracking-wider w-1/3`}
               >
-                Origin
+                Nguốn gốc
               </th>
               <th
                 className={`${tableCellClasses} text-center text-x font-large text-zinc-500 uppercase tracking-wider w-1/3`}
               >
-                Actions
+                Hoạt động
               </th>
             </tr>
           </thead>
@@ -185,8 +186,8 @@ const BrandList = () => {
         </table>
         <div className="px-6 py-3 bg-zinc-50 flex justify-between items-center">
           <div className="text-sm text-zinc-700">
-            Showing <span className="font-medium">{brands.length}</span> out of{" "}
-            <span className="font-medium">{brands.length}</span> entries
+            Đang hiển thị <span className="font-medium">{brands.length}</span> trên{" "}
+            <span className="font-medium">{brands.length}</span> bản ghi
           </div>
           <div className="flex space-x-1">
             {currentPage > 0 && (
@@ -194,7 +195,7 @@ const BrandList = () => {
                 className="px-3 py-1 border border-zinc-300 text-zinc-500 rounded-md bg-zinc-200 hover:bg-zinc-300"
                 onClick={handlePreviousPage}
               >
-                Previous
+                Trước
               </button>
             )}
 
@@ -204,7 +205,7 @@ const BrandList = () => {
                 className="px-3 py-1 border border-zinc-300 text-zinc-500 rounded-md bg-zinc-200 hover:bg-zinc-300"
                 onClick={handleNextPage}
               >
-                Next
+                Tiếp
               </button>
             )}
           </div>
