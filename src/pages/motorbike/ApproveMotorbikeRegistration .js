@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Dropdown from "./Dropdown";
@@ -109,7 +108,6 @@ const ApproveMotorbikeRegistration = () => {
     setShowDetailModal(false);
     setSelectedMotorbike(null);
   };
-
 
   const searchMotorbike = async (searchTerm, userId, roles, page, size) => {
     try {
@@ -225,13 +223,12 @@ const ApproveMotorbikeRegistration = () => {
     setSelectedMotorbike(null);
     setActionType("");
   };
-    const statusMap = {
-    PENDING : 'Đang chờ duyệt',
-    ACTIVE  : "Hoạt động",
-    DEACTIVE : "Không hoạt động",
-    All : "Tất cả"
-  }
-
+  const statusMap = {
+    PENDING: "Đang chờ duyệt",
+    ACTIVE: "Hoạt động",
+    DEACTIVE: "Không hoạt động",
+    All: "Tất cả",
+  };
 
   const isAdmin = userRole.includes("ADMIN");
   const isLessor = userRole.includes("LESSOR");
@@ -385,68 +382,6 @@ const ApproveMotorbikeRegistration = () => {
                   Không thấy xe nào
                 </td>
               </tr>
-            ) : (
-  <>
-    {filteredMotorbikes.map((motorbike) => (
-      <tr
-        key={motorbike.id}
-        className="border-b transition duration-300 ease-in-out hover:bg-slate-200 "
-      >
-        {isAdmin && (
-          <td className="px-6 py-4 whitespace-nowrap font-bold text-sky-900 ">
-            {motorbike.id}
-          </td>
-        )}
-        {isAdmin && (
-          <td className={tableCellClasses}>
-            {motorbike.user.firstName + " " + motorbike.user.lastName}
-          </td>
-        )}
-        <td className={tableCellClasses}>{motorbike.model.modelName}</td>
-        <td className={tableCellClasses}>{motorbike.motorbikePlate}</td>
-        <td className={tableCellClasses}>{motorbike.motorbikeStatus}</td>
-        <td className={tableCellClasses}>
-          {isAdmin && motorbike.motorbikeStatus === 'PENDING' ? (
-            <>
-              <button
-                className={`hover:bg-green-600 bg-green-500 text-white mr-2 ${buttonClasses}`}
-                onClick={() => handleAction(motorbike, 'approve')}
-              >
-                <FontAwesomeIcon icon={faCheck} />
-              </button>
-              <button
-                className={`hover:bg-red-600 bg-red-500 text-white mr-2 ${buttonClasses}`}
-                onClick={() => handleAction(motorbike, 'reject')}
-              >
-               <FontAwesomeIcon icon={faTimesCircle} />
-              </button>
-              <button
-                className={`hover:bg-blue-600 bg-blue-500 text-white ${buttonClasses}`}
-                onClick={() => handleViewDetail(motorbike.id)}
-              >
-           <FontAwesomeIcon icon={faInfoCircle} />
-              </button>
-            </>
-          ) : isLessor &&
-            (motorbike.motorbikeStatus === 'ACTIVE' ||
-              motorbike.motorbikeStatus === 'DEACTIVE') ? (
-            motorbike.motorbikeStatus === 'ACTIVE' ? (
-              <>
-                  <button
-                className={`hover:bg-red-600 bg-red-500 text-white  ${buttonClasses}`}
-                onClick={() => handleAction(motorbike, 'deactivate')}
-              >
-               {/* <ImSwitch /> */}
-               <FontAwesomeIcon icon={faToggleOn} />
-              </button>
-          
-              <button
-              className={`hover:bg-blue-600 bg-blue-500 text-white ml-2 ${buttonClasses}`}
-              onClick={() => handleViewDetail(motorbike.id)}
-            >
-            <FontAwesomeIcon icon={faInfoCircle}  />
-            </button>
-            </>
             ) : (
               <>
                 {filteredMotorbikes.map((motorbike) => (
