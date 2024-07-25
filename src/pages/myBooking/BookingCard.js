@@ -250,7 +250,7 @@ const BookingCard = ({ booking }) => {
                 <button
                   className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center hover:scale-105"
                   style={{ backgroundColor: "#5fcf86" }}
-                  onClick={openManageBooking}
+                  onClick={openFeedback}
                 >
                   Đánh giá
                 </button>
