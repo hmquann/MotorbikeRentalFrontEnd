@@ -84,7 +84,7 @@ const FeatureItem = ({ icon, altText, title, description }) => (
       <p className="text-zinc-500 font-bold">{title}</p>
       <p className="text-lg">
         {description}
-        {title === "Fuel" ? "" : "l/100km"}
+        {title === "Nhiên liệu" ? "" : "l/100km"}
       </p>
     </div>
   </div>
@@ -105,6 +105,7 @@ const Booking = () => {
   const userDataString = localStorage.getItem("user");
   const userData = JSON.parse(userDataString);
   const userId = userData.userId;
+  console.log(userId);
 
   const [selectedLocation, setSelectedLocation] = useState("");
   const [showPopUp, setShowPopUp] = useState(false);
@@ -302,13 +303,14 @@ const Booking = () => {
           `http://localhost:8080/api/discounts/getListDiscountByUser/${userId}`
         );
         setDiscounts(response.data);
+        console.log(response.data);
       } catch (error) {
         console.error("Error fetching discounts:", error);
       }
     };
 
     fetchDiscounts();
-  }, [userId]);
+  }, []);
 
   const handleVoucher = () => {
     setShowPopUpVoucher(true);
@@ -373,7 +375,11 @@ const Booking = () => {
         throw new Error("API license failed");
       }
 
-      if (response1.data === null || response1.data === "") {
+      if (
+        response1.data === null ||
+        response1.data === "" ||
+        response1.data.status !== "APPROVED"
+      ) {
         setShowPopUpLicense(true);
         setMessageLicense(
           "You need to verify your driver's license to be able to book a motorbike!"
@@ -383,13 +389,13 @@ const Booking = () => {
         //kiem tra xem giay phep lai xe co hop le hay khong
         //truong hop khong hop le
         if (
-          response1.data.licenseType === "A1" &&
-          receiveData.licenseType === "A2"
+          response1.data.licenseType === "A" &&
+          receiveData.licenseType === "A1"
         ) {
           console.log(112312313131313131312313);
           setShowPopUpLicense(true);
           setMessageLicense(
-            "This motorbike requires an A2 license. Please update your driver's license."
+            "This motorbike requires an A1 license. Please update your driver's license."
           );
           setButtonLicense("UPDATE");
         }

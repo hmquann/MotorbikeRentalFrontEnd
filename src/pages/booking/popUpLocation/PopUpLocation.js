@@ -180,6 +180,7 @@ const PopUpLocation = ({ onClose, onSelectLocation, onChangeLocation }) => {
                           name="province"
                           value={selectedProvince}
                           onChange={handleProvinceChange}
+                          disabled={selectedOption !== "map-location"}
                         >
                           <option value="">Tỉnh/ Thành phố</option>
                           {provinces.map((province) => (
@@ -198,7 +199,10 @@ const PopUpLocation = ({ onClose, onSelectLocation, onChangeLocation }) => {
                           value={selectedDistrict}
                           name="district"
                           onChange={handleDistrictChange}
-                          disabled={!selectedProvince}
+                          disabled={
+                            selectedOption !== "map-location" ||
+                            !selectedProvince
+                          }
                         >
                           <option value="">Quận/ Huyện</option>
                           {districts.map((district) => (
@@ -217,7 +221,10 @@ const PopUpLocation = ({ onClose, onSelectLocation, onChangeLocation }) => {
                           value={selectedWard}
                           name="ward"
                           onChange={handleWardChange}
-                          disabled={!selectedDistrict}
+                          disabled={
+                            selectedOption !== "map-location" ||
+                            !selectedDistrict
+                          }
                           id="wards"
                         >
                           <option value="">Phường/ Xã</option>
@@ -235,6 +242,7 @@ const PopUpLocation = ({ onClose, onSelectLocation, onChangeLocation }) => {
                         onChange={handleAddressChange}
                         className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
                         placeholder="VD: Số 1 đường A"
+                        disabled={selectedOption !== "map-location"}
                       />
                     </div>
                   </div>
