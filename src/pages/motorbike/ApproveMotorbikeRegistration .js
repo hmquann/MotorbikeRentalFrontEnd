@@ -43,6 +43,8 @@ const ApproveMotorbikeRegistration = () => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
   const debouncedSearchTerm = useDebounce(searchTerm, 1000);
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
 
   useEffect(() => {
     const role = JSON.parse(localStorage.getItem("roles"));
@@ -105,6 +107,7 @@ const ApproveMotorbikeRegistration = () => {
   };
 
   const handleCloseModal = () => {
+    setShowModal(false);
     setShowDetailModal(false);
     setSelectedMotorbike(null);
   };
@@ -179,11 +182,49 @@ const ApproveMotorbikeRegistration = () => {
     setSearchTerm(e.target.value);
     setCurrentPage(0);
   };
+  const handleActionWithCheck = async (motorbike, action) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/api/booking/motorbike/${motorbike.id}`
+      );
+      const bookings = response.data;
+
+      const invalidStatuses = ["DEPOSIT_MADE", "BUSY", "RENTING"];
+      const statusMap = {
+        DEPOSIT_MADE: "Đã Cọc",
+        BUSY: "Đang Bận",
+        RENTING: "Đang Trong Chuyến",
+      };
+      const invalidBookings = bookings.filter((booking) =>
+        invalidStatuses.includes(booking.status)
+      );
+
+      if (invalidBookings.length > 0) {
+        const statusMessages = invalidBookings
+          .map((booking) => statusMap[booking.status])
+          .join(", ");
+        setModalMessage(`${statusMessages}`);
+        setShowModal(true);
+      } else {
+        handleAction(motorbike, action);
+      }
+    } catch (error) {
+      console.error("Error fetching bookings:", error);
+      setModalMessage("Error fetching booking information.");
+      setShowModal(true);
+    }
+  };
 
   const handleAction = (motorbike, action) => {
     setSelectedMotorbike(motorbike);
     setActionType(action);
     setIsModalOpen(true);
+  };
+  const actionTypeMap = {
+    approve: "Xác nhận",
+    reject: "Từ chối",
+    activate: "Kích hoạt",
+    deactivate: "Hủy kích hoạt",
   };
 
   const handleConfirm = () => {
@@ -454,7 +495,7 @@ const ApproveMotorbikeRegistration = () => {
                             <button
                               className={`hover:bg-red-600 bg-red-500 text-white  ${buttonClasses}`}
                               onClick={() =>
-                                handleAction(motorbike, "deactivate")
+                                handleActionWithCheck(motorbike, "deactivate")
                               }
                             >
                               {/* <ImSwitch /> */}
@@ -531,6 +572,22 @@ const ApproveMotorbikeRegistration = () => {
           )}
         </div>
       </div>
+      <Modal show={showModal} onHide={handleCloseModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Lưu ý</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p className="text-lg text-zinc-800">
+            Bạn không thể dừng hoạt động xe đang trong trạng thái{" "}
+            <span className="text-red-500 font-bold">{modalMessage}</span>{" "}
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>
+            Đóng
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
       {isModalOpen && (
         <Modal show={isModalOpen} onHide={handleCancel} backdrop="static">
@@ -539,7 +596,11 @@ const ApproveMotorbikeRegistration = () => {
           </Modal.Header>
           <Modal.Body>
             <p className="text-lg text-zinc-800">
-              Bạn có chắc muốn {actionType} chiếc xe này?
+              Bạn có chắc muốn{" "}
+              <span className="text-red-500 font-bold">
+                {actionTypeMap[actionType]}
+              </span>{" "}
+              chiếc xe này?
             </p>
           </Modal.Body>
           <Modal.Footer>
