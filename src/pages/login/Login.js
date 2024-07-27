@@ -1,17 +1,22 @@
 import React, { useState, useEffect } from "react";
-
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faLock, faUser } from "@fortawesome/free-solid-svg-icons";
+
+
 
 const Login = () => {
   const apiLogin = "http://localhost:8080/api/auth/signin";
-  const containerClasses =
-    "flex items-center justify-center min-h-screen bg-gray-100 light:bg-zinc-900";
+  const containerClasses = "bg-gray-50 font-[sans-serif]";
   const contentClasses =
-    "bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-6 w-full max-w-md";
+    "min-h-screen flex flex-col items-center justify-center py-6 px-4";
+  const formClasses = "max-w-md w-full p-8 rounded-2xl bg-white shadow";
   const inputClasses =
-    "w-full p-2 border border-gray-300 rounded bg-zinc-200 text-zinc-900 dark:text-zinc-100-dark";
-  const buttonClasses = "w-full bg-green-500 text-white p-2 rounded";
+    "w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600";
+  const buttonClasses =
+    "w-full py-3 px-4 text-sm tracking-wide rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none";
+  const errorClasses = "text-red-500 mt-2 ml-1";
 
   const [credentials, setCredentials] = useState({
     emailOrPhone: "",
@@ -49,10 +54,10 @@ const Login = () => {
         firstName: data.firstName,
         lastName: data.lastName,
         phone: data.phone,
-        totalTrip: data.totalTripCount
+        totalTrip: data.totalTripCount,
       };
       localStorage.setItem("user", JSON.stringify(userInfor));
-      const token = localStorage.setItem("token", data.token);
+      localStorage.setItem("token", data.token);
       if (data.roles && data.roles.length > 0) {
         localStorage.setItem("roles", JSON.stringify(data.roles));
       } else {
@@ -68,7 +73,7 @@ const Login = () => {
       if (error.response) {
         const { status, data } = error.response;
         if (status === 401) {
-          setError("Please check your username and password.");
+          setError("Hãy kiểm tra lại tài khoản hoặc mật khẩu.");
         } else if (status === 403) {
           setError("Your account has been locked");
         } else {
@@ -81,6 +86,7 @@ const Login = () => {
       }
     }
   };
+
   useEffect(() => {
     const token = localStorage.getItem("user");
     if (token) {
@@ -91,39 +97,78 @@ const Login = () => {
   return (
     <div className={containerClasses}>
       <div className={contentClasses}>
-        <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100-dark">
-          Login
-        </h2>
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            name="emailOrPhone"
-            placeholder="Email or PhoneNumber"
-            className={inputClasses}
-            value={credentials.emailOrPhone}
-            onChange={handleChange}
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            className={inputClasses}
-            value={credentials.password}
-            onChange={handleChange}
-          />
-          <div className="flex justify-between text-sm text-zinc-600 dark:text-zinc-400">
-            <Link to="/register" className="hover:underline">
-              Register
-            </Link>
-            <Link to="/forgotpassword" className="hover:underline">
-              Forgotten Password?
-            </Link>
+        <div className="max-w-md w-full">
+          <div className={formClasses}>
+            <h2 className="text-gray-800 text-center text-2xl font-bold">
+              Đăng nhập
+            </h2>
+            <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
+              <div>
+                <label className="text-gray-800 text-sm font-semibold mb-2 block">
+                  Email/Số điện thoại
+                </label>
+                <div className="relative flex items-center">
+                  <input
+                    name="emailOrPhone"
+                    type="text"
+                    required
+                    className={inputClasses}
+                    placeholder="Nhập Email hoặc Số điện thoại"
+                    value={credentials.emailOrPhone}
+                    onChange={handleChange}
+                  />
+           <FontAwesomeIcon icon={faUser}  className="w-4 h-4 absolute right-4" />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-gray-800 text-sm font-semibold mb-2 block">
+                  Mật khẩu
+                </label>
+                <div className="relative flex items-center">
+                  <input
+                    name="password"
+                    type="password"
+                    required
+                    className={inputClasses}
+                    placeholder="Nhập mật khẩu"
+                    value={credentials.password}
+                    onChange={handleChange}
+                  />
+                 <FontAwesomeIcon icon={faLock}  className="w-4 h-4 absolute right-4" />
+              
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-end gap-4">
+                <div className="text-sm">
+                  <Link
+                    to="/forgotpassword"
+                    className="text-green-500 no-underline hover:underline ml-1 whitespace-nowrap font-semibold"
+                  >
+                    Quên mật khẩu?
+                  </Link>
+                </div>
+              </div>
+
+              <div className="!mt-8">
+                <button type="submit" className={buttonClasses}>
+                  Đăng nhập
+                </button>
+              </div>
+              {error && <div className={errorClasses}>{error}</div>}
+              <p className="text-gray-800 text-sm !mt-8 text-center">
+               Bạn chưa có tài khoản?{" "}
+                <Link
+                  to="/register"
+                  className="text-green-500 no-underline hover:underline ml-1 whitespace-nowrap font-semibold"
+                >
+                  Đăng ký ở đây
+                </Link>
+              </p>
+            </form>
           </div>
-          {error && <div className="text-red-500">{error}</div>}
-          <button className={buttonClasses} type="submit">
-            Submit
-          </button>
-        </form>
+        </div>
       </div>
     </div>
   );
