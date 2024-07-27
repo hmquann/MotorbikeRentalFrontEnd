@@ -8,6 +8,7 @@ import {
   faOilCan,
   faX,
 } from "@fortawesome/free-solid-svg-icons";
+import { faCircleQuestion } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState, useEffect } from "react";
 import RentalDocument from "./rentaldocument/RentalDocument";
@@ -22,6 +23,7 @@ import PopUpBookingSuccess from "./PopUpBookingSuccess";
 import { format } from "date-fns";
 import PopUpConfirmBooking from "./popUpConfirm/PopUpConfirmBooking";
 import PopUpVoucher from "./popUpVoucher/PopUpVoucher";
+import PopUpPricePerDay from "./popUpPricePerDay/PopUpPricePerDay";
 const sharedClasses = {
   rounded: "rounded",
   flex: "flex",
@@ -84,7 +86,7 @@ const FeatureItem = ({ icon, altText, title, description }) => (
       <p className="text-zinc-500 font-bold">{title}</p>
       <p className="text-lg">
         {description}
-        {title === "Fuel" ? "" : "l/100km"}
+        {title === "Nhiên liệu" ? "" : "l/100km"}
       </p>
     </div>
   </div>
@@ -105,6 +107,7 @@ const Booking = () => {
   const userDataString = localStorage.getItem("user");
   const userData = JSON.parse(userDataString);
   const userId = userData.userId;
+  console.log(userId);
 
   const [selectedLocation, setSelectedLocation] = useState("");
   const [showPopUp, setShowPopUp] = useState(false);
@@ -118,6 +121,7 @@ const Booking = () => {
   const [totalPrice, setTotalPrice] = useState(receiveData.price);
   const [deliveryFee, setDeliveryFee] = useState(0);
   const [rentalDays, setRentalDays] = useState(1);
+  const [showPopUpPricePerDay, setShowPopUpPricePerDay] = useState(false);
   const handleClosePopup = () => {
     setShowPopUp(false);
   };
@@ -134,6 +138,14 @@ const Booking = () => {
   const handleSelectLocation = (location) => {
     setSelectedLocation(location);
     setShowPopUp(false);
+  };
+
+  const handlePricePerDay = () => {
+    setShowPopUpPricePerDay(true);
+  };
+
+  const handleClosePopUpPricePerDay = () => {
+    setShowPopUpPricePerDay(false);
   };
 
   const [dateRange, setDateRange] = useState([null, null]);
@@ -191,6 +203,7 @@ const Booking = () => {
       )
     );
   };
+  console.log(gettedLocation);
 
   const [distance, setDistance] = useState(0);
   const [newAddressData, setNewAddressData] = useState([]);
@@ -302,13 +315,14 @@ const Booking = () => {
           `http://localhost:8080/api/discounts/getListDiscountByUser/${userId}`
         );
         setDiscounts(response.data);
+        console.log(response.data);
       } catch (error) {
         console.error("Error fetching discounts:", error);
       }
     };
 
     fetchDiscounts();
-  }, [userId]);
+  }, []);
 
   const handleVoucher = () => {
     setShowPopUpVoucher(true);
@@ -373,7 +387,11 @@ const Booking = () => {
         throw new Error("API license failed");
       }
 
-      if (response1.data === null || response1.data === "") {
+      if (
+        response1.data === null ||
+        response1.data === "" ||
+        response1.data.status !== "APPROVED"
+      ) {
         setShowPopUpLicense(true);
         setMessageLicense(
           "You need to verify your driver's license to be able to book a motorbike!"
@@ -383,13 +401,13 @@ const Booking = () => {
         //kiem tra xem giay phep lai xe co hop le hay khong
         //truong hop khong hop le
         if (
-          response1.data.licenseType === "A1" &&
-          receiveData.licenseType === "A2"
+          response1.data.licenseType === "A" &&
+          receiveData.licenseType === "A1"
         ) {
           console.log(112312313131313131312313);
           setShowPopUpLicense(true);
           setMessageLicense(
-            "This motorbike requires an A2 license. Please update your driver's license."
+            "This motorbike requires an A1 license. Please update your driver's license."
           );
           setButtonLicense("UPDATE");
         }
@@ -494,8 +512,7 @@ const Booking = () => {
                 <div
                   className={`flex ${sharedClasses.itemsCenter} ${sharedClasses.textSm} ${sharedClasses.textZinc500} ${sharedClasses.mb2}`}
                 >
-                  <span className="mr-2"></span>
-                  <span className="mr-2">{receiveData.tripCount}</span>
+                  {/* <span className="mr-2">{receiveData.tripCount}</span> */}
                   <span>{receiveData.motorbikeAddress}</span>
                 </div>
                 <div
@@ -610,13 +627,13 @@ const Booking = () => {
               </div>
 
               <div className="mb-3">
-                <label className="block text-lg  text-zinc-700 mb-1">
+                <label className="block text-lg text-zinc-700 mb-1">
                   Địa điểm giao nhận xe
                 </label>
                 <div className="relative">
                   <input
                     type="text"
-                    className={`w-full px-3 py-2 border border-zinc-300 rounded shadow-sm focus:outline-none focus:border-zinc-500`}
+                    className={`w-full px-3 py-2 border border-zinc-300 rounded shadow-sm focus:outline-none focus:border-zinc-500 overflow-hidden text-ellipsis whitespace-nowrap`}
                     value={gettedLocation}
                     readOnly
                     onClick={() => setShowPopUp(true)}
@@ -627,7 +644,15 @@ const Booking = () => {
               <div
                 className={`flex justify-between text-lg ${sharedClasses.mb2}`}
               >
-                <span>Đơn giá</span>
+                <span>
+                  Đơn giá{" "}
+                  <span style={{ cursor: "pointer" }}>
+                    <FontAwesomeIcon
+                      onClick={handlePricePerDay}
+                      icon={faCircleQuestion}
+                    ></FontAwesomeIcon>
+                  </span>{" "}
+                </span>
                 <span className="font-semibold">
                   {receiveData.price.toLocaleString("vi-VN")}đ/ ngày
                 </span>
@@ -723,6 +748,7 @@ const Booking = () => {
                 onClose={() => setShowPopUp(false)}
                 onSelectLocation={motorbikeAddress}
                 onChangeLocation={handleChangeLocation}
+                receiveData={receiveData}
               />
             )}
             {showPopUpVoucher && (
@@ -731,6 +757,11 @@ const Booking = () => {
                 discounts={discounts}
                 discountValue={handleDiscountValue}
               ></PopUpVoucher>
+            )}
+            {showPopUpPricePerDay && (
+              <PopUpPricePerDay
+                onClose={handleClosePopUpPricePerDay}
+              ></PopUpPricePerDay>
             )}
           </div>
         </div>
