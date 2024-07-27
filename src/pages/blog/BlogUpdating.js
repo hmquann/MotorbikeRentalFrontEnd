@@ -71,7 +71,7 @@ const BlogUpdating = ({ blog, onUpdate, onClose, onSuccess }) => {
 
     try {
       const response = await axios.put(
-        `http://localhost:8080/api/blogs/updateBlog/${blog.id}`,
+        `https://rentalmotorbikewebapp.azurewebsites.net/api/blogs/updateBlog/${blog.id}`,
         updatedBlogData
       );
       console.log("Blog updated:", response.data);

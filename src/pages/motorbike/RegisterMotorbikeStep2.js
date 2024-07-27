@@ -220,7 +220,7 @@ const RegisterMotorbikeStep2 = (files) => {
   });
     setFormData(newFormData);
     axios
-      .post("http://localhost:8080/api/motorbike/register", newFormData, {
+      .post("https://rentalmotorbikewebapp.azurewebsites.net/api/motorbike/register", newFormData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },

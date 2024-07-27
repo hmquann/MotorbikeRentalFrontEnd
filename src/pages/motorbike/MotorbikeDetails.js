@@ -66,7 +66,7 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post(`http://localhost:8080/api/motorbike/updateMotorbike/${motorbike.id}`, updateForm);
+      const response = await axios.post(`https://rentalmotorbikewebapp.azurewebsites.net/api/motorbike/updateMotorbike/${motorbike.id}`, updateForm);
       console.log('Data sent successfully', response.data);
       // You can handle success actions here
     } catch (error) {

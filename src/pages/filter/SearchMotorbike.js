@@ -110,7 +110,7 @@ const SearchMotorbike = () => {
   
       setLoading(true);
       try {
-        const response = await axios.post('http://localhost:8080/api/motorbike/filter', filterList, {
+        const response = await axios.post('https://rentalmotorbikewebapp.azurewebsites.net/api/motorbike/filter', filterList, {
           headers: {
             'Content-Type': 'application/json',
           },

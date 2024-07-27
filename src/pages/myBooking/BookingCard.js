@@ -77,7 +77,7 @@ const BookingCard = ({ booking }) => {
     const fetcMotorbike = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/motorbike/${booking.motorbikeId}`
+          `https://rentalmotorbikewebapp.azurewebsites.net/api/motorbike/${booking.motorbikeId}`
         );
         setMotorbikeName(
           `${response.data.model.modelName} ${response.data.yearOfManufacture}`
@@ -88,7 +88,7 @@ const BookingCard = ({ booking }) => {
         setUrlImage(response.data.motorbikeImages[0].url);
 
         const response1 = await axios.get(
-          `http://localhost:8080/api/motorbike/existMotorbikeByUserId/${booking.motorbikeId}/${userData.userId}`
+          `https://rentalmotorbikewebapp.azurewebsites.net/api/motorbike/existMotorbikeByUserId/${booking.motorbikeId}/${userData.userId}`
         );
         setMotorbike(response1.data);
       } catch (error) {
@@ -140,7 +140,7 @@ const BookingCard = ({ booking }) => {
 
   const handleConfirm = async () => {
     try {
-      const url = `http://localhost:8080/api/booking/changeStatus/${booking.bookingId}/${action}`;
+      const url = `https://rentalmotorbikewebapp.azurewebsites.net/api/booking/changeStatus/${booking.bookingId}/${action}`;
       await axios.put(url);
       setShowPopUp(false);
       setShowPopupSuccess(true); // Show success popup

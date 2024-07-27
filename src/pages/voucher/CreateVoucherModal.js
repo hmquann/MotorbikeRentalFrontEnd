@@ -146,7 +146,7 @@ const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
       return;
     }
     axios
-      .post("http://localhost:8080/api/discounts/addDiscount", formData, {
+      .post("https://rentalmotorbikewebapp.azurewebsites.net/api/discounts/addDiscount", formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },

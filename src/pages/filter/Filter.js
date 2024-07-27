@@ -188,7 +188,7 @@ const Filter = () => {
     setSchedulePopUp(true)
   }
   useEffect(() => {
-    axios.get('http://localhost:8080/api/brand/getAllBrand')
+    axios.get('https://rentalmotorbikewebapp.azurewebsites.net/api/brand/getAllBrand')
       .then(response => setBrands(response.data))
       .catch(error => console.error('Error fetching other entities 1:', error));
   }, []);
@@ -324,7 +324,7 @@ const Filter = () => {
     }
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:8080/api/motorbike/filter', newFilterList, {
+      const response = await axios.post('https://rentalmotorbikewebapp.azurewebsites.net/api/motorbike/filter', newFilterList, {
         headers: {
           'Content-Type': 'application/json',
         },

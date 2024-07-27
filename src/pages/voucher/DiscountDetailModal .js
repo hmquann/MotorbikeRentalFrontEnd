@@ -118,7 +118,7 @@ const DiscountDetailModal = ({fetchVoucher, showModalDetail, setShowModalDetail,
     }
     
     if (isEditing) {
-        const response = await axios.patch(`http://localhost:8080/api/discounts/updateDiscount/${voucher.id}`, formData)
+        const response = await axios.patch(`https://rentalmotorbikewebapp.azurewebsites.net/api/discounts/updateDiscount/${voucher.id}`, formData)
         .then((response) =>{
           fetchVoucher();
           setIsEditing(false); 

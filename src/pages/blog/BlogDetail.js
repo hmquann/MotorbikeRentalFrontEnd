@@ -11,7 +11,7 @@ const BlogDetail = () => {
     const fetchBlog = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/blogs/getBlog/${id}`
+          `https://rentalmotorbikewebapp.azurewebsites.net/api/blogs/getBlog/${id}`
         );
         setBlog(response.data);
       } catch (error) {

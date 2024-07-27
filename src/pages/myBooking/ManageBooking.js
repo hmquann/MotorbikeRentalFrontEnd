@@ -75,7 +75,7 @@ export default function Widget() {
     const fetchMotorbike = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/motorbike/${booking.motorbikeId}`
+          `https://rentalmotorbikewebapp.azurewebsites.net/api/motorbike/${booking.motorbikeId}`
         );
         console.log(response.data);
         setMotorbikeName(
@@ -88,7 +88,7 @@ export default function Widget() {
         setLessorId(response.data.user.userId);
 
         const response2 = await axios.get(
-          `http://localhost:8080/api/user/${booking.renterId}`
+          `https://rentalmotorbikewebapp.azurewebsites.net/api/user/${booking.renterId}`
         );
         console.log(response2.data);
         setRenterName(response2.data.firstName + " " + response2.data.lastName);
@@ -128,7 +128,7 @@ export default function Widget() {
       } else if (action === "complete") {
         status = "DONE";
       }
-      const url = `http://localhost:8080/api/booking/changeStatus/${booking.bookingId}/${status}`;
+      const url = `https://rentalmotorbikewebapp.azurewebsites.net/api/booking/changeStatus/${booking.bookingId}/${status}`;
       await axios.put(url);
       setShowPopup(false);
       setShowPopupSuccess(true); // Show success popup

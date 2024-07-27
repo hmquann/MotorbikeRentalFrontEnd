@@ -56,7 +56,7 @@ const License = () => {
   useEffect(() => {
     axios
       .get(
-        `http://localhost:8080/api/license/getLicenseByUserId/${user.userId}`
+        `https://rentalmotorbikewebapp.azurewebsites.net/api/license/getLicenseByUserId/${user.userId}`
       )
       .then((response) => setLicense(response.data))
       .catch((error) => console.error("Error fetching motorbikes:", error));
@@ -77,7 +77,7 @@ const License = () => {
       setError("Hãy kiểm tra thông tin bạn nhập vào");
     } else {
       axios
-        .post("http://localhost:8080/api/license/uploadLicense", formData, {
+        .post("https://rentalmotorbikewebapp.azurewebsites.net/api/license/uploadLicense", formData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },

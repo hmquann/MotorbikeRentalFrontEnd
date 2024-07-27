@@ -12,7 +12,7 @@ const VerifyChangeEmail = () => {
     console.log(token);
     if (token !== null) {
       axios
-        .post(`http://localhost:8080/updateEmail/${token}/${newEmail}`)
+        .post(`https://rentalmotorbikewebapp.azurewebsites.net/updateEmail/${token}/${newEmail}`)
         .then((response) => {
           console.log("User:", response.data);
           setShowPopup(true); // Hiển thị popup khi thành công

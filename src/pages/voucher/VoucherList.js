@@ -36,7 +36,7 @@ const VoucherList = () => {
 
   const fetchDiscountDetails = async (discountId) => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/discounts/${discountId}`);
+      const response = await axios.get(`https://rentalmotorbikewebapp.azurewebsites.net/api/discounts/${discountId}`);
       setSelectedVoucher(response.data);
     } catch (error) {
       console.error("Error fetching discount details", error);
@@ -47,7 +47,7 @@ const VoucherList = () => {
     setIsLoading(true)
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/discounts/getAllDiscount/${currentPage}/${pageSize}`,
+        `https://rentalmotorbikewebapp.azurewebsites.net/api/discounts/getAllDiscount/${currentPage}/${pageSize}`,
         {
           params:{
             roles : userRole.join(','),
@@ -149,14 +149,14 @@ const VoucherList = () => {
   const handleDelete = async () => {
     try {
       // Remove references
-      await axios.delete(`http://localhost:8080/api/discounts/${selectedVoucher}/remove-references`, {
+      await axios.delete(`https://rentalmotorbikewebapp.azurewebsites.net/api/discounts/${selectedVoucher}/remove-references`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`
         }
       });
       
       // Delete discount
-      await axios.delete(`http://localhost:8080/api/discounts/delete/${selectedVoucher}`, {
+      await axios.delete(`https://rentalmotorbikewebapp.azurewebsites.net/api/discounts/delete/${selectedVoucher}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`
         }

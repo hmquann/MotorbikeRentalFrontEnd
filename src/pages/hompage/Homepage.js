@@ -29,7 +29,7 @@ const Homepage = () => {
   const fetchBlogs = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8080/api/blogs/getAllBlogs"
+        "https://rentalmotorbikewebapp.azurewebsites.net/api/blogs/getAllBlogs"
       );
       const sortedBlogs = response.data.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)

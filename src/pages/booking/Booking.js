@@ -312,7 +312,7 @@ const Booking = () => {
     const fetchDiscounts = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/discounts/getListDiscountByUser/${userId}`
+          `https://rentalmotorbikewebapp.azurewebsites.net/api/discounts/getListDiscountByUser/${userId}`
         );
         setDiscounts(response.data);
         console.log(response.data);
@@ -376,7 +376,7 @@ const Booking = () => {
     try {
       // check license
       const response1 = await axios.get(
-        `http://localhost:8080/api/license/getLicenseByUserId/${userId}`
+        `https://rentalmotorbikewebapp.azurewebsites.net/api/license/getLicenseByUserId/${userId}`
       );
       console.log(response1.data.licenseType);
 
@@ -425,11 +425,11 @@ const Booking = () => {
     e.preventDefault();
     if (discount) {
       const deleteDiscount = axios.delete(
-        `http://localhost:8080/api/discounts/deleteDiscountByIdAndUserId/${userId}/${discount.id}`
+        `https://rentalmotorbikewebapp.azurewebsites.net/api/discounts/deleteDiscountByIdAndUserId/${userId}/${discount.id}`
       );
     }
     const response2 = await axios
-      .post("http://localhost:8080/api/booking/create", {
+      .post("https://rentalmotorbikewebapp.azurewebsites.net/api/booking/create", {
         renterId: userId,
         motorbikeId: receiveData.id,
         startDate: dayjs(dateRange[0]).format("YYYY-MM-DDTHH:mm:ss"),

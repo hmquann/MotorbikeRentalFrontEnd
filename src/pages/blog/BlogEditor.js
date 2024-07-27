@@ -56,7 +56,7 @@ const BlogEditor = ({ onSave }) => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/blogs/createBlog",
+        "https://rentalmotorbikewebapp.azurewebsites.net/api/blogs/createBlog",
         blogData
       );
       console.log("Blog saved:", response.data);

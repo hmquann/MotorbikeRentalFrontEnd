@@ -7,7 +7,7 @@ import { faLock, faUser } from "@fortawesome/free-solid-svg-icons";
 
 
 const Login = () => {
-  const apiLogin = "http://localhost:8080/api/auth/signin";
+  const apiLogin = "https://rentalmotorbikewebapp.azurewebsites.net/api/auth/signin";
   const containerClasses = "bg-gray-50 font-[sans-serif]";
   const contentClasses =
     "min-h-screen flex flex-col items-center justify-center py-6 px-4";

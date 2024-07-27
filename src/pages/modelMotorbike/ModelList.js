@@ -31,7 +31,7 @@ const ModelList = () => {
     try {
       setIsLoading(true); 
       const response = await axios.get(
-        `http://localhost:8080/api/model/getAllModel/${currentPage}/${pageSize}`
+        `https://rentalmotorbikewebapp.azurewebsites.net/api/model/getAllModel/${currentPage}/${pageSize}`
       );
 
       if (response.data && response.data.content) {
@@ -57,7 +57,7 @@ const ModelList = () => {
   const searchModels = async (searchTerm, page, size) => {
     try {
       setIsLoading(true)
-      const response = await axios.get(`http://localhost:8080/api/model/search`, {
+      const response = await axios.get(`https://rentalmotorbikewebapp.azurewebsites.net/api/model/search`, {
         params: {
           searchTerm,
           page,

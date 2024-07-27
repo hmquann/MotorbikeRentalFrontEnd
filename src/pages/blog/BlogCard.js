@@ -21,7 +21,7 @@ const BlogCard = ({ blog, onUpdate }) => {
 
   const deleteBlog = () => {
     axios
-      .delete(`http://localhost:8080/api/blogs/deleteBlog/${blog.id}`)
+      .delete(`https://rentalmotorbikewebapp.azurewebsites.net/api/blogs/deleteBlog/${blog.id}`)
       .then((response) => {
         setSuccessMessage("This blog deleted successfully!");
         setShowDeletePopup(false);

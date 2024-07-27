@@ -27,7 +27,7 @@
     useEffect(() => {
       const fetchFeedbacks = async () => {
         try {
-          const response = await axios.get(`http://localhost:8080/api/feedback/${motorbikeId}/feedbacks`);
+          const response = await axios.get(`https://rentalmotorbikewebapp.azurewebsites.net/api/feedback/${motorbikeId}/feedbacks`);
           setFeedbacks(response.data);
         } catch (error) {
           console.error('Error fetching feedbacks:', error);
@@ -37,7 +37,7 @@
       const fetchCurrentUser = async () => {
         try {
           const id = JSON.parse(localStorage.getItem("user")).userId
-          const response = await axios.get(`http://localhost:8080/api/user/${id}`); 
+          const response = await axios.get(`https://rentalmotorbikewebapp.azurewebsites.net/api/user/${id}`); 
           setCurrentUser(response.data);
           console.log(response.data);
         } catch (error) {
@@ -80,11 +80,11 @@
 
     const handleDelete = async () => {
       try {
-        const response = await axios.delete(`http://localhost:8080/api/feedback/delete/${feedbackToDelete.id}`);
+        const response = await axios.delete(`https://rentalmotorbikewebapp.azurewebsites.net/api/feedback/delete/${feedbackToDelete.id}`);
         if (response.status === 200) {
           const fetchFeedbacks = async () => {
             try {
-              const response = await axios.get(`http://localhost:8080/api/feedback/${motorbikeId}/feedbacks`);
+              const response = await axios.get(`https://rentalmotorbikewebapp.azurewebsites.net/api/feedback/${motorbikeId}/feedbacks`);
               const updatedFeedbacks = feedbacks.filter(feedback => feedback.id !== feedbackToDelete.id);
               setFeedbacks(updatedFeedbacks);
             } catch (error) {
@@ -109,7 +109,7 @@
 
     const handleUpdate = async () => {
       try {
-        const response = await axios.patch(`http://localhost:8080/api/feedback/update/${editingFeedbackId}`, {
+        const response = await axios.patch(`https://rentalmotorbikewebapp.azurewebsites.net/api/feedback/update/${editingFeedbackId}`, {
           feedbackContent: editingContent,
           rate: editingRate
         },

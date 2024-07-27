@@ -20,7 +20,7 @@ const FeedbackModal = ({ show, onHide, bookingId, onFeedbackSubmitted }) => {
       try {
         const token = localStorage.getItem('token'); // Hoặc cách bạn lưu token
         const response = await axios.get(
-          `http://localhost:8080/api/booking/checkFeedbackStatus/${bookingId}`,
+          `https://rentalmotorbikewebapp.azurewebsites.net/api/booking/checkFeedbackStatus/${bookingId}`,
           {
             headers: {
               'Authorization': `Bearer ${token}`
@@ -45,7 +45,7 @@ const FeedbackModal = ({ show, onHide, bookingId, onFeedbackSubmitted }) => {
   const handleSendReview = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/feedback/sendFeedback",
+        "https://rentalmotorbikewebapp.azurewebsites.net/api/feedback/sendFeedback",
         { bookingId, feedbackContent, rate: rating },
         {
           headers: {

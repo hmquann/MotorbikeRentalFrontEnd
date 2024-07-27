@@ -93,7 +93,7 @@ const ManageSchedulePopUp = ({ isOpen, onClose, motorbikeId }) => {
   const fetchScheduleMotorbike = async (motorbikeId) => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/booking/listSchedule/${motorbikeId}`
+        `https://rentalmotorbikewebapp.azurewebsites.net/booking/listSchedule/${motorbikeId}`
       );
       console.log(response.data);
       setListSchedule(response.data);
@@ -191,7 +191,7 @@ const ManageSchedulePopUp = ({ isOpen, onClose, motorbikeId }) => {
       };
       console.log(data)
       // Gửi dữ liệu đến backend
-      const response =axios.post(`http://localhost:8080/booking/markBusyDays/${motorbikeId}`, data, {
+      const response =axios.post(`https://rentalmotorbikewebapp.azurewebsites.net/booking/markBusyDays/${motorbikeId}`, data, {
         headers: {
           "Content-Type": "application/json"
         }

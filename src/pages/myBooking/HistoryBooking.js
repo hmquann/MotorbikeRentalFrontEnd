@@ -12,7 +12,7 @@ const HistoryBooking = ({ filters }) => {
     const fetchBookings = async () => {
       try {
         const response = await axios.post(
-          "http://localhost:8080/api/booking/filter",
+          "https://rentalmotorbikewebapp.azurewebsites.net/api/booking/filter",
           {
             tripType: filters.tripType,
             userId: filters.userId,

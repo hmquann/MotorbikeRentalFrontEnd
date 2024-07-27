@@ -59,7 +59,7 @@ const ApproveMotorbikeRegistration = () => {
       setIsLoading(true);
       // const status = statusFilter !== 'all' ? statusFilter : 'all';
       const response = await axios.get(
-        `http://localhost:8080/api/motorbike/allMotorbike/${page}/${size}`,
+        `https://rentalmotorbikewebapp.azurewebsites.net/api/motorbike/allMotorbike/${page}/${size}`,
         {
           params: {
             userId: userId,
@@ -93,7 +93,7 @@ const ApproveMotorbikeRegistration = () => {
   const fetchDetailMotorbike = async (motorbikeId) => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/motorbike/${motorbikeId}`
+        `https://rentalmotorbikewebapp.azurewebsites.net/api/motorbike/${motorbikeId}`
       );
       console.log(response.data);
       setSelectedMotorbike(response.data);
@@ -116,7 +116,7 @@ const ApproveMotorbikeRegistration = () => {
     try {
       setIsLoading(true);
       const response = await axios.get(
-        `http://localhost:8080/api/motorbike/search`,
+        `https://rentalmotorbikewebapp.azurewebsites.net/api/motorbike/search`,
         {
           params: {
             searchTerm,
@@ -185,7 +185,7 @@ const ApproveMotorbikeRegistration = () => {
   const handleActionWithCheck = async (motorbike, action) => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/booking/motorbike/${motorbike.id}`
+        `https://rentalmotorbikewebapp.azurewebsites.net/api/booking/motorbike/${motorbike.id}`
       );
       const bookings = response.data;
 
@@ -230,12 +230,12 @@ const ApproveMotorbikeRegistration = () => {
   const handleConfirm = () => {
     const url =
       actionType === "approve"
-        ? `http://localhost:8080/api/motorbike/approve/${selectedMotorbike.id}`
+        ? `https://rentalmotorbikewebapp.azurewebsites.net/api/motorbike/approve/${selectedMotorbike.id}`
         : actionType === "reject"
-        ? `http://localhost:8080/api/motorbike/reject/${selectedMotorbike.id}`
+        ? `https://rentalmotorbikewebapp.azurewebsites.net/api/motorbike/reject/${selectedMotorbike.id}`
         : actionType === "activate"
-        ? `http://localhost:8080/api/motorbike/toggleStatus/${selectedMotorbike.id}`
-        : `http://localhost:8080/api/motorbike/toggleStatus/${selectedMotorbike.id}`;
+        ? `https://rentalmotorbikewebapp.azurewebsites.net/api/motorbike/toggleStatus/${selectedMotorbike.id}`
+        : `https://rentalmotorbikewebapp.azurewebsites.net/api/motorbike/toggleStatus/${selectedMotorbike.id}`;
 
     axios
       .put(url)

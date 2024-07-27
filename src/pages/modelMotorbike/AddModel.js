@@ -28,7 +28,7 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
     const fetchBrands = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/brand/getAllBrand"
+          "https://rentalmotorbikewebapp.azurewebsites.net/api/brand/getAllBrand"
         );
         setBrands(response.data);
       } catch (error) {
@@ -43,7 +43,7 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
     const fetchFuelTypes = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/model/fuelTypes"
+          "https://rentalmotorbikewebapp.azurewebsites.net/api/model/fuelTypes"
         );
         setFuelTypes(response.data);
       } catch (error) {
@@ -58,7 +58,7 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
     const fetchModelTypes = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/model/modelTypes"
+          "https://rentalmotorbikewebapp.azurewebsites.net/api/model/modelTypes"
         );
         setModelTypes(response.data);
       } catch (error) {
@@ -121,7 +121,7 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
       return;
     }
     axios
-      .post("http://localhost:8080/api/model/addModel", {
+      .post("https://rentalmotorbikewebapp.azurewebsites.net/api/model/addModel", {
         modelName: formData.modelName,
         cylinderCapacity: formData.cylinderCapacity,
         fuelType: formData.fuelType,

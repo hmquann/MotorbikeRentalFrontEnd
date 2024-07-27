@@ -11,15 +11,15 @@ const Dashboard = () => {
   const [twoRecentMonthBookingCount, setTwoMonthBookingCount] = useState([]);
   
   useEffect(() => {
-    axios.get('http://localhost:8080/dashboard/sixMonthRevenue')
+    axios.get('https://rentalmotorbikewebapp.azurewebsites.net/dashboard/sixMonthRevenue')
       .then(response => setMonthlyRevenue(response.data))
       .catch(error => console.error('Error fetching revenue:', error));
 
-    axios.get('http://localhost:8080/dashboard/mainLocationCount')
+    axios.get('https://rentalmotorbikewebapp.azurewebsites.net/dashboard/mainLocationCount')
       .then(response => setLocationPercentage(response.data))
       .catch(error => console.error('Error fetching location data:', error));
 
-    axios.get('http://localhost:8080/dashboard/twoRecentMonthBookingCount')
+    axios.get('https://rentalmotorbikewebapp.azurewebsites.net/dashboard/twoRecentMonthBookingCount')
       .then(response => setTwoMonthBookingCount(response.data))
       .catch(error => console.error('Error fetching booking count data:', error));
   }, []);
