@@ -69,8 +69,25 @@ const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
           newErrors[name] = `Hãy điền ${name}`;
       }
     } else {
-      delete newErrors[name];
+      if (name === "name") {
+        const regex = /^[a-zA-Z0-9\s\u00C0-\u1EF9]*$/;
+        if (!regex.test(value)) {
+          newErrors[name] = "Tên không được chứa ký tự đặc biệt.";
+        } else {
+          delete newErrors[name];
+        }
+      } else if (name === "code") {
+        const regex = /^[a-zA-Z0-9\s\u00C0-\u1EF9]*$/;
+        if (!regex.test(value)) {
+          newErrors[name] = "Mã khuyến mãi không được chứa ký tự đặc biệt";
+        } else {
+          delete newErrors[name];
+        }
+      } else {
+        delete newErrors[name];
+      }
     }
+
     setErrors(newErrors);
     setFormData({
       ...formData,
