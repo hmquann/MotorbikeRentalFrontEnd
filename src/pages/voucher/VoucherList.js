@@ -329,13 +329,13 @@ const VoucherList = () => {
          <div className="flex justify-end space-x-4">
             <button
               onClick={() => setShowConfirmModal(false)}
-              className="hover:bg-gray-200 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg"
+              className="hover:bg-gray-400 bg-gray-300 text-gray-700 px-4 py-2 rounded-lg transition hover:scale-105"
             >
               Hủy
             </button>
             <button
               onClick={handleDelete}
-              className="hover:bg-red-700 bg-red-600 text-white px-4 py-2 rounded-lg"
+              className="hover:bg-red-700 bg-red-600 text-white px-4 py-2 rounded-lg transition hover:scale-105"
             >
               Xóa
             </button>

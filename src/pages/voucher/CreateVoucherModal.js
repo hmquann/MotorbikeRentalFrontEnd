@@ -400,14 +400,14 @@ const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
           <button
             type="button"
             onClick={() => setShowModal(false)}
-            className="hover:bg-red-700 bg-red-600 text-white px-4 py-2 rounded-lg"
+            className="hover:bg-red-700 bg-red-600 text-white px-4 py-2 rounded-lg transition hover:scale-105"
           >
             Đóng
           </button>
           <button
             type="submit"
             onClick={handleSubmit}
-            className="hover:bg-blue-700 bg-blue-600 text-white px-4 py-2 rounded-lg"
+            className="hover:bg-blue-700 bg-blue-600 text-white px-4 py-2 rounded-lg transition hover:scale-105"
           >
             Lưu
           </button>

@@ -7,8 +7,8 @@ const titleClasses = "text-center text-md font-bold text-zinc-900 dark:text-zinc
 const textClasses = "text-center text-zinc-700 dark:text-zinc-300 mt-2";
 const inputClasses = "w-full p-2 border border-zinc-300 dark:border-zinc-700 rounded-md";
 const buttonContainerClasses = "flex mt-4 border border-zinc-300 dark:border-zinc-700 rounded-md";
-const buttonClasses = "w-1/2 p-2 border-r border-zinc-300 dark:border-zinc-700";
-const buttonLastClasses = "w-1/2 p-2";
+const buttonClasses = "w-1/2 p-2 border-r border-zinc-300 dark:border-zinc-700 transition hover:scale-105";
+const buttonLastClasses = "w-1/2 p-2 transition hover:scale-105";
 
 const TopUp = ({ onClose, onConfirm, setError }) => {
   const [amount, setAmount] = useState("");
@@ -104,10 +104,10 @@ const TopUp = ({ onClose, onConfirm, setError }) => {
           Bạn có chắc muốn nạp {formattedAmount} VND?
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowConfirmModal(false)}>
+          <Button variant="secondary" className='transition hover:scale-105' onClick={() => setShowConfirmModal(false)}>
             Hủy
           </Button>
-          <Button variant="primary" onClick={handleTopUpConfirm}>
+          <Button variant="primary" className='transition hover:scale-105' onClick={handleTopUpConfirm}>
             Đồng ý
           </Button>
         </Modal.Footer>

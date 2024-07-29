@@ -197,13 +197,13 @@ const UserWallet = () => {
       </p>
       <div className="mt-4 flex space-x-4">
         <button
-          className={`bg-orange-400 hover:bg-orange-500 text-white py-2 px-4 rounded`}
+          className={`bg-orange-400 hover:bg-orange-500 text-white py-2 px-4 rounded transition hover:scale-105`}
           onClick={handleWithdrawClick}
         >
           Rút tiền
         </button>
         <button
-          className={`bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded`}
+          className={`bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded transition hover:scale-105`}
           onClick={handleDepositClick}
         >
           Nạp tiền
@@ -269,6 +269,7 @@ const UserWallet = () => {
         <Modal.Footer>
           <Button
             variant="secondary"
+            className="transition hover:scale-105"
             onClick={() => setShowWithdrawModal(false)}
           >
             Đóng
@@ -291,7 +292,7 @@ const UserWallet = () => {
           />
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowTopUpModal(false)}>
+          <Button variant="secondary" className="transition hover:scale-105" onClick={() => setShowTopUpModal(false)}>
             Đóng
           </Button>
         </Modal.Footer>

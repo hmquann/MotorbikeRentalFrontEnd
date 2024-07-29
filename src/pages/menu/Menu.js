@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { NavLink, Route, Routes, useNavigate } from "react-router-dom";
 import "./Menu.css";
 import Profile from "../profile/Profile";
+import { Modal } from "react-bootstrap";
+import Dashboard from "../dashboard/Dashboard"
 
 import UserWallet from "../wallet/UserWallet";
 import ApproveMotorbikeRegistration from "../motorbike/ApproveMotorbikeRegistration ";
@@ -52,20 +54,23 @@ const Menu = () => {
     <div className="menu bg-zinc-100">
       <div className="menu-left">
         <ul>
-          <li>
-            <NavLink
-              to="#"
-              className={({ isActive }) => (isActive ? "active" : "")}
-            >
-              Dashboard
-            </NavLink>
-          </li>
+        {isAdmin && (
+            <>
+              <li>
+                <NavLink
+                  to="/menu/dashboard"
+                  className={({ isActive }) => (isActive ? "active" : "")}
+                >
+                  Dashboard
+                </NavLink>
+              </li>
+              </>)}
           <li>
             <NavLink
               to="/menu/profile"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
-              My Profile
+              Tài khoản của tôi
             </NavLink>
           </li>
           <li>
@@ -73,7 +78,7 @@ const Menu = () => {
               to="/menu/myBooking"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
-              My Booking
+              Chuyến của tôi
             </NavLink>
           </li>
           <li>
@@ -81,7 +86,7 @@ const Menu = () => {
               to="/menu/wallet"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
-              Wallet
+              Ví của tôi
             </NavLink>
           </li>
           <li>
@@ -99,7 +104,7 @@ const Menu = () => {
                   to="/menu/brand"
                   className={({ isActive }) => (isActive ? "active" : "")}
                 >
-                  Manage Brand
+                  Quản lý thương hiệu xe
                 </NavLink>
               </li>
               <li>
@@ -107,7 +112,7 @@ const Menu = () => {
                   to="/menu/approveLicense"
                   className={({ isActive }) => (isActive ? "active" : "")}
                 >
-                  Approve License
+                  Quản lý bằng lái xe
                 </NavLink>
               </li>
               <li>
@@ -115,7 +120,7 @@ const Menu = () => {
                   to="/menu/model"
                   className={({ isActive }) => (isActive ? "active" : "")}
                 >
-                  Manage Model
+                  Quản lý mẫu xe
                 </NavLink>
               </li>
 
@@ -124,7 +129,7 @@ const Menu = () => {
                   to="/menu/userData"
                   className={({ isActive }) => (isActive ? "active" : "")}
                 >
-                  User Management
+                  Quản lý người dùng
                 </NavLink>
               </li>
               <li>
@@ -144,7 +149,7 @@ const Menu = () => {
                   to="/menu/approveMotorbike"
                   className={({ isActive }) => (isActive ? "active" : "")}
                 >
-                 {isAdmin?" Motorbike Status":"My registered motorbike"}
+                  {isAdmin ? "Quản lý xe  " : "Xe của tôi"}
                 </NavLink>
               </li>
               <li>
@@ -152,7 +157,7 @@ const Menu = () => {
                   to="/menu/voucher"
                   className={({ isActive }) => (isActive ? "active" : "")}
                 >
-                  Manage Voucher
+                  Quản lý khuyến mãi
                 </NavLink>
               </li>
             </>
@@ -160,7 +165,7 @@ const Menu = () => {
 
           <li>
             <NavLink onClick={handleLogout} className="nav-link">
-              Logout
+              Đăng xuất
             </NavLink>
           </li>
         </ul>
@@ -176,7 +181,7 @@ const Menu = () => {
             <>
               <Route path="/brand" element={<BrandList />} />
               <Route path="/model" element={<ModelList />} />
-
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/approveLicense" element={<ApproveLicense />} />
               <Route path="/userData" element={<UserData />} />
               <Route path="/blogList" element={<BlogList />} />
@@ -196,29 +201,32 @@ const Menu = () => {
         </Routes>
       </div>
 
-      {showLogoutModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 shadow-md">
-            <p className="text-lg text-zinc-800 light:text-zinc-200">
-              Are you sure you want to log out?
-            </p>
-            <div className="mt-4 flex justify-end">
-              <button
-                onClick={handleConfirmLogout}
-                className="bg-green-500 hover:bg-green-600 text-white mr-2 px-4 py-2 rounded-lg"
-              >
-                Yes
-              </button>
-              <button
-                onClick={handleCancelLogout}
-                className="bg-zinc-500 hover:bg-zinc-600 dark:bg-zinc-700 dark:text-zinc-200 px-4 py-2 rounded-lg"
-              >
-                No
-              </button>
-            </div>
+      <Modal show={showLogoutModal} onHide={handleCancelLogout}>
+        <div className="p-8 rounded bg-gray-50 font-[sans-serif]">
+          <h1 className="text-gray-800 text-center text-2xl font-bold">
+            Đăng xuất
+          </h1>
+          <p className="text-gray-800 text-sm mt-4 text-center">
+            Bạn có chắc muốn đăng xuất khỏi tài khoản?
+          </p>
+          <div className="text-center mt-3">
+            <button
+              type="button"
+              onClick={handleConfirmLogout}
+              className="py-2 px-4 text-sm w-32 tracking-wide rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none transition hover:scale-105"
+            >
+              Đăng xuất
+            </button>
+            <button
+              type="button"
+              onClick={handleCancelLogout}
+              className="py-2 px-4 text-sm w-32 tracking-wide rounded-lg text-white bg-red-600 hover:bg-red-700 focus:outline-none ml-2 transition hover:scale-105"
+            >
+              Hủy
+            </button>
           </div>
         </div>
-      )}
+      </Modal>
     </div>
   );
 };

@@ -8,9 +8,9 @@ import Modal from 'react-bootstrap/Modal';
 
 const BUTTON_CLASS = "px-4 py-2 rounded w-28 flex items-center justify-center";
 const GREEN_BUTTON_CLASS =
-  "py-1 px-2 rounded-lg bg-green-500 text-white  hover:bg-green-600 " 
+  "py-1 px-2 rounded-lg bg-green-500 text-white  hover:bg-green-600 transition hover:scale-105" 
 const RED_BUTTON_CLASS =
-  "py-1 px-2 rounded-lg bg-red-500 text-white  hover:bg-red-600 "
+  "py-1 px-2 rounded-lg bg-red-500 text-white  hover:bg-red-600 transition hover:scale-105"
 const HEADER_CLASS = "py-3 px-4 font-semibold text-uppercase text-gray-500";
 const CELL_CLASS = "py-3 px-4 text-md";
 
@@ -214,7 +214,7 @@ const UserInformation = ({
                           {user.active ? <FontAwesomeIcon icon={faToggleOn} /> : <FontAwesomeIcon icon={faToggleOff} />}
                         </button>
                         <button
-                          className="py-1 px-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600"
+                          className="py-1 px-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition hover:scale-105"
                           onClick={() => handleUserClick(user)}
                         >
                           <FontAwesomeIcon icon={faCircleInfo} />
@@ -266,14 +266,15 @@ const UserInformation = ({
         </p>
       </Modal.Body>
       <Modal.Footer>
-      <Button variant="secondary" onClick={() => setShowConfirmation(false)}>
-          Cancel
+      <Button variant="danger" className="hover:scale-105" onClick={() => setShowConfirmation(false)}>
+          Hủy
         </Button>
         <Button
           variant="primary"
+          className="transition hover:scale-105"
           onClick={() => confirmToggleUserStatus(selectedUserId)}
         >
-          Confirm
+          Xác nhận
         </Button>
       </Modal.Footer>
     </Modal>

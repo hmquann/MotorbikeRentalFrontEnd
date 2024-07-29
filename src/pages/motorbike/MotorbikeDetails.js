@@ -247,12 +247,12 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
       </Modal.Body>
       <Modal.Footer>
         {isUpdate && (
-          <Button variant="primary" onClick={handleSubmit}>
-            Update
+          <Button variant="primary" className="transition hover:scale-105" onClick={handleSubmit}>
+            Cập nhật
           </Button>
         )}
-        <Button variant="secondary" onClick={onClose}>
-          Close
+        <Button variant="secondary" className="transition hover:scale-105" onClick={onClose}>
+          Đóng
         </Button>
       </Modal.Footer>
     </Modal>

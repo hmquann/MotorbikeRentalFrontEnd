@@ -120,7 +120,7 @@ const ViewModel = ({ showModal, setShowModal, modelId }) => {
         </form>
       </Modal.Body>
       <Modal.Footer>
-        <button onClick={() => setShowModal(false)} className="px-4 py-2 hover:bg-red-700 bg-red-600 text-white rounded-lg mr-2">
+        <button onClick={() => setShowModal(false)} className="px-4 py-2 hover:bg-red-700 bg-red-600 text-white rounded-lg mr-2 transition hover:scale-105">
           Đóng
         </button>
       </Modal.Footer>
