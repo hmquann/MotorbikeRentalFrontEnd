@@ -124,7 +124,12 @@ const BookingCard = ({ booking }) => {
         setAction("DONE");
         break;
       case "deposit_made":
-        setMessageConfirm("Bạn có chắc chắn muốn đặt cọc?");
+        setMessageConfirm(
+          `Bạn có chắc chắn muốn thanh toán ${(
+            (booking.totalPrice * 30) /
+            100
+          ).toLocaleString("vi-VN")}đ tiền cọc?`
+        );
         setAction("DEPOSIT_MADE");
         break;
       default:

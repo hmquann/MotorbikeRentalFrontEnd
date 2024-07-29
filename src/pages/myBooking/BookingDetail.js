@@ -103,7 +103,10 @@ export default function Widget() {
         : actionType === "canceled"
         ? "Bạn có chắc chắn muốn hủy chuyến này?"
         : actionType === "deposit_made"
-        ? "Bạn có chắc chắn muốn đặt cọc chuyến này?"
+        ? `Bạn có chắc chắn muốn thanh toán ${(
+            (booking.totalPrice * 30) /
+            100
+          ).toLocaleString("vi-VN")}đ tiền cọc?`
         : ""
     );
     setAction(actionType);
@@ -113,12 +116,10 @@ export default function Widget() {
   const handleConfirm = async () => {
     try {
       let status;
-      if (action === "accept") {
-        status = "PENDING_DEPOSIT";
-      } else if (action === "reject") {
-        status = booking.status === "PENDING_DEPOSIT" ? "REJECTED" : "REJECTED";
-      } else if (action === "deliver") {
-        status = "RENTING";
+      if (action === "canceled") {
+        status = "CANCELED";
+      } else if (action === "deposit_made") {
+        status = "DEPOSIT_MADE";
       } else if (action === "complete") {
         status = "DONE";
       }
@@ -300,13 +301,28 @@ export default function Widget() {
               </a>
             </div>
             <div className="mb-6">
-              <h4 className="text-gray-500">
-                Tổng tiền: {booking.totalPrice.toLocaleString("vi-VN")}vnd
-              </h4>
+              <h5 className="text-gray-500">
+                Tổng tiền:{" "}
+                <span className="font-bold">
+                  {booking.totalPrice.toLocaleString("vi-VN")}đ
+                </span>
+              </h5>
             </div>
-            <div>
-              <h4 className="text-gray-500">Lời nhắn riêng:</h4>
-              <p className="text-gray-700">Không có lời nhắn</p>
+            <div className="mb-6">
+              <h5 className="text-gray-500">
+                Đặt cọc qua ứng dụng:{" "}
+                <span className="font-bold">
+                  {((booking.totalPrice * 30) / 100).toLocaleString("vi-VN")}đ
+                </span>
+              </h5>
+            </div>
+            <div className="mb-6">
+              <h5 className="text-gray-500">
+                Thanh toán khi nhận xe:{" "}
+                <span className="font-bold">
+                  {((booking.totalPrice * 70) / 100).toLocaleString("vi-VN")}đ
+                </span>
+              </h5>
             </div>
             <div className="flex p-1 mt-6 justify-center">
               {booking.status === "PENDING" && (

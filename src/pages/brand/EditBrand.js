@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import FloatingLabel from "react-bootstrap/FloatingLabel";
 import Form from "react-bootstrap/Form";
@@ -11,32 +10,76 @@ const EditBrand = ({
   brandToEdit,
   onBrandUpdated,
 }) => {
-  const [brandName, setBrandName] = useState("");
-  const [origin, setOrigin] = useState("");
-  const [error, setError] = useState("");
+  const [formData, setFormData] = useState({
+    brandName: "",
+    origin: "",
+  });
+
+  const [errors, setErrors] = useState({
+    brandName: "",
+    origin: "",
+  });
 
   useEffect(() => {
     if (brandToEdit) {
-      setBrandName(brandToEdit.brandName || "");
-      setOrigin(brandToEdit.origin || "");
+      setFormData({
+        brandName: brandToEdit.brandName || "",
+        origin: brandToEdit.origin || "",
+      });
+      setErrors({
+        brandName: "",
+        origin: "",
+      });
     }
   }, [brandToEdit]);
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    const regex = /^[a-zA-Z0-9\s\u00C0-\u1EF9]*$/;
+
+    if (!regex.test(value)) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: "Không được chứa ký tự đặc biệt.",
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: "",
+      }));
+    }
+
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.brandName.trim()) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        brandName: "Vui lòng điền tên thương hiệu",
+      }));
+      return;
+    }
+    if (!formData.origin.trim()) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        origin: "Vui lòng điền xuất xứ",
+      }));
+      return;
+    }
+    if (errors.brandName || errors.origin) {
+      return; 
+    }
+
     try {
-      if (!brandName.trim()) {
-        setError("Vui lòng điền tên thương hiệu");
-        return;
-      }
-      if (!origin.trim()) {
-        setError("Vui lòng điền xuất xứ");
-        return;
-      }
       const updatedBrand = {
         ...brandToEdit,
-        brandName,
-        origin,
+        brandName: formData.brandName,
+        origin: formData.origin,
       };
 
       await axios.patch(
@@ -49,8 +92,10 @@ const EditBrand = ({
     } catch (error) {
       if (error.response) {
         if (error.response.status === 400) {
-          setError("Thương hiệu đã tồn tại");
-          console.log(error.response);
+          setErrors((prevErrors) => ({
+            ...prevErrors,
+            form: "Thương hiệu đã tồn tại",
+          }));
         }
       } else if (error.request) {
         console.error("Error connecting to server:", error.request);
@@ -77,9 +122,14 @@ const EditBrand = ({
             <Form.Control
               type="text"
               placeholder="Tên thương hiệu"
-              value={brandName}
-              onChange={(e) => setBrandName(e.target.value)}
+              name="brandName"
+              value={formData.brandName}
+              onChange={handleChange}
+              isInvalid={!!errors.brandName}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors.brandName}
+            </Form.Control.Feedback>
           </FloatingLabel>
           <FloatingLabel
             controlId="floatingBrandOrigin"
@@ -89,13 +139,18 @@ const EditBrand = ({
             <Form.Control
               type="text"
               placeholder="Xuất xứ"
-              value={origin}
-              onChange={(e) => setOrigin(e.target.value)}
+              name="origin"
+              value={formData.origin}
+              onChange={handleChange}
+              isInvalid={!!errors.origin}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors.origin}
+            </Form.Control.Feedback>
           </FloatingLabel>
-          {error && (
+          {errors.form && (
             <div className="text-red-500 mb-2 font-bold text-center">
-              {error}
+              {errors.form}
             </div>
           )}
         </form>
