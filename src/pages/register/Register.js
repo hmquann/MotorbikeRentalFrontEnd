@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import Popup from "../forgotpassword/PopUpSuccess";
+import { Modal } from "react-bootstrap";
 import apiClient from "../../axiosConfig";
 
 
-const Register = () => {
+const Register = ({ show, handleClose, showLogin }) => {
   const [formData, setFormData] = useState({
     firstname: "",
     lastname: "",
@@ -27,6 +29,27 @@ const Register = () => {
   const [genderError, setGenderError] = useState("");
   const navigate = useNavigate();
   const [showPopup, setShowPopup] = useState(false);
+  const [showForm, setShowForm] = useState(true);
+
+  useEffect(() => {
+    if (show) {
+      setFormData({
+        firstname: "",
+        lastname: "",
+        phone: "",
+        email: "",
+        password: "",
+        gender: "",
+      });
+      setRepassword("");
+      setFirstNameError(null);
+      setlastNameError(null);
+      setEmailError(null);
+      setPhoneError(null);
+      setPasswordError(null);
+      setRepasswordError(null);
+    }
+  }, [show]);
   const validateName = (name) => {
     return /^[a-zA-Z]+$/.test(name);
   };
@@ -52,7 +75,7 @@ const Register = () => {
 
     if (name === "firstname") {
       if (!validateName(value)) {
-        setFirstNameError("First name must only have alphabet characters.");
+        setFirstNameError("Họ không hợp lệ");
       } else {
         setFirstNameError("");
       }
@@ -67,7 +90,7 @@ const Register = () => {
     if (name === "password") {
       if (!validatePassword(value)) {
         setPasswordError(
-          "Password length 8-20 characters and contains upper character and number."
+          "Mật khẩu phải có từ 8-20 kí tự bao gồm cả số và chữ in hoa"
         );
       } else {
         setPasswordError("");
@@ -75,14 +98,14 @@ const Register = () => {
     }
     if (name === "phone") {
       if (!validatePhoneNumber(value)) {
-        setPhoneError("Invalid phone number. It should be 10 digits.");
+        setPhoneError("Số điện thoại phải bao gồm 10 chữ số");
       } else {
         setPhoneError("");
       }
     }
     if (name === "email") {
       if (!validateEmail(value)) {
-        setEmailError("Invalid email format.");
+        setEmailError("Email không hợp lệ");
       } else {
         setEmailError("");
       }
@@ -97,9 +120,9 @@ const Register = () => {
         setRepassword(value);
       }
       if (name === "repassword" && formData.password !== value) {
-        setRepasswordError("Passwords do not match.");
+        setRepasswordError("Mật khẩu không trùng khớp");
       } else if (name === "password" && repassword && value !== repassword) {
-        setRepasswordError("Passwords do not match.");
+        setRepasswordError("Mật khẩu không trùng khớp");
       } else {
         setRepasswordError("");
       }
@@ -146,12 +169,15 @@ const Register = () => {
           },
         }
       )
+
       .then((response) => {
         console.log("Data sent successfully:", response.data);
-        setShowPopup(true); // Hiển thị popup khi thành công
+        setShowPopup(true);
+        setShowForm(false);
         setTimeout(() => {
-          setShowPopup(false); // Ẩn popup sau 3 giây
-          navigate("/login"); //chuyển sang trang login sau khi thông báo
+          setShowPopup(false);
+          handleClose();
+          navigate("/homepage");
         }, 3000);
         setLoading(false);
       })
@@ -169,13 +195,21 @@ const Register = () => {
               "Error 404: Not Found. The requested resource could not be found."
             );
           } else if (error.response.status === 409) {
-            setError(error.response.data);
-          } else {
-            setError(
-              `Error ${error.response.status}: ${
-                error.response.data.message || "An error occurred."
-              }`
+            const translateErrorMessage = (message) => {
+              switch (message) {
+                case "Email existed":
+                  return "Email đã tồn tại";
+                case "Phone existed":
+                  return "Số điện thoại đã tồn tại";
+                default:
+                  return "Đã xảy ra lỗi. Vui lòng thử lại.";
+              }
+            };
+            const translatedMessage = translateErrorMessage(
+              error.response.data
             );
+            setError(translatedMessage);
+          } else {
           }
         } else if (error.request) {
           // The request was made but no response was received
@@ -187,98 +221,182 @@ const Register = () => {
         setLoading(false);
       });
   };
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
-      <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h2 className="text-center text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">
-          Register
-        </h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="text"
-            name="firstname"
-            placeholder="First Name"
-            value={formData.firstname}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          {firstNameError && (
-            <div className="text-red-500">{firstNameError}</div>
-          )}
-          <input
-            type="text"
-            name="lastname"
-            placeholder="Last Name"
-            value={formData.lastname}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          {lastNameError && <div className="text-red-500">{lastNameError}</div>}
-          <input
-            type="text"
-            name="phone"
-            placeholder="Phone Number"
-            value={formData.phone}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          {phoneError && <div className="text-red-500">{phoneError}</div>}
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          {emailError && <div className="text-red-500">{emailError}</div>}
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          {passwordError && <div className="text-red-500">{passwordError}</div>}
-          <input
-            type="password"
-            name="repassword"
-            placeholder="Confirm Password"
-            value={repassword}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          {repasswordError && (
-            <div className="text-red-500">{repasswordError}</div>
-          )}
-          <select
-            name="gender"
-            value={formData.gender}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value=""> Gender</option>
-            <option value="true">Male</option>
-            <option value="false">Female</option>
-          </select>
-          {/* {genderError && <div className="text-red-500">{genderError}</div>} */}
-          <button
-            type="submit"
-            className="w-full p-3 bg-teal-500 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 hover:bg-teal-600"
-            disabled={loading}
-          >
-            {loading ? "Submitting..." : "Submit"}
-          </button>
-          {error && (
-            <div className="text-red-500 text-center mt-4">{error}</div>
-          )}
-        </form>
+    <Modal show={show} onHide={handleClose} centered>
+      <div className="p-8 rounded bg-gray-50 font-[sans-serif]">
+        {showForm && (
+          <>
+            <h2 className="text-gray-800 text-center text-2xl font-bold">
+              Đăng ký
+            </h2>
+            <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
+              <div>
+                <label className="text-gray-800 text-sm font-semibold mb-2 block">
+                  Họ
+                </label>
+                <input
+                  name="firstname"
+                  type="text"
+                  required
+                  className="w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600"
+                  placeholder="Nhập họ"
+                  value={formData.firstname}
+                  onChange={handleChange}
+                />
+                {firstNameError && (
+                  <div className="text-red-500">{firstNameError}</div>
+                )}
+              </div>
+              <div>
+                <label className="text-gray-800 text-sm font-semibold mb-2 block">
+                  Tên
+                </label>
+                <input
+                  name="lastname"
+                  type="text"
+                  required
+                  className="w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600"
+                  placeholder="Nhập tên"
+                  value={formData.lastname}
+                  onChange={handleChange}
+                />
+                {lastNameError && (
+                  <div className="text-red-500">{lastNameError}</div>
+                )}
+              </div>
+              <div>
+                <label className="text-gray-800 text-sm font-semibold mb-2 block">
+                  Số điện thoại
+                </label>
+                <input
+                  name="phone"
+                  type="tel"
+                  required
+                  className="w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600"
+                  placeholder="Nhập số điện thoại"
+                  value={formData.phone}
+                  onChange={handleChange}
+                />
+                {phoneError && <div className="text-red-500">{phoneError}</div>}
+              </div>
+              <div>
+                <label className="text-gray-800 text-sm font-semibold mb-2 block">
+                  Email
+                </label>
+                <input
+                  name="email"
+                  type="email"
+                  required
+                  className="w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600"
+                  placeholder="Nhập email"
+                  value={formData.email}
+                  onChange={handleChange}
+                />
+                {emailError && <div className="text-red-500">{emailError}</div>}
+              </div>
+              <div>
+                <label className="text-gray-800 text-sm font-semibold mb-2 block">
+                  Giới tính
+                </label>
+                <select
+                  name="gender"
+                  required
+                  className="w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600"
+                  value={formData.gender}
+                  onChange={handleChange}
+                >
+                  <option value="">Chọn giới tính</option>
+                  <option value="true">Nam</option>
+                  <option value="false">Nữ</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-gray-800 text-sm font-semibold mb-2 block">
+                  Mật khẩu
+                </label>
+                <input
+                  name="password"
+                  type="password"
+                  required
+                  className="w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600"
+                  placeholder="Nhập mật khẩu"
+                  value={formData.password}
+                  onChange={handleChange}
+                />
+                {passwordError && (
+                  <div className="text-red-500">{passwordError}</div>
+                )}
+              </div>
+              <div>
+                <label className="text-gray-800 text-sm font-semibold mb-2 block">
+                  Nhập lại mật khẩu
+                </label>
+                <input
+                  name="repassword"
+                  type="password"
+                  required
+                  className="w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600"
+                  placeholder="Nhập lại mật khẩu"
+                  value={repassword}
+                  onChange={handleChange}
+                />
+                {repasswordError && (
+                  <div className="text-red-500">{repasswordError}</div>
+                )}
+              </div>
+              <div className="!mt-8">
+                <button
+                  type="submit"
+                  className="w-full py-3 px-4 text-sm tracking-wide rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none transition hover:scale-105"
+                >
+                  Đăng ký
+                </button>
+              </div>
+              {error && (
+                <div className="text-red-500 font-bold text-center">
+                  {error}
+                </div>
+              )}
+              <p className="text-gray-800 text-sm !mt-8 text-center">
+                Đã có tài khoản?{" "}
+                <button
+                  type="button"
+                  onClick={showLogin}
+                  className="text-green-500 no-underline hover:underline ml-1 whitespace-nowrap font-semibold"
+                >
+                  Đăng nhập tại đây
+                </button>
+              </p>
+            </form>
+          </>
+        )}
         {showPopup && (
-          <Popup message="Your request sent successfully! Please check your email!" />
+          <Modal show={showPopup} onHide={() => setShowPopup(false)} centered>
+            <div className="p-8 rounded bg-gray-50 font-[sans-serif]">
+              <h2 className="text-gray-800 text-center text-2xl font-bold">
+                Đăng ký thành công!
+              </h2>
+              <p className="text-gray-800 text-sm mt-4 text-center">
+                Hãy kiểm tra Email của bạn để xác thực tài khoản
+              </p>
+              <div className="text-center mt-8">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowPopup(false);
+                    handleClose();
+                  }}
+                  className="py-2 px-4 text-sm tracking-wide rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none"
+                >
+                  OK
+                </button>
+              </div>
+            </div>
+          </Modal>
         )}
       </div>
-    </div>
+    </Modal>
   );
 };
 

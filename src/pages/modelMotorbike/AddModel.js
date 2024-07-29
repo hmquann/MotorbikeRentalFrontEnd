@@ -258,10 +258,10 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
         </form>
       </Modal.Body>
       <Modal.Footer>
-        <button className="px-4 py-2 hover:bg-red-700 bg-red-600 text-white rounded-lg mr-2" onClick={() => setShowModal(false)}>
+        <button className="px-4 py-2 hover:bg-red-700 bg-red-600 text-white rounded-lg mr-2 transition hover:scale-105" onClick={() => setShowModal(false)}>
           Hủy
         </button>
-        <button className="px-4 py-2 hover:bg-blue-700 bg-blue-600 text-white rounded-lg mr-2" onClick={handleSubmit}>
+        <button className="px-4 py-2 hover:bg-blue-700 bg-blue-600 text-white rounded-lg mr-2 transition hover:scale-105" onClick={handleSubmit}>
           Lưu
         </button>
       </Modal.Footer>

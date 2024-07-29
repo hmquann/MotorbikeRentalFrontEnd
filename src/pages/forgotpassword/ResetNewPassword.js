@@ -1,19 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
-import Popup from "./PopUpSuccess";
 import apiClient from "../../axiosConfig";
+import PopupSuccess from "./PopUpSuccess";
 
-const modalOverlayClasses =
-  "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50";
-const modalContentClasses =
-  "bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-6 w-80";
-const buttonClasses =
-  "text-zinc-500 dark:text-zinc-300 hover:text-zinc-700 dark:hover:text-zinc-100";
-const inputClasses =
-  "w-full p-2 mb-4 bg-zinc-200 rounded-lg light:bg-zinc-700 dark:text-zinc-200-dark";
-const submitButtonClasses =
-  "w-full p-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600";
 
 const PasswordResetForm = () => {
   const [newPassword, setNewPassword] = useState("");
@@ -41,19 +31,18 @@ const PasswordResetForm = () => {
     setNewPassword(newPasswordValue);
     if (!validatePassword(newPasswordValue)) {
       setPasswordError(
-        "Password length 8-20 characters and contains upper character and number."
+        "Mât khẩu phải chứa từ 8-20 kí tự bao gồm cả chữ số và chữ in hoa"
       );
     } else {
       setPasswordError("");
-      setNewPassword(newPasswordValue); // Cập nhật giá trị của newPassword
     }
   };
 
   const handleChangeRenewPassword = (e) => {
     const renewPasswordValue = e.target.value;
-    setRenewPassword(renewPasswordValue); // Cập nhật giá trị của renewPassword
+    setRenewPassword(renewPasswordValue);
     if (renewPasswordValue !== newPassword) {
-      setRepasswordError("Password does not match!");
+      setRepasswordError("Mật khẩu không trùng khớp");
     } else {
       setRepasswordError("");
     }
@@ -61,7 +50,7 @@ const PasswordResetForm = () => {
 
   const handleClose = () => {
     setIsOpen(false);
-    navigate("/login"); // Điều hướng đến trang login sau khi đóng modal
+    navigate("/homepage");
   };
 
   const handleSubmit = (e) => {
@@ -95,16 +84,15 @@ const PasswordResetForm = () => {
       )
       .then((response) => {
         console.log(response.data);
-        setShowPopup(true); // Hiển thị popup khi thành công
+        setShowPopup(true);
         setTimeout(() => {
-          setShowPopup(false); // Ẩn popup sau 3 giây
-          navigate("/login"); //chuyển sang trang login sau khi thông báo
+          setShowPopup(false);
+          navigate("/homepage");
         }, 3000);
       })
       .catch((error) => {
         console.error(error);
         setError("An error occurred. Please try again.");
-        // Xử lý lỗi
       })
       .finally(() => {
         setLoading(false);
@@ -114,49 +102,76 @@ const PasswordResetForm = () => {
   if (!isOpen) return null;
 
   return (
-    <div className={modalOverlayClasses}>
-      <div className={modalContentClasses}>
+    <>
+    {showPopup ? (
+      <PopupSuccess
+        show={showPopup}
+        onHide={() => {
+          setShowPopup(false);
+          handleClose();
+        }}
+        message="Mật khẩu của bạn đã được đặt lại"
+      />
+    ) : (
+      <>
+    <div className="flex justify-center mt-20">
+      <div className="bg-white rounded-lg shadow-lg p-6 w-full sm:max-w-md dark:bg-gray-800 dark:border-gray-700">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100-dark">
-            Reset Password
+        <h2 className="text-gray-800 text-center text-2xl font-bold">
+            Đặt lại mật khẩu
           </h2>
           <button
             onClick={handleClose}
-            className={`text-zinc-400 dark:text-zinc-300 hover:text-zinc-600 dark:hover:text-zinc-500 ${buttonClasses}`}
+            className="text-zinc-400 text-3xl mb-2 dark:text-zinc-300 hover:text-zinc-600 dark:hover:text-zinc-500"
           >
             <span className="sr-only">Close</span>
             &times;
           </button>
         </div>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="password"
-            placeholder="Enter new password"
-            value={newPassword}
-            onChange={handleChangeNewPassWord}
-            className={inputClasses}
-          />
-          {passwordError && <div className="text-red-500">{passwordError}</div>}
-          <input
-            type="password"
-            placeholder="Confirm new password"
-            onChange={handleChangeRenewPassword}
-            value={renewPassword}
-            className={inputClasses}
-          />
-          {repasswordError && (
-            <div className="text-red-500">{repasswordError}</div>
-          )}
-          <button type="submit" className={submitButtonClasses}>
-            {loading ? "Submitting..." : "Submit"}
+        <form onSubmit={handleSubmit} className="space-y-4 lg:mt-5 md:space-y-5">
+          <div>
+            <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+              Mật khẩu mới
+            </label>
+            <input
+              type="password"
+              name="password"
+              id="password"
+              value={newPassword}
+              onChange={handleChangeNewPassWord}
+              className= "w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600"
+              required
+            />
+            {passwordError && <div className="text-red-500">{passwordError}</div>}
+          </div>
+          <div>
+            <label htmlFor="confirm-password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+              Xác nhận lại mật khẩu
+            </label>
+            <input
+              type="password"
+              name="confirm-password"
+              id="confirm-password"
+              value={renewPassword}
+              onChange={handleChangeRenewPassword}
+              className= "w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600"
+              required
+            />
+            {repasswordError && <div className="text-red-500">{repasswordError}</div>}
+          </div>
+          <button
+            type="submit"
+           className="w-full py-3 px-4 text-sm tracking-wide rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none"
+          >
+            {loading ? "Đang xác nhận..." : "Đổi mật khẩu"}
           </button>
-          {error && (
-            <div className="text-red-500 text-center mt-4">{error}</div>
-          )}
+          {error && <div className="text-red-500 text-center mt-4">{error}</div>}
         </form>
-        {showPopup && <Popup message="Password changed successfully!" />}
       </div>
     </div>
+    </>
+    )}
+    </>
   );
 };
 

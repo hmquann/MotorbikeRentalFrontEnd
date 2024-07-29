@@ -18,7 +18,7 @@ import apiClient from "../../axiosConfig";
 
 const tableCellClasses =
   "px-6 py-4 whitespace-nowrap text-base font-semibold text-amber-900 ";
-const buttonClasses = "py-1 px-2 rounded-lg";
+const buttonClasses = "py-1 px-2 rounded-lg transition hover:scale-105";
 const modalOverlayClasses =
   "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 backdrop-blur-sm";
 const modalContentClasses = "bg-white p-4 rounded-lg shadow-lg max-w-md w-full";
@@ -584,7 +584,7 @@ const ApproveMotorbikeRegistration = () => {
           </p>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal}>
+          <Button variant="secondary" className="transition hover:scale-105" onClick={handleCloseModal}>
             Đóng
           </Button>
         </Modal.Footer>
@@ -605,10 +605,10 @@ const ApproveMotorbikeRegistration = () => {
             </p>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="success" onClick={handleConfirm}>
+            <Button variant="success" className="transition hover:scale-105" onClick={handleConfirm}>
               Có
             </Button>
-            <Button variant="secondary" onClick={handleCancel}>
+            <Button variant="secondary" className="transition hover:scale-105" onClick={handleCancel}>
               Hủy
             </Button>
           </Modal.Footer>

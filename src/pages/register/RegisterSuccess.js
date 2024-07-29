@@ -16,10 +16,10 @@ const RegisterSuccess = () => {
         .get(`/verify/${token}`)
         .then((response) => {
           console.log("User:", response.data);
-          setShowPopup(true); // Hiển thị popup khi thành công
+          setShowPopup(true); 
           setTimeout(() => {
-            setShowPopup(false); // Ẩn popup sau 3 giây
-            navigate("/login"); //chuyển sang trang login sau khi thông báo
+            setShowPopup(false); 
+            navigate("/homepage"); 
           }, 3000);
         })
         .catch((error) => {
@@ -29,11 +29,18 @@ const RegisterSuccess = () => {
     }
   }, [navigate, token]);
 
+  const handleClosePopup = () => {
+    setShowPopup(false);
+    navigate('/homepage');
+  };
+
   return (
     <div>
-      {showPopup && (
-        <Popup message="Your account has been successfully verified!" />
-      )}
+      <Popup 
+        show={showPopup}
+        onHide={handleClosePopup}
+        message="Tài khoản của bạn đã được xác nhận!"
+      />
     </div>
   );
 };
