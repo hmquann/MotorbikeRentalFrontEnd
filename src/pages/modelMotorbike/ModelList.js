@@ -5,6 +5,7 @@ import ViewModel from "./ViewModel";
 import { MdOutlineAddCircleOutline, MdSearch } from "react-icons/md";
 import { IoEyeOutline } from "react-icons/io5";
 import useDebounce from "../../hooks/useDebounce";
+import apiClient from "../../axiosConfig";
 
 const buttonClasses = "font-semibold px-4 py-2 rounded-lg";
 const tableCellClasses = " px-6 py-4 whitespace-nowrap text-md ";
@@ -30,8 +31,8 @@ const ModelList = () => {
   const fetchModels = async () => {
     try {
       setIsLoading(true); 
-      const response = await axios.get(
-        `https://rentalmotorbikewebapp.azurewebsites.net/api/model/getAllModel/${currentPage}/${pageSize}`
+      const response = await apiClient.get(
+        `/api/model/getAllModel/${currentPage}/${pageSize}`
       );
 
       if (response.data && response.data.content) {
@@ -57,7 +58,7 @@ const ModelList = () => {
   const searchModels = async (searchTerm, page, size) => {
     try {
       setIsLoading(true)
-      const response = await axios.get(`https://rentalmotorbikewebapp.azurewebsites.net/api/model/search`, {
+      const response = await apiClient.get(`/api/model/search`, {
         params: {
           searchTerm,
           page,

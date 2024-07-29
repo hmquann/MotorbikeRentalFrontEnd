@@ -3,6 +3,7 @@ import axios from "axios";
 import { useEffect } from "react";
 import Homepage from "../hompage/Homepage";
 import { useNavigate } from "react-router-dom";
+import apiClient from "../../axiosConfig";
 
 const sharedClasses = {
   bgGreen: 'bg-green-500',
@@ -161,11 +162,11 @@ const RegisterMotorbikeStep1 = () => {
   const[motorbikeModelError,setMotorbikeModelError]=useState([]);
   const[manufactureYearError,setManufactureYearError]=useState([]);
   useEffect(() => {
-      axios.get('https://rentalmotorbikewebapp.azurewebsites.net/api/model/getAllModel')
+      apiClient.get('/api/model/getAllModel')
           .then(response => setModels(response.data))
           .catch(error => console.error('Error fetching models:', error));
          
-      axios.get('https://rentalmotorbikewebapp.azurewebsites.net/api/brand/getAllBrand')
+      apiClient.get('/api/brand/getAllBrand')
           .then(response => setBrands(response.data))
           .catch(error => console.error('Error fetching other entities 1:', error));
   }, []);

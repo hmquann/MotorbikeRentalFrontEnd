@@ -14,6 +14,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
+import apiClient from "../../axiosConfig";
 
 const tableCellClasses =
   "px-6 py-4 whitespace-nowrap text-base font-semibold text-amber-900 ";
@@ -58,8 +59,8 @@ const ApproveMotorbikeRegistration = () => {
     try {
       setIsLoading(true);
       // const status = statusFilter !== 'all' ? statusFilter : 'all';
-      const response = await axios.get(
-        `https://rentalmotorbikewebapp.azurewebsites.net/api/motorbike/allMotorbike/${page}/${size}`,
+      const response = await apiClient.get(
+        `/api/motorbike/allMotorbike/${page}/${size}`,
         {
           params: {
             userId: userId,
@@ -92,8 +93,8 @@ const ApproveMotorbikeRegistration = () => {
 
   const fetchDetailMotorbike = async (motorbikeId) => {
     try {
-      const response = await axios.get(
-        `https://rentalmotorbikewebapp.azurewebsites.net/api/motorbike/${motorbikeId}`
+      const response = await apiClient.get(
+        `/api/motorbike/${motorbikeId}`
       );
       console.log(response.data);
       setSelectedMotorbike(response.data);
@@ -115,8 +116,8 @@ const ApproveMotorbikeRegistration = () => {
   const searchMotorbike = async (searchTerm, userId, roles, page, size) => {
     try {
       setIsLoading(true);
-      const response = await axios.get(
-        `https://rentalmotorbikewebapp.azurewebsites.net/api/motorbike/search`,
+      const response = await apiClient.get(
+        `/api/motorbike/search`,
         {
           params: {
             searchTerm,
@@ -184,8 +185,8 @@ const ApproveMotorbikeRegistration = () => {
   };
   const handleActionWithCheck = async (motorbike, action) => {
     try {
-      const response = await axios.get(
-        `https://rentalmotorbikewebapp.azurewebsites.net/api/booking/motorbike/${motorbike.id}`
+      const response = await apiClient.get(
+        `/api/booking/motorbike/${motorbike.id}`
       );
       const bookings = response.data;
 
@@ -230,14 +231,14 @@ const ApproveMotorbikeRegistration = () => {
   const handleConfirm = () => {
     const url =
       actionType === "approve"
-        ? `https://rentalmotorbikewebapp.azurewebsites.net/api/motorbike/approve/${selectedMotorbike.id}`
+        ? `/api/motorbike/approve/${selectedMotorbike.id}`
         : actionType === "reject"
-        ? `https://rentalmotorbikewebapp.azurewebsites.net/api/motorbike/reject/${selectedMotorbike.id}`
+        ? `/api/motorbike/reject/${selectedMotorbike.id}`
         : actionType === "activate"
-        ? `https://rentalmotorbikewebapp.azurewebsites.net/api/motorbike/toggleStatus/${selectedMotorbike.id}`
-        : `https://rentalmotorbikewebapp.azurewebsites.net/api/motorbike/toggleStatus/${selectedMotorbike.id}`;
+        ? `/api/motorbike/toggleStatus/${selectedMotorbike.id}`
+        : `/api/motorbike/toggleStatus/${selectedMotorbike.id}`;
 
-    axios
+    apiClient
       .put(url)
       .then((response) => {
         if (response.data) {

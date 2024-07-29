@@ -3,6 +3,7 @@ import axios from "axios";
 import Modal from "react-bootstrap/Modal";
 import FloatingLabel from "react-bootstrap/FloatingLabel";
 import Form from "react-bootstrap/Form";
+import apiClient from "../../axiosConfig";
 
 
 const DiscountDetailModal = ({fetchVoucher, showModalDetail, setShowModalDetail, voucher, isDetailView }) => {
@@ -118,7 +119,7 @@ const DiscountDetailModal = ({fetchVoucher, showModalDetail, setShowModalDetail,
     }
     
     if (isEditing) {
-        const response = await axios.patch(`https://rentalmotorbikewebapp.azurewebsites.net/api/discounts/updateDiscount/${voucher.id}`, formData)
+        const response = await apiClient.patch(`/api/discounts/updateDiscount/${voucher.id}`, formData)
         .then((response) =>{
           fetchVoucher();
           setIsEditing(false); 

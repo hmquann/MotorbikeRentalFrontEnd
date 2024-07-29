@@ -3,11 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLock, faUser } from "@fortawesome/free-solid-svg-icons";
-
-
+import apiClient from "../../axiosConfig";
 
 const Login = () => {
-  const apiLogin = "https://rentalmotorbikewebapp.azurewebsites.net/api/auth/signin";
+  // const apiLogin = "https://rentalmotorbikewebapp.azurewebsites.net/api/auth/signin";
+
   const containerClasses = "bg-gray-50 font-[sans-serif]";
   const contentClasses =
     "min-h-screen flex flex-col items-center justify-center py-6 px-4";
@@ -36,7 +36,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(apiLogin, credentials, {
+      const response = await apiClient.post("/api/auth/signin", credentials, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -117,7 +117,10 @@ const Login = () => {
                     value={credentials.emailOrPhone}
                     onChange={handleChange}
                   />
-           <FontAwesomeIcon icon={faUser}  className="w-4 h-4 absolute right-4" />
+                  <FontAwesomeIcon
+                    icon={faUser}
+                    className="w-4 h-4 absolute right-4"
+                  />
                 </div>
               </div>
 
@@ -135,8 +138,10 @@ const Login = () => {
                     value={credentials.password}
                     onChange={handleChange}
                   />
-                 <FontAwesomeIcon icon={faLock}  className="w-4 h-4 absolute right-4" />
-              
+                  <FontAwesomeIcon
+                    icon={faLock}
+                    className="w-4 h-4 absolute right-4"
+                  />
                 </div>
               </div>
 
@@ -158,7 +163,7 @@ const Login = () => {
               </div>
               {error && <div className={errorClasses}>{error}</div>}
               <p className="text-gray-800 text-sm !mt-8 text-center">
-               Bạn chưa có tài khoản?{" "}
+                Bạn chưa có tài khoản?{" "}
                 <Link
                   to="/register"
                   className="text-green-500 no-underline hover:underline ml-1 whitespace-nowrap font-semibold"

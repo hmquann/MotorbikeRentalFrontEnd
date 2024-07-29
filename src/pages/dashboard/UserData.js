@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import UserInformation from "./UserInformation";
 import useDebounce from "../../hooks/useDebounce";
+import apiClient from "../../axiosConfig";
 
 const UserData = () => {
   const [users, setUsers] = useState([]);
@@ -17,8 +18,8 @@ const UserData = () => {
   const fetchUsers = async () => {
     try {
       setIsLoading(true)
-      const response = await axios.get(
-        `https://rentalmotorbikewebapp.azurewebsites.net/api/user/allUser/${currentPage}/${pageSize}`,
+      const response = await apiClient.get(
+        `/api/user/allUser/${currentPage}/${pageSize}`,
       
       );
 
@@ -36,8 +37,8 @@ const UserData = () => {
   const searchUsers = async (term, page, size) => {
     try {
       setIsLoading(true);
-      const response = await axios.get(
-        `https://rentalmotorbikewebapp.azurewebsites.net/api/user/search`,
+      const response = await apiClient.get(
+        `/api/user/search`,
         {
           params: {
             searchTerm: term,

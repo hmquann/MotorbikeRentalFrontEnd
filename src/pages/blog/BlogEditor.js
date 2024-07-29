@@ -4,6 +4,8 @@ import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import axios from "axios";
 import UploadAdapter from "./UploadAdapter";
 import styled from "styled-components";
+import apiClient from "../../axiosConfig";
+
 
 const BlogEditorWrapper = styled.div`
   max-width: 768px;
@@ -55,8 +57,8 @@ const BlogEditor = ({ onSave }) => {
     const blogData = { title, content, userId };
 
     try {
-      const response = await axios.post(
-        "https://rentalmotorbikewebapp.azurewebsites.net/api/blogs/createBlog",
+      const response = await apiClient.post(
+        "/api/blogs/createBlog",
         blogData
       );
       console.log("Blog saved:", response.data);

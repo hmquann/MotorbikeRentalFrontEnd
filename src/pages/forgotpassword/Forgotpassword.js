@@ -3,6 +3,7 @@ import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Popup from "./PopUpSuccess";
+import apiClient from "../../axiosConfig";
 
 const modalOverlayClasses =
   "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50";
@@ -41,8 +42,8 @@ const Forgotpassword = () => {
     e.preventDefault();
     setLoading(true);
 
-    axios
-      .post("https://rentalmotorbikewebapp.azurewebsites.net/password/forgot", null, {
+    apiClient
+      .post("/password/forgot", null, {
         params: { email: email },
         headers: {
           "Content-Type": "application/json",

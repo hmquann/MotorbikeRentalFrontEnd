@@ -11,6 +11,7 @@ import { Navigation } from "@mui/icons-material";
 import { Pagination } from "react-bootstrap";
 import { darkScrollbar } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import apiClient from "../../axiosConfig";
 const Homepage = () => {
   const buttonClasses =
     "px-4 py-2 rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105";
@@ -28,8 +29,8 @@ const Homepage = () => {
   const [blogs, setBlogs] = useState([]);
   const fetchBlogs = async () => {
     try {
-      const response = await axios.get(
-        "https://rentalmotorbikewebapp.azurewebsites.net/api/blogs/getAllBlogs"
+      const response = await apiClient.get(
+        "/api/blogs/getAllBlogs"
       );
       const sortedBlogs = response.data.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)

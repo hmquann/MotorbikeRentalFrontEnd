@@ -4,6 +4,7 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import FloatingLabel from "react-bootstrap/FloatingLabel";
 import Form from "react-bootstrap/Form";
+import apiClient from "../../axiosConfig";
 
 const EditBrand = ({
   showModal,
@@ -39,8 +40,8 @@ const EditBrand = ({
         origin,
       };
 
-      await axios.patch(
-        `https://rentalmotorbikewebapp.azurewebsites.net/api/brand/updateBrand/${brandToEdit.brandId}`,
+      await apiClient.patch(
+        `/api/brand/updateBrand/${brandToEdit.brandId}`,
         updatedBrand
       );
 

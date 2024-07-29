@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import Popup from "./PopUpSuccess";
+import apiClient from "../../axiosConfig";
 
 const modalOverlayClasses =
   "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50";
@@ -80,9 +81,9 @@ const PasswordResetForm = () => {
       return;
     }
 
-    axios
+    apiClient
       .post(
-        `https://rentalmotorbikewebapp.azurewebsites.net/password/reset/${token}`,
+        `/password/reset/${token}`,
         {
           password: newPassword,
         },

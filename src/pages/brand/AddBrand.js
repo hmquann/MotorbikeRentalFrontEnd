@@ -4,6 +4,7 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Form from 'react-bootstrap/Form';
+import apiClient from "../../axiosConfig";
 
 const AddBrand = ({ showModal, setShowModal, onBrandCreated }) => {
   const [brandName, setBrandName] = useState("");
@@ -40,8 +41,8 @@ const AddBrand = ({ showModal, setShowModal, onBrandCreated }) => {
     }
 
     try {
-      const response = await axios.post(
-        "https://rentalmotorbikewebapp.azurewebsites.net/api/brand/createBrand",
+      const response = await apiClient.post(
+        "/api/brand/createBrand",
         {
           brandName,
           origin: brandOrigin,

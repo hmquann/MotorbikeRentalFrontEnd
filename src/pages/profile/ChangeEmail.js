@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PopupMessage from "./PopupMessage";
+import apiClient from "../../axiosConfig";
 const modalOverlayClasses =
   "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50";
 const modalContentClasses =
@@ -38,9 +39,9 @@ const ChangeEmail = ({ onClose, isOpen }) => {
     e.preventDefault();
     setLoading(true);
     console.log("123123213");
-    axios
+    apiClient
       .post(
-        "https://rentalmotorbikewebapp.azurewebsites.net/api/auth/changeEmail",
+        "/api/auth/changeEmail",
         {
           userId: userData.userId,
           newEmail: email,

@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Popup from "../forgotpassword/PopUpSuccess";
+import apiClient from "../../axiosConfig";
+
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -135,9 +136,9 @@ const Register = () => {
         return;
       }
     }
-    axios
+    apiClient
       .post(
-        "https://rentalmotorbikewebapp.azurewebsites.net/api/auth/signup",
+        "/api/auth/signup",
         formData,
         {
           headers: {

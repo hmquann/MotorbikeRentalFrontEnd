@@ -3,6 +3,7 @@ import axios from "axios";
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { Form } from "react-bootstrap";
+import apiClient from "../../axiosConfig";
 
 const inputClasses =
   "mt-1 block w-full p-2 border border-zinc-300 rounded-md text-black font-medium";
@@ -25,8 +26,8 @@ const ViewModel = ({ showModal, setShowModal, modelId }) => {
     if (modelId && showModal) {
       const fetchModelDetails = async () => {
         try {
-          const response = await axios.get(
-            `https://rentalmotorbikewebapp.azurewebsites.net/api/model/${modelId}`
+          const response = await apiClient.get(
+            `/api/model/${modelId}`
           );
           setModelData(response.data);
         } catch (error) {

@@ -3,6 +3,7 @@ import axios from "axios";
 import { useEffect } from "react";
 import { useNavigate,useLocation } from "react-router-dom";
 import ImageUploader from './ImageUploader';
+import apiClient from "../../axiosConfig";
 const inputClasses =
   "w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500";
 const buttonClasses =
@@ -219,8 +220,8 @@ const RegisterMotorbikeStep2 = (files) => {
 
   });
     setFormData(newFormData);
-    axios
-      .post("https://rentalmotorbikewebapp.azurewebsites.net/api/motorbike/register", newFormData, {
+    apiClient
+      .post("/api/motorbike/register", newFormData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },

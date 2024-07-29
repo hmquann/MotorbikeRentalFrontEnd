@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Popup from "./PopupMessage";
+import apiClient from "../../axiosConfig";
 
 const modalOverlayClasses =
   "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50";
@@ -95,9 +96,9 @@ const UpdatePassword = ({ onClose, isOpen }) => {
     e.preventDefault();
     setLoading(true);
 
-    axios
+    apiClient
       .post(
-        "https://rentalmotorbikewebapp.azurewebsites.net/password/change",
+        "/password/change",
         {
           oldPassword: oldPassword,
           newPassword: newPassword,

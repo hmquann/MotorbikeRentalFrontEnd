@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Popup from "../forgotpassword/PopUpSuccess";
+import apiClient from "../../axiosConfig";
 
 const RegisterSuccess = () => {
   const [showPopup, setShowPopup] = useState(false);
@@ -11,8 +12,8 @@ const RegisterSuccess = () => {
   useEffect(() => {
     console.log(token);
     if (token !== null) {
-      axios
-        .get(`https://rentalmotorbikewebapp.azurewebsites.net/verify/${token}`)
+      apiClient
+        .get(`/verify/${token}`)
         .then((response) => {
           console.log("User:", response.data);
           setShowPopup(true); // Hiển thị popup khi thành công

@@ -3,6 +3,8 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./CustomDatePicker.css";
 import axios from "axios";
+import apiClient from "../../../axiosConfig";
+
 
 const sharedClasses = {
   flex: "flex",
@@ -92,8 +94,8 @@ const ManageSchedulePopUp = ({ isOpen, onClose, motorbikeId }) => {
 
   const fetchScheduleMotorbike = async (motorbikeId) => {
     try {
-      const response = await axios.get(
-        `https://rentalmotorbikewebapp.azurewebsites.net/booking/listSchedule/${motorbikeId}`
+      const response = await apiClient.get(
+        `/booking/listSchedule/${motorbikeId}`
       );
       console.log(response.data);
       setListSchedule(response.data);
@@ -191,7 +193,7 @@ const ManageSchedulePopUp = ({ isOpen, onClose, motorbikeId }) => {
       };
       console.log(data)
       // Gửi dữ liệu đến backend
-      const response =axios.post(`https://rentalmotorbikewebapp.azurewebsites.net/booking/markBusyDays/${motorbikeId}`, data, {
+      const response =apiClient.post(`/booking/markBusyDays/${motorbikeId}`, data, {
         headers: {
           "Content-Type": "application/json"
         }

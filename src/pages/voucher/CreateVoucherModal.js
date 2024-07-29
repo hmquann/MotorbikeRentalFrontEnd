@@ -4,6 +4,7 @@ import "./CreateVoucher.css";
 import Modal from "react-bootstrap/Modal";
 import FloatingLabel from "react-bootstrap/FloatingLabel";
 import Form from "react-bootstrap/Form";
+import apiClient from "../../axiosConfig";
 
 const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
   const [formData, setFormData] = useState({
@@ -145,8 +146,8 @@ const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
       setErrors(formErrors);
       return;
     }
-    axios
-      .post("https://rentalmotorbikewebapp.azurewebsites.net/api/discounts/addDiscount", formData, {
+    apiClient
+      .post("/api/discounts/addDiscount", formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
