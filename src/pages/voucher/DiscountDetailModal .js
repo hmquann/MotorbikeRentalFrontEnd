@@ -419,15 +419,7 @@ const DiscountDetailModal = ({
             >
               Chỉnh sửa
             </button>
-            {isDetailView && !isEditing && (
-              <button
-                type="button"
-                onClick={handleEdit}
-                className="hover:bg-yellow-600 bg-yellow-500 text-white px-4 py-2 rounded-lg transition hover:scale-105"
-              >
-                Chỉnh sửa
-              </button>
-            )}
+          )}
             {!isDetailView || isEditing ? (
               <button
                 type="submit"
@@ -439,6 +431,7 @@ const DiscountDetailModal = ({
             ) : null}
           </div>
         </Modal.Footer>
+        </Modal>
   );
 };
 

@@ -75,30 +75,29 @@ const BookingCard = ({ booking }) => {
 
   const [motorbike, setMotorbike] = useState();
   useEffect(() => {
-    const fetchMotorbike = async () => {
+    const fetcMotorbike = async () => {
       try {
-        const response = await apiClient.get(`/api/motorbike/${booking.motorbikeId}`);
-        setMotorbikeName(`${response.data.model.modelName} ${response.data.yearOfManufacture}`);
-        setLessorName(`${response.data.user.firstName} ${response.data.user.lastName}`);
+        const response = await apiClient.get(
+          `/api/motorbike/${booking.motorbikeId}`
+        );
+        setMotorbikeName(
+          `${response.data.model.modelName} ${response.data.yearOfManufacture}`
+        );
+        setLessorName(
+          `${response.data.user.firstName} ${response.data.user.lastName}`
+        );
         setUrlImage(response.data.motorbikeImages[0].url);
 
-        try {
-          const response1 = await apiClient.get(`/api/motorbike/existMotorbikeByUserId/${booking.motorbikeId}/${userData.userId}`);
-          setMotorbike(response1.data);
-        } catch (error) {
-          if (error.response && error.response.status === 404) {
-            console.log("Motorbike not found for the given user");
-            setMotorbike(null); // or handle the case when motorbike is not found
-          } else {
-            console.error("Error:", error);
-          }
-        }
+        const response1 = await apiClient.get(
+          `/api/motorbike/existMotorbikeByUserId/${booking.motorbikeId}/${userData.userId}`
+        );
+        setMotorbike(response1.data);
       } catch (error) {
         console.error("Error:", error);
       }
     };
 
-    fetchMotorbike();
+    fetcMotorbike();
   }, [booking.motorbikeId, userData.userId]);
 
   const openBookingDetail = () => {
@@ -143,6 +142,7 @@ const BookingCard = ({ booking }) => {
   const handleConfirm = async () => {
     try {
       const url = `/api/booking/changeStatus/${booking.bookingId}/${action}`;
+      
       await apiClient.put(url);
       setShowPopUp(false);
       setShowPopupSuccess(true); // Show success popup
