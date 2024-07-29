@@ -180,7 +180,7 @@ const UserDetail = ({ user, onClose }) => {
         </div>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="danger" onClick={onClose}>
+        <Button variant="danger" className="transition hover:scale-105" onClick={onClose}>
           Đóng
         </Button>
       </Modal.Footer>

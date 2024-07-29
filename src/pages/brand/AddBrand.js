@@ -91,10 +91,10 @@ const AddBrand = ({ showModal, setShowModal, onBrandCreated }) => {
         </form>
       </Modal.Body>
       <Modal.Footer>
-      <button  className="px-4 py-2 hover:bg-red-700 bg-red-600 text-white rounded-lg mr-2" onClick={handleModalClose}>
+      <button  className="px-4 py-2 hover:bg-red-700 bg-red-600 text-white rounded-lg mr-2 transition hover:scale-105" onClick={handleModalClose}>
           Đóng
         </button>
-        <button  className="px-4 py-2 hover:bg-blue-700 bg-blue-600 text-white rounded-lg" onClick={handleCreateBrand}>
+        <button  className="px-4 py-2 hover:bg-blue-700 bg-blue-600 text-white rounded-lg transition hover:scale-105" onClick={handleCreateBrand}>
           Lưu
         </button>
       </Modal.Footer>

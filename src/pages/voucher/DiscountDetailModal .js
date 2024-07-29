@@ -361,7 +361,7 @@ const DiscountDetailModal = ({fetchVoucher, showModalDetail, setShowModalDetail,
             <button
               type="button"
               onClick={handleClose}
-              className="hover:bg-red-700 bg-red-600 text-white px-4 py-2 rounded-lg"
+              className="hover:bg-red-700 bg-red-600 text-white px-4 py-2 rounded-lg transition hover:scale-105"
             >
               Đóng
             </button>
@@ -369,7 +369,7 @@ const DiscountDetailModal = ({fetchVoucher, showModalDetail, setShowModalDetail,
               <button
                 type="button"
                 onClick={handleEdit}
-                className="hover:bg-yellow-600 bg-yellow-500 text-white px-4 py-2 rounded-lg"
+                className="hover:bg-yellow-600 bg-yellow-500 text-white px-4 py-2 rounded-lg transition hover:scale-105"
               >
                 Chỉnh sửa
               </button>
@@ -378,7 +378,7 @@ const DiscountDetailModal = ({fetchVoucher, showModalDetail, setShowModalDetail,
               <button
                 type="submit"
                 onClick={handleSubmit}
-                className="hover:bg-blue-700 bg-blue-600 text-white px-4 py-2 rounded-lg"
+                className="hover:bg-blue-700 bg-blue-600 text-white px-4 py-2 rounded-lg transition hover:scale-105"
               >
                 Lưu
               </button>

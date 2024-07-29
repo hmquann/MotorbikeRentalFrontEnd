@@ -104,14 +104,14 @@ const EditBrand = ({
         <button
           type="button"
           onClick={() => setShowModal(false)}
-          className="px-4 py-2 hover:bg-red-700 bg-red-600 text-white rounded-lg mr-2"
+          className="px-4 py-2 hover:bg-red-700 bg-red-600 text-white rounded-lg mr-2 transition hover:scale-105"
         >
           Hủy
         </button>
         <button
           type="submit"
           onClick={handleSubmit}
-          className="px-4 py-2 hover:bg-blue-700 bg-blue-600 text-white rounded-lg"
+          className="px-4 py-2 hover:bg-blue-700 bg-blue-600 text-white rounded-lg transition hover:scale-105"
         >
           Lưu
         </button>

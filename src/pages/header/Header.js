@@ -4,34 +4,35 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import "./Header.css";
 import Avatar from "./Avatar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBell, faCaretDown, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faBell, faCaretDown } from "@fortawesome/free-solid-svg-icons";
 import NotificationDropdown from "./NotificationDropdown";
+import Login from "../login/Login";
+import Register from "../register/Register";
+import Forgotpassword from "../forgotpassword/Forgotpassword"; // Import Forgotpassword component
 
 const Header = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false); // State for Forgotpassword modal
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const [username, setUsername] = useState(""); // Khai báo state cho username
+  const [username, setUsername] = useState(""); // State for username
   const avatarClasses = "w-10 h-10 rounded-full border-2 border-yellow-400";
-  
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     const userDataString = localStorage.getItem("user");
-  
-    // Chuyển đổi chuỗi JSON thành đối tượng JavaScript
+
+    // Parse JSON string to JavaScript object
     const userData = JSON.parse(userDataString);
 
-    // Lấy ra username từ đối tượng userData
-    userData
-      ? setUsername(userData.firstName + " " + userData.lastName)
-      : setUsername("");
+    // Get username from userData object
+    userData ? setUsername(userData.firstName + " " + userData.lastName) : setUsername("");
     setIsLoggedIn(!!token);
   }, [location]);
 
-  // const handleLogout = () => {
-  //   setShowLogoutModal(true);
-  // };
   const handleAccount = () => {
     navigate("/menu");
   };
@@ -39,12 +40,45 @@ const Header = () => {
   const handleConfirmLogout = () => {
     localStorage.clear();
     setIsLoggedIn(false);
-    navigate("");
+    navigate("/homepage");
     setShowLogoutModal(false);
   };
 
   const handleCancelLogout = () => {
     setShowLogoutModal(false);
+  };
+
+  const handleLoginOpen = () => {
+    setShowLoginModal(true);
+  };
+  
+  const handleRegisterOpen = () => {
+    setShowRegister(true);
+  };
+
+  const handleLoginClose = () => {
+    setShowLoginModal(false);
+  };
+
+  const handleLoginSuccess = () => {
+    setShowLoginModal(false);
+    setIsLoggedIn(true);
+  };
+
+  const handleShowRegister = () => {
+    setShowLoginModal(false);
+    setShowRegister(true);
+  };
+
+  const handleShowLogin = () => {
+    setShowLoginModal(true);
+    setShowRegister(false);
+    setShowForgotPassword(false); 
+  };
+
+  const handleForgotPasswordOpen = () => {
+    setShowLoginModal(false);
+    setShowForgotPassword(true);
   };
 
   return (
@@ -68,9 +102,6 @@ const Header = () => {
             </Nav.Link>
             <NotificationDropdown />
             {isLoggedIn ? (
-              // <Nav.Link onClick={handleLogout} className="nav-link">
-              //   Logout
-              // </Nav.Link>
               <div
                 className="flex items-center cursor-pointer"
                 onClick={handleAccount}
@@ -88,10 +119,10 @@ const Header = () => {
               </div>
             ) : (
               <>
-                <Nav.Link as={Link} to="/register" className="nav-link">
+                <Nav.Link as={Link} onClick={handleRegisterOpen} className="nav-link">
                   Register
                 </Nav.Link>
-                <Nav.Link as={Link} to="/login" className="nav-link">
+                <Nav.Link as={Link} to="#" className="nav-link" onClick={handleLoginOpen}>
                   Login
                 </Nav.Link>
               </>
@@ -99,6 +130,29 @@ const Header = () => {
           </Nav>
         </nav>
       </header>
+      {showLoginModal && (
+        <Login
+          show={showLoginModal}
+          handleClose={handleLoginClose}
+          onLoginSuccess={handleLoginSuccess}
+          showRegister={handleShowRegister}
+          showForgotPassword={handleForgotPasswordOpen} 
+        />
+      )}
+      {showRegister && (
+        <Register
+          show={showRegister}
+          handleClose={() => setShowRegister(false)}
+          showLogin={handleShowLogin}
+        />
+      )}
+      {showForgotPassword && (
+        <Forgotpassword
+          show={showForgotPassword}
+          handleClose={() => setShowForgotPassword(false)} 
+          showLogin={handleShowLogin}
+        />
+      )}
     </>
   );
 };
