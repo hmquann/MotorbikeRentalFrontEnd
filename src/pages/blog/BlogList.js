@@ -4,6 +4,8 @@ import BlogCard from "./BlogCard";
 import BlogEditor from "./BlogEditor";
 import { useNavigate } from "react-router-dom"; // Adjust the import path as necessary
 import PopUpSuccess from "./PopUpSuccess";
+import apiClient from "../../axiosConfig";
+
 
 const BlogList = () => {
   const [blogs, setBlogs] = useState([]);
@@ -13,8 +15,8 @@ const BlogList = () => {
 
   const fetchBlogs = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:8080/api/blogs/getAllBlogs"
+      const response = await apiClient.get(
+        "/api/blogs/getAllBlogs"
       );
       const sortedBlogs = response.data.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)

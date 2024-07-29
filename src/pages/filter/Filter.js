@@ -7,6 +7,7 @@ import MotorbikeList from '../hompage/MotorbikeList';
 import MotorbikeSchedulePopUp from '../booking/schedule/MotorbikeSchedulePopUp';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
+import apiClient from '../../axiosConfig';
 const buttonClasses =
 "px-4 py-2 rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105";
 const textClasses = "text-zinc-600 dark:text-zinc-300";
@@ -188,7 +189,7 @@ const Filter = () => {
     setSchedulePopUp(true)
   }
   useEffect(() => {
-    axios.get('http://localhost:8080/api/brand/getAllBrand')
+    apiClient.get('/api/brand/getAllBrand')
       .then(response => setBrands(response.data))
       .catch(error => console.error('Error fetching other entities 1:', error));
   }, []);
@@ -324,7 +325,7 @@ const Filter = () => {
     }
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:8080/api/motorbike/filter', newFilterList, {
+      const response = await apiClient.post('/api/motorbike/filter', newFilterList, {
         headers: {
           'Content-Type': 'application/json',
         },

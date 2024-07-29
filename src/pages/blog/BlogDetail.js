@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import dayjs from "dayjs";
+import apiClient from "../../axiosConfig";
 
 const BlogDetail = () => {
   const { id } = useParams();
@@ -10,9 +11,7 @@ const BlogDetail = () => {
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:8080/api/blogs/getBlog/${id}`
-        );
+        const response = await apiClient.get(`/api/blogs/getBlog/${id}`);
         setBlog(response.data);
       } catch (error) {
         console.error("Error fetching blog:", error);

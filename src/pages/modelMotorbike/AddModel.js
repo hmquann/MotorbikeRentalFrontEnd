@@ -3,6 +3,7 @@ import axios from "axios";
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { Form, FloatingLabel } from "react-bootstrap";
+import apiClient from "../../axiosConfig";
 
 const inputClasses = "mt-1 block w-full p-2 border border-zinc-300 rounded-md dark:text-green-800 font-medium";
 const labelClasses = "block text-md font-bold text-slate-500 dark:text-neutral-300";
@@ -27,8 +28,8 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
   useEffect(() => {
     const fetchBrands = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:8080/api/brand/getAllBrand"
+        const response = await apiClient.get(
+          "/api/brand/getAllBrand"
         );
         setBrands(response.data);
       } catch (error) {
@@ -42,8 +43,8 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
   useEffect(() => {
     const fetchFuelTypes = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:8080/api/model/fuelTypes"
+        const response = await apiClient.get(
+          "/api/model/fuelTypes"
         );
         setFuelTypes(response.data);
       } catch (error) {
@@ -57,8 +58,8 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
   useEffect(() => {
     const fetchModelTypes = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:8080/api/model/modelTypes"
+        const response = await apiClient.get(
+          "/api/model/modelTypes"
         );
         setModelTypes(response.data);
       } catch (error) {
@@ -120,8 +121,8 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
       setErrorsMess("Hãy điền đủ thông tin.");
       return;
     }
-    axios
-      .post("http://localhost:8080/api/model/addModel", {
+    apiClient
+      .post("/api/model/addModel", {
         modelName: formData.modelName,
         cylinderCapacity: formData.cylinderCapacity,
         fuelType: formData.fuelType,

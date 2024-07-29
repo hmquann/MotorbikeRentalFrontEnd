@@ -16,6 +16,7 @@ import PopUpConfirm from "./PopUpConfirm";
 import PopUpSuccess from "./PopUpSuccess";
 import { useNavigate } from "react-router-dom";
 import FeedbackModal from "../booking/FeedbackModal";
+import apiClient from "../../axiosConfig";
 
 const BookingCard = ({ booking }) => {
   const [motorbikeName, setMotorbikeName] = useState();
@@ -74,29 +75,30 @@ const BookingCard = ({ booking }) => {
 
   const [motorbike, setMotorbike] = useState();
   useEffect(() => {
-    const fetcMotorbike = async () => {
+    const fetchMotorbike = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:8080/api/motorbike/${booking.motorbikeId}`
-        );
-        setMotorbikeName(
-          `${response.data.model.modelName} ${response.data.yearOfManufacture}`
-        );
-        setLessorName(
-          `${response.data.user.firstName} ${response.data.user.lastName}`
-        );
+        const response = await apiClient.get(`/api/motorbike/${booking.motorbikeId}`);
+        setMotorbikeName(`${response.data.model.modelName} ${response.data.yearOfManufacture}`);
+        setLessorName(`${response.data.user.firstName} ${response.data.user.lastName}`);
         setUrlImage(response.data.motorbikeImages[0].url);
 
-        const response1 = await axios.get(
-          `http://localhost:8080/api/motorbike/existMotorbikeByUserId/${booking.motorbikeId}/${userData.userId}`
-        );
-        setMotorbike(response1.data);
+        try {
+          const response1 = await apiClient.get(`/api/motorbike/existMotorbikeByUserId/${booking.motorbikeId}/${userData.userId}`);
+          setMotorbike(response1.data);
+        } catch (error) {
+          if (error.response && error.response.status === 404) {
+            console.log("Motorbike not found for the given user");
+            setMotorbike(null); // or handle the case when motorbike is not found
+          } else {
+            console.error("Error:", error);
+          }
+        }
       } catch (error) {
         console.error("Error:", error);
       }
     };
 
-    fetcMotorbike();
+    fetchMotorbike();
   }, [booking.motorbikeId, userData.userId]);
 
   const openBookingDetail = () => {
@@ -140,8 +142,8 @@ const BookingCard = ({ booking }) => {
 
   const handleConfirm = async () => {
     try {
-      const url = `http://localhost:8080/api/booking/changeStatus/${booking.bookingId}/${action}`;
-      await axios.put(url);
+      const url = `/api/booking/changeStatus/${booking.bookingId}/${action}`;
+      await apiClient.put(url);
       setShowPopUp(false);
       setShowPopupSuccess(true); // Show success popup
       setTimeout(() => {

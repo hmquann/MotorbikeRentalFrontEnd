@@ -7,6 +7,7 @@ import RentalDocument from "../booking/rentaldocument/RentalDocument";
 import PopUpConfirm from "./PopUpConfirm";
 import { useNavigate } from "react-router-dom";
 import PopUpSuccess from "./PopUpSuccess";
+import apiClient from "../../axiosConfig";
 
 const statusTranslations = {
   PENDING: "Chờ duyệt",
@@ -74,8 +75,8 @@ export default function Widget() {
   useEffect(() => {
     const fetchMotorbike = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:8080/api/motorbike/${booking.motorbikeId}`
+        const response = await apiClient.get(
+          `/api/motorbike/${booking.motorbikeId}`
         );
         console.log(response.data);
         setMotorbikeName(
@@ -123,8 +124,8 @@ export default function Widget() {
       } else if (action === "complete") {
         status = "DONE";
       }
-      const url = `http://localhost:8080/api/booking/changeStatus/${booking.bookingId}/${status}`;
-      await axios.put(url);
+      const url = `/api/booking/changeStatus/${booking.bookingId}/${status}`;
+      await apiClient.put(url);
       setShowPopup(false);
       setShowPopupSuccess(true); // Show success popup
       setTimeout(() => {

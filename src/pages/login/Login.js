@@ -4,9 +4,12 @@ import { Modal } from "react-bootstrap";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLock, faUser } from "@fortawesome/free-solid-svg-icons";
+import apiClient from "../../axiosConfig";
+
 
 const Login = ({ show, handleClose, onLoginSuccess, showRegister, showForgotPassword}) => {
   const apiLogin = "http://localhost:8080/api/auth/signin";
+
   const containerClasses = "bg-gray-50 font-[sans-serif]";
   const contentClasses =
     "min-h-screen flex flex-col items-center justify-center py-6 px-4";
@@ -35,7 +38,7 @@ const Login = ({ show, handleClose, onLoginSuccess, showRegister, showForgotPass
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(apiLogin, credentials, {
+      const response = await apiClient.post("/api/auth/signin", credentials, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -139,7 +142,6 @@ const Login = ({ show, handleClose, onLoginSuccess, showRegister, showForgotPass
                       <FontAwesomeIcon icon={faLock} className="w-4 h-4 absolute right-4" />
                     </div>
                   </div>
-
                   <div className="flex flex-wrap items-center justify-end gap-4">
                     <div className="text-sm">
                     <button

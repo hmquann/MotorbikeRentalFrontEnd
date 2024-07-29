@@ -3,6 +3,7 @@ import axios from "axios";
 import Modal from "react-bootstrap/Modal";
 import FloatingLabel from "react-bootstrap/FloatingLabel";
 import Form from "react-bootstrap/Form";
+import apiClient from "../../axiosConfig";
 
 const DiscountDetailModal = ({
   fetchVoucher,
@@ -148,12 +149,8 @@ const DiscountDetailModal = ({
     }
 
     if (isEditing) {
-      const response = await axios
-        .patch(
-          `http://localhost:8080/api/discounts/updateDiscount/${voucher.id}`,
-          formData
-        )
-        .then((response) => {
+        const response = await apiClient.patch(`/api/discounts/updateDiscount/${voucher.id}`, formData)
+        .then((response) =>{
           fetchVoucher();
           setIsEditing(false);
         })

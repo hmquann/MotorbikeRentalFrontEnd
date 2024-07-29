@@ -3,6 +3,7 @@ import axios from "axios";
 import Modal from "react-bootstrap/Modal";
 import FloatingLabel from "react-bootstrap/FloatingLabel";
 import Form from "react-bootstrap/Form";
+import apiClient from "../../axiosConfig";
 
 const EditBrand = ({
   showModal,
@@ -82,8 +83,8 @@ const EditBrand = ({
         origin: formData.origin,
       };
 
-      await axios.patch(
-        `http://localhost:8080/api/brand/updateBrand/${brandToEdit.brandId}`,
+      await apiClient.patch(
+        `/api/brand/updateBrand/${brandToEdit.brandId}`,
         updatedBrand
       );
 

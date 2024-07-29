@@ -4,6 +4,7 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Form from 'react-bootstrap/Form';
+import apiClient from "../../axiosConfig";
 
 const AddBrand = ({ showModal, setShowModal, onBrandCreated }) => {
   const [formData, setFormData] = useState({
@@ -65,8 +66,8 @@ const AddBrand = ({ showModal, setShowModal, onBrandCreated }) => {
     }
 
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/brand/createBrand",
+      const response = await apiClient.post(
+        "/api/brand/createBrand",
         {
           brandName: formData.brandName,
           origin: formData.brandOrigin,

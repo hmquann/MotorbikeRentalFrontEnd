@@ -4,6 +4,8 @@ import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import axios from "axios";
 import UploadAdapter from "./UploadAdapter";
 import styled from "styled-components";
+import apiClient from "../../axiosConfig";
+
 
 const BlogUpdatingWrapper = styled.div`
   max-width: 768px;
@@ -70,8 +72,8 @@ const BlogUpdating = ({ blog, onUpdate, onClose, onSuccess }) => {
     const updatedBlogData = { title, content, userId };
 
     try {
-      const response = await axios.put(
-        `http://localhost:8080/api/blogs/updateBlog/${blog.id}`,
+      const response = await apiClient.put(
+        `/api/blogs/updateBlog/${blog.id}`,
         updatedBlogData
       );
       console.log("Blog updated:", response.data);

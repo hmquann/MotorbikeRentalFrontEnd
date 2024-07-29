@@ -6,6 +6,7 @@ import WithDraw from "./WithDraw";
 import TransactionListModal from "./TransactionModal";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
+import apiClient from "../../axiosConfig";
 
 const UserWallet = () => {
   const [balance, setBalance] = useState(0);
@@ -38,8 +39,8 @@ const UserWallet = () => {
     const token = localStorage.getItem("token");
 
     try {
-      const response = await axios.get(
-        `http://localhost:8080/api/user/${userId}`,
+      const response = await apiClient.get(
+        `/api/user/${userId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -63,8 +64,8 @@ const UserWallet = () => {
     const token = localStorage.getItem("token");
 
     try {
-      const response = await axios.get(
-        `http://localhost:8080/api/transaction/${userId}`,
+      const response = await apiClient.get(
+        `/api/transaction/${userId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -87,10 +88,10 @@ const UserWallet = () => {
   const handlePayment = async (amount) => {
     const token = localStorage.getItem("token");
     const userId = JSON.parse(localStorage.getItem("user")).userId;
-    const apiPayment = `http://localhost:8080/api/payment/create_payment?id=${userId}&amount=${amount}`;
+    const apiPayment = `/api/payment/create_payment?id=${userId}&amount=${amount}`;
 
     try {
-      const response = await axios.get(apiPayment, {
+      const response = await apiClient.get(apiPayment, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -117,8 +118,8 @@ const UserWallet = () => {
     const token = localStorage.getItem("token");
     const userId = JSON.parse(localStorage.getItem("user")).userId;
     try {
-      const response = await axios.post(
-        `http://localhost:8080/api/payment/withdraw`,
+      const response = await apiClient.post(
+        `/api/payment/withdraw`,
         null,
         {
           params: {

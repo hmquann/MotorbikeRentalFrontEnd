@@ -2,8 +2,10 @@ import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Popup from "./PopUpSuccess";
+import apiClient from "../../axiosConfig";
 import { Modal } from "react-bootstrap";
 import PopupSuccess from "./PopUpSuccess";
+
 
 const modalContentClasses =
   "p-8 rounded bg-gray-50 font-[sans-serif]";
@@ -34,8 +36,8 @@ const Forgotpassword = ({ show, handleClose, showLogin }) => {
     }
     setLoading(true);
 
-    axios
-      .post("http://localhost:8080/password/forgot", null, {
+    apiClient
+      .post("/password/forgot", null, {
         params: { email: email },
         headers: {
           "Content-Type": "application/json",

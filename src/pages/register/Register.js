@@ -1,7 +1,10 @@
+
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Modal } from "react-bootstrap";
+import apiClient from "../../axiosConfig";
+
 
 const Register = ({ show, handleClose, showLogin }) => {
   const [formData, setFormData] = useState({
@@ -156,12 +159,17 @@ const Register = ({ show, handleClose, showLogin }) => {
         return;
       }
     }
-    axios
-      .post("http://localhost:8080/api/auth/signup", formData, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
+    apiClient
+      .post(
+        "/api/auth/signup",
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+
       .then((response) => {
         console.log("Data sent successfully:", response.data);
         setShowPopup(true);

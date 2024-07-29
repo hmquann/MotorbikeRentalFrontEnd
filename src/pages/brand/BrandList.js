@@ -4,6 +4,7 @@ import AddBrand from "./AddBrand";
 import EditBrand from "./EditBrand";
 import { MdOutlineAddCircleOutline } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
+import apiClient from "../../axiosConfig";
 
 
 const buttonClasses = "px-4 py-2 rounded-lg";
@@ -24,8 +25,8 @@ const BrandList = () => {
   const fetchBrands = async () => {
     setIsLoading(true)
     try {
-      const response = await axios.get(
-        `http://localhost:8080/api/brand/getAllBrand/${currentPage}/${pageSize}`
+      const response = await apiClient.get(
+        `/api/brand/getAllBrand/${currentPage}/${pageSize}`
       );
       const totalElements = response.data.totalElements;
       const totalPages = Math.ceil(totalElements / pageSize);

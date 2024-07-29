@@ -4,6 +4,7 @@ import MotorbikeSchedulePopUp from '../booking/schedule/MotorbikeSchedulePopUp';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import { useNavigate } from "react-router-dom";
+import apiClient from '../../axiosConfig';
 const formatDateTime = (dateTimeString) => {
   const date = new Date(dateTimeString);
   
@@ -110,7 +111,7 @@ const SearchMotorbike = () => {
   
       setLoading(true);
       try {
-        const response = await axios.post('http://localhost:8080/api/motorbike/filter', filterList, {
+        const response = await apiClient.post('/api/motorbike/filter', filterList, {
           headers: {
             'Content-Type': 'application/json',
           },
