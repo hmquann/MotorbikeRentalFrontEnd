@@ -111,8 +111,11 @@ const Booking = () => {
   const userDataString = localStorage.getItem("user");
   const userData = JSON.parse(userDataString);
   const userId = userData ? userData.userId : null;
-  const userName = userData.firstName + " " + userData.lastName;
-  const userEmail = userData.email;
+  const userName = userData
+    ? userData.firstName + " " + userData.lastName
+    : null;
+  const userEmail = userData ? userData.email : null;
+
   console.log(userId);
 
   const [selectedLocation, setSelectedLocation] = useState("");
@@ -384,9 +387,21 @@ const Booking = () => {
 
   const [messageLicense, setMessageLicense] = useState("");
   const [buttonLicense, setButtonLicense] = useState("");
+  const [buttonBackHomePage, setButtonBackHomePage] = useState("Chọn xe khác");
   const handleFormSubmit = async (e) => {
+    e.preventDefault();
     if (!userId) {
       handleOpenLoginModal();
+      return;
+    }
+
+    if (receiveData.userId === userId) {
+      setMessageLicense("Bạn không thể tự đặt xe của chính bạn.");
+      setButtonLicense(null);
+      setButtonBackHomePage("Chọn xe khác");
+      setShowPopUpLicense(true);
+
+      return; // Prevent further execution if this condition is met
     }
     e.preventDefault();
     try {
@@ -462,6 +477,7 @@ const Booking = () => {
         `/api/discounts/deleteDiscountByIdAndUserId/${userId}/${discount.id}`
       );
     }
+
     const response2 = await apiClient
       .post("/api/booking/create", {
         renterId: userId,
@@ -811,6 +827,7 @@ const Booking = () => {
                 onClose={() => setShowPopUpLicense(false)}
                 messageLicense={messageLicense}
                 buttonLicense={buttonLicense}
+                buttonBackHomePage="Chọn xe khác"
               />
             )}
             {showPopupSuccess && (

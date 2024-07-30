@@ -21,6 +21,7 @@ import apiClient from "../../axiosConfig";
 const BookingCard = ({ booking }) => {
   const [motorbikeName, setMotorbikeName] = useState();
   const [lessorName, setLessorName] = useState();
+  const [lessorId, setLessorId] = useState();
   const [urlImage, setUrlImage] = useState();
   const userDataString = localStorage.getItem("user");
   const userData = JSON.parse(userDataString);
@@ -86,6 +87,7 @@ const BookingCard = ({ booking }) => {
         setLessorName(
           `${response.data.user.firstName} ${response.data.user.lastName}`
         );
+        setLessorId(`${response.data.user.id}`);
         setUrlImage(response.data.motorbikeImages[0].url);
 
         const response1 = await apiClient.get(
@@ -142,8 +144,19 @@ const BookingCard = ({ booking }) => {
   const handleConfirm = async () => {
     try {
       const url = `/api/booking/changeStatus/${booking.bookingId}/${action}`;
-      
       await apiClient.put(url);
+      if (action === "DEPOSIT_MADE") {
+        const subtractMoneyUrl = `/api/payment/subtract`;
+        const addMoneyUrl = `/api/payment/add`;
+        const renterId = userData.userId; // Replace with actual user ID if different
+        const amount = (booking.totalPrice * 30) / 100; // Replace with actual amount to be subtracted
+        await apiClient.post(subtractMoneyUrl, null, {
+          params: { id: renterId, amount: amount },
+        });
+        await apiClient.post(addMoneyUrl, null, {
+          params: { id: lessorId, amount: amount },
+        });
+      }
       setShowPopUp(false);
       setShowPopupSuccess(true); // Show success popup
       setTimeout(() => {
