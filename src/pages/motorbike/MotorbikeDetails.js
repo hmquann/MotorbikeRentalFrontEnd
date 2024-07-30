@@ -9,6 +9,7 @@ import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendarDay } from "@fortawesome/free-solid-svg-icons";
 import ManageSchedulePopUp from '../booking/schedule/ManageSchedulePopUp';
+import apiClient from "../../axiosConfig";
 const inputClasses = "w-full px-3 py-2 mt-1 rounded-md bg-input text-primary-foreground";
 const labelClasses = "block text-sm font-medium";
 const buttonClasses = "px-4 py-2 rounded";
@@ -66,7 +67,7 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post(`http://localhost:8080/api/motorbike/updateMotorbike/${motorbike.id}`, updateForm);
+      const response = await apiClient.post(`/api/motorbike/updateMotorbike/${motorbike.id}`, updateForm);
       console.log('Data sent successfully', response.data);
       // You can handle success actions here
     } catch (error) {

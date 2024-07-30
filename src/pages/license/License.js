@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import apiClient from "../../axiosConfig";
 
 const cardClasses =
   "bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-md max-w-4xl mx-auto border border-zinc-300 dark:border-zinc-700 mt-8";
@@ -54,9 +55,9 @@ const License = () => {
   const [licenseNumberError, setLicenseNumberError] = useState("");
   const [birthDateError, setBirthOfDateError] = useState("");
   useEffect(() => {
-    axios
+    apiClient
       .get(
-        `http://localhost:8080/api/license/getLicenseByUserId/${user.userId}`
+        `/api/license/getLicenseByUserId/${user.userId}`
       )
       .then((response) => setLicense(response.data))
       .catch((error) => console.error("Error fetching motorbikes:", error));
@@ -76,8 +77,8 @@ const License = () => {
     if (licenseNumberError || birthDateError || !formLicenseData.licenseType||!formLicenseData.birthOfDate||!formLicenseData.licenseNumber) {
       setError("Hãy kiểm tra thông tin bạn nhập vào");
     } else {
-      axios
-        .post("http://localhost:8080/api/license/uploadLicense", formData, {
+      apiClient
+        .post("/api/license/uploadLicense", formData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },

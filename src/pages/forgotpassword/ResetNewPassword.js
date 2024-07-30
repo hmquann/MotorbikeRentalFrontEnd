@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
-import Popup from "./PopUpSuccess";
+import apiClient from "../../axiosConfig";
 import PopupSuccess from "./PopUpSuccess";
+
 
 const PasswordResetForm = () => {
   const [newPassword, setNewPassword] = useState("");
@@ -69,9 +70,9 @@ const PasswordResetForm = () => {
       return;
     }
 
-    axios
+    apiClient
       .post(
-        `http://localhost:8080/password/reset/${token}`,
+        `/password/reset/${token}`,
         {
           password: newPassword,
         },

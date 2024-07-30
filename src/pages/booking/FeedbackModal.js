@@ -3,6 +3,7 @@ import { Rating } from '@mui/material';
 import axios from 'axios';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
+import apiClient from '../../axiosConfig';
 
 const cardClass = "max-w-sm mx-auto p-3 bg-card text-card-foreground rounded-lg shadow-md";
 const buttonClass = "py-2 px-4";
@@ -19,8 +20,8 @@ const FeedbackModal = ({ show, onHide, bookingId, onFeedbackSubmitted }) => {
     const checkFeedbackStatus = async () => {
       try {
         const token = localStorage.getItem('token'); // Hoặc cách bạn lưu token
-        const response = await axios.get(
-          `http://localhost:8080/api/booking/checkFeedbackStatus/${bookingId}`,
+        const response = await apiClient.get(
+          `/api/booking/checkFeedbackStatus/${bookingId}`,
           {
             headers: {
               'Authorization': `Bearer ${token}`
@@ -44,8 +45,8 @@ const FeedbackModal = ({ show, onHide, bookingId, onFeedbackSubmitted }) => {
 
   const handleSendReview = async () => {
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/feedback/sendFeedback",
+      const response = await apiClient.post(
+        "/api/feedback/sendFeedback",
         { bookingId, feedbackContent, rate: rating },
         {
           headers: {

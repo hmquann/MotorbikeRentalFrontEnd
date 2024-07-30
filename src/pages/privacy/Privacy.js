@@ -1,8 +1,9 @@
 import React from "react";
-import PrivacyList from './PrivacyList';  // Import the PolicyList component
+import PrivacyList from "./PrivacyList"; // Import the PolicyList component
 
 // Shared Tailwind CSS classes
-const cardContainerClass = "dark:bg-teal-50 dark:bg-zinc-800 p-4 rounded-lg shadow-md";
+const cardContainerClass =
+  "dark:bg-teal-50 dark:bg-zinc-800 p-4 rounded-lg shadow-md";
 const textClass = "text-zinc-800 dark:text-dark-300";
 
 const Privacy = () => {
@@ -11,9 +12,10 @@ const Privacy = () => {
       <div className="max-w-7xl mx-auto">
         <div className="relative">
           <img
-            src="https://placehold.co/1200x400"
+            src="https://imgcdnblog.carbay.com/wp-content/uploads/2019/12/16150859/Ducati-Streetfighter-v4s2.jpg"
             alt="Hero Image"
-            className="w-full h-64 object-cover rounded-lg"
+            className="w-full h-96 object-cover rounded-b-lg shadow-md"
+            crossorigin="anonymous"
           />
           <div className="absolute inset-0 flex items-center justify-center">
             <h1 className="text-white text-3xl md:text-5xl font-bold">
@@ -42,17 +44,17 @@ const Privacy = () => {
 
         <div className="flex flex-col md:flex-row mt-6">
           <div className="md:w-1/4">
-            <PrivacyList />  {/* Use the PolicyList component here */}
+            <PrivacyList /> {/* Use the PolicyList component here */}
           </div>
 
           <div className="md:w-3/4 md:ml-6">
-            <div >
+            <div>
               <h2 className="text-2xl font-bold mb-4">Chính sách & Quy định</h2>
               <h3 className="text-xl font-semibold mb-2">
                 1. Trách nhiệm của khách thuê xe và chủ xe trong giao dịch cho
                 thuê xe tự lái
               </h3>
-              <p className={textClass} >
+              <p className={textClass}>
                 Mục đích chính của các Chính sách & Quy định này là xây dựng các
                 nguyên tắc cho việc thuê xe tự lái tại Việt Nam. Vì vậy, để đảm
                 bảo các giao dịch thuê xe trong cộng đồng được diễn ra một cách
@@ -61,7 +63,6 @@ const Privacy = () => {
                 nhiệm. Đây là những nguyên tắc cơ bản mà Motio và các khách hàng
                 cam kết sẽ thực hiện và tuân thủ một cách nghiêm túc và có trách
                 nhiệm.
-
               </p>
               <ul className="list-disc list-inside mt-4 text-zinc-700 dark:text-zinc-300">
                 <li>

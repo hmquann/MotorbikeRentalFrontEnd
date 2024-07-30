@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import ModalImage from "react-modal-image";
+import apiClient from "../../axiosConfig";
 
 // import ImageWithLightbox from "./ImageWithLightBox";
 
@@ -27,8 +28,8 @@ const ApproveLicense = () => {
   const isAdmin = JSON.parse(localStorage.getItem("roles")).includes("ADMIN");
   const fetchLicenses = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:8080/api/license/getAllLicense/${currentPage}/${pageSize}`
+      const response = await apiClient.get(
+        `/api/license/getAllLicense/${currentPage}/${pageSize}`
       );
       const totalElements = response.data.totalElements;
       const totalPages = Math.ceil(totalElements / pageSize);
@@ -103,8 +104,8 @@ const ApproveLicense = () => {
     e.preventDefault();
     const action =
       actionType === "approve"
-        ? "http://localhost:8080/api/license/approve"
-        : "http://localhost:8080/api/license/reject";
+        ? "https://rentalmotorbikewebapp.azurewebsites.net/api/license/approve"
+        : "https://rentalmotorbikewebapp.azurewebsites.net/api/license/reject";
         if(e.target.name==="approve"){
     fetch(action,{
       method: "POST",

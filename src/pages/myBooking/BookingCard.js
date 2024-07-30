@@ -16,6 +16,7 @@ import PopUpConfirm from "./PopUpConfirm";
 import PopUpSuccess from "./PopUpSuccess";
 import { useNavigate } from "react-router-dom";
 import FeedbackModal from "../booking/FeedbackModal";
+import apiClient from "../../axiosConfig";
 
 const BookingCard = ({ booking }) => {
   const [motorbikeName, setMotorbikeName] = useState();
@@ -76,8 +77,8 @@ const BookingCard = ({ booking }) => {
   useEffect(() => {
     const fetcMotorbike = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:8080/api/motorbike/${booking.motorbikeId}`
+        const response = await apiClient.get(
+          `/api/motorbike/${booking.motorbikeId}`
         );
         setMotorbikeName(
           `${response.data.model.modelName} ${response.data.yearOfManufacture}`
@@ -87,8 +88,8 @@ const BookingCard = ({ booking }) => {
         );
         setUrlImage(response.data.motorbikeImages[0].url);
 
-        const response1 = await axios.get(
-          `http://localhost:8080/api/motorbike/existMotorbikeByUserId/${booking.motorbikeId}/${userData.userId}`
+        const response1 = await apiClient.get(
+          `/api/motorbike/existMotorbikeByUserId/${booking.motorbikeId}/${userData.userId}`
         );
         setMotorbike(response1.data);
       } catch (error) {
@@ -124,7 +125,12 @@ const BookingCard = ({ booking }) => {
         setAction("DONE");
         break;
       case "deposit_made":
-        setMessageConfirm("Bạn có chắc chắn muốn đặt cọc?");
+        setMessageConfirm(
+          `Bạn có chắc chắn muốn thanh toán ${(
+            (booking.totalPrice * 30) /
+            100
+          ).toLocaleString("vi-VN")}đ tiền cọc?`
+        );
         setAction("DEPOSIT_MADE");
         break;
       default:
@@ -135,8 +141,9 @@ const BookingCard = ({ booking }) => {
 
   const handleConfirm = async () => {
     try {
-      const url = `http://localhost:8080/api/booking/changeStatus/${booking.bookingId}/${action}`;
-      await axios.put(url);
+      const url = `/api/booking/changeStatus/${booking.bookingId}/${action}`;
+      
+      await apiClient.put(url);
       setShowPopUp(false);
       setShowPopupSuccess(true); // Show success popup
       setTimeout(() => {
