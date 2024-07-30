@@ -63,12 +63,12 @@ const Login = ({ show, handleClose, onLoginSuccess, showRegister, showForgotPass
         console.error("No roles found in the response:", data.roles);
       }
 
-      if (data.roles.includes("ADMIN")) {
-        navigate("/menu/dashboard");
-      } else if (data.roles && data.roles.includes("USER", "LESSOR")) {
-        navigate("/homepage");
-      }
-      onLoginSuccess();
+      // if (data.roles && data.roles.includes("ADMIN")) {
+      //   navigate("/menu/dashboard");
+      // } else if (data.roles && data.roles.includes("USER", "LESSOR")) {
+      //   navigate("/homepage");
+      // }
+      onLoginSuccess(userInfor);
     } catch (error) {
       if (error.response) {
         const { status, data } = error.response;
