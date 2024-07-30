@@ -361,6 +361,7 @@ export default function Widget() {
             </div>
             {showPopup && (
               <PopUpConfirm
+                show={showPopup}
                 message={popupContent}
                 onConfirm={handleConfirm}
                 onCancel={() => setShowPopup(false)}
