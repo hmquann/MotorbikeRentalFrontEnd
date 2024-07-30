@@ -107,9 +107,11 @@ const Booking = () => {
 
   const userDataString = localStorage.getItem("user");
   const userData = JSON.parse(userDataString);
-  const userId = userData.userId;
-  const userName = userData.firstName + " " + userData.lastName;
-  const userEmail = userData.email;
+  const userId = userData ? userData.userId : null;
+  const userName = userData
+    ? userData.firstName + " " + userData.lastName
+    : null;
+  const userEmail = userData ? userData.email : null;
   console.log(userId);
 
   const [selectedLocation, setSelectedLocation] = useState("");
@@ -798,7 +800,7 @@ const Booking = () => {
                 onClose={() => setShowPopUpLicense(false)}
                 messageLicense={messageLicense}
                 buttonLicense={buttonLicense}
-                buttonBackHomePage = "Chọn xe khác"
+                buttonBackHomePage="Chọn xe khác"
               />
             )}
             {showPopupBooking && (
