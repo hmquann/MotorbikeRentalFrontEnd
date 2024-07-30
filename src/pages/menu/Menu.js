@@ -24,15 +24,23 @@ const Menu = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const navigate = useNavigate();
   const [userRole, setUserRole] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const roles = localStorage.getItem("roles");
-    console.log(roles);
-    setUserRole(roles);
-  }, []);
+    const token = localStorage.getItem("token");
 
-  const isAdmin = userRole.includes("ADMIN");
-  const isLessor = userRole.includes("LESSOR");
+    if (token) {
+      setUserRole(roles || "");
+      setIsAuthenticated(true);
+    } else {
+      setIsAuthenticated(false);
+      navigate("/homepage"); 
+    }
+  }, [navigate]);
+
+  const isAdmin = userRole && userRole.includes("ADMIN");
+  const isLessor = userRole && userRole.includes("LESSOR");
   const [username, setUsername] = useState("");
   const [room, setRoom] = useState("");
 
@@ -52,6 +60,8 @@ const Menu = () => {
 
   return (
     <div className="menu bg-zinc-100">
+       {isAuthenticated && (
+        <>
       <div className="menu-left">
         <ul>
         {isAdmin && (
@@ -227,6 +237,8 @@ const Menu = () => {
           </div>
         </div>
       </Modal>
+      </>
+    )}
     </div>
   );
 };

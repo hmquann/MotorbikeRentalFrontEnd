@@ -16,6 +16,7 @@ const Header = () => {
   const [showRegister, setShowRegister] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false); // State for Forgotpassword modal
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [redirectPath, setRedirectPath] = useState("/");
   const location = useLocation();
   const navigate = useNavigate();
   const [username, setUsername] = useState(""); // State for username
@@ -49,6 +50,8 @@ const Header = () => {
   };
 
   const handleLoginOpen = () => {
+    const currentPath = window.location.pathname;
+    setRedirectPath(currentPath);
     setShowLoginModal(true);
   };
   
@@ -60,9 +63,18 @@ const Header = () => {
     setShowLoginModal(false);
   };
 
-  const handleLoginSuccess = () => {
+
+  const handleLoginSuccess = (userInfo) => {
     setShowLoginModal(false);
     setIsLoggedIn(true);
+
+    if (userInfo.roles.includes("ADMIN")) {
+      navigate("/menu/dashboard");
+    } else if (userInfo.roles.includes("USER") || userInfo.roles.includes("LESSOR")) {
+      navigate(redirectPath || "/homepage");
+    } else {
+      navigate("/homepage");
+    }
   };
 
   const handleShowRegister = () => {

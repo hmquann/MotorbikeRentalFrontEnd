@@ -23,6 +23,8 @@ import PopUpBookingSuccess from "./PopUpBookingSuccess";
 import { format } from "date-fns";
 import PopUpConfirmBooking from "./popUpConfirm/PopUpConfirmBooking";
 import PopUpVoucher from "./popUpVoucher/PopUpVoucher";
+import Login from "../login/Login";
+import PopupSuccess from "../myBooking/PopUpSuccess";
 import PopUpPricePerDay from "./popUpPricePerDay/PopUpPricePerDay";
 import apiClient from "../../axiosConfig";
 const sharedClasses = {
@@ -101,7 +103,8 @@ const Booking = () => {
     return parts.length > 2 ? parts.slice(2).join(", ") : parts.join(", ");
   };
   const location = useLocation();
-  const receiveData = JSON.parse(localStorage.getItem("selectedMotorbike"));
+  const selectedMotorbike = localStorage.getItem("selectedMotorbike");
+  const receiveData = selectedMotorbike ? JSON.parse(selectedMotorbike) : {};
   const motorbikeId = receiveData ? receiveData.id : null;
   console.log(receiveData);
 
@@ -112,6 +115,7 @@ const Booking = () => {
     ? userData.firstName + " " + userData.lastName
     : null;
   const userEmail = userData ? userData.email : null;
+
   console.log(userId);
 
   const [selectedLocation, setSelectedLocation] = useState("");
@@ -126,6 +130,16 @@ const Booking = () => {
   const [totalPrice, setTotalPrice] = useState(receiveData.price);
   const [deliveryFee, setDeliveryFee] = useState(0);
   const [rentalDays, setRentalDays] = useState(1);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [redirectUrl, setRedirectUrl] = useState(null);
+  const [showPopupSuccess, setShowPopupSuccess] = useState(false);
+
+  const handleOpenLoginModal = () => {
+    const currentPath = window.location.pathname;
+    setRedirectUrl(currentPath);
+    setShowLoginModal(true);
+  };
+
   const [showPopUpPricePerDay, setShowPopUpPricePerDay] = useState(false);
   const handleClosePopup = () => {
     setShowPopUp(false);
@@ -377,7 +391,7 @@ const Booking = () => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     if (!userId) {
-      navigate("/login");
+      handleOpenLoginModal();
       return;
     }
 
@@ -475,6 +489,7 @@ const Booking = () => {
         receiveLocation: gettedLocation,
       })
       .then(() => {
+        setShowPopupSuccess(true); // Hiển thị popup khi thành công
         const response3 = apiClient.post(
           "/api/booking/sendEmailSuccessBooking",
           {
@@ -503,7 +518,7 @@ const Booking = () => {
         console.log(gettedLocation);
         setShowPopupBooking(true); // Hiển thị popup khi thành công
         setTimeout(() => {
-          setShowPopupBooking(false); // Ẩn popup sau 3 giây
+          setShowPopupSuccess(false); // Ẩn popup sau 3 giây
           navigate("/menu/myBooking"); //chuyển sang trang mybooking sau khi thông báo
         }, 3000);
       });
@@ -513,6 +528,18 @@ const Booking = () => {
   const handleCancelBooking = () => {
     setShowConfirmPopup(false);
   };
+
+  const handleLoginSuccess = (userInfor) => {
+    localStorage.setItem("user", JSON.stringify(userInfor));
+    setShowLoginModal(false);
+    window.location.reload(); // Reload page to keep the current state
+  };
+
+  useEffect(() => {
+    if (userId) {
+      setShowLoginModal(false);
+    }
+  }, [userId]);
 
   return (
     <div>
@@ -627,7 +654,7 @@ const Booking = () => {
                 Chủ xe thân thiện hỗ trợ nhiệt tình
               </p>
             </div>
-            <RentalDocument />
+            {/* <RentalDocument /> */}
             {/* Other amenities section */}
             <div
               className={`${sharedClasses.grid} ${sharedClasses.gridCols4} ${sharedClasses.gap4}`}
@@ -803,8 +830,12 @@ const Booking = () => {
                 buttonBackHomePage="Chọn xe khác"
               />
             )}
-            {showPopupBooking && (
-              <PopUpBookingSuccess message="Your request booking sent successfully!" />
+            {showPopupSuccess && (
+                 <PopupSuccess
+                 show={showPopupSuccess}
+                 onHide={() => setShowPopupSuccess(false)}
+                 message="Yêu cầu đặt xe của bạn đã được gửi đi !"
+                 />
             )}
             {showPopUp && (
               <PopUpLocation
@@ -820,6 +851,13 @@ const Booking = () => {
                 discounts={discounts}
                 discountValue={handleDiscountValue}
               ></PopUpVoucher>
+            )}
+            {showLoginModal && (
+              <Login
+                show={showLoginModal}
+                handleClose={() => setShowLoginModal(false)}
+                onLoginSuccess={handleLoginSuccess}
+              />
             )}
             {showPopUpPricePerDay && (
               <PopUpPricePerDay
