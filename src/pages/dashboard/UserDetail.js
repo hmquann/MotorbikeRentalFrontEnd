@@ -27,9 +27,31 @@ const UserDetail = ({ user, onClose }) => {
   const mapRoles = (roles) => {
     return roles.map(role => roleMap[role] || role).join(", ");
   };
+  const translateStatus = (status) => {
+    switch (status) {
+      case 'PENDING':
+        return 'Đang chờ xử lý';
+      case 'PENDING_DEPOSIT':
+        return 'Đang chờ đặt cọc';
+      case 'DEPOSIT_MADE':
+        return 'Đã đặt cọc';
+      case 'BUSY':
+        return 'Đang bận';
+      case 'RENTING':
+        return 'Đang thuê';
+      case 'REJECTED':
+        return 'Đã từ chối';
+      case 'CANCELED':
+        return 'Đã hủy';
+      case 'DONE':
+        return 'Đã hoàn thành';
+      default:
+        return 'Không xác định';
+    }
+  };
 
   return (
-    <Modal show onHide={onClose} size="xl" >
+    <Modal show onHide={onClose} size="xl" className="font-manrope" >
       <Modal.Body>
         <div className="flex flex-col md:flex-row w-full gap-4 shadow-lg rounded-lg">
           {/* Left Side: User Information */}
@@ -154,16 +176,16 @@ const UserDetail = ({ user, onClose }) => {
                         {user.bookings.map((booking) => (
                           <li key={booking.id} className="border-b border-gray-300 pb-2">
                             <p>
-                              <strong>Start Date:</strong> {format(new Date(booking.startDate), 'dd-MM-yyyy HH:mm:ss')}
+                              <strong>Ngày bắt đầu:</strong> {format(new Date(booking.startDate), 'dd-MM-yyyy HH:mm:ss')}
                             </p>
                             <p>
-                              <strong>End Date:</strong> {format(new Date(booking.endTime), 'dd-MM-yyyy HH:mm:ss')}
+                              <strong>Ngày kết thúc:</strong> {format(new Date(booking.endTime), 'dd-MM-yyyy HH:mm:ss')}
                             </p>
                             <p>
-                              <strong>Price:</strong> {booking.totalPrice} VND
+                              <strong>Giá tiền:</strong> {booking.totalPrice.toLocaleString()} VND
                             </p>
                             <p>
-                              <strong>Status:</strong> {booking.status}
+                            <strong>Trạng thái:</strong> <span className="text-red-600 font-bold">{translateStatus(booking.status)}</span>
                             </p>
                             {/* Add more booking details as needed */}
                           </li>

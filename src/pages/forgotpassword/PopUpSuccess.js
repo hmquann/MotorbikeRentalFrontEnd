@@ -4,7 +4,7 @@ import { Modal } from 'react-bootstrap';
 const PopupSuccess = ({ show, onHide, message }) => {
   return (
     <Modal show={show} onHide={onHide} >
-      <div className="p-8 rounded bg-gray-50 font-[sans-serif]">
+      <div className="p-8 rounded bg-gray-50 font-manrope">
         <h2 className="text-gray-800 text-center text-2xl font-bold">
           Thành công
         </h2>

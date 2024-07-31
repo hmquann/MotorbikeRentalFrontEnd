@@ -6,6 +6,7 @@ import { Modal } from "react-bootstrap";
 import apiClient from "../../axiosConfig";
 
 
+const inputClasses = "w-full text-gray-800 font-semibold text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600"
 const Register = ({ show, handleClose, showLogin }) => {
   const [formData, setFormData] = useState({
     firstname: "",
@@ -224,7 +225,7 @@ const Register = ({ show, handleClose, showLogin }) => {
 
   return (
     <Modal show={show} onHide={handleClose} centered>
-      <div className="p-8 rounded bg-gray-50 font-[sans-serif]">
+      <div className="p-8 rounded bg-gray-50 font-manrope">
         {showForm && (
           <>
             <h2 className="text-gray-800 text-center text-2xl font-bold">
@@ -239,7 +240,7 @@ const Register = ({ show, handleClose, showLogin }) => {
                   name="firstname"
                   type="text"
                   required
-                  className="w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600"
+                  className={inputClasses}
                   placeholder="Nhập họ"
                   value={formData.firstname}
                   onChange={handleChange}
@@ -256,7 +257,7 @@ const Register = ({ show, handleClose, showLogin }) => {
                   name="lastname"
                   type="text"
                   required
-                  className="w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600"
+                  className={inputClasses}
                   placeholder="Nhập tên"
                   value={formData.lastname}
                   onChange={handleChange}
@@ -273,7 +274,7 @@ const Register = ({ show, handleClose, showLogin }) => {
                   name="phone"
                   type="tel"
                   required
-                  className="w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600"
+                  className={inputClasses}
                   placeholder="Nhập số điện thoại"
                   value={formData.phone}
                   onChange={handleChange}
@@ -288,7 +289,7 @@ const Register = ({ show, handleClose, showLogin }) => {
                   name="email"
                   type="email"
                   required
-                  className="w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600"
+                  className={inputClasses}
                   placeholder="Nhập email"
                   value={formData.email}
                   onChange={handleChange}
@@ -302,7 +303,7 @@ const Register = ({ show, handleClose, showLogin }) => {
                 <select
                   name="gender"
                   required
-                  className="w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600"
+                  className={inputClasses}
                   value={formData.gender}
                   onChange={handleChange}
                 >
@@ -319,7 +320,7 @@ const Register = ({ show, handleClose, showLogin }) => {
                   name="password"
                   type="password"
                   required
-                  className="w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600"
+                  className={inputClasses}
                   placeholder="Nhập mật khẩu"
                   value={formData.password}
                   onChange={handleChange}
@@ -336,7 +337,7 @@ const Register = ({ show, handleClose, showLogin }) => {
                   name="repassword"
                   type="password"
                   required
-                  className="w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600"
+                  className={inputClasses}
                   placeholder="Nhập lại mật khẩu"
                   value={repassword}
                   onChange={handleChange}

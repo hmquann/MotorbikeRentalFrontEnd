@@ -156,7 +156,7 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
   };
 
   return (
-    <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
+    <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" className="font-manrope">
       <Modal.Header closeButton>
         <Modal.Title>Thêm mẫu xe</Modal.Title>
       </Modal.Header>

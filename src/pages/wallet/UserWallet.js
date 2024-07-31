@@ -190,8 +190,8 @@ const UserWallet = () => {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto bg-white rounded-xl dark:bg-zinc-800">
-      <h1 className="text-3xl font-bold">Ví của tôi</h1>
+    <div className="p-6 max-w-4xl mx-auto bg-white rounded-xl font-manrope">
+      <h1 className="text- font-bold">Ví của tôi</h1>
       <p className="mt-4 text-lg font-medium">Số dư khả dụng:</p>
       <p className="text-3xl text-green-600 font-base">
         {balance.toLocaleString()} VND
@@ -299,7 +299,7 @@ const UserWallet = () => {
         </Modal.Footer>
       </Modal>
       {error && (
-        <div className="text-red-500 font-medium mt-2 ml-10">{error}</div>
+        <div className="text-red-500 font-semibold mt-2 ml-10">{error}</div>
       )}
     </div>
   );

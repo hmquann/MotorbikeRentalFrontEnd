@@ -46,8 +46,8 @@ const MyBooking = () => {
   }, [showFilterPopup]);
 
   return (
-    <div className="containerMyBooking mx-auto my-8">
-      <h1 className="text-3xl font-bold mb-4 text-left">Chuyến của tôi</h1>
+    <div className="containerMyBooking mx-auto my-8 font-manrope">
+      <h1 className="text-4xl font-extrabold mb-4 text-left">Chuyến của tôi</h1>
       <div className="flex justify-between items-center mb-4">
         <div className="flex" style={{ color: "#767676" }}>
           <button

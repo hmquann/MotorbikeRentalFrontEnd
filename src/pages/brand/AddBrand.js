@@ -86,7 +86,7 @@ const AddBrand = ({ showModal, setShowModal, onBrandCreated }) => {
   };
 
   return (
-    <Modal show={showModal} onHide={handleModalClose} backdrop="static" >
+    <Modal show={showModal} onHide={handleModalClose} backdrop="static" className="font-manrope" >
       <Modal.Header closeButton>
         <Modal.Title>Thêm thương hiệu</Modal.Title>
       </Modal.Header>

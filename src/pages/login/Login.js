@@ -4,18 +4,15 @@ import { Modal } from "react-bootstrap";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLock, faUser } from "@fortawesome/free-solid-svg-icons";
-import apiClient from "../../axiosConfig";
-
 
 const Login = ({ show, handleClose, onLoginSuccess, showRegister, showForgotPassword}) => {
   const apiLogin = "http://localhost:8080/api/auth/signin";
-
   const containerClasses = "bg-gray-50 font-[sans-serif]";
   const contentClasses =
     "min-h-screen flex flex-col items-center justify-center py-6 px-4";
-  const formClasses = "p-8 rounded bg-gray-50 font-[sans-serif]";
+  const formClasses = "p-8 rounded bg-gray-50 font-manrope";
   const inputClasses =
-    "w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600";
+    "w-full text-gray-800 font-semibold text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600";
   const buttonClasses =
     "w-full py-3 px-4 text-sm tracking-wide rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none transition hover:scale-105";
   const errorClasses = "text-red-500 text-center font-bold";
@@ -38,7 +35,7 @@ const Login = ({ show, handleClose, onLoginSuccess, showRegister, showForgotPass
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await apiClient.post("/api/auth/signin", credentials, {
+      const response = await axios.post(apiLogin, credentials, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -142,6 +139,7 @@ const Login = ({ show, handleClose, onLoginSuccess, showRegister, showForgotPass
                       <FontAwesomeIcon icon={faLock} className="w-4 h-4 absolute right-4" />
                     </div>
                   </div>
+
                   <div className="flex flex-wrap items-center justify-end gap-4">
                     <div className="text-sm">
                     <button

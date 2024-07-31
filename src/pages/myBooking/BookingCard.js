@@ -181,56 +181,45 @@ const BookingCard = ({ booking }) => {
         </span>
         <span>{dayjs(booking.bookingTime).format("HH:mm, DD/MM/YYYY")}</span>
       </div>
-      <div className="flex">
-        <div className="flex-1">
-          <div className="flex mb-4">
+      <div className="flex flex-wrap w-full">
+        <div className="flex-1 w-full md:w-2/3 lg:w-3/4">
+          <div className="flex flex-col md:flex-row mb-4">
             <img
-              className="object-cover rounded-t-lg"
-              style={{ height: "200px", width: "350px" }}
+              className="object-cover rounded-lg w-full md:w-1/2"
+              style={{ height: "200px" }}
               src={urlImage}
               alt="Motorbike"
             />
-            <div className="pl-4">
+            <div className="pl-4 w-full md:w-1/2">
               <h2 className="text-xl font-bold mb-2">{motorbikeName}</h2>
               <div className="flex items-center mb-2 text-gray-600">
-                <FontAwesomeIcon
-                  icon={faCalendarDays}
-                  size="lg"
-                  color="gray"
-                ></FontAwesomeIcon>
-                <span>
-                  &nbsp;&nbsp;Start date:{" "}
-                  {format(new Date(booking.startDate), "Pp")}
+                <FontAwesomeIcon icon={faCalendarDays} size="lg" color="gray" />
+                <span className="ml-2">
+                  Ngày bắt đầu: {format(new Date(booking.startDate), "Pp")}
                 </span>
               </div>
               <div className="flex items-center mb-2 text-gray-600">
-                <FontAwesomeIcon
-                  icon={faCalendarDays}
-                  size="lg"
-                  color="gray"
-                ></FontAwesomeIcon>
-                <span>
-                  &nbsp;&nbsp;End date:{" "}
-                  {format(new Date(booking.endDate), "Pp")}
+                <FontAwesomeIcon icon={faCalendarDays} size="lg" color="gray" />
+                <span className="ml-2">
+                  Ngày kết thúc: {format(new Date(booking.endDate), "Pp")}
                 </span>
               </div>
-              <div className="flex items-center mb-2 text-gray-600">
-                <FontAwesomeIcon icon={faUser} size="lg"></FontAwesomeIcon>
-                <span>&nbsp;&nbsp;{lessorName}</span>
+              <div className="flex  mb-2 text-gray-600">
+                <FontAwesomeIcon icon={faUser} size="lg" />
+                <span className="ml-2 font-extrabold">Chủ xe: {lessorName}</span>
               </div>
               <div className="font-bold text-lg">
-                Total price: {booking.totalPrice.toLocaleString("vi-VN")} vnd
+                Tổng chi phí: {booking.totalPrice.toLocaleString("vi-VN")} vnd
               </div>
             </div>
           </div>
         </div>
-        <div className="flex flex-col justify-center items-start ml-4">
+        <div className="flex flex-col justify-center items-start ml-4 w-full md:w-1/3 lg:w-1/4">
           {motorbike ? (
             <>
               {booking.status === "PENDING" && (
                 <button
-                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center hover:scale-105"
-                  style={{ backgroundColor: "#5fcf86" }}
+                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:bg-green-600 hover:scale-105"
                   onClick={() => handleAction("accept")}
                 >
                   Chấp nhận
@@ -238,8 +227,7 @@ const BookingCard = ({ booking }) => {
               )}
               {booking.status === "DEPOSIT_MADE" && (
                 <button
-                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center hover:scale-105"
-                  style={{ backgroundColor: "#5fcf86" }}
+                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:bg-green-600 hover:scale-105"
                   onClick={() => handleAction("renting")}
                 >
                   Giao xe
@@ -247,16 +235,14 @@ const BookingCard = ({ booking }) => {
               )}
               {booking.status === "RENTING" && (
                 <button
-                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center hover:scale-105"
-                  style={{ backgroundColor: "#5fcf86" }}
+                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:bg-green-600 hover:scale-105"
                   onClick={() => handleAction("done")}
                 >
                   Hoàn thành
                 </button>
               )}
               <button
-                className="bg-green-500 text-white py-2 px-4 rounded w-full text-center hover:scale-105"
-                style={{ backgroundColor: "#5fcf86" }}
+                className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:bg-green-600 hover:scale-105"
                 onClick={openManageBooking}
               >
                 Xem chi tiết
@@ -266,8 +252,7 @@ const BookingCard = ({ booking }) => {
             <>
               {booking.status === "DONE" && (
                 <button
-                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center hover:scale-105"
-                  style={{ backgroundColor: "#5fcf86" }}
+                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:bg-green-600 hover:scale-105"
                   onClick={openFeedback}
                 >
                   Đánh giá
@@ -275,15 +260,14 @@ const BookingCard = ({ booking }) => {
               )}
               {booking.status === "PENDING_DEPOSIT" && (
                 <button
-                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center hover:scale-105"
-                  style={{ backgroundColor: "#5fcf86" }}
+                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:bg-green-600 hover:scale-105"
                   onClick={() => handleAction("deposit_made")}
                 >
                   Đặt cọc
                 </button>
               )}
               <button
-                className="bg-green-500 text-white py-2 px-4 rounded w-full text-center hover:scale-105"
+                className="bg-green-500 text-white py-2 px-4 rounded w-full text-center transition hover:scale-105"
                 style={{ backgroundColor: "#5fcf86" }}
                 onClick={openBookingDetail}
               >
@@ -299,6 +283,7 @@ const BookingCard = ({ booking }) => {
           />
         </div>
       </div>
+
       {showPopUp && (
         <PopUpConfirm
           show={showPopUp}
@@ -308,11 +293,11 @@ const BookingCard = ({ booking }) => {
         />
       )}
       {showPopupSuccess && (
-       <PopUpSuccess
-       show={showPopupSuccess}
-       onHide={() => setShowPopupSuccess(false)}
-       message="Bạn đã cập nhật thành công trạng thái chuyến !"
-       />
+        <PopUpSuccess
+          show={showPopupSuccess}
+          onHide={() => setShowPopupSuccess(false)}
+          message="Bạn đã cập nhật thành công trạng thái chuyến !"
+        />
       )}
     </div>
   );
