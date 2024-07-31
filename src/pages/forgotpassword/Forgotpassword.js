@@ -77,7 +77,7 @@ const Forgotpassword = ({ show, handleClose, showLogin }) => {
       ) : (
         <>
           <div >
-            <div className="p-4 sm:p-7">
+            <div className="p-4 sm:p-7 font-manrope">
               <div className="text-center">
                 <h1 className="block text-2xl font-bold text-gray-800 dark:text-white">Quên mật khẩu</h1>
                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">

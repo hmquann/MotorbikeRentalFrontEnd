@@ -368,7 +368,11 @@ export default function Widget() {
               />
             )}
             {showPopupSuccess && (
-              <PopUpSuccess message="Bạn đã cập nhật thành công trạng thái chuyến!"></PopUpSuccess>
+              <PopUpSuccess
+                show={showPopupSuccess}
+                onHide={() => setShowPopupSuccess(false)}
+                message="Bạn đã cập nhật thành công trạng thái chuyến !"
+              />
             )}
           </div>
           <div className="bg-white p-6 rounded-lg shadow-lg">

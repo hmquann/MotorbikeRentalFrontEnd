@@ -79,7 +79,7 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
   if (!motorbike) return null;
 
   return (
-    <Modal show={true} onHide={onClose} size="lg">
+    <Modal show={true} onHide={onClose} size="lg" className="font-manrope">
       <Modal.Header closeButton>
         <Modal.Title>Chi tiết mẫu xe</Modal.Title>
         <svg onClick={() => setIsUpdate(!isUpdate)}

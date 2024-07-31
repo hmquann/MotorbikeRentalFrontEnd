@@ -192,6 +192,7 @@ const DiscountDetailModal = ({
       show={showModalDetail}
       onHide={() => setShowModalDetail(false)}
       centered
+      className="font-manrope"
     >
       <Modal.Header closeButton>
         <Modal.Title>Chi tiết khuyến mãi</Modal.Title>
@@ -407,15 +408,15 @@ const DiscountDetailModal = ({
           <button
             type="button"
             onClick={handleClose}
-            className="hover:bg-red-700 bg-red-600 text-white px-4 py-2 rounded-lg"
+            className="hover:bg-red-700 bg-red-600 text-white px-4 py-2 rounded-lg transition hover:scale-105"
           >
             Đóng
           </button>
           {isDetailView && !isEditing && (
             <button
               type="button"
-              onClick={handleClose}
-              className="hover:bg-red-700 bg-red-600 text-white px-4 py-2 rounded-lg transition hover:scale-105"
+              onClick={handleEdit}
+              className="hover:bg-yellow-700 bg-yellow-600 text-white px-4 py-2 rounded-lg transition hover:scale-105"
             >
               Chỉnh sửa
             </button>

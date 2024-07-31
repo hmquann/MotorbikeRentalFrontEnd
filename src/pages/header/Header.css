@@ -17,3 +17,13 @@
         margin-right: 0;
     }
 }
+
+.nav-link-custom {
+    color: #000; /* text-black */
+    font-size: 0.875rem; /* text-sm */
+    font-weight: 700; /* font-bold */
+    font-family: 'Manrope', sans-serif; /* font-manrope */
+    border-right: 2px solid #000; /* border-r-2 */
+    padding: 0.5rem 1rem; /* Thay đổi padding nếu cần */
+    transition: color 0.3s, border-color 0.3s; /* Hiệu ứng chuyển tiếp cho màu sắc và border */
+  }

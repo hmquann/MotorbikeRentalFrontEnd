@@ -199,7 +199,7 @@ const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
   }
 
   return (
-    <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+    <Modal show={showModal} onHide={() => setShowModal(false)} centered className="font-manrope">
       <Modal.Header closeButton>
         <Modal.Title>Thêm khuyến mãi</Modal.Title>
       </Modal.Header>

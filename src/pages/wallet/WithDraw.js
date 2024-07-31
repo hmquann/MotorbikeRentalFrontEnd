@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 
-const containerClasses = "max-w-sm mx-auto p-4 bg-white dark:bg-zinc-800 rounded-lg shadow-lg";
+const containerClasses = "max-w-sm mx-auto p-4 bg-white dark:bg-zinc-800 rounded-lg shadow-lg font-manrope";
 const titleClasses = "text-center text-md font-semibold text-zinc-900 dark:text-zinc-100";
 const textClasses = "text-center text-zinc-700 dark:text-zinc-300 mt-2";
 const inputClasses = "w-full p-2 border border-zinc-300 dark:border-zinc-700 rounded-md";

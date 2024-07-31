@@ -114,7 +114,7 @@ const PasswordResetForm = () => {
       />
     ) : (
       <>
-    <div className="flex justify-center mt-20">
+    <div className="flex justify-center mt-20 font-manrope">
       <div className="bg-white rounded-lg shadow-lg p-6 w-full sm:max-w-md dark:bg-gray-800 dark:border-gray-700">
         <div className="flex justify-between items-center mb-4">
         <h2 className="text-gray-800 text-center text-2xl font-bold">

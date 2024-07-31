@@ -61,7 +61,7 @@ const License = () => {
       )
       .then((response) => setLicense(response.data))
       .catch((error) => console.error("Error fetching motorbikes:", error));
-  }, [license]);
+  }, []);
   const [formLicenseData, setFormLicenseData] = useState({
     licenseNumber: "",
     birthOfDate: "",

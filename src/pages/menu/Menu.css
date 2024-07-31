@@ -1,41 +1,83 @@
+/* Menu Container */
 .menu {
   display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px; 
+  box-sizing: border-box; 
 }
 
+/* Menu Left */
 .menu-left {
-  width: 200px; /* Độ rộng của phần menu items */
+  width: 300px; 
   padding: 20px;
-  background-color: #f0f0f0; 
-  margin-left: 20px;/* Màu nền của phần menu items */
+  position: relative; 
+  height: 100%; 
+  flex-shrink: 0; 
+ 
 }
 
+/* Menu Right */
 .menu-right {
-  flex-grow: 1; /* Phần content sẽ chiếm phần còn lại của không gian */
+  width: 100%;
+  padding: 20px; /* Khoảng cách nội dung */
+ 
 }
 
+/* Menu List */
 .menu ul {
   list-style-type: none;
   padding: 0;
+  margin: 0;
 }
 
 .menu ul li {
-  margin-bottom: 10px; /* Khoảng cách giữa các menu items */
-  border-bottom: 1px solid #ccc; /* Đường kẻ giữa các menu items */
-  padding-bottom: 10px; /* Khoảng cách từ menu item đến đường kẻ */
+  margin-bottom: 10px;
+}
+.sub-menu {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+  opacity: 1;
 }
 
-.menu ul li:last-child {
-  border-bottom: none; /* Không có đường kẻ ở menu item cuối cùng */
+.sub-menu.open {
+  max-height: 500px; /* Adjust based on the expected height of the content */
+  opacity: 1;
 }
 
+/* Menu Links */
 .menu ul li a {
   text-decoration: none;
-  color: #000;
+  color: #333;
   display: block;
-  padding: 10px 0; /* Thêm khoảng cách cho các liên kết */
+  padding: 10px 15px;
+  border-radius: 4px; /* Bo góc liên kết để mềm mại hơn */
+  transition: background-color 0.3s, color 0.3s; /* Hiệu ứng chuyển tiếp */
+}
+
+.menu ul li a:hover {
+  background-color: #e0e0e0;
 }
 
 .menu ul li a.active {
-  font-weight: bold;
-  color: rgb(86, 86, 91); /* Màu chữ của menu item được chọn */
+  /* background-color: #ddd; */
+  color: #000; /* Màu chữ của menu item được chọn */
+  font-weight: 600; /* Đổi font-weight để làm nổi bật menu item đang chọn */
+  border-left: 4px solid #5fcf86;
+}
+
+
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .menu {
+    flex-direction: column; /* Đặt menu và nội dung thành cột dọc trên màn hình nhỏ hơn */
+  }
+
+
+  .menu-left, .menu-right {
+    width: 100%; /* Đặt chiều rộng của menu-left và menu-right 100% trên màn hình nhỏ hơn */
+    height: auto; /* Để chiều cao tự động điều chỉnh */
+  }
 }

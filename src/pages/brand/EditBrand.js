@@ -109,7 +109,7 @@ const EditBrand = ({
   const handleClose = () => setShowModal(false);
 
   return (
-    <Modal show={showModal} onHide={handleClose} backdrop="static">
+    <Modal show={showModal} onHide={handleClose} backdrop="static" className="font-manrope">
       <Modal.Header closeButton>
         <Modal.Title>Chỉnh sửa</Modal.Title>
       </Modal.Header>
