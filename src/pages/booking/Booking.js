@@ -1,5 +1,14 @@
 import "./Booking.css";
 import { useLocation, useNavigate } from "react-router-dom";
+import {
+  doc,
+  setDoc,
+  collection,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
+import { db } from "../../firebase";
 import { FaMotorcycle } from "react-icons/fa";
 import {
   faArrowRight,
@@ -27,6 +36,7 @@ import Login from "../login/Login";
 import PopupSuccess from "../myBooking/PopUpSuccess";
 import PopUpPricePerDay from "./popUpPricePerDay/PopUpPricePerDay";
 import apiClient from "../../axiosConfig";
+import { useNotification } from "../../NotificationContext";
 const sharedClasses = {
   rounded: "rounded",
   flex: "flex",
@@ -133,6 +143,7 @@ const Booking = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [redirectUrl, setRedirectUrl] = useState(null);
   const [showPopupSuccess, setShowPopupSuccess] = useState(false);
+  const { incrementNotificationCount } = useNotification();
 
   const handleOpenLoginModal = () => {
     const currentPath = window.location.pathname;
@@ -488,7 +499,7 @@ const Booking = () => {
         totalPrice: totalPrice,
         receiveLocation: gettedLocation,
       })
-      .then(() => {
+      .then(async () => {
         setShowPopupSuccess(true); // Hiển thị popup khi thành công
         const response3 = apiClient.post(
           "/api/booking/sendEmailSuccessBooking",
@@ -505,17 +516,30 @@ const Booking = () => {
             receiveLocation: gettedLocation,
           }
         );
-        console.log(userName);
-        console.log(userEmail);
-        console.log(
-          receiveData.model.modelName + " " + receiveData.yearOfManufacture
-        );
-        console.log(receiveData.motorbikePlate);
-        console.log(dayjs().format("YYYY-MM-DDTHH:mm:ss"));
-        console.log(dayjs(dateRange[0]).format("YYYY-MM-DDTHH:mm:ss"));
-        console.log(dayjs(dateRange[1]).format("YYYY-MM-DDTHH:mm:ss"));
-        console.log(totalPrice);
-        console.log(gettedLocation);
+
+        const now = new Date();
+
+        await setDoc(doc(collection(db, "notifications")), {
+          userId: userId,
+          message: JSON.stringify({
+            title: '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
+            content: `Yêu cầu đặt xe <strong>${receiveData.motorbikePlate}</strong> của bạn đã được gửi.`,
+          }),
+          timestamp: now,
+          seen: false,
+        });
+
+        await setDoc(doc(collection(db, "notifications")), {
+          userId: receiveData.userId,
+          message: JSON.stringify({
+            title: '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
+            content: `${userName} đã đặt xe <strong>${receiveData.motorbikePlate}</strong> của bạn.`,
+          }),
+          timestamp: now,
+          seen: false,
+        });
+
+
         setShowPopupBooking(true); // Hiển thị popup khi thành công
         setTimeout(() => {
           setShowPopupSuccess(false); // Ẩn popup sau 3 giây
@@ -831,11 +855,11 @@ const Booking = () => {
               />
             )}
             {showPopupSuccess && (
-                 <PopupSuccess
-                 show={showPopupSuccess}
-                 onHide={() => setShowPopupSuccess(false)}
-                 message="Yêu cầu đặt xe của bạn đã được gửi đi !"
-                 />
+              <PopupSuccess
+                show={showPopupSuccess}
+                onHide={() => setShowPopupSuccess(false)}
+                message="Yêu cầu đặt xe của bạn đã được gửi đi !"
+              />
             )}
             {showPopUp && (
               <PopUpLocation
