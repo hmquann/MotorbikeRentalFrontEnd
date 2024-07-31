@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleQuestion } from "@fortawesome/free-regular-svg-icons";
-import { faQuestionCircle } from "@fortawesome/free-solid-svg-icons";
+import MapboxSelectLocationPopUp from "../../filter/MapboxSelectLocation";
 
 const sharedClasses = {
   textZinc: "text-zinc-900 dark:text-zinc-100",
   textZincLight: "text-zinc-600 dark:text-zinc-400",
   textZincLighter: "text-zinc-500 dark:text-zinc-500",
-  green: "text-green-500",
-  greenHover: "hover:text-green-600",
+  black: "text-black-500",
+  redHover: "hover:text-red-600",
   bgGreen: "bg-green-500",
   bgGreenHover: "hover:bg-green-600",
 };
@@ -21,17 +19,15 @@ const PopUpLocation = ({
   receiveData,
 }) => {
   const [selectedOption, setSelectedOption] = useState("pickup-location");
-  const [customLocation, setCustomLocation] = useState(""); // State to store custom location input
+  const [customLocation, setCustomLocation] = useState(null); // Updated to hold coordinates
+  const motorbikeCoords = {
+    longitude: receiveData.longitude,
+    latitude: receiveData.latitude,
+  };
 
   // State management for location selection
   const [selectedLocation, setSelectedLocation] = useState(onSelectLocation);
-  const [selectedProvince, setSelectedProvince] = useState("");
-  const [selectedDistrict, setSelectedDistrict] = useState("");
-  const [selectedWard, setSelectedWard] = useState("");
-  const [addressDetail, setAddressDetail] = useState("");
-  const [provinces, setProvinces] = useState([]);
-  const [districts, setDistricts] = useState([]);
-  const [wards, setWards] = useState([]);
+  const [openMapboxSearch, setOpenMapBoxSearch] = useState(false);
   const [error, setError] = useState(null);
   const [formError, setFormError] = useState("");
 
@@ -39,99 +35,18 @@ const PopUpLocation = ({
   const [distance, setDistance] = useState(0);
   const [deliveryFee, setDeliveryFee] = useState(0);
 
-  // State for custom location coordinates
-  const [customCoords, setCustomCoords] = useState(null);
-
-  useEffect(() => {
-    fetch("https://vapi.vnappmob.com/api/province/")
-      .then((response) => response.json())
-      .then((data) => {
-        if (data && data.results) {
-          setProvinces(data.results);
-        } else {
-          throw new Error("Invalid data format");
-        }
-      })
-      .catch((error) => {
-        setError(error);
-      });
-  }, []);
-
-  const handleProvinceChange = (event) => {
-    const provinceId = event.target.value;
-    setSelectedProvince(provinceId);
-    fetch(`https://vapi.vnappmob.com/api/province/district/${provinceId}`)
-      .then((response) => response.json())
-      .then((data) => {
-        if (data && data.results) {
-          setDistricts(data.results);
-          setWards([]);
-        } else {
-          throw new Error("Invalid data format");
-        }
-      })
-      .catch((error) => {
-        setError(error);
-      });
-  };
-
-  const handleDistrictChange = (event) => {
-    const districtId = event.target.value;
-    setSelectedDistrict(districtId);
-    fetch(`https://vapi.vnappmob.com/api/province/ward/${districtId}`)
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.results.length === 0) {
-          setWards([]); // Clear wards if no wards are available
-        }
-        if (data && data.results) {
-          setWards(data.results);
-        } else {
-          throw new Error("Invalid data format");
-        }
-      })
-      .catch((error) => {
-        setError(error);
-      });
-  };
-
-  const handleWardChange = (event) => {
-    const wardId = event.target.value;
-    setSelectedWard(wardId);
-    updateCustomLocation();
-  };
-
-  const handleAddressChange = (e) => {
-    setAddressDetail(e.target.value);
-    updateCustomLocation();
-  };
-  const [addressDetailData, setAddressDetailData] = useState();
-  useEffect(() => {
-    console.log(addressDetail);
-    setAddressDetailData(addressDetail);
-    updateCustomLocation();
-  }, [addressDetail]);
-  const fetchGeocodeData = async (address) => {
-    try {
-      const response = await axios.get(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-          address
-        )}.json?access_token=pk.eyJ1Ijoibmd1eWVua2llbjAyIiwiYSI6ImNseDNpem83bjByM3cyaXF4NTZqOWFhZWIifQ.pVT0I74tSdI290kImTlphQ`
-      );
-
-      if (response.status === 200 && response.data) {
-        const coordinates = response.data.features[0].geometry.coordinates;
-        return { longitude: coordinates[0], latitude: coordinates[1] };
-      } else {
-        throw new Error("Invalid response status or data.");
-      }
-    } catch (error) {
-      console.error("Error making Axios request:", error);
-      return null;
-    }
+  const handleSelectLocation = (location) => {
+    console.log("Selected Location:", location);
+    setSelectedLocation(location);
+    setCustomLocation({
+      long: location.long,
+      lat: location.lat,
+      place_name: location.place_name,
+    });
   };
 
   const checkDistance = async (addressOne, addressTwo) => {
+    console.log(customLocation);
     if (!addressOne || !addressTwo) {
       console.error("Invalid addresses provided.");
       return;
@@ -151,7 +66,7 @@ const PopUpLocation = ({
         response.data.routes &&
         response.data.routes.length > 0
       ) {
-        const distance = response.data.routes[0].distance / 1000;
+        const distance = response.data.routes[0].distance / 1000; // Convert from meters to kilometers
         console.log(`Distance is: ${distance} km`);
         setDistance(distance.toFixed(1));
         return distance;
@@ -172,24 +87,13 @@ const PopUpLocation = ({
   }, [distance]);
 
   const updateCustomLocation = async () => {
-    const province = provinces.find(
-      (d) => d.province_id === selectedProvince
-    )?.province_name;
-    const district = districts.find(
-      (d) => d.district_id === selectedDistrict
-    )?.district_name;
-    const ward = wards.find((d) => d.ward_id === selectedWard)?.ward_name;
-    const location = `${addressDetailData}, ${ward}, ${district}, ${province}`;
-    console.log(location);
-    setCustomLocation(location);
-
-    if (selectedOption === "map-location") {
-      const customCoords = await fetchGeocodeData(location);
-      setCustomCoords(customCoords);
-      const motorbikeCoords = await fetchGeocodeData(onSelectLocation);
+    if (selectedOption === "map-location" && customLocation) {
       const calculatedDistance = await checkDistance(
         motorbikeCoords,
-        customCoords
+        {
+          longitude: customLocation.long,
+          latitude: customLocation.lat,
+        } // Use customLocation directly
       );
       if (calculatedDistance > receiveData.freeShipLimit) {
         setDeliveryFee(calculatedDistance * receiveData.deliveryFee);
@@ -199,22 +103,18 @@ const PopUpLocation = ({
     }
   };
 
-  const handleDistance = () => {};
-  const handleDeliveryFee = () => {};
+  useEffect(() => {
+    if (selectedOption === "map-location" && customLocation) {
+      updateCustomLocation();
+    }
+  }, [customLocation]);
 
   const handleSubmitForm = (e) => {
     e.preventDefault(); // Prevent the default form submission behavior
 
-    if (selectedOption === "map-location") {
-      if (
-        !selectedProvince ||
-        !selectedDistrict ||
-        !selectedWard ||
-        !addressDetail
-      ) {
-        setFormError("Vui lòng nhập đầy đủ thông tin địa chỉ.");
-        return; // Stop form submission
-      }
+    if (selectedOption === "map-location" && !customLocation) {
+      setFormError("Vui lòng chọn địa điểm trên bản đồ.");
+      return; // Stop form submission
     }
 
     setFormError(""); // Clear any existing error
@@ -224,13 +124,22 @@ const PopUpLocation = ({
     if (selectedOption === "pickup-location") {
       location = selectedLocation; // Use onSelectLocation directly
     } else if (selectedOption === "map-location") {
-      location = customLocation;
+      location = customLocation.place_name;
     }
 
-    // Call the onSelectLocation callback to send location data
+    // Call the onChangeLocation callback to send location data
     console.log(location);
     onChangeLocation(location);
     onClose(); // Close the popup after selection
+  };
+
+  const handleOptionChange = (option) => {
+    setSelectedOption(option);
+    if (option === "map-location") {
+      setOpenMapBoxSearch(true);
+    } else {
+      setOpenMapBoxSearch(false);
+    }
   };
 
   return (
@@ -244,10 +153,11 @@ const PopUpLocation = ({
             <h2 className={`text-xl font-semibold ${sharedClasses.textZinc}`}>
               Chọn địa điểm giao nhận xe
             </h2>
+
             <button
               type="button"
               onClick={onClose}
-              className={`${sharedClasses.green} ${sharedClasses.greenHover}`}
+              className={`${sharedClasses.black} ${sharedClasses.redHover}`}
             >
               {/* Optional: Add close icon or text here */}X
             </button>
@@ -260,9 +170,9 @@ const PopUpLocation = ({
                     type="radio"
                     name="pickup-location"
                     value="pickup-location"
-                    className={`form-radio ${sharedClasses.green}`}
+                    className={`form-radio ${sharedClasses.black}`}
                     checked={selectedOption === "pickup-location"}
-                    onChange={() => setSelectedOption("pickup-location")}
+                    onChange={() => handleOptionChange("pickup-location")}
                   />
                   <div className="ml-3">
                     <p
@@ -279,102 +189,42 @@ const PopUpLocation = ({
                 <label className="flex items-center p-4 border rounded-lg cursor-pointer mb-2">
                   <input
                     type="radio"
-                    name="pickup-location"
+                    name="map-location"
                     value="map-location"
-                    className={`form-radio ${sharedClasses.green}`}
+                    className={`form-radio ${sharedClasses.black}`}
                     checked={selectedOption === "map-location"}
-                    onChange={() => setSelectedOption("map-location")}
+                    onChange={() => handleOptionChange("map-location")}
                   />
                   <div className="ml-3 w-full">
-                    <p
-                      className={sharedClasses.textZinc}
-                      style={{ fontWeight: "bold" }}
-                    >
-                      Nhận xe tại vị trí của bạn
+                    <button 
+                      type="button"
+                      onClick={() => setOpenMapBoxSearch(true)}
+                      className="text-zinc-500"
+                    > <p
+                    className={sharedClasses.textZinc}
+                    style={{ fontWeight: "bold" }}
+                  >
+                     Chọn địa điểm trên bản đồ
+                  </p>
+                  <p className={sharedClasses.textZincLight}>
+                  {customLocation?(customLocation.place_name):""}
                     </p>
-                    <div className="flex flex-wrap gap-6 mb-6">
-                      <div className="flex-1">
-                        <select
-                          className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
-                          id="provinces"
-                          name="province"
-                          value={selectedProvince}
-                          onChange={handleProvinceChange}
-                          disabled={selectedOption !== "map-location"}
-                        >
-                          <option value="">Tỉnh/ Thành phố</option>
-                          {provinces.map((province) => (
-                            <option
-                              key={province.province_id}
-                              value={province.province_id}
-                            >
-                              {province.province_name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div className="flex-1">
-                        <select
-                          className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
-                          value={selectedDistrict}
-                          name="district"
-                          onChange={handleDistrictChange}
-                          disabled={
-                            selectedOption !== "map-location" ||
-                            !selectedProvince
-                          }
-                        >
-                          <option value="">Quận/ Huyện</option>
-                          {districts.map((district) => (
-                            <option
-                              key={district.district_id}
-                              value={district.district_id}
-                            >
-                              {district.district_name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div className="flex-1">
-                        <select
-                          className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
-                          value={selectedWard}
-                          name="ward"
-                          onChange={handleWardChange}
-                          disabled={
-                            selectedOption !== "map-location" ||
-                            !selectedDistrict
-                          }
-                          id="wards"
-                        >
-                          <option value="">Phường/ Xã</option>
-                          {wards.map((ward) => (
-                            <option key={ward.ward_id} value={ward.ward_id}>
-                              {ward.ward_name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <input
-                        type="text"
-                        name="addressDetail"
-                        value={addressDetail}
-                        onChange={handleAddressChange}
-                        className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
-                        placeholder="VD: Số 1 đường A"
-                        disabled={selectedOption !== "map-location"}
-                      />
-                    </div>
+                    
+                    </button>
                   </div>
                 </label>
               </div>
             </div>
           </div>
           {formError && <div className="text-red-500 mb-4">{formError}</div>}
-          {selectedOption === "map-location" && (
+          {selectedOption === "map-location" && customLocation && (
             <div>
               <p>Khoảng cách giao nhận xe: {distance} km</p>
-              <p>Phí giao nhận xe: {deliveryFee.toLocaleString("vi-VN")}đ</p>
+              <p>Miễn phí giao nhận xe trong: {receiveData.freeShipLimit} km</p>
+              <p>
+                Phí giao nhận xe 2 chiều: {deliveryFee.toLocaleString("vi-VN")}{" "}
+                đ
+              </p>
             </div>
           )}
           <div className="flex justify-end">
@@ -394,6 +244,11 @@ const PopUpLocation = ({
           </div>
         </form>
       </div>
+      <MapboxSelectLocationPopUp
+        open={openMapboxSearch}
+        onClose={() => setOpenMapBoxSearch(false)}
+        onSelect={handleSelectLocation}
+      />
     </div>
   );
 };

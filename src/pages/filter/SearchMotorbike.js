@@ -4,10 +4,14 @@ import MotorbikeSchedulePopUp from '../booking/schedule/MotorbikeSchedulePopUp';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import { useNavigate } from "react-router-dom";
+
+import MapboxSearchPopUp from './MapboxSearchPopUp';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faLocationDot,faCalendarDays} from '@fortawesome/free-solid-svg-icons';
 import apiClient from '../../axiosConfig';
+
 const formatDateTime = (dateTimeString) => {
   const date = new Date(dateTimeString);
-  
   const day = String(date.getDate()).padStart(2, '0');
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const year = date.getFullYear();
@@ -17,136 +21,95 @@ const formatDateTime = (dateTimeString) => {
   return `${hours}:${minutes}, ${day}/${month}/${year}`;
 };
 
+const extractSecondAndThirdLastElements = (str) => {
+  const parts = str.split(',');
+  if (parts.length < 3) return ''; // Nếu chuỗi không có đủ phần tử, trả về chuỗi rỗng
+  const secondLastElement = parts[parts.length - 3].trim();
+  const thirdLastElement = parts[parts.length - 2].trim();
+  return `${secondLastElement}, ${thirdLastElement}`;
+};
+
 const SearchMotorbike = () => {
   const navigate = useNavigate();
-    const[addressPopUp,setAddressPopUp]=useState(false);
-    const [selectedDate, setSelectedDate] = useState(new Date());
-    const [rentalStartTime, setRentalStartTime] = useState(new Date());
-    const [rentalEndTime, setRentalEndTime] = useState(addDays(new Date(), 1));
-    const[rentalAddress,setRentalAddress]=useState("");
-    const[schedulePopUp,setSchedulePopUp]=useState(false);
-    const [provinces, setProvinces] = useState([]);
-    const [districts, setDistricts] = useState([]);
-    const [selectedProvince, setSelectedProvince] = useState("");
-    const [selectedDistrict, setSelectedDistrict] = useState("");
-    const [error, setError] = useState(null);
-    const[loading,setLoading]=useState(false);
-    const handleOpenSchedulePopup=()=>{
-      setSchedulePopUp(true)
-    }
-    useEffect(() => {
-      fetch("https://vapi.vnappmob.com/api/province/")
-        .then(response => response.json())
-        .then(data => {
-          console.log('API response:', data); 
-          if (data && data.results) {
-            setProvinces(data.results); // Điều chỉnh theo cấu trúc dữ liệu thực tế
-          } else {
-            throw new Error('Invalid data format');
-          } 
-        })
-        .catch(error => {
-          setError(error);
-        });
-    }, []);
-    const handleProvinceChange = (event) => {
-      const provinceId = event.target.value;
-      setSelectedProvince(provinceId);
-      // Fetch districts based on selected province
-      fetch(`https://vapi.vnappmob.com/api/province/district/${provinceId}`)
-        .then((response) => response.json())
-        .then((data) => {
-  
-          if (data && data.results) {           
-            setDistricts(data.results);
-          } else {
-            throw new Error("Invalid data format");
-          }
-        })
-        .catch((error) => {
-          setError(error);
-        });
-    };
-    const handleDistrictChange=(event)=>{
-      const districtId = event.target.value;
-      setSelectedDistrict(districtId);
-    }
-    useEffect(() => {
-      const getCurrentTime = () => {
-        const now = new Date();
-        const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), Math.ceil(now.getHours()) + 1, 0);
-        const end = addDays(start, 1);
-    
-        setRentalStartTime(start);
-        setRentalEndTime(end);
-      };
-    
-      getCurrentTime();
-    }, []);
 
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [rentalStartTime, setRentalStartTime] = useState(new Date());
+  const [rentalEndTime, setRentalEndTime] = useState(addDays(new Date(), 1));
+  const [rentalAddress, setRentalAddress] = useState("");
+  const [schedulePopUp, setSchedulePopUp] = useState(false);
+  const [openMapboxSearch, setOpenMapBoxSearch] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    const getCurrentTime = () => {
+      const now = new Date();
+      const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), Math.ceil(now.getHours()) + 1, 0);
+      const end = addDays(start, 1);
+  
+      setRentalStartTime(start);
+      setRentalEndTime(end);
+    };
+  
+    getCurrentTime();
+  }, []);
 
   const handlePopUpSubmit = (data) => {
-    // Handle data submission to destination page
     setRentalStartTime(data.startDateTime);
     setRentalEndTime(data.endDateTime);
 
-    // Perform any further actions here
   };
-  const handleAddressSubmit=()=>{
-    console.log(selectedDistrict)
-    console.log(selectedProvince);
-    const province = provinces.find(d => d.province_id === selectedProvince).province_name;
-    const district = districts.find(d => d.district_id === selectedDistrict).district_name;
-  setRentalAddress(district+","+province);
-  console.log(rentalAddress)
-  setAddressPopUp(false)
-  }
-    const handleSearchMotor = async () => {
-      
-      const filterList = {
-        startDate:dayjs(rentalStartTime).format('YYYY-MM-DDTHH:mm:ss'),
-        endDate: dayjs(rentalEndTime).format('YYYY-MM-DDTHH:mm:ss'),
-        address: rentalAddress,
-      };
-  
-      setLoading(true);
-      try {
-        const response = await apiClient.post('/api/motorbike/filter', filterList, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        console.log('Data sent successfully:', response.data);
-        const listMotor=response.data;
-        navigate('/filter', { state: { filterList,listMotor } });
-      } catch (error) {
-        handleRequestError(error);
-      } finally {
-        setLoading(false);
-      }
+  const handleSearchMotor = async () => {
+    const filterList = {
+      startDate: dayjs(rentalStartTime).format('YYYY-MM-DDTHH:mm:ss'),
+      endDate: dayjs(rentalEndTime).format('YYYY-MM-DDTHH:mm:ss'),
+      address: rentalAddress,
     };
-  
-    const handleRequestError = (error) => {
-      if (error.response) {
-        console.error('Error response:', error.response);
-        console.error('Status code:', error.response.status);
-        console.error('Data:', error.response.data);
-  
-        if (error.response.status === 404) {
-          setError('Error 404: Not Found. The requested resource could not be found.');
-        } else if (error.response.status === 409) {
-          setError(error.response.data);
-        } else {
-          setError(`Error ${error.response.status}: ${error.response.data.message || 'An error occurred.'}`);
-        }
-      } else if (error.request) {
-        console.error('Error request:', error.request);
-        setError('No response received. Please check your network connection.');
+    setLoading(true);
+    try {
+      const response = await axios.post('http://localhost:8080/api/motorbike/filter', filterList, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log('Data sent successfully:', response.data);
+      const listMotor = response.data;
+      navigate('/filter', { state: { filterList, listMotor } });
+    } catch (error) {
+      handleRequestError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRequestError = (error) => {
+    if (error.response) {
+      console.error('Error response:', error.response);
+      console.error('Status code:', error.response.status);
+      console.error('Data:', error.response.data);
+
+      if (error.response.status === 404) {
+        setError('Error 404: Not Found. The requested resource could not be found.');
+      } else if (error.response.status === 409) {
+        setError(error.response.data);
       } else {
-        console.error('Error message:', error.message);
-        setError('An error occurred. Please try again.');
+        setError(`Error ${error.response.status}: ${error.response.data.message || 'An error occurred.'}`);
       }
-    };
+    } else if (error.request) {
+      console.error('Error request:', error.request);
+      setError('No response received. Please check your network connection.');
+    } else {
+      console.error('Error message:', error.message);
+      setError('An error occurred. Please try again.');
+    }
+  };
+
+  const handleSelectLocation = (location) => {
+    setSelectedLocation(location);
+    setRentalAddress(extractSecondAndThirdLastElements(location.place_name));
+    setOpenMapBoxSearch(false);
+  };
+
   return (
     <div>
       <div className="bg-white dark:bg-zinc-800 p-4 rounded-lg shadow-md flex items-center justify-between">
@@ -171,71 +134,21 @@ const SearchMotorbike = () => {
             />
           </svg>
 
-          <div onClick={()=>setAddressPopUp(true)}>
-            <span className="text-zinc-500 dark:text-zinc-400 text-sm"> Địa điểm
+          <div onClick={() => setOpenMapBoxSearch(true)}>
+            <span className="text-zinc-500 dark:text-zinc-400 text-sm">
+          <FontAwesomeIcon icon={faLocationDot} size="sm" style={{color: "#9ea0a3",}} /> Địa điểm
             </span>
             <div className="flex items-center space-x-1">
-              <span className="text-black dark:text-white">{rentalAddress?rentalAddress:"Chọn địa điểm"}</span>
+              <span className="text-black dark:text-white">{rentalAddress ? rentalAddress : "Chọn địa điểm"}</span>
             </div>
           </div>
-          {addressPopUp && (
-  <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
-    <div className="bg-white p-6 rounded-lg shadow-lg">
-      <div className="p-4">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div name="province"
-              value={selectedProvince}
-              onChange={handleProvinceChange}>
-            <label className="block text-sm font-medium text-gray-700">Thành phố</label>
-            <select className="mt-1 block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 sm:text-sm text-gray-700">
-            <option value="" className="text-gray-700 bg-white">Chọn thành phố</option>
-              {provinces.map((province) => (
-                <option  className="text-gray-700 bg-white" key={province.province_id} value={province.province_id}>
-                  {province.province_name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div  name="district"
-              value={selectedDistrict}
-              onChange={handleDistrictChange}
-              >
-            <label className="block text-sm font-medium text-gray-700">Quận / Huyện</label>
-            <select className="mt-1 block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 sm:text-sm text-gray-700">
-            <option className="text-gray-700 bg-white" value="">Chọn quận/huyện</option>
-              {districts.map((district) => (
-                <option className="text-gray-700 bg-white" key={district.district_id} value={district.district_id}>
-                  {district.district_name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <MapboxSearchPopUp open={openMapboxSearch} onClose={() => setOpenMapBoxSearch(false)} onSelect={handleSelectLocation} />
         </div>
-        <div className="mt-4 flex justify-end space-x-2">
-          <button
-            className="bg-gray-500 text-white rounded px-3 py-1"
-            onClick={() => setAddressPopUp(false)}
-          >
-            Hủy
-          </button>
-          <button
-            className="bg-blue-500 text-white rounded px-3 py-1"
-            onClick={handleAddressSubmit}
-          >
-            Xác nhận
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-)}
 
-       
-
-        <div className="flex items-center space-x-2" >
-          <div onClick={(handleOpenSchedulePopup)}>
+        <div className="flex items-center space-x-2">
+          <div onClick={()=>setSchedulePopUp(true)}>
             <span className="text-zinc-600 dark:text-zinc-300">
-              Thời gian thuê
+            <FontAwesomeIcon icon={faCalendarDays} size="sm" style={{color: "#9ea0a3",}} /> Thời gian thuê
             </span>
             <div className="flex items-center space-x-1">
               <svg
@@ -259,19 +172,14 @@ const SearchMotorbike = () => {
             </div>
           </div>
           <div className="flex justify-center mt-8">
-          <MotorbikeSchedulePopUp isOpen={schedulePopUp} onClose={() => setSchedulePopUp(false)} onSubmit={handlePopUpSubmit} />
+            <MotorbikeSchedulePopUp isOpen={schedulePopUp} onClose={() => setSchedulePopUp(false)} onSubmit={handlePopUpSubmit} />
           </div>
-          
         </div>
 
         <button className="bg-green-500 text-white px-4 py-2 rounded-lg" onClick={handleSearchMotor} >
-        {loading ? "Đang tìm kiếm..." : "Tìm xe"}
+          {loading ? "Đang tìm kiếm..." : "Tìm xe"}
         </button>
-        
       </div>
-
-      
-    </div>
     </div>
   );
 };

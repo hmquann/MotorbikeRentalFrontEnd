@@ -47,6 +47,9 @@ import Filter from "./pages/filter/Filter";
 import FeedbackModal from "./pages/booking/FeedbackModal";
 import Footer from "./pages/footer/Footer";
 
+import MapboxSearchPopUp from "./pages/filter/MapboxSearchPopUp";
+
+
 
 function App() {
   return (
@@ -111,6 +114,7 @@ function App() {
           element={<VerifyChangeEmail />}
         />
         <Route path="/chatapp" element={<ChatApp />} />
+        <Route path="/mapboxSearch" element={<MapboxSearchPopUp/>}/>
       </Routes>
       <Footer />
     </>
