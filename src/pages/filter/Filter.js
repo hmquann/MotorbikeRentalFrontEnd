@@ -5,8 +5,9 @@ import { format, addDays } from 'date-fns';
 import { useNavigate,useLocation } from "react-router-dom";
 import MotorbikeList from '../hompage/MotorbikeList';
 import MotorbikeSchedulePopUp from '../booking/schedule/MotorbikeSchedulePopUp';
-import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
+import MapboxSearchPopUp from './MapboxSearchPopUp';
+
 const buttonClasses =
 "px-4 py-2 rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105";
 const textClasses = "text-zinc-600 dark:text-zinc-300";
@@ -50,7 +51,7 @@ function SetPriceRangeModal({ minValueProp, maxValueProp, modelTypeProp, onUpdat
     const totalWidth = 100000; // max value of the range
     return (rangeWidth / totalWidth) * 100;
   };
-
+  
   return (
     <Modal {...props} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
       <Modal.Header closeButton>
@@ -141,11 +142,19 @@ function SetPriceRangeModal({ minValueProp, maxValueProp, modelTypeProp, onUpdat
   );
 }
 
-
+const extractSecondAndThirdLastElements = (str) => {
+  const parts = str.split(',');
+  if (parts.length < 3) return ''; // Nếu chuỗi không có đủ phần tử, trả về chuỗi rỗng
+  const secondLastElement = parts[parts.length - 3].trim();
+  const thirdLastElement = parts[parts.length - 2].trim();
+  return `${secondLastElement}, ${thirdLastElement}`;
+};
 const Filter = () => {
   const navigate = useNavigate();
   const[addressPopUp,setAddressPopUp]=useState(false);
+  const [openMapboxSearch, setOpenMapBoxSearch] = useState(false);
   const [selectedButtons, setSelectedButtons] = useState([]);
+  const [selectedLocation, setSelectedLocation] = useState(null);
   const [brands, setBrands] = useState([]);
   const [models, setModels] = useState();
   const [filterBrands, setFilterBrands] = useState([]);
@@ -361,6 +370,11 @@ const Filter = () => {
       setError('An error occurred. Please try again.');
     }
   };
+  const handleSelectLocation = (location) => {
+    setSelectedLocation(location);
+    setFilterList({...filterList,address:extractSecondAndThirdLastElements(location.place_name)});
+    setOpenMapBoxSearch(false);
+  };
   return (
 
   
@@ -399,7 +413,7 @@ const Filter = () => {
 <div className="flex justify-center items-center mt-8" >
   <div style={{ width: '100%' }}>
     <div className="flex items-center justify-center space-x-4 text-foreground">
-      <div className='flex items-center space-x-2' onClick={()=>setAddressPopUp(true)}>
+      <div className='flex items-center space-x-2' onClick={() => setOpenMapBoxSearch(true)}>
       <svg class="h-6 w-6 text-green-500"  width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">  
       <path stroke="none" d="M0 0h24v24H0z"/>  <circle cx="12" cy="11" r="3" />  
       <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 0 1 -2.827 0l-4.244-4.243a8 8 0 1 1 11.314 0z" /></svg>
@@ -414,57 +428,7 @@ const Filter = () => {
     </div>
   </div>
 </div>           
-{addressPopUp && (
-  <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
-    <div className="bg-white p-6 rounded-lg shadow-lg">
-      <div className="p-4">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div name="province"
-              value={selectedProvince}
-              onChange={handleProvinceChange}>
-            <label className="block text-sm font-medium text-gray-700">Thành phố</label>
-            <select className="mt-1 block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 sm:text-sm ">
-            <option value="" className="text-gray-700 bg-white">Chọn thành phố</option>
-              {provinces.map((province) => (
-                <option  className="text-gray-700 bg-white" key={province.province_id} value={province.province_id}>
-                  {province.province_name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div  name="district"
-              value={selectedDistrict}
-              onChange={handleDistrictChange}
-              >
-            <label className="block text-sm font-medium text-gray-700">Quận / Huyện</label>
-            <select className="mt-1 block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 sm:text-sm">
-            <option className="text-gray-700 bg-white" value="">Chọn quận/huyện</option>
-              {districts.map((district) => (
-                <option className="text-gray-700 bg-white" key={district.district_id} value={district.district_id}>
-                  {district.district_name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-        <div className="mt-4 flex justify-end space-x-2">
-          <button
-            className="bg-gray-500 text-white rounded px-3 py-1"
-            onClick={() => setAddressPopUp(false)}
-          >
-            Hủy
-          </button>
-          <button
-            className="bg-blue-500 text-white rounded px-3 py-1"
-            onClick={handleAddressSubmit}
-          >
-            Xác nhận
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-)}
+  <MapboxSearchPopUp open={openMapboxSearch} onClose={() => setOpenMapBoxSearch(false)} onSelect={handleSelectLocation} />
           <div className="flex justify-center mt-8" >
           <MotorbikeSchedulePopUp isOpen={schedulePopUp} onClose={() => setSchedulePopUp(false)} onSubmit={handlePopUpSubmit} />
           </div>    
