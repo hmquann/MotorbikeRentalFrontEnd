@@ -1,68 +1,99 @@
-import React, { useState } from "react";
-import { IconButton } from "@mui/material";
-import { Popover } from "@mui/material";
-import { Card } from "@mui/material";
-import { CardContent } from "@mui/material";
-import { Typography } from "@mui/material";
-import { Divider } from "@mui/material";
-import NotificationsIcon from '@mui/icons-material/Notifications';
+import React, { useState, useEffect } from "react";
+import {
+  collection,
+  onSnapshot,
+  doc,
+  updateDoc,
+  query,
+  where,
+} from "firebase/firestore";
+import { db } from "../../firebase";
+import {
+  IconButton,
+  Popover,
+  Card,
+  CardContent,
+  Typography,
+  Divider,
+  CircularProgress,
+} from "@mui/material";
+import NotificationsIcon from "@mui/icons-material/Notifications";
 import { styled } from "@mui/system";
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 
 dayjs.extend(relativeTime);
+dayjs.locale("vi");
 
 const NotificationButton = styled(IconButton)({
-  color: "rgb(34 197 94)", // Màu xanh lá cây
-  marginRight: "8px", // hoặc theme.spacing(2) nếu bạn đang sử dụng chủ đề Material-UI
+  color: "rgb(34 197 94)", // Green color
+  marginRight: "8px", // or theme.spacing(2) if you're using Material-UI theme
 });
 
 const PopoverContent = styled("div")({
   width: "400px",
-  maxHeight: "300px", // Giới hạn chiều cao của popover
-  overflowY: "auto", // Hiển thị thanh cuộn khi nội dung vượt quá chiều cao
-  padding: "16px", // hoặc theme.spacing(2)
+  maxHeight: "300px", // Limit the height of the popover
+  overflowY: "auto", // Show scrollbar when content overflows
+  padding: "16px", // or theme.spacing(2)
 });
 
 const NotificationCard = styled(Card)({
-  marginBottom: "8px", // hoặc theme.spacing(1)
+  marginBottom: "8px", // or theme.spacing(1)
 });
 
-const notifications = [
-  {
-    title: "Thông báo",
-    message: "Yêu cầu đăng kí xe 32323 bị từ chối phê duyệt.",
-    time: dayjs().subtract(2, "month"),
-  },
-  {
-    title: "Hủy đặt xe - Quá hạn đặt cọc",
-    message:
-      "Yêu cầu thuê xe, chủ xe Quýt, xe SUZUKI XL7 2020, T3 21:00 21/05/2024 - T4 20:00 22/05/2024 đã bị hủy vì quá hạn đặt cọc.",
-    time: dayjs().subtract(2, "month"),
-  },
-  {
-    title: "Thông báo",
-    message: "Cập nhật GPLX thất bại. Bấm để xem chi tiết",
-    time: dayjs().subtract(2, "month"),
-  },
-  {
-    title: "Thông báo",
-    message: "Yêu cầu đăng kí xe đã được gửi.",
-    time: dayjs().subtract(2, "month"),
-  },
-  {
-    title: "Welcome to Mioto",
-    message:
-      "Chào mừng bạn tham gia cộng đồng Mioto, bấm vào đây để xem những kinh nghiệm thuê xe hữu ích.",
-    time: dayjs().subtract(2, "month"),
-  },
-];
-
 const NotificationDropdown = () => {
+  const [notifications, setNotifications] = useState([]);
+  const [notificationCount, setNotificationCount] = useState(0);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [loading, setLoading] = useState(true); // Add loading state
+  const userDataString = localStorage.getItem("user");
+  const userData = JSON.parse(userDataString);
+  const userId = userData ? userData.userId : null;
 
-  const handleClick = (event) => {
+  useEffect(() => {
+    if (!userId) return; // Ensure userId is available
+
+    // Query notifications filtered by userId
+    const q = query(
+      collection(db, "notifications"),
+      where("userId", "==", userId)
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const notificationsData = snapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          message: JSON.parse(data.message), // Parse the message from JSON
+          timestamp: data.timestamp.toDate(),
+        };
+      });
+      setNotifications(notificationsData);
+
+      // Calculate unseen notifications
+      const unseenCount = notificationsData.filter(
+        (notification) => !notification.seen
+      ).length;
+      setNotificationCount(unseenCount);
+      setLoading(false); // Set loading to false after data is loaded
+    });
+
+    return () => unsubscribe(); // Cleanup subscription on unmount
+  }, [userId]);
+
+  const handleClick = async (event) => {
     setAnchorEl(event.currentTarget);
+
+    // Mark all notifications as seen when the bell is clicked
+    notifications.forEach(async (notification) => {
+      if (!notification.seen) {
+        const notificationDocRef = doc(db, "notifications", notification.id);
+        await updateDoc(notificationDocRef, { seen: true });
+      }
+    });
+
+    setNotificationCount(0); // Reset the count after viewing
   };
 
   const handleClose = () => {
@@ -76,6 +107,11 @@ const NotificationDropdown = () => {
     <div>
       <NotificationButton aria-describedby={id} onClick={handleClick}>
         <NotificationsIcon />
+        {notificationCount > 0 && (
+          <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+            {notificationCount}
+          </span>
+        )}
       </NotificationButton>
       <Popover
         id={id}
@@ -92,18 +128,38 @@ const NotificationDropdown = () => {
         }}
       >
         <PopoverContent>
-          {notifications.map((notification, index) => (
-            <NotificationCard key={index}>
-              <CardContent>
-                <Typography variant="h6">{notification.title}</Typography>
-                <Typography variant="body2">{notification.message}</Typography>
-                <Typography color="textSecondary" variant="caption">
-                  {notification.time.fromNow()}
-                </Typography>
-              </CardContent>
-              {index < notifications.length - 1 && <Divider />}
-            </NotificationCard>
-          ))}
+          {loading ? (
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <CircularProgress />
+            </div>
+          ) : !userId || notifications.length === 0 ? (
+            <Typography variant="body2" color="textSecondary">
+              Hiện chưa có thông báo
+            </Typography>
+          ) : (
+            notifications.map((notification, index) => (
+              <NotificationCard key={notification.id}>
+                <CardContent>
+                  <Typography
+                    variant="h6"
+                    dangerouslySetInnerHTML={{
+                      __html: notification.message.title,
+                    }}
+                  />
+                  <Typography
+                    variant="body2"
+                    dangerouslySetInnerHTML={{
+                      __html: notification.message.content,
+                    }}
+                  />
+                  <Typography color="textSecondary" variant="caption">
+                    {dayjs(notification.timestamp).fromNow()}
+                  </Typography>
+                </CardContent>
+                {index < notifications.length - 1 && <Divider />}
+              </NotificationCard>
+            ))
+          )}
         </PopoverContent>
       </Popover>
     </div>
