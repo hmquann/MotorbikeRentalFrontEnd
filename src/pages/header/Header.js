@@ -25,7 +25,7 @@ const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [username, setUsername] = useState(""); // State for username
+
 
   useEffect(() => {
     const token = localStorage.getItem("token");
