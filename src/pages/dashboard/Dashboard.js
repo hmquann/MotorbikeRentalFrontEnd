@@ -4,6 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, LineChart,
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowTrendUp, faArrowTrendDown } from '@fortawesome/free-solid-svg-icons';
 import "./Dashboard.css";
+import apiClient from '../../axiosConfig';
 
 const Dashboard = () => {
   const [monthlyRevenue, setMonthlyRevenue] = useState([]);
@@ -11,15 +12,15 @@ const Dashboard = () => {
   const [twoRecentMonthBookingCount, setTwoMonthBookingCount] = useState([]);
   
   useEffect(() => {
-    axios.get('http://localhost:8080/dashboard/sixMonthRevenue')
+    apiClient.get('/dashboard/sixMonthRevenue')
       .then(response => setMonthlyRevenue(response.data))
       .catch(error => console.error('Error fetching revenue:', error));
 
-    axios.get('http://localhost:8080/dashboard/mainLocationCount')
+    apiClient.get('/dashboard/mainLocationCount')
       .then(response => setLocationPercentage(response.data))
       .catch(error => console.error('Error fetching location data:', error));
 
-    axios.get('http://localhost:8080/dashboard/twoRecentMonthBookingCount')
+    apiClient.get('/dashboard/twoRecentMonthBookingCount')
       .then(response => setTwoMonthBookingCount(response.data))
       .catch(error => console.error('Error fetching booking count data:', error));
   }, []);

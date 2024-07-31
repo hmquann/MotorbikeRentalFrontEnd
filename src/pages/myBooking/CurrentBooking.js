@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import BookingCard from "./BookingCard";
-import axios from "axios";
+import apiClient from "../../axiosConfig";
 import NoBooking from "./NoBooking";
 
 const CurrentBooking = ({ filters }) => {
@@ -11,8 +11,8 @@ const CurrentBooking = ({ filters }) => {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const response = await axios.post(
-          "http://localhost:8080/api/booking/filter",
+        const response = await apiClient.post(
+          "/api/booking/filter",
           {
             tripType: filters.tripType,
             userId: filters.userId,

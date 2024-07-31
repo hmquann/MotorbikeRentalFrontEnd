@@ -53,7 +53,6 @@ function App() {
     <>
       <Header />
       <Routes>
-        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/employee" element={<PostUser />} />
         <Route path="/employee/:id" element={<UpdateUser />} />
         <Route path="/login" element={<Login />} />
@@ -94,6 +93,7 @@ function App() {
           <Route path="/menu/profile" element={<Profile />} />
           <Route path="/menu/approveLicense" element={<ApproveLicense />} />
           <Route path="/menu/userData" element={<UserData />} />
+          <Route path="/menu/dashboard" element={<Dashboard />} />
         </Route>
 
         <Route path="/booking" element={<Booking />} />

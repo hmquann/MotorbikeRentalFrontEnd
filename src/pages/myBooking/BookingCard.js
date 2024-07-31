@@ -16,10 +16,12 @@ import PopUpConfirm from "./PopUpConfirm";
 import PopUpSuccess from "./PopUpSuccess";
 import { useNavigate } from "react-router-dom";
 import FeedbackModal from "../booking/FeedbackModal";
+import apiClient from "../../axiosConfig";
 
 const BookingCard = ({ booking }) => {
   const [motorbikeName, setMotorbikeName] = useState();
   const [lessorName, setLessorName] = useState();
+  const [lessorId, setLessorId] = useState();
   const [urlImage, setUrlImage] = useState();
   const userDataString = localStorage.getItem("user");
   const userData = JSON.parse(userDataString);
@@ -76,8 +78,8 @@ const BookingCard = ({ booking }) => {
   useEffect(() => {
     const fetcMotorbike = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:8080/api/motorbike/${booking.motorbikeId}`
+        const response = await apiClient.get(
+          `/api/motorbike/${booking.motorbikeId}`
         );
         setMotorbikeName(
           `${response.data.model.modelName} ${response.data.yearOfManufacture}`
@@ -85,10 +87,11 @@ const BookingCard = ({ booking }) => {
         setLessorName(
           `${response.data.user.firstName} ${response.data.user.lastName}`
         );
+        setLessorId(`${response.data.user.id}`);
         setUrlImage(response.data.motorbikeImages[0].url);
 
-        const response1 = await axios.get(
-          `http://localhost:8080/api/motorbike/existMotorbikeByUserId/${booking.motorbikeId}/${userData.userId}`
+        const response1 = await apiClient.get(
+          `/api/motorbike/existMotorbikeByUserId/${booking.motorbikeId}/${userData.userId}`
         );
         setMotorbike(response1.data);
       } catch (error) {
@@ -140,8 +143,20 @@ const BookingCard = ({ booking }) => {
 
   const handleConfirm = async () => {
     try {
-      const url = `http://localhost:8080/api/booking/changeStatus/${booking.bookingId}/${action}`;
-      await axios.put(url);
+      const url = `/api/booking/changeStatus/${booking.bookingId}/${action}`;
+      await apiClient.put(url);
+      if (action === "DEPOSIT_MADE") {
+        const subtractMoneyUrl = `/api/payment/subtract`;
+        const addMoneyUrl = `/api/payment/add`;
+        const renterId = userData.userId; // Replace with actual user ID if different
+        const amount = (booking.totalPrice * 30) / 100; // Replace with actual amount to be subtracted
+        await apiClient.post(subtractMoneyUrl, null, {
+          params: { id: renterId, amount: amount },
+        });
+        await apiClient.post(addMoneyUrl, null, {
+          params: { id: lessorId, amount: amount },
+        });
+      }
       setShowPopUp(false);
       setShowPopupSuccess(true); // Show success popup
       setTimeout(() => {
@@ -286,13 +301,18 @@ const BookingCard = ({ booking }) => {
       </div>
       {showPopUp && (
         <PopUpConfirm
+          show={showPopUp}
           message={messageConfirm}
           onConfirm={handleConfirm}
           onCancel={() => setShowPopUp(false)}
         />
       )}
       {showPopupSuccess && (
-        <PopUpSuccess message="Bạn đã cập nhật thành công trạng thái chuyến!"></PopUpSuccess>
+       <PopUpSuccess
+       show={showPopupSuccess}
+       onHide={() => setShowPopupSuccess(false)}
+       message="Bạn đã cập nhật thành công trạng thái chuyến !"
+       />
       )}
     </div>
   );

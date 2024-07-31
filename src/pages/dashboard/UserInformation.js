@@ -5,12 +5,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleInfo, faToggleOff, faToggleOn } from "@fortawesome/free-solid-svg-icons";
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
+import apiClient from "../../axiosConfig";
 
 const BUTTON_CLASS = "px-4 py-2 rounded w-28 flex items-center justify-center";
 const GREEN_BUTTON_CLASS =
-  "py-1 px-2 rounded-lg bg-green-500 text-white  hover:bg-green-600 " 
+  "py-1 px-2 rounded-lg bg-green-500 text-white  hover:bg-green-600 transition hover:scale-105" 
 const RED_BUTTON_CLASS =
-  "py-1 px-2 rounded-lg bg-red-500 text-white  hover:bg-red-600 "
+  "py-1 px-2 rounded-lg bg-red-500 text-white  hover:bg-red-600 transition hover:scale-105"
 const HEADER_CLASS = "py-3 px-4 font-semibold text-uppercase text-gray-500";
 const CELL_CLASS = "py-3 px-4 text-md";
 
@@ -42,7 +43,7 @@ const UserInformation = ({
   const confirmToggleUserStatus = async (id) => {
     setIsLoading(true);
     try {
-      await axios.patch(`http://localhost:8080/api/user/${id}/toggle`);
+      await apiClient.patch(`/api/user/${id}/toggle`);
 
       const updatedUsers = users.map((user) =>
         user.id === id ? { ...user, active: !user.active } : user
@@ -214,7 +215,7 @@ const UserInformation = ({
                           {user.active ? <FontAwesomeIcon icon={faToggleOn} /> : <FontAwesomeIcon icon={faToggleOff} />}
                         </button>
                         <button
-                          className="py-1 px-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600"
+                          className="py-1 px-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition hover:scale-105"
                           onClick={() => handleUserClick(user)}
                         >
                           <FontAwesomeIcon icon={faCircleInfo} />
@@ -266,14 +267,15 @@ const UserInformation = ({
         </p>
       </Modal.Body>
       <Modal.Footer>
-      <Button variant="secondary" onClick={() => setShowConfirmation(false)}>
-          Cancel
+      <Button variant="danger" className="hover:scale-105" onClick={() => setShowConfirmation(false)}>
+          Hủy
         </Button>
         <Button
           variant="primary"
+          className="transition hover:scale-105"
           onClick={() => confirmToggleUserStatus(selectedUserId)}
         >
-          Confirm
+          Xác nhận
         </Button>
       </Modal.Footer>
     </Modal>

@@ -7,6 +7,7 @@ import axios from "axios";
 import PopUpSuccess from "./PopUpSuccess";
 import BlogUpdating from "./BlogUpdating"; // Adjust the import path as necessary
 import { useNavigate } from "react-router-dom"; // Ensure this import is correct
+import apiClient from "../../axiosConfig";
 
 const BlogCard = ({ blog, onUpdate }) => {
   const [showDeletePopup, setShowDeletePopup] = useState(false);
@@ -20,8 +21,8 @@ const BlogCard = ({ blog, onUpdate }) => {
   };
 
   const deleteBlog = () => {
-    axios
-      .delete(`http://localhost:8080/api/blogs/deleteBlog/${blog.id}`)
+    apiClient
+      .delete(`/api/blogs/deleteBlog/${blog.id}`)
       .then((response) => {
         setSuccessMessage("This blog deleted successfully!");
         setShowDeletePopup(false);

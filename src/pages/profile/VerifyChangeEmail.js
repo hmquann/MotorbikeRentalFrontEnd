@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import PopupMessage from "./PopupMessage";
+import apiClient from "../../axiosConfig";
 
 const VerifyChangeEmail = () => {
   const [showPopup, setShowPopup] = useState(true);
@@ -11,8 +12,8 @@ const VerifyChangeEmail = () => {
   useEffect(() => {
     console.log(token);
     if (token !== null) {
-      axios
-        .post(`http://localhost:8080/updateEmail/${token}/${newEmail}`)
+      apiClient
+        .post(`/updateEmail/${token}/${newEmail}`)
         .then((response) => {
           console.log("User:", response.data);
           setShowPopup(true); // Hiển thị popup khi thành công

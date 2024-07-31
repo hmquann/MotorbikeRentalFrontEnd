@@ -4,47 +4,73 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Form from 'react-bootstrap/Form';
+import apiClient from "../../axiosConfig";
 
 const AddBrand = ({ showModal, setShowModal, onBrandCreated }) => {
-  const [brandName, setBrandName] = useState("");
-  const [brandOrigin, setBrandOrigin] = useState("");
-  const [error, setError] = useState("");
+  const [formData, setFormData] = useState({
+    brandName: "",
+    brandOrigin: "",
+  });
 
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === "Escape") {
-        handleModalClose();
-      } else if (e.key === "Enter") {
-        handleCreateBrand();
-      }
-    };
+  const [errors, setErrors] = useState({
+    brandName: "",
+    brandOrigin: "",
+  });
 
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [brandName, brandOrigin]);
 
   const handleModalClose = () => {
     setShowModal(false);
-    setBrandName("");
-    setBrandOrigin("");
-    setError("");
+    setFormData({
+      brandName: "",
+      brandOrigin: "",
+    });
+    setErrors({
+      brandName: "",
+      brandOrigin: "",
+    });
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    const regex = /^[a-zA-Z0-9\s\u00C0-\u1EF9]*$/;
+
+    if (!regex.test(value)) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: "Không được chứa ký tự đặc biệt.",
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: "",
+      }));
+    }
+
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
   };
 
   const handleCreateBrand = async () => {
-    if (!brandName.trim() || !brandOrigin.trim()) {
-      setError("Hãy điền đủ thông tin.");
+    if (!formData.brandName.trim() || !formData.brandOrigin.trim()) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        form: "Hãy điền đủ thông tin.",
+      }));
       return;
     }
 
+    if (errors.brandName || errors.brandOrigin) {
+      return; 
+    }
+
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/brand/createBrand",
+      const response = await apiClient.post(
+        "/api/brand/createBrand",
         {
-          brandName,
-          origin: brandOrigin,
+          brandName: formData.brandName,
+          origin: formData.brandOrigin,
         }
       );
       if (response.status === 200) {
@@ -52,12 +78,15 @@ const AddBrand = ({ showModal, setShowModal, onBrandCreated }) => {
         handleModalClose();
       }
     } catch (error) {
-      setError("Thương hiệu đã tồn tại");
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        form: "Thương hiệu đã tồn tại",
+      }));
     }
   };
 
   return (
-    <Modal show={showModal} onHide={handleModalClose} backdrop="static" keyboard={false}>
+    <Modal show={showModal} onHide={handleModalClose} backdrop="static" >
       <Modal.Header closeButton>
         <Modal.Title>Thêm thương hiệu</Modal.Title>
       </Modal.Header>
@@ -71,9 +100,14 @@ const AddBrand = ({ showModal, setShowModal, onBrandCreated }) => {
             <Form.Control
               type="text"
               placeholder="Tên thương hiệu"
-              value={brandName}
-              onChange={(e) => setBrandName(e.target.value)}
+              name="brandName"
+              value={formData.brandName}
+              onChange={handleChange}
+              isInvalid={!!errors.brandName}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors.brandName}
+            </Form.Control.Feedback>
           </FloatingLabel>
           <FloatingLabel
             controlId="floatingBrandOrigin"
@@ -83,18 +117,24 @@ const AddBrand = ({ showModal, setShowModal, onBrandCreated }) => {
             <Form.Control
               type="text"
               placeholder="Xuất xứ"
-              value={brandOrigin}
-              onChange={(e) => setBrandOrigin(e.target.value)}
+              name="brandOrigin"
+              value={formData.brandOrigin}
+              onChange={handleChange}
+              isInvalid={!!errors.brandOrigin}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors.brandOrigin}
+            </Form.Control.Feedback>
           </FloatingLabel>
-          {error && <div className="text-red-500 mb-2 font-bold text-center">{error}</div>}
+          {errors.form && <div className="text-red-500 mb-2 font-bold text-center">{errors.form}</div>}
         </form>
       </Modal.Body>
       <Modal.Footer>
-      <button  className="px-4 py-2 hover:bg-red-700 bg-red-600 text-white rounded-lg mr-2" onClick={handleModalClose}>
+      <button  className="px-4 py-2 hover:bg-red-700 bg-red-600 text-white rounded-lg mr-2 transition hover:scale-105" onClick={handleModalClose}>
           Đóng
         </button>
-        <button  className="px-4 py-2 hover:bg-blue-700 bg-blue-600 text-white rounded-lg" onClick={handleCreateBrand}>
+        <button  className="px-4 py-2 hover:bg-blue-700 bg-blue-600 text-white rounded-lg transition hover:scale-105" onClick={handleCreateBrand}>
+
           Lưu
         </button>
       </Modal.Footer>

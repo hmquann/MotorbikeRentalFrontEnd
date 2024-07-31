@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import CurrentBooking from "./CurrentBooking";
-import "./MyBooking.css";
 import HistoryBooking from "./HistoryBooking";
+import "./MyBooking.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSliders } from "@fortawesome/free-solid-svg-icons";
 import PopUpFilter from "./PopUpFilter";
@@ -11,14 +11,17 @@ const MyBooking = () => {
   const userDataString = localStorage.getItem("user");
   const userData = JSON.parse(userDataString);
   const [showFilterPopup, setShowFilterPopup] = useState(false);
-  const [filters, setFilters] = useState({
+
+  const defaultFilters = {
     tripType: "all",
     userId: userData.userId,
     status: "all",
     sort: "sortByBookingTimeDesc",
     startTime: null,
     endTime: null,
-  });
+  };
+
+  const [filters, setFilters] = useState(defaultFilters);
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
@@ -28,6 +31,11 @@ const MyBooking = () => {
     console.log("Applied filters:", appliedFilters);
     setFilters(appliedFilters);
   };
+
+  useEffect(() => {
+    // Reset filters to default when activeTab changes
+    setFilters(defaultFilters);
+  }, [activeTab]);
 
   useEffect(() => {
     if (showFilterPopup) {
@@ -80,6 +88,7 @@ const MyBooking = () => {
           onClose={() => setShowFilterPopup(false)}
           onApply={handleApplyFilter}
           activeTab={activeTab}
+          initialFilters={filters} // Pass current filters as initial filters
         />
       )}
     </div>

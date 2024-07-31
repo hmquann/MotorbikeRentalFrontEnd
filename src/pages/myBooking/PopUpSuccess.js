@@ -1,11 +1,28 @@
-import React from "react";
+import React from 'react';
+import { Modal } from 'react-bootstrap';
 
-const PopUpSuccess = ({ message }) => {
+const PopupSuccess = ({ show, onHide, message }) => {
   return (
-    <div className="fixed top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-green-500 text-white px-4 py-2 rounded shadow">
-      {message}
-    </div>
+    <Modal show={show} onHide={onHide} centered>
+      <div className="p-8 rounded bg-gray-50 font-[sans-serif]">
+        <h2 className="text-gray-800 text-center text-2xl font-bold">
+          Thành công
+        </h2>
+        <p className="text-gray-800 text-sm mt-4 text-center">
+          {message}
+        </p>
+        <div className="text-center mt-8">
+          <button
+            type="button"
+            onClick={onHide}
+            className="py-2 px-4 text-sm tracking-wide rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none"
+          >
+            OK
+          </button>
+        </div>
+      </div>
+    </Modal>
   );
 };
 
-export default PopUpSuccess;
+export default PopupSuccess;

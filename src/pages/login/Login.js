@@ -1,22 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Modal } from "react-bootstrap";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLock, faUser } from "@fortawesome/free-solid-svg-icons";
+import apiClient from "../../axiosConfig";
 
 
-
-const Login = () => {
+const Login = ({ show, handleClose, onLoginSuccess, showRegister, showForgotPassword}) => {
   const apiLogin = "http://localhost:8080/api/auth/signin";
+
   const containerClasses = "bg-gray-50 font-[sans-serif]";
   const contentClasses =
     "min-h-screen flex flex-col items-center justify-center py-6 px-4";
-  const formClasses = "max-w-md w-full p-8 rounded-2xl bg-white shadow";
+  const formClasses = "p-8 rounded bg-gray-50 font-[sans-serif]";
   const inputClasses =
     "w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600";
   const buttonClasses =
-    "w-full py-3 px-4 text-sm tracking-wide rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none";
-  const errorClasses = "text-red-500 mt-2 ml-1";
+    "w-full py-3 px-4 text-sm tracking-wide rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none transition hover:scale-105";
+  const errorClasses = "text-red-500 text-center font-bold";
 
   const [credentials, setCredentials] = useState({
     emailOrPhone: "",
@@ -36,7 +38,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(apiLogin, credentials, {
+      const response = await apiClient.post("/api/auth/signin", credentials, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -64,18 +66,19 @@ const Login = () => {
         console.error("No roles found in the response:", data.roles);
       }
 
-      if (data.roles.includes("ADMIN")) {
-        navigate("/dashboard");
-      } else if (data.roles && data.roles.includes("USER", "LESSOR")) {
-        navigate("/homepage");
-      }
+      // if (data.roles && data.roles.includes("ADMIN")) {
+      //   navigate("/menu/dashboard");
+      // } else if (data.roles && data.roles.includes("USER", "LESSOR")) {
+      //   navigate("/homepage");
+      // }
+      onLoginSuccess(userInfor);
     } catch (error) {
       if (error.response) {
         const { status, data } = error.response;
         if (status === 401) {
-          setError("Hãy kiểm tra lại tài khoản hoặc mật khẩu.");
+          setError("Hãy kiểm tra lại tài khoản hoặc mật khẩu");
         } else if (status === 403) {
-          setError("Your account has been locked");
+          setError("Tài khoản của bạn chưa được kích hoạt");
         } else {
           setError(data.message || "Something went wrong");
         }
@@ -95,82 +98,85 @@ const Login = () => {
   }, [navigate]);
 
   return (
-    <div className={containerClasses}>
-      <div className={contentClasses}>
-        <div className="max-w-md w-full">
-          <div className={formClasses}>
-            <h2 className="text-gray-800 text-center text-2xl font-bold">
-              Đăng nhập
-            </h2>
-            <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
-              <div>
-                <label className="text-gray-800 text-sm font-semibold mb-2 block">
-                  Email/Số điện thoại
-                </label>
-                <div className="relative flex items-center">
-                  <input
-                    name="emailOrPhone"
-                    type="text"
-                    required
-                    className={inputClasses}
-                    placeholder="Nhập Email hoặc Số điện thoại"
-                    value={credentials.emailOrPhone}
-                    onChange={handleChange}
-                  />
-           <FontAwesomeIcon icon={faUser}  className="w-4 h-4 absolute right-4" />
-                </div>
-              </div>
+    <Modal show={show} onHide={handleClose} >
+        <div >
+          <div >
+            <div >
+              <div className={formClasses}>
+                <h2 className="text-gray-800 text-center text-2xl font-bold">
+                  Đăng nhập
+                </h2>
+                <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
+                  <div>
+                    <label className="text-gray-800 text-sm font-semibold mb-2 block">
+                      Email/Số điện thoại
+                    </label>
+                    <div className="relative flex items-center">
+                      <input
+                        name="emailOrPhone"
+                        type="text"
+                        required
+                        className={inputClasses}
+                        placeholder="Nhập Email hoặc Số điện thoại"
+                        value={credentials.emailOrPhone}
+                        onChange={handleChange}
+                      />
+                      <FontAwesomeIcon icon={faUser} className="w-4 h-4 absolute right-4" />
+                    </div>
+                  </div>
 
-              <div>
-                <label className="text-gray-800 text-sm font-semibold mb-2 block">
-                  Mật khẩu
-                </label>
-                <div className="relative flex items-center">
-                  <input
-                    name="password"
-                    type="password"
-                    required
-                    className={inputClasses}
-                    placeholder="Nhập mật khẩu"
-                    value={credentials.password}
-                    onChange={handleChange}
-                  />
-                 <FontAwesomeIcon icon={faLock}  className="w-4 h-4 absolute right-4" />
-              
-                </div>
-              </div>
-
-              <div className="flex flex-wrap items-center justify-end gap-4">
-                <div className="text-sm">
-                  <Link
-                    to="/forgotpassword"
+                  <div>
+                    <label className="text-gray-800 text-sm font-semibold mb-2 block">
+                      Mật khẩu
+                    </label>
+                    <div className="relative flex items-center">
+                      <input
+                        name="password"
+                        type="password"
+                        required
+                        className={inputClasses}
+                        placeholder="Nhập mật khẩu"
+                        value={credentials.password}
+                        onChange={handleChange}
+                      />
+                      <FontAwesomeIcon icon={faLock} className="w-4 h-4 absolute right-4" />
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center justify-end gap-4">
+                    <div className="text-sm">
+                    <button
+                    type="button"
+                    onClick={showForgotPassword}
                     className="text-green-500 no-underline hover:underline ml-1 whitespace-nowrap font-semibold"
                   >
-                    Quên mật khẩu?
-                  </Link>
-                </div>
-              </div>
+                    Quên mật khẩu
+                  </button>
+                    </div>
+                  </div>
 
-              <div className="!mt-8">
-                <button type="submit" className={buttonClasses}>
-                  Đăng nhập
-                </button>
+                  <div className="!mt-8">
+                    <button type="submit" className={buttonClasses}>
+                      Đăng nhập
+                    </button>
+                  </div>
+                  {error && <div className={errorClasses}>{error}</div>}
+                  <p className="text-gray-800 text-sm !mt-8 text-center">
+                    Bạn chưa có tài khoản?{" "}
+                    <button
+                    type="button"
+                    onClick={showRegister}
+                    className="text-green-500 no-underline hover:underline ml-1 whitespace-nowrap font-semibold"
+                  >
+                    Đăng ký ở đây
+                  </button>
+                  </p>
+                </form>
               </div>
-              {error && <div className={errorClasses}>{error}</div>}
-              <p className="text-gray-800 text-sm !mt-8 text-center">
-               Bạn chưa có tài khoản?{" "}
-                <Link
-                  to="/register"
-                  className="text-green-500 no-underline hover:underline ml-1 whitespace-nowrap font-semibold"
-                >
-                  Đăng ký ở đây
-                </Link>
-              </p>
-            </form>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+  
+    </Modal>
   );
 };
 

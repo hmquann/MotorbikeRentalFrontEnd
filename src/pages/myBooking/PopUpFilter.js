@@ -6,12 +6,12 @@ import dayjs from "dayjs";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 
-const PopUpFilter = ({ onClose, onApply, activeTab }) => {
-  const [sort, setSort] = useState("sortByBookingTimeDesc");
-  const [tripType, setTripType] = useState("all");
-  const [status, setStatus] = useState("all");
-  const [startTime, setStartTime] = useState(dayjs().format("YYYY-MM-DD"));
-  const [endTime, setEndTime] = useState(dayjs().format("YYYY-MM-DD"));
+const PopUpFilter = ({ onClose, onApply, activeTab, initialFilters }) => {
+  const [sort, setSort] = useState(initialFilters.sort);
+  const [tripType, setTripType] = useState(initialFilters.tripType);
+  const [status, setStatus] = useState(initialFilters.status);
+  const [startTime, setStartTime] = useState(initialFilters.startTime);
+  const [endTime, setEndTime] = useState(initialFilters.endTime);
   const [error, setError] = useState(null);
 
   const userDataString = localStorage.getItem("user");
@@ -21,16 +21,14 @@ const PopUpFilter = ({ onClose, onApply, activeTab }) => {
     setSort("sortByBookingTimeDesc");
     setTripType("all");
     setStatus("all");
-    setStartTime(dayjs().format("YYYY-MM-DD"));
-    setEndTime(dayjs().format("YYYY-MM-DD"));
+    setStartTime(null);
+    setEndTime(null);
     setError(null);
   };
 
   const handleStartDateChange = (newValue) => {
-    const formattedDate = newValue
-      ? newValue.format("YYYY-MM-DD")
-      : dayjs().format("YYYY-MM-DD");
-    if (dayjs(formattedDate).isAfter(endTime)) {
+    const formattedDate = newValue ? newValue.format("YYYY-MM-DD") : null;
+    if (formattedDate && dayjs(formattedDate).isAfter(endTime)) {
       setError("End date cannot be earlier than start date");
     } else {
       setStartTime(formattedDate);
@@ -39,10 +37,8 @@ const PopUpFilter = ({ onClose, onApply, activeTab }) => {
   };
 
   const handleEndDateChange = (newValue) => {
-    const formattedDate = newValue
-      ? newValue.format("YYYY-MM-DD")
-      : dayjs().format("YYYY-MM-DD");
-    if (dayjs(formattedDate).isBefore(startTime)) {
+    const formattedDate = newValue ? newValue.format("YYYY-MM-DD") : null;
+    if (formattedDate && dayjs(formattedDate).isBefore(startTime)) {
       setError("End date cannot be earlier than start date");
     } else {
       setEndTime(formattedDate);
@@ -51,22 +47,23 @@ const PopUpFilter = ({ onClose, onApply, activeTab }) => {
   };
 
   useEffect(() => {
-    if (dayjs(startTime).isAfter(endTime)) {
+    if (startTime && endTime && dayjs(startTime).isAfter(endTime)) {
       setError("End date cannot be earlier than start date");
-    }
-    if (!dayjs(startTime).isAfter(endTime)) {
+    } else {
       setError(null);
     }
   }, [startTime, endTime]);
 
   const handleApply = () => {
-    if (error !== null || error !== "") {
+    if (!error) {
       const formDataApply = {
         sort,
         tripType,
         status,
-        startTime: dayjs(startTime).format("YYYY-MM-DDTHH:mm:ss"),
-        endTime: dayjs(endTime).format("YYYY-MM-DDTHH:mm:ss"),
+        startTime: startTime
+          ? dayjs(startTime).format("YYYY-MM-DDTHH:mm:ss")
+          : null,
+        endTime: endTime ? dayjs(endTime).format("YYYY-MM-DDTHH:mm:ss") : null,
         userId: userData.userId,
       };
       onApply(formDataApply);
@@ -107,7 +104,6 @@ const PopUpFilter = ({ onClose, onApply, activeTab }) => {
             <label className="block text-sm font-medium mb-2">Sắp xếp</label>
             <select
               className="form-select w-full border border-border rounded-lg p-2"
-              defaultValue="sortByBookingTimeDesc"
               value={sort}
               onChange={(e) => setSort(e.target.value)}
             >
@@ -166,7 +162,7 @@ const PopUpFilter = ({ onClose, onApply, activeTab }) => {
                     }
                   >
                     <DesktopDatePicker
-                      value={dayjs(startTime)}
+                      value={startTime ? dayjs(startTime) : null}
                       onChange={handleStartDateChange}
                     />
                   </DemoItem>
@@ -178,7 +174,7 @@ const PopUpFilter = ({ onClose, onApply, activeTab }) => {
                     }
                   >
                     <DesktopDatePicker
-                      value={dayjs(endTime)}
+                      value={endTime ? dayjs(endTime) : null}
                       onChange={handleEndDateChange}
                     />
                   </DemoItem>

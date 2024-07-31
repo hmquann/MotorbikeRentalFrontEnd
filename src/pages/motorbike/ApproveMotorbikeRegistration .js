@@ -14,10 +14,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
+import apiClient from "../../axiosConfig";
 
 const tableCellClasses =
   "px-6 py-4 whitespace-nowrap text-base font-semibold text-amber-900 ";
-const buttonClasses = "py-1 px-2 rounded-lg";
+const buttonClasses = "py-1 px-2 rounded-lg transition hover:scale-105";
 const modalOverlayClasses =
   "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 backdrop-blur-sm";
 const modalContentClasses = "bg-white p-4 rounded-lg shadow-lg max-w-md w-full";
@@ -58,8 +59,8 @@ const ApproveMotorbikeRegistration = () => {
     try {
       setIsLoading(true);
       // const status = statusFilter !== 'all' ? statusFilter : 'all';
-      const response = await axios.get(
-        `http://localhost:8080/api/motorbike/allMotorbike/${page}/${size}`,
+      const response = await apiClient.get(
+        `/api/motorbike/allMotorbike/${page}/${size}`,
         {
           params: {
             userId: userId,
@@ -92,8 +93,8 @@ const ApproveMotorbikeRegistration = () => {
 
   const fetchDetailMotorbike = async (motorbikeId) => {
     try {
-      const response = await axios.get(
-        `http://localhost:8080/api/motorbike/${motorbikeId}`
+      const response = await apiClient.get(
+        `/api/motorbike/${motorbikeId}`
       );
       console.log(response.data);
       setSelectedMotorbike(response.data);
@@ -115,8 +116,8 @@ const ApproveMotorbikeRegistration = () => {
   const searchMotorbike = async (searchTerm, userId, roles, page, size) => {
     try {
       setIsLoading(true);
-      const response = await axios.get(
-        `http://localhost:8080/api/motorbike/search`,
+      const response = await apiClient.get(
+        `/api/motorbike/search`,
         {
           params: {
             searchTerm,
@@ -184,8 +185,8 @@ const ApproveMotorbikeRegistration = () => {
   };
   const handleActionWithCheck = async (motorbike, action) => {
     try {
-      const response = await axios.get(
-        `http://localhost:8080/api/booking/motorbike/${motorbike.id}`
+      const response = await apiClient.get(
+        `/api/booking/motorbike/${motorbike.id}`
       );
       const bookings = response.data;
 
@@ -230,14 +231,14 @@ const ApproveMotorbikeRegistration = () => {
   const handleConfirm = () => {
     const url =
       actionType === "approve"
-        ? `http://localhost:8080/api/motorbike/approve/${selectedMotorbike.id}`
+        ? `/api/motorbike/approve/${selectedMotorbike.id}`
         : actionType === "reject"
-        ? `http://localhost:8080/api/motorbike/reject/${selectedMotorbike.id}`
+        ? `/api/motorbike/reject/${selectedMotorbike.id}`
         : actionType === "activate"
-        ? `http://localhost:8080/api/motorbike/toggleStatus/${selectedMotorbike.id}`
-        : `http://localhost:8080/api/motorbike/toggleStatus/${selectedMotorbike.id}`;
+        ? `/api/motorbike/toggleStatus/${selectedMotorbike.id}`
+        : `/api/motorbike/toggleStatus/${selectedMotorbike.id}`;
 
-    axios
+    apiClient
       .put(url)
       .then((response) => {
         if (response.data) {
@@ -583,7 +584,7 @@ const ApproveMotorbikeRegistration = () => {
           </p>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal}>
+          <Button variant="secondary" className="transition hover:scale-105" onClick={handleCloseModal}>
             Đóng
           </Button>
         </Modal.Footer>
@@ -604,10 +605,10 @@ const ApproveMotorbikeRegistration = () => {
             </p>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="success" onClick={handleConfirm}>
+            <Button variant="success" className="transition hover:scale-105" onClick={handleConfirm}>
               Có
             </Button>
-            <Button variant="secondary" onClick={handleCancel}>
+            <Button variant="secondary" className="transition hover:scale-105" onClick={handleCancel}>
               Hủy
             </Button>
           </Modal.Footer>

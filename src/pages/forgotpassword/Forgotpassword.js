@@ -1,48 +1,43 @@
 import axios from "axios";
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Popup from "./PopUpSuccess";
+import apiClient from "../../axiosConfig";
+import { Modal } from "react-bootstrap";
+import PopupSuccess from "./PopUpSuccess";
 
-const modalOverlayClasses =
-  "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50";
+
 const modalContentClasses =
-  "bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-6 w-80";
+  "p-8 rounded bg-gray-50 font-[sans-serif]";
 const buttonClasses =
   "text-zinc-500 dark:text-zinc-300 hover:text-zinc-700 dark:hover:text-zinc-100";
 const inputClasses =
   "w-full p-2 mb-4 bg-zinc-200 rounded-lg light:bg-zinc-700 dark:text-zinc-200-dark";
 const submitButtonClasses =
-  "w-full p-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600";
+  "w-full py-3 px-4 text-sm tracking-wide rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none";
 
-const Forgotpassword = () => {
-  const [isOpen, setIsOpen] = useState(true);
+const Forgotpassword = ({ show, handleClose, showLogin }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [error, setError] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
 
-  const handleClose = () => {
-    setIsOpen(false);
-    navigate("/login"); // Điều hướng đến trang chủ hoặc trang bạn muốn sau khi đóng modal
-  };
-
   const handleChange = (event) => {
     setEmail(event.target.value);
   };
 
   const handleSubmit = (e) => {
+    e.preventDefault();
     if (!email.trim()) {
       setError("Email cannot be empty.");
       setLoading(false);
       return;
     }
-    e.preventDefault();
     setLoading(true);
 
-    axios
-      .post("http://localhost:8080/password/forgot", null, {
+    apiClient
+      .post("/password/forgot", null, {
         params: { email: email },
         headers: {
           "Content-Type": "application/json",
@@ -50,59 +45,87 @@ const Forgotpassword = () => {
       })
       .then((response) => {
         console.log(response.data);
-        setShowPopup(true); // Hiển thị popup khi thành công
+        setShowPopup(true); 
         setTimeout(() => {
-          setShowPopup(false); // Ẩn popup sau 3 giây
-          navigate("/login"); //chuyển sang trang login sau khi thông báo
+          setShowPopup(false); 
+          handleClose(); 
         }, 3000);
-        // Xử lý phản hồi thành công
       })
       .catch((error) => {
         console.error(error);
         setError(error.response.data);
-        // Xử lý lỗi
       })
       .finally(() => {
         setLoading(false);
       });
   };
 
-  if (!isOpen) return null;
-  return (
-    <div className={modalOverlayClasses}>
-      <div className={modalContentClasses}>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100-dark">
-            Forgotten Password
-          </h2>
-          <button
-            onClick={handleClose}
-            className={`text-zinc-400 dark:text-zinc-300 hover:text-zinc-600 dark:hover:text-zinc-500 ${buttonClasses}`}
-          >
-            <span className="sr-only">Close</span>
-            &times;
-          </button>
-        </div>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="email"
-            onChange={handleChange}
-            placeholder="Enter your email"
-            className={inputClasses}
-          />
+  if (!show) return null;
 
-          <button type="submit" className={submitButtonClasses}>
-            {loading ? "Submitting..." : "Submit"}
-          </button>
-          {error && (
-            <div className="text-red-500 text-center mt-4">{error}</div>
-          )}
-        </form>
-        {showPopup && (
-          <Popup message="Your request sent successfully! Please check your email!" />
-        )}
-      </div>
-    </div>
+ 
+  return (
+    <Modal show={show} onHide={handleClose}>
+      {showPopup ? (
+        <PopupSuccess
+          show={showPopup}
+          onHide={() => {
+            setShowPopup(false);
+            handleClose();
+          }}
+          message="Yêu cầu đổi mật khẩu đã gửi thành công! Hãy kiểm tra email của bạn"
+        />
+      ) : (
+        <>
+          <div >
+            <div className="p-4 sm:p-7">
+              <div className="text-center">
+                <h1 className="block text-2xl font-bold text-gray-800 dark:text-white">Quên mật khẩu</h1>
+                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                  Bạn đã nhớ mật khẩu?
+                  <button
+              type="button"
+              onClick={showLogin}
+              className="text-green-500 no-underline hover:underline ml-1 whitespace-nowrap font-semibold"
+            >
+              Đăng nhập tại đây
+            </button>
+                </p>
+              </div>
+              <div className="mt-5">
+                <form onSubmit={handleSubmit}>
+                  <div className="grid gap-y-4">
+                    <div>
+                      <label htmlFor="email" className="block text-sm font-bold ml-1 mb-2 dark:text-white">Email của bạn</label>
+                      <div className="relative">
+                        <input
+                          type="email"
+                          id="email"
+                          name="email"
+                          className="w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600"
+                          required
+                          aria-describedby="email-error"
+                          value={email}
+                          onChange={handleChange}
+                        />
+                      </div>
+                      {error && (
+                        <p className="text-xs text-red-600 mt-2" id="email-error">{error}</p>
+                      )}
+                    </div>
+                    <button
+                      type="submit"
+                       className="w-full py-3 px-4 text-sm tracking-wide rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none transition hover:scale-105"
+                    >
+                      {loading ? "Đang xác nhận..." : "Đổi mật khẩu"}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+    </Modal>
   );
 };
 
