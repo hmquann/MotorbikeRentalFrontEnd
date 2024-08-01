@@ -378,8 +378,8 @@ const Filter = () => {
   return (
 
   
-    <div>
-      <div className="relative">
+    <div className='bg-gray-200'>
+      <div className="relative ">
         <img
           src="https://imgcdnblog.carbay.com/wp-content/uploads/2019/12/16150859/Ducati-Streetfighter-v4s2.jpg"
           alt="Hero Image"
@@ -410,51 +410,60 @@ const Filter = () => {
     </div>
    
 </div>
-<div className="flex justify-center items-center mt-8" >
-  <div style={{ width: '100%' }}>
-    <div className="flex items-center justify-center space-x-4 text-foreground">
-      <div className='flex items-center space-x-2' onClick={() => setOpenMapBoxSearch(true)}>
-      <svg class="h-6 w-6 text-green-500"  width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">  
-      <path stroke="none" d="M0 0h24v24H0z"/>  <circle cx="12" cy="11" r="3" />  
-      <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 0 1 -2.827 0l-4.244-4.243a8 8 0 1 1 11.314 0z" /></svg>
+
+<div className="flex justify-center items-center mt-4">
+  <div style={{ width: '40%' }}>
+    <div className="flex items-center justify-center space-x-2 text-foreground border-2 border-gray-500 bg-gray-200 rounded-full px-2 py-1 text-sm">
+      <div className='flex items-center space-x-1' onClick={() => setOpenMapBoxSearch(true)}>
+        <svg className="h-4 w-4 text-green-500" width="16" height="16" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">  
+          <path stroke="none" d="M0 0h24v24H0z"/>  
+          <circle cx="12" cy="11" r="3" />  
+          <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 0 1 -2.827 0l-4.244-4.243a8 8 0 1 1 11.314 0z" />
+        </svg>
         <span>{filterList.address}</span>
       </div>
-      <div className='flex items-center space-x-2' onClick={(handleOpenSchedulePopup)}>
-      <svg class="h-6 w-6 text-green-500"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"> 
-       <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />  <line x1="16" y1="2" x2="16" y2="6" /> 
-       <line x1="8" y1="2" x2="8" y2="6" />  <line x1="3" y1="10" x2="21" y2="10" /></svg>
-        <span>{format(filterList.startDate, 'HH:mm, dd/MM/yyyy')} - {format(filterList.endDate, 'HH:mm, dd/MM/yyyy')}</span>
+      <div className='flex items-center space-x-1' onClick={handleOpenSchedulePopup}>
+        <svg className="h-4 w-4 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"> 
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />  
+          <line x1="16" y1="2" x2="16" y2="6" /> 
+          <line x1="8" y1="2" x2="8" y2="6" />  
+          <line x1="3" y1="10" x2="21" y2="10" />
+        </svg>
+        <span>
+          {format(filterList.startDate, 'HH:mm, dd/MM/yyyy')} - {format(filterList.endDate, 'HH:mm, dd/MM/yyyy')}
+        </span>
       </div>
     </div>
   </div>
-</div>           
   <MapboxSearchPopUp open={openMapboxSearch} onClose={() => setOpenMapBoxSearch(false)} onSelect={handleSelectLocation} />
-          <div className="flex justify-center mt-8" >
-          <MotorbikeSchedulePopUp isOpen={schedulePopUp} onClose={() => setSchedulePopUp(false)} onSubmit={handlePopUpSubmit} />
-          </div>    
- 
-    <div className="flex justify-center mt-8">
-    
-      <div className="flex flex-wrap gap-2 p-4">
-        {buttons.map(button => (
-          <button
-            key={button.name}
-            className={`flex items-center border rounded-full px-3 py-1 ${
-              selectedButtons.includes(button.name) ? 'bg-green-500 text-white' : 'bg-gray-200 text-black'
-            }`}
-            onClick={() => handleButtonClick(button.name)}
-          >
-            <span className={`mr-2 ${selectedButtons.includes(button.name) ? 'text-white' : 'text-green-500'}`}>
-              {button.svg}
-            </span>
-            {button.label}
-          </button>
-        ))}
-      </div>
-      
-  
+  <MotorbikeSchedulePopUp isOpen={schedulePopUp} onClose={() => setSchedulePopUp(false)} onSubmit={handlePopUpSubmit} />
+</div>
 
-    </div>
+
+
+
+
+
+<div className="flex justify-center mt-2">
+  <div className="flex flex-wrap gap-2 p-4">
+    {buttons.map(button => (
+      <button
+        key={button.name}
+        className={`flex items-center border rounded-full px-3 py-1 ${
+          selectedButtons.includes(button.name) ? 'bg-green-500 text-white border-white-500' : 'bg-white text-black border-gray-200'
+        }`}
+        onClick={() => handleButtonClick(button.name)}
+      >
+        <span className={`mr-2 ${selectedButtons.includes(button.name) ? 'text-white' : 'text-green-500'}`}>
+          {button.svg}
+        </span>
+        {button.label}
+      </button>
+    ))}
+  </div>
+</div>
+
+
     <div className="flex justify-center">
       <div style={{ width: '95%' }}>
       <MotorbikeList listMotor={listMotor}/>
@@ -489,6 +498,7 @@ const Filter = () => {
           onUpdateModelType={handleUpdateModelType}
       />
     </div>
+
   );
 };
 
