@@ -7,6 +7,7 @@ import RentalDocument from "../booking/rentaldocument/RentalDocument";
 import PopUpConfirm from "./PopUpConfirm";
 import { useNavigate } from "react-router-dom";
 import PopUpSuccess from "./PopUpSuccess";
+import apiClient from "../../axiosConfig";
 
 const statusTranslations = {
   PENDING: "Chờ duyệt",
@@ -74,8 +75,8 @@ export default function Widget() {
   useEffect(() => {
     const fetchMotorbike = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:8080/api/motorbike/${booking.motorbikeId}`
+        const response = await apiClient.get(
+          `/api/motorbike/${booking.motorbikeId}`
         );
         console.log(response.data);
         setMotorbikeName(
@@ -87,8 +88,8 @@ export default function Widget() {
         setUrlImage(response.data.motorbikeImages[0].url);
         setLessorId(response.data.user.userId);
 
-        const response2 = await axios.get(
-          `http://localhost:8080/api/user/${booking.renterId}`
+        const response2 = await apiClient.get(
+          `/api/user/${booking.renterId}`
         );
         console.log(response2.data);
         setRenterName(response2.data.firstName + " " + response2.data.lastName);
@@ -128,8 +129,8 @@ export default function Widget() {
       } else if (action === "complete") {
         status = "DONE";
       }
-      const url = `http://localhost:8080/api/booking/changeStatus/${booking.bookingId}/${status}`;
-      await axios.put(url);
+      const url = `/api/booking/changeStatus/${booking.bookingId}/${status}`;
+      await apiClient.put(url);
       setShowPopup(false);
       setShowPopupSuccess(true); // Show success popup
       setTimeout(() => {
@@ -142,18 +143,18 @@ export default function Widget() {
   };
 
   return (
-    <div className="p-12 bg-gray">
+    <div className="p-12 bg-gray font-manrope">
       <div
         className={`${statusStyle.bg} ${statusStyle.text} p-4 rounded-lg flex items-center mb-6`}
       >
-        <FontAwesomeIcon icon={statusStyle.icon} className="mr-2" />
+        <FontAwesomeIcon icon={statusStyles.icon} className="mr-2" />
         <span>{statusTranslations[booking.status]}</span>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="col-span-2 bg-white p-6 rounded-lg shadow-lg">
           <div className="flex items-center mb-6">
             <img
-              className="object-cover rounded-t-lg"
+              className="object-cover rounded-lg md:mr-4 mb-4 md:mb-0"
               style={{ height: "200px", width: "350px" }}
               src={urlImage}
               alt="Motorbike"
@@ -286,9 +287,9 @@ export default function Widget() {
           <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
             <div className="flex items-center mb-6">
               <img
-                src="https://placehold.co/48x48"
+               src="https://n1-cstg.mioto.vn/m/avatars/avatar-0.png"
                 alt="User avatar"
-                className="w-12 h-12 rounded-full mr-4"
+                className="w-14 h-14 rounded-full mr-4 mb-3"
               />
               <div>
                 <h4 className="font-semibold">{renterName}</h4>
@@ -309,21 +310,17 @@ export default function Widget() {
                 Tổng tiền: {booking.totalPrice.toLocaleString("vi-VN")}vnd
               </h4>
             </div>
-            <div>
-              <h4 className="text-gray-500">Lời nhắn riêng:</h4>
-              <p className="text-gray-700">Không có lời nhắn</p>
-            </div>
             <div className="flex p-1 mt-6 justify-center">
               {booking.status === "PENDING" && (
                 <>
                   <button
-                    className="bg-red-500 text-white py-2 px-4 rounded mb-2 mr-4 w-full text-center"
+                    className="bg-red-500 text-white py-2 px-4 rounded mb-2 mr-4 w-full text-center transition hover:scale-105"
                     onClick={() => handleAction("reject")}
                   >
                     Từ chối
                   </button>
                   <button
-                    className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center"
+                    className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:scale-105"
                     onClick={() => handleAction("accept")}
                   >
                     Chấp nhận
@@ -332,7 +329,7 @@ export default function Widget() {
               )}
               {booking.status === "PENDING_DEPOSIT" && (
                 <button
-                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center"
+                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:scale-105"
                   onClick={() => handleAction("reject")}
                 >
                   Hủy chuyến
@@ -341,13 +338,13 @@ export default function Widget() {
               {booking.status === "DEPOSIT_MADE" && (
                 <>
                   <button
-                    className="bg-red-500 text-white py-2 px-4 rounded mb-2 mr-4 w-full text-center"
+                    className="bg-red-500 text-white py-2 px-4 rounded mb-2 mr-4 w-full text-center transition hover:scale-105"
                     onClick={() => handleAction("reject")}
                   >
                     Hủy chuyến
                   </button>
                   <button
-                    className="bg-blue-500 text-white py-2 px-4 rounded mb-2 w-full text-center"
+                    className="bg-blue-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:scale-105"
                     onClick={() => handleAction("deliver")}
                   >
                     Giao xe
@@ -356,7 +353,7 @@ export default function Widget() {
               )}
               {booking.status === "RENTING" && (
                 <button
-                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center"
+                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:scale-105"
                   onClick={() => handleAction("complete")}
                 >
                   Hoàn thành
@@ -366,13 +363,18 @@ export default function Widget() {
 
             {showPopup && (
               <PopUpConfirm
+                show={showPopup}
                 message={popupContent}
                 onConfirm={handleConfirm}
                 onCancel={() => setShowPopup(false)}
               />
             )}
             {showPopupSuccess && (
-              <PopUpSuccess message="Bạn đã cập nhật thành công trạng thái chuyến!"></PopUpSuccess>
+              <PopUpSuccess
+               show={showPopupSuccess}
+               onHide={() => setShowPopupSuccess(false)}
+               message="Bạn đã cập nhật thành công trạng thái chuyến !"
+               />
             )}
           </div>
           <div className="bg-white p-6 rounded-lg shadow-lg">

@@ -3,6 +3,9 @@ import axios from "axios";
 import { useEffect } from "react";
 import Homepage from "../hompage/Homepage";
 import { useNavigate } from "react-router-dom";
+import apiClient from "../../axiosConfig";
+import { fontFamily } from "@mui/system";
+import { Form, Button } from 'react-bootstrap';
 
 const sharedClasses = {
   bgGreen: 'bg-green-500',
@@ -41,20 +44,20 @@ const sharedClasses = {
   roundedFull: 'rounded-full',
 };
 
-const Navbar = () => {
-  return (
-    <nav className={`bg-white dark:bg-zinc-800 ${sharedClasses.shadow} ${sharedClasses.p4} ${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter}`}>
-      <div className={`${sharedClasses.flex} ${sharedClasses.itemsCenter} ${sharedClasses.spaceX4}`}>
-        <img src="https://placehold.co/50x50" alt="Logo" className={sharedClasses.h10} />
-        <button className={`${sharedClasses.bgGreen} ${sharedClasses.textWhite} px-4 py-2 ${sharedClasses.roundedLG}`}>About</button>
-        <button className={`${sharedClasses.bgGreen} ${sharedClasses.textWhite} px-4 py-2 ${sharedClasses.roundedLG}`}>Trips</button>
-        <button className={`${sharedClasses.bgGreen} ${sharedClasses.textWhite} px-4 py-2 ${sharedClasses.roundedLG}`}>Car Rent</button>
-        <button className={`${sharedClasses.bgGreen} ${sharedClasses.textWhite} px-4 py-2 ${sharedClasses.roundedLG}`}>Contact</button>
-      </div>
-      <button className={`${sharedClasses.bgGreen} ${sharedClasses.textWhite} px-4 py-2 ${sharedClasses.roundedLG}`}>User</button>
-    </nav>
-  );
-};
+// const Navbar = () => {
+//   return (
+//     <nav className={`bg-white dark:bg-zinc-800 ${sharedClasses.shadow} ${sharedClasses.p4} ${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter}`}>
+//       <div className={`${sharedClasses.flex} ${sharedClasses.itemsCenter} ${sharedClasses.spaceX4}`}>
+//         <img src="https://placehold.co/50x50" alt="Logo" className={sharedClasses.h10} />
+//         <button className={`${sharedClasses.bgGreen} ${sharedClasses.textWhite} px-4 py-2 ${sharedClasses.roundedLG}`}>About</button>
+//         <button className={`${sharedClasses.bgGreen} ${sharedClasses.textWhite} px-4 py-2 ${sharedClasses.roundedLG}`}>Trips</button>
+//         <button className={`${sharedClasses.bgGreen} ${sharedClasses.textWhite} px-4 py-2 ${sharedClasses.roundedLG}`}>Car Rent</button>
+//         <button className={`${sharedClasses.bgGreen} ${sharedClasses.textWhite} px-4 py-2 ${sharedClasses.roundedLG}`}>Contact</button>
+//       </div>
+//       <button className={`${sharedClasses.bgGreen} ${sharedClasses.textWhite} px-4 py-2 ${sharedClasses.roundedLG}`}>User</button>
+//     </nav>
+//   );
+// };
 
 const StepIndicator = ({ stepNumber, stepText }) => {
   return (
@@ -156,16 +159,16 @@ const RegisterMotorbikeStep1 = () => {
   const[loading,setLoading]=useState(false);
   const [selectedBrand, setSelectedBrand] = useState(null);
   const [selectedModel, setSelectedModel] = useState(null);
-  const[motorbikePlateError,setMotorbikePlateError]=useState([]);
-  const[motorbikeBrandError,setMotorbikeBrandError]=useState([]);
-  const[motorbikeModelError,setMotorbikeModelError]=useState([]);
-  const[manufactureYearError,setManufactureYearError]=useState([]);
+  const[motorbikePlateError,setMotorbikePlateError]=useState('');
+  const[motorbikeBrandError,setMotorbikeBrandError]=useState('');
+  const[motorbikeModelError,setMotorbikeModelError]=useState('');
+  const[manufactureYearError,setManufactureYearError]=useState('');
   useEffect(() => {
-      axios.get('http://localhost:8080/api/model/getAllModel')
+      apiClient.get('/api/model/getAllModel')
           .then(response => setModels(response.data))
           .catch(error => console.error('Error fetching models:', error));
          
-      axios.get('http://localhost:8080/api/brand/getAllBrand')
+      apiClient.get('/api/brand/getAllBrand')
           .then(response => setBrands(response.data))
           .catch(error => console.error('Error fetching other entities 1:', error));
   }, []);
@@ -175,7 +178,8 @@ const RegisterMotorbikeStep1 = () => {
   }
   const checkManufactureYear=(manufacture)=>{
     const regex=/^\d{4}$/;
-    return (regex.test(manufacture)&&manufacture>2000&&manufacture<2030)
+    const currentYear = new Date().getFullYear();
+    return (regex.test(manufacture)&&manufacture>2000&&manufacture<= currentYear)
   }
   
   useEffect(() => {  
@@ -206,7 +210,7 @@ useEffect(() => {
   setSelectedModel(newModels.find((model) => model.modelName == e.target.value));  
   console.log(selectedModel)
   if(e.target.value==""){
-    setMotorbikeModelError("Not be empty")
+    setMotorbikeModelError("Hãy chọn mẫu xe")
   }else{
     setMotorbikeModelError("")
   }
@@ -216,9 +220,9 @@ const handleChange=(e)=>{
   const {name,value}=e.target;
   if (name === "motorbikePlate") {
     if (!value) {
-      setMotorbikePlateError( "Plate number cannot be empty.");
+      setMotorbikePlateError( "Hãy điền biển số xe");
     } else if (checkPlate(value)==false) {
-      setMotorbikePlateError("Invalid plate format. Example: 11-A1-11111");
+      setMotorbikePlateError("Sai định dạng biển số xe. Ví dụ: 11-A1-11111");
     }else{
       setMotorbikePlateError("");
     }
@@ -226,9 +230,9 @@ const handleChange=(e)=>{
 
   if (name === "yearOfManufacture") {
     if (!value) {
-      setManufactureYearError( "Manufacture cannot be empty.");
+      setManufactureYearError( "Hãy điền năm sản xuất");
     }else if(checkManufactureYear(value)==false){
-      setManufactureYearError("Invalid year")
+      setManufactureYearError("Năm sản xuất phải từ 2000 trở lên")
     }
     else{
       setManufactureYearError("");
@@ -246,62 +250,123 @@ const handleReturnNavigate=()=>{
   console.log(formData)
   e.preventDefault();
   setError(null);
-  if ( motorbikePlateError || manufactureYearError||!selectedModel) {
-    setError("Please enter correct  before submitting.");
+  if ( !formData.motorbikePlate.trim()) {
+    setMotorbikePlateError("Hãy điền biển số xe")
+  }else if ( !selectedModel){
+    setMotorbikeModelError("Hãy chọn mẫu xe")
+  }else if (!formData.yearOfManufacture.trim()){
+    setManufactureYearError("Hãy điền năm sản xuất")
   }else{
     setLoading(true)
     navigate('/registermotorbike/step2', { state: {formData} });
   }
  }
   return ( 
-    <div className={`min-h-screen bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100`}>
-      <Navbar />
-      <div className={`bg-white dark:bg-zinc-800 ${sharedClasses.shadow} ${sharedClasses.p4} ${sharedClasses.mt4} ${sharedClasses.flex} ${sharedClasses.justifyCenter} ${sharedClasses.spaceX4}`}>
-        <StepIndicator stepNumber="1" stepText="Information" />
-        <span>&gt;</span>
-        <StepIndicator stepNumber="2" stepText="Lease" />
-        <span>&gt;</span>
-        <StepIndicator stepNumber="3" stepText="Image" />
-      </div>
-      <div className={`bg-white dark:bg-zinc-800 ${sharedClasses.shadow} ${sharedClasses.p6} ${sharedClasses.mt4} ${sharedClasses.mx4} ${sharedClasses.roundedLG}`}>
-      <div className={sharedClasses.mb4}>
-      <h2 className={`${sharedClasses.textLg} ${sharedClasses.fontSemibold}`}>Motorbike Plate</h2>
-      <input  type="text"
-            name="motorbikePlate"
-            placeholder="Enter your motorbike plate"
-            value={formData.motorbikePlate}
-            onChange={handleChange}  className={`${sharedClasses.wFull} mt-2 p-2 ${sharedClasses.border} ${sharedClasses.borderZinc300} ${sharedClasses.roundedLG}`}  />
-    </div>
-        {motorbikePlateError&& <div className="text-red-500">{motorbikePlateError}</div>}
-        <FormSelect label="Motorbike Brand"  name="brand"onChange={handleBrandsChange}  options={brands} keyName="brandName" keyId="brandId" disableCondition="" value={brands.brandName}/>
-        {motorbikeBrandError && <div className="text-red-500">{motorbikeBrandError}</div>}        
-        <FormSelect label="Motorbike Model"  name="model"onChange={handleModelChange}  options={newModels} keyName="modelName" keyId="id" disableCondition="" value={newModels.modelName}/>        
-        {motorbikeModelError && <div className="text-red-500">{motorbikeModelError}</div>}
-        <h2 className={`${sharedClasses.textLg} ${sharedClasses.fontSemibold}`}>Manufacture Year</h2>
-        <input  type="text"
-            name="yearOfManufacture"
-            placeholder="enter manufacture year"
-            value={formData.yearOfManufacture}
-            onChange={handleChange}  className={`${sharedClasses.wFull} mt-2 p-2 ${sharedClasses.border} ${sharedClasses.borderZinc300} ${sharedClasses.roundedLG}`}  />
-        {manufactureYearError && <div className="text-red-500">{manufactureYearError}</div>}
-        <h2 className={`${sharedClasses.textLg} ${sharedClasses.fontSemibold}`}>Constraint Motorbike</h2>
-        <input  type="text"
-            name="constraintMotorbike"
-            placeholder="Constraint Motorbike"
-            value={formData.constraintMotorbike}
-            onChange={handleChange}  className={`${sharedClasses.wFull} mt-2 p-2 ${sharedClasses.border} ${sharedClasses.borderZinc300} ${sharedClasses.roundedLG}`}  />
+    <div className={`min-h-screen font-manrope bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 flex flex-col items-center justify-center`}>
+       <h1 className="text-3xl font-extrabold mb-6 font-encode">Đăng ký xe</h1>
+      <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-lg max-w-xl w-full">
+      <Form onSubmit={handleSunbmit}>
+          {/* Biển số xe */}
+          <Form.Group className="mb-4">
+            <Form.Label>Biển số xe</Form.Label>
+            <Form.Control
+              type="text"
+              name="motorbikePlate"
+              value={formData.motorbikePlate}
+              onChange={handleChange}
+              isInvalid={!!motorbikePlateError}
+            />
+            <Form.Control.Feedback type="invalid">
+              {motorbikePlateError}
+            </Form.Control.Feedback>
+          </Form.Group>
 
-        <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.mt4}`}>
+          {/* Hãng xe */}
+          <Form.Group className="mb-4">
+      <Form.Label>Hãng xe</Form.Label>
+      <Form.Select
+        name="brand"
+        value={formData.brand}
+        onChange={handleBrandsChange}
+        isInvalid={!!motorbikeBrandError}
+      >
+        <option value="">Chọn hãng xe</option>
+        {brands.map((brand) => (
+          <option key={brand.brandId} value={brand.brandName}>
+            {brand.brandName}
+          </option>
+        ))}
+      </Form.Select>
+      {motorbikeBrandError && <div className="text-red-500">{motorbikeBrandError}</div>}
+    </Form.Group>
+
+          {/* Mẫu xe */}
+          <Form.Group className="mb-4">
+      <Form.Label>Mẫu xe</Form.Label>
+      <Form.Select
+        name="model"
+        value={formData.model}
+        onChange={handleModelChange}
+        isInvalid={!!motorbikeModelError}
+      >
+        <option value="">Chọn mẫu xe</option>
+        {newModels.map((model) => (
+          <option key={model.id} value={model.modelName}>
+            {model.modelName}
+          </option>
+        ))}
+      </Form.Select>
+      {motorbikeModelError && <div className="text-red-500">{motorbikeModelError}</div>}
+    </Form.Group>
+
+          {/* Năm sản xuất */}
+          <Form.Group className="mb-4">
+            <Form.Label>Năm sản xuất</Form.Label>
+            <Form.Control
+              type="text"
+              name="yearOfManufacture"
+              value={formData.yearOfManufacture}
+              onChange={handleChange}
+              isInvalid={!!manufactureYearError}
+            />
+            <Form.Control.Feedback type="invalid">
+              {manufactureYearError}
+            </Form.Control.Feedback>
+          </Form.Group>
+
+          {/* Điều kiện ràng buộc */}
+          <Form.Group className="mb-4">
+            <Form.Label>Điều kiện ràng buộc thuê xe</Form.Label>
+            <Form.Control
+              as="textarea"
+              name="constraintMotorbike"
+              value={formData.constraintMotorbike}
+              onChange={handleChange}
+              rows="3"
+            />
+          </Form.Group>
+          {error && <div className="text-red-500 font-bold text-center">{error}</div>}
+
+          {/* Buttons */}
+          <div className="flex justify-between mt-2">
+            <button
+              type="button"
+              onClick={handleReturnNavigate}
+              className="w-5/12 py-2 text-base font-bold text-white bg-zinc-400 rounded-lg hover:bg-zinc-500 transition hover:scale-105"
+            >
+              Quay lại
+            </button>
           
-          <button type="button" onClick={handleReturnNavigate} className={`${sharedClasses.bgGreen} ${sharedClasses.textWhite} px-4 py-2 ${sharedClasses.roundedLG}`}>Back</button>
-          {error && <div className="text-red-500">{error}</div>}
-          <button type="submit" onClick={handleSunbmit}className={`${sharedClasses.bgGreen} ${sharedClasses.textWhite} px-4 py-2 ${sharedClasses.roundedLG}`} >        
-          {loading ? "Continue..." : "Continue"}</button>
-          
-        </div>
-      </div>
-      <Footer />
-      
+            <button
+              type="submit"
+             className="w-5/12 py-2 text-base font-bold text-white  bg-green-500 rounded-lg hover:bg-green-600 transition hover:scale-105"
+              disabled={loading}
+            >
+              {loading ? "Continue..." : "Tiếp tục"}
+            </button>
+          </div>
+        </Form>
+      </div>      
     </div>
   );
 };

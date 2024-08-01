@@ -1,0 +1,49 @@
+/* DatePicker.css */
+
+/* Basic styles for the datepicker container */
+.react-datepicker {
+    font-family: sans-serif;
+    border: 1px solid #ccc;
+    background-color: white;
+    border-radius: 0.25rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    z-index: 1000;
+  }
+  
+  /* Styles for the datepicker days */
+  .react-datepicker__day {
+    display: inline-block;
+    width: 2.75rem;
+    line-height: 2.75rem;
+    text-align: center;
+    margin: 0.166rem;
+    cursor: pointer;
+    border-radius: 0.25rem;
+  }
+  
+  /* Highlighted days (busy days) */
+  .react-datepicker__day--highlighted-busy {
+    background-color: red;
+    color: white;
+  }
+  
+  /* Selected day */
+  .react-datepicker__day--selected {
+    background-color: #0066cc;
+    color: white;
+  }
+  
+  /* Today */
+  .react-datepicker__day--today {
+    font-weight: bold;
+  }
+  
+  /* Navigation buttons */
+  .react-datepicker__navigation {
+    top: 0.5rem;
+    line-height: 1.5rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+  }
+  

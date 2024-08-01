@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 
-const containerClasses = "max-w-sm mx-auto p-4 bg-white dark:bg-zinc-800 rounded-lg shadow-lg";
+const containerClasses = "max-w-sm mx-auto p-4 bg-white dark:bg-zinc-800 rounded-lg shadow-lg font-manrope";
 const titleClasses = "text-center text-md font-semibold text-zinc-900 dark:text-zinc-100";
 const textClasses = "text-center text-zinc-700 dark:text-zinc-300 mt-2";
 const inputClasses = "w-full p-2 border border-zinc-300 dark:border-zinc-700 rounded-md";
@@ -76,12 +76,12 @@ const Withdraw = ({balance, onClose, onConfirm, setError }) => {
       {localError && <div className="text-red-500 mt-2">{localError}</div>}
       <div className={buttonContainerClasses}>
         <button 
-          className={`${buttonClasses} hover:bg-red-500 text-zinc-700 dark:text-zinc-300`} 
+          className={`${buttonClasses} hover:bg-red-500 text-zinc-700 dark:text-zinc-300 transition hover:scale-105`} 
           onClick={onClose}>
           Hủy
         </button>
         <button 
-          className={`${buttonLastClasses} hover:bg-green-500 text-blue-600 dark:text-blue-400`} 
+          className={`${buttonLastClasses} hover:bg-green-500 text-blue-600 dark:text-blue-400 transition hover:scale-105`} 
           onClick={handleConfirm}>
           Rút
         </button>
@@ -100,10 +100,10 @@ const Withdraw = ({balance, onClose, onConfirm, setError }) => {
           Bạn có chắc muốn rút {formattedAmount} VND?
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowConfirmModal(false)}>
+          <Button variant="secondary" className='transition hover:scale-105' onClick={() => setShowConfirmModal(false)}>
             Hủy
           </Button>
-          <Button variant="primary" onClick={handleWithdrawConfirm}>
+          <Button variant="primary" className='transition hover:scale-105' onClick={handleWithdrawConfirm}>
             Đồng ý
           </Button>
         </Modal.Footer>

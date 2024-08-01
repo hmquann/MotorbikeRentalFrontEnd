@@ -4,6 +4,7 @@ import "./CreateVoucher.css";
 import Modal from "react-bootstrap/Modal";
 import FloatingLabel from "react-bootstrap/FloatingLabel";
 import Form from "react-bootstrap/Form";
+import apiClient from "../../axiosConfig";
 
 const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
   const [formData, setFormData] = useState({
@@ -69,8 +70,25 @@ const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
           newErrors[name] = `Hãy điền ${name}`;
       }
     } else {
-      delete newErrors[name];
+      if (name === "name") {
+        const regex = /^[a-zA-Z0-9\s\u00C0-\u1EF9]*$/;
+        if (!regex.test(value)) {
+          newErrors[name] = "Tên không được chứa ký tự đặc biệt.";
+        } else {
+          delete newErrors[name];
+        }
+      } else if (name === "code") {
+        const regex = /^[a-zA-Z0-9\s\u00C0-\u1EF9]*$/;
+        if (!regex.test(value)) {
+          newErrors[name] = "Mã khuyến mãi không được chứa ký tự đặc biệt";
+        } else {
+          delete newErrors[name];
+        }
+      } else {
+        delete newErrors[name];
+      }
     }
+
     setErrors(newErrors);
     setFormData({
       ...formData,
@@ -145,8 +163,8 @@ const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
       setErrors(formErrors);
       return;
     }
-    axios
-      .post("http://localhost:8080/api/discounts/addDiscount", formData, {
+    apiClient
+      .post("/api/discounts/addDiscount", formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -181,7 +199,7 @@ const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
   }
 
   return (
-    <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+    <Modal show={showModal} onHide={() => setShowModal(false)} centered className="font-manrope">
       <Modal.Header closeButton>
         <Modal.Title>Thêm khuyến mãi</Modal.Title>
       </Modal.Header>
@@ -383,14 +401,14 @@ const CreateVoucherModal = ({ showModal, setShowModal, onDiscountCreated }) => {
           <button
             type="button"
             onClick={() => setShowModal(false)}
-            className="hover:bg-red-700 bg-red-600 text-white px-4 py-2 rounded-lg"
+            className="hover:bg-red-700 bg-red-600 text-white px-4 py-2 rounded-lg transition hover:scale-105"
           >
             Đóng
           </button>
           <button
             type="submit"
             onClick={handleSubmit}
-            className="hover:bg-blue-700 bg-blue-600 text-white px-4 py-2 rounded-lg"
+            className="hover:bg-blue-700 bg-blue-600 text-white px-4 py-2 rounded-lg transition hover:scale-105"
           >
             Lưu
           </button>

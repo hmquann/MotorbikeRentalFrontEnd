@@ -13,11 +13,21 @@ const sharedClasses = {
   rounded: "rounded",
 };
 
-const PopUpLicense = ({ onClose, messageLicense, buttonLicense }) => {
+const PopUpLicense = ({
+  onClose,
+  messageLicense,
+  buttonLicense,
+  buttonBackHomePage,
+}) => {
   const navigate = useNavigate();
   const handleNavigateLicense = () => {
     navigate("/menu/profile#license");
   };
+  const handleNavigateHomePage = () => {
+    navigate("/homepage");
+  };
+  console.log(buttonBackHomePage);
+  console.log(buttonLicense);
 
   return (
     <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-50">
@@ -35,13 +45,23 @@ const PopUpLicense = ({ onClose, messageLicense, buttonLicense }) => {
           style={{ color: "red", fontSize: "48px", marginBottom: "16px" }}
         />
         <span className="mb-4 text-center">{messageLicense}</span>
-        <button
-          type="button"
-          className={`text-lg ${sharedClasses.mt4} ${sharedClasses.wFull} ${sharedClasses.bgGreen500} ${sharedClasses.textWhite} ${sharedClasses.py2} ${sharedClasses.rounded}`}
-          onClick={handleNavigateLicense}
-        >
-          {buttonLicense}
-        </button>
+        {buttonLicense ? (
+          <button
+            type="button"
+            className={`text-lg ${sharedClasses.mt4} ${sharedClasses.wFull} ${sharedClasses.bgGreen500} ${sharedClasses.textWhite} ${sharedClasses.py2} ${sharedClasses.rounded}`}
+            onClick={handleNavigateLicense}
+          >
+            {buttonLicense}
+          </button>
+        ) : (
+          <button
+            type="button"
+            className={`text-lg ${sharedClasses.mt4} ${sharedClasses.wFull} ${sharedClasses.bgGreen500} ${sharedClasses.textWhite} ${sharedClasses.py2} ${sharedClasses.rounded}`}
+            onClick={handleNavigateHomePage}
+          >
+            {buttonBackHomePage}
+          </button>
+        )}
       </div>
     </div>
   );

@@ -3,6 +3,7 @@ import axios from "axios";
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { Form } from "react-bootstrap";
+import apiClient from "../../axiosConfig";
 
 const inputClasses =
   "mt-1 block w-full p-2 border border-zinc-300 rounded-md text-black font-medium";
@@ -25,8 +26,8 @@ const ViewModel = ({ showModal, setShowModal, modelId }) => {
     if (modelId && showModal) {
       const fetchModelDetails = async () => {
         try {
-          const response = await axios.get(
-            `http://localhost:8080/api/model/${modelId}`
+          const response = await apiClient.get(
+            `/api/model/${modelId}`
           );
           setModelData(response.data);
         } catch (error) {
@@ -45,7 +46,7 @@ const ViewModel = ({ showModal, setShowModal, modelId }) => {
   };
 
   return (
-    <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" >
+    <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" className="font-manrope" >
       <Modal.Header closeButton>
         <Modal.Title>Chi tiết mẫu xe</Modal.Title>
       </Modal.Header>
@@ -120,7 +121,7 @@ const ViewModel = ({ showModal, setShowModal, modelId }) => {
         </form>
       </Modal.Body>
       <Modal.Footer>
-        <button onClick={() => setShowModal(false)} className="px-4 py-2 hover:bg-red-700 bg-red-600 text-white rounded-lg mr-2">
+        <button onClick={() => setShowModal(false)} className="px-4 py-2 hover:bg-red-700 bg-red-600 text-white rounded-lg mr-2 transition hover:scale-105">
           Đóng
         </button>
       </Modal.Footer>

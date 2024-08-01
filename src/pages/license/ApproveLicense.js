@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import ModalImage from "react-modal-image";
+import apiClient from "../../axiosConfig";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheck, faTimesCircle } from "@fortawesome/free-solid-svg-icons";
+import { Button, Modal } from "react-bootstrap";
 
 // import ImageWithLightbox from "./ImageWithLightBox";
 
 const tableCellClasses =
   "px-6 py-4 whitespace-nowrap text-base font-semibold text-amber-900 ";
-const buttonClasses = "p-2 rounded-lg";
+const buttonClasses = "py-1 px-2 rounded-lg transition hover:scale-105";
 const modalOverlayClasses =
   "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 backdrop-blur-sm";
 const modalContentClasses = "bg-white p-4 rounded-lg shadow-lg max-w-md w-full";
@@ -27,8 +31,8 @@ const ApproveLicense = () => {
   const isAdmin = JSON.parse(localStorage.getItem("roles")).includes("ADMIN");
   const fetchLicenses = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:8080/api/license/getAllLicense/${currentPage}/${pageSize}`
+      const response = await apiClient.get(
+        `/api/license/getAllLicense/${currentPage}/${pageSize}`
       );
       const totalElements = response.data.totalElements;
       const totalPages = Math.ceil(totalElements / pageSize);
@@ -103,8 +107,8 @@ const ApproveLicense = () => {
     e.preventDefault();
     const action =
       actionType === "approve"
-        ? "http://localhost:8080/api/license/approve"
-        : "http://localhost:8080/api/license/reject";
+        ? "https://rentalmotorbikewebapp.azurewebsites.net/api/license/approve"
+        : "https://rentalmotorbikewebapp.azurewebsites.net/api/license/reject";
         if(e.target.name==="approve"){
     fetch(action,{
       method: "POST",
@@ -113,10 +117,12 @@ const ApproveLicense = () => {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
       body: JSON.stringify({ licenseNumber: selectedLicense.licenseNumber }),
+     
     })
       .then((response) => response.json())
       .then((data) => {
         console.log("Success:", data);
+        setIsModalOpen(true)
          
       })
       .catch((error) => {
@@ -129,27 +135,32 @@ const ApproveLicense = () => {
   const handleClick=(license)=>{
     setSelectedLicense(license);
   }
+
+  const actionTypeMap = {
+    'approve' : "Chấp nhận",
+    'rejected' : 'Từ chối'
+  };
   return (
-    <div className="bg-zinc-300  p-6 rounded-lg shadow-md max-w-5xl mx-auto">
+    <div className="p-4 rounded-lg max-w-5xl mx-auto font-manrope">
       <div className="bg-gradient-to-r from-slate-500 from-60% to-zinc-500 text-white p-4 rounded-t-lg flex justify-between items-center">
-        <h1 className="text-4xl font-semibold mb-4">Approve License</h1>
+        <h1 className="text-4xl font-semibold mb-4">Quản lý bằng lái xe</h1>
       </div>
 
       {isAdmin ? (
         <table className="min-w-full table-fixed divide-y divide-gray-400  ">
           <thead className="bg-gray-50 ">
             <tr>
-              <th className="px-6 py-3 text-left text-xm font-medium text-gray-500  uppercase tracking-wider">
-                License Number
+              <th className="px-6 py-3 text-left text-xm font-bold text-gray-500  uppercase tracking-wider">
+                Số bằng lái xe
               </th>
-              <th className="px-6 py-3 text-left text-xm font-medium text-gray-500  uppercase tracking-wider">
-                Date of birth
+              <th className="px-6 py-3 text-left text-xm font-bold text-gray-500  uppercase tracking-wider">
+                Ngày sinh
               </th>
-              <th className="px-6 py-3 text-left text-xm font-medium text-gray-500  uppercase tracking-wider">
-                Image
+              <th className="px-6 py-3 text-left text-xm font-bold text-gray-500  uppercase tracking-wider">
+                Hình ảnh
               </th>
-              <th className="px-6 py-3 text-left text-xm font-medium text-gray-500  uppercase tracking-wider">
-                Actions
+              <th className="px-6 py-3 text-left text-xm font-bold text-gray-500  uppercase tracking-wider">
+                Hành động
               </th>
             </tr>
           </thead>
@@ -182,8 +193,8 @@ const ApproveLicense = () => {
               </tr>
             ) : licenses.length === 0 ? (
               <tr>
-                <td colSpan="6" className="p-4 text-center text-amber-700">
-                  No license found
+                <td colSpan="6" className="p-4 text-center text-amber-700 font-bold">
+                 Không có bản ghi nào
                 </td>
               </tr>
             ) : (
@@ -203,7 +214,7 @@ const ApproveLicense = () => {
                        <ModalImage
                   small={license.licenseImageUrl}
                   large={license.licenseImageUrl}
-                  className=" object-cover rounded-md mr-2 mb-2"
+                  className="w-28 h-14 object-cover rounded-md mr-2 mb-2"
                 />
 
                     </td>
@@ -214,13 +225,13 @@ const ApproveLicense = () => {
                           className={`hover:bg-green-600 bg-green-500 text-white mr-2 ${buttonClasses}`}
                           onClick={() => handleAction(license, "approve")}
                         >
-                          Approve
+                          <FontAwesomeIcon icon={faCheck} />
                         </button>
                         <button
                           className={`hover:bg-red-600 bg-red-500 text-white ${buttonClasses}`}
                           onClick={() => handleAction(license, "rejected")}
                         >
-                          Reject
+                          <FontAwesomeIcon icon={faTimesCircle} />
                         </button>
                       </>
                     </td>
@@ -232,13 +243,13 @@ const ApproveLicense = () => {
         </table>
       ) : (
         <p className="text-red-500">
-          You do not have permission to access this page.
+          Bạn không có quyền truy cập trang này
         </p>
       )}
       <div className="px-6 py-3 bg-zinc-50 flex justify-between items-center">
         <div className="text-sm text-zinc-700">
-          Showing <span className="font-medium">{licenses.length}</span> out of{" "}
-          <span className="font-medium">{licenses.length}</span> entries
+          Đang hiển thị <span className="font-medium">{licenses.length}</span> trên{" "}
+          <span className="font-medium">{licenses.length}</span> bản ghi
         </div>
         <div className="flex space-x-1">
           {currentPage > 0 && (
@@ -246,7 +257,7 @@ const ApproveLicense = () => {
               className="px-3 py-1 border border-zinc-300 text-zinc-500 rounded-md bg-zinc-200 hover:bg-zinc-300"
               onClick={handlePreviousPage}
             >
-              Previous
+              Trước
             </button>
           )}
 
@@ -256,36 +267,35 @@ const ApproveLicense = () => {
               className="px-3 py-1 border border-zinc-300 text-zinc-500 rounded-md bg-zinc-200 hover:bg-zinc-300"
               onClick={handleNextPage}
             >
-              Next
+              Tiếp
             </button>
           )}
         </div>
       </div>
 
       {isModalOpen && (
-        <div className={modalOverlayClasses}>
-          <div className={modalContentClasses}>
-            <p className="text-lg text-zinc-800 mb-4">
-              Are you sure to {actionType} this motorbike?
+        <Modal show={isModalOpen} onHide={() => setIsModalOpen(false)} backdrop="static">
+          <Modal.Header closeButton>
+            <Modal.Title>Xác nhận</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p className="text-lg text-zinc-800">
+              Bạn có chắc muốn{" "}
+              <span className="text-red-500 font-bold">
+                {actionTypeMap[actionType]}
+              </span>{" "}
+              bằng lái xe này?
             </p>
-            <div className="flex justify-end">
-              <button
-                className={approveButtonClasses}
-                onClick={handleSubmit}
-                name="approve"
-              >
-                Yes
-              </button>
-              <button
-                className={cancelButtonClasses}
-                onClick={handleSubmit}
-                name="cancel"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="success" className="transition hover:scale-105" onClick={handleSubmit}>
+              Có
+            </Button>
+            <Button variant="secondary" className="transition hover:scale-105" onClick={() => setIsModalOpen(false)}>
+              Hủy
+            </Button>
+          </Modal.Footer>
+        </Modal>
       )}
     </div>
   );

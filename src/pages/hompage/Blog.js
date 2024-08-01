@@ -3,15 +3,14 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swiper from "swiper";
 import { SwiperSlide } from "swiper/react";
+import apiClient from "../../api/axiosConfig";
 
 const Blog = () => {
   const navigate = useNavigate();
   const [blogs, setBlogs] = useState([]);
   const fetchBlogs = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:8080/api/blogs/getAllBlogs"
-      );
+      const response = await apiClient.get("/api/blogs/getAllBlogs");
       const sortedBlogs = response.data.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
       );

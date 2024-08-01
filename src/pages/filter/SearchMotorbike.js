@@ -4,10 +4,11 @@ import MotorbikeSchedulePopUp from '../booking/schedule/MotorbikeSchedulePopUp';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import { useNavigate } from "react-router-dom";
+
 import MapboxSearchPopUp from './MapboxSearchPopUp';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLocationDot,faCalendarDays} from '@fortawesome/free-solid-svg-icons';
-
+import apiClient from '../../axiosConfig';
 
 const formatDateTime = (dateTimeString) => {
   const date = new Date(dateTimeString);
@@ -58,14 +59,12 @@ const SearchMotorbike = () => {
     setRentalEndTime(data.endDateTime);
 
   };
-
   const handleSearchMotor = async () => {
     const filterList = {
       startDate: dayjs(rentalStartTime).format('YYYY-MM-DDTHH:mm:ss'),
       endDate: dayjs(rentalEndTime).format('YYYY-MM-DDTHH:mm:ss'),
       address: rentalAddress,
     };
-
     setLoading(true);
     try {
       const response = await axios.post('http://localhost:8080/api/motorbike/filter', filterList, {

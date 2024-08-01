@@ -1,5 +1,14 @@
 import "./Booking.css";
 import { useLocation, useNavigate } from "react-router-dom";
+import {
+  doc,
+  setDoc,
+  collection,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
+import { db } from "../../firebase";
 import { FaMotorcycle } from "react-icons/fa";
 import {
   faArrowRight,
@@ -24,7 +33,11 @@ import PopUpBookingSuccess from "./PopUpBookingSuccess";
 import { format } from "date-fns";
 import PopUpConfirmBooking from "./popUpConfirm/PopUpConfirmBooking";
 import PopUpVoucher from "./popUpVoucher/PopUpVoucher";
+import Login from "../login/Login";
+import PopupSuccess from "../myBooking/PopUpSuccess";
 import PopUpPricePerDay from "./popUpPricePerDay/PopUpPricePerDay";
+import apiClient from "../../axiosConfig";
+import { useNotification } from "../../NotificationContext";
 const sharedClasses = {
   rounded: "rounded",
   flex: "flex",
@@ -117,14 +130,19 @@ const Booking = () => {
     return parts.length > 2 ? parts.slice(2).join(", ") : parts.join(", ");
   };
   const location = useLocation();
-  const receiveData = JSON.parse(localStorage.getItem("selectedMotorbike"));
-  
+  const selectedMotorbike = localStorage.getItem("selectedMotorbike");
+  const receiveData = selectedMotorbike ? JSON.parse(selectedMotorbike) : {};
   const motorbikeId = receiveData ? receiveData.id : null;
   console.log(receiveData);
 
   const userDataString = localStorage.getItem("user");
   const userData = JSON.parse(userDataString);
-  const userId = userData.userId;
+  const userId = userData ? userData.userId : null;
+  const userName = userData
+    ? userData.firstName + " " + userData.lastName
+    : null;
+  const userEmail = userData ? userData.email : null;
+
   console.log(userId);
 
   const [selectedLocation, setSelectedLocation] = useState("");
@@ -139,6 +157,17 @@ const Booking = () => {
   const [totalPrice, setTotalPrice] = useState(receiveData.price);
   const [deliveryFee, setDeliveryFee] = useState(0);
   const [rentalDays, setRentalDays] = useState(1);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [redirectUrl, setRedirectUrl] = useState(null);
+  const [showPopupSuccess, setShowPopupSuccess] = useState(false);
+  const { incrementNotificationCount } = useNotification();
+
+  const handleOpenLoginModal = () => {
+    const currentPath = window.location.pathname;
+    setRedirectUrl(currentPath);
+    setShowLoginModal(true);
+  };
+
   const [showPopUpPricePerDay, setShowPopUpPricePerDay] = useState(false);
   const motorbikeAddress = receiveData.motorbikeAddress;
   const [gettedLocation, setGettedLocation] = useState(motorbikeAddress);
@@ -332,8 +361,8 @@ const Booking = () => {
   useEffect(() => {
     const fetchDiscounts = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:8080/api/discounts/getListDiscountByUser/${userId}`
+        const response = await apiClient.get(
+          `/api/discounts/getListDiscountByUser/${userId}`
         );
         setDiscounts(response.data);
         console.log(response.data);
@@ -389,24 +418,28 @@ const Booking = () => {
 
   const [messageLicense, setMessageLicense] = useState("");
   const [buttonLicense, setButtonLicense] = useState("");
+  const [buttonBackHomePage, setButtonBackHomePage] = useState("Chọn xe khác");
   const handleFormSubmit = async (e) => {
+    e.preventDefault();
     if (!userId) {
-      navigate("/login");
+      handleOpenLoginModal();
+      return;
+    }
+
+    if (receiveData.userId === userId) {
+      setMessageLicense("Bạn không thể tự đặt xe của chính bạn.");
+      setButtonLicense(null);
+      setButtonBackHomePage("Chọn xe khác");
+      setShowPopUpLicense(true);
+
+      return; // Prevent further execution if this condition is met
     }
     e.preventDefault();
     try {
       // check license
-      const response1 = await axios.get(
-        `http://localhost:8080/api/license/getLicenseByUserId/${userId}`
+      const response1 = await apiClient.get(
+        `/api/license/getLicenseByUserId/${userId}`
       );
-      console.log(response1.data.licenseType);
-
-      console.log(receiveData);
-
-      // check api license thanh cong hay khong thanh cong
-      if (response1.status !== 200) {
-        throw new Error("API license failed");
-      }
 
       if (
         response1.data === null ||
@@ -415,42 +448,69 @@ const Booking = () => {
       ) {
         setShowPopUpLicense(true);
         setMessageLicense(
-          "You need to verify your driver's license to be able to book a motorbike!"
+          "GPLX của bạn chưa được duyệt. Bạn vui lòng cập nhật hoặc đợi duyệt GPLX."
         );
-        setButtonLicense("VERIFY");
+        setButtonLicense("Cập nhật");
       } else {
-        //kiem tra xem giay phep lai xe co hop le hay khong
-        //truong hop khong hop le
+        // Kiểm tra xem giấy phép lái xe có hợp lệ hay không
         if (
           response1.data.licenseType === "A" &&
           receiveData.licenseType === "A1"
         ) {
-
           setShowPopUpLicense(true);
           setMessageLicense(
-            "This motorbike requires an A1 license. Please update your driver's license."
+            "Xe này yêu cầu bằng A1. Bạn vui lòng cập nhật GPLX để có thể đặt xe."
           );
-          setButtonLicense("UPDATE");
-        }
-        //truong hop hop le
-        else {
+          setButtonLicense("Cập nhật");
+        } else {
           setShowConfirmPopup(true);
         }
       }
     } catch (error) {
       console.error("Error:", error);
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.log("Response data:", error.response.data);
+        console.log("Response status:", error.response.status);
+        console.log("Response headers:", error.response.headers);
+        if (error.response.status === 404) {
+          setShowPopUpLicense(true);
+          setMessageLicense(
+            "GPLX chưa có. Bạn cần xác thực GPLX để có thể đặt xe."
+          );
+          setButtonLicense("Xác thực");
+        } else {
+          setShowPopUpLicense(true);
+          setMessageLicense("An error occurred. Please try again later.");
+          setButtonLicense("OK");
+        }
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.log("Request data:", error.request);
+        setShowPopUpLicense(true);
+        setMessageLicense("No response from server. Please try again later.");
+        setButtonLicense("OK");
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.log("Error message:", error.message);
+        setShowPopUpLicense(true);
+        setMessageLicense("An error occurred. Please try again later.");
+        setButtonLicense("OK");
+      }
     }
   };
 
   const handleConfirmBooking = async (e) => {
     e.preventDefault();
     if (discount) {
-      const deleteDiscount = axios.delete(
-        `http://localhost:8080/api/discounts/deleteDiscountByIdAndUserId/${userId}/${discount.id}`
+      const deleteDiscount = apiClient.delete(
+        `/api/discounts/deleteDiscountByIdAndUserId/${userId}/${discount.id}`
       );
     }
-    const response2 = await axios
-      .post("http://localhost:8080/api/booking/create", {
+
+    const response2 = await apiClient
+      .post("/api/booking/create", {
         renterId: userId,
         motorbikeId: receiveData.id,
         startDate: dayjs(dateRange[0]).format("YYYY-MM-DDTHH:mm:ss"),
@@ -459,10 +519,50 @@ const Booking = () => {
         totalPrice: totalPrice,
         receiveLocation: gettedLocation,
       })
-      .then(() => {
+      .then(async () => {
+        setShowPopupSuccess(true); // Hiển thị popup khi thành công
+        const response3 = apiClient.post(
+          "/api/booking/sendEmailSuccessBooking",
+          {
+            renterName: userName,
+            renterEmail: userEmail,
+            motorbikeName:
+              receiveData.model.modelName + " " + receiveData.yearOfManufacture,
+            motorbikePlate: receiveData.motorbikePlate,
+            bookingTime: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
+            startDate: dayjs(dateRange[0]).format("YYYY-MM-DDTHH:mm:ss"),
+            endDate: dayjs(dateRange[1]).format("YYYY-MM-DDTHH:mm:ss"),
+            totalPrice: totalPrice,
+            receiveLocation: gettedLocation,
+          }
+        );
+
+        const now = new Date();
+
+        await setDoc(doc(collection(db, "notifications")), {
+          userId: userId,
+          message: JSON.stringify({
+            title: '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
+            content: `Yêu cầu đặt xe <strong>${receiveData.motorbikePlate}</strong> của bạn đã được gửi.`,
+          }),
+          timestamp: now,
+          seen: false,
+        });
+
+        await setDoc(doc(collection(db, "notifications")), {
+          userId: receiveData.userId,
+          message: JSON.stringify({
+            title: '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
+            content: `${userName} đã đặt xe <strong>${receiveData.motorbikePlate}</strong> của bạn.`,
+          }),
+          timestamp: now,
+          seen: false,
+        });
+
+
         setShowPopupBooking(true); // Hiển thị popup khi thành công
         setTimeout(() => {
-          setShowPopupBooking(false); // Ẩn popup sau 3 giây
+          setShowPopupSuccess(false); // Ẩn popup sau 3 giây
           navigate("/menu/myBooking"); //chuyển sang trang mybooking sau khi thông báo
         }, 3000);
       });
@@ -472,6 +572,18 @@ const Booking = () => {
   const handleCancelBooking = () => {
     setShowConfirmPopup(false);
   };
+
+  const handleLoginSuccess = (userInfor) => {
+    localStorage.setItem("user", JSON.stringify(userInfor));
+    setShowLoginModal(false);
+    window.location.reload(); // Reload page to keep the current state
+  };
+
+  useEffect(() => {
+    if (userId) {
+      setShowLoginModal(false);
+    }
+  }, [userId]);
 
   return (
     <div>
@@ -592,7 +704,7 @@ const Booking = () => {
                 Chủ xe thân thiện hỗ trợ nhiệt tình
               </p>
             </div>
-            <RentalDocument />
+            {/* <RentalDocument /> */}
             {/* Other amenities section */}
             <div
               className={`${sharedClasses.grid} ${sharedClasses.gridCols4} ${sharedClasses.gap4}`}
@@ -766,10 +878,15 @@ const Booking = () => {
                 onClose={() => setShowPopUpLicense(false)}
                 messageLicense={messageLicense}
                 buttonLicense={buttonLicense}
+                buttonBackHomePage="Chọn xe khác"
               />
             )}
-            {showPopupBooking && (
-              <PopUpBookingSuccess message="Your request booking sent successfully!" />
+            {showPopupSuccess && (
+              <PopupSuccess
+                show={showPopupSuccess}
+                onHide={() => setShowPopupSuccess(false)}
+                message="Yêu cầu đặt xe của bạn đã được gửi đi !"
+              />
             )}
             {showPopUp && (
               <PopUpLocation
@@ -785,6 +902,13 @@ const Booking = () => {
                 discounts={discounts}
                 discountValue={handleDiscountValue}
               ></PopUpVoucher>
+            )}
+            {showLoginModal && (
+              <Login
+                show={showLoginModal}
+                handleClose={() => setShowLoginModal(false)}
+                onLoginSuccess={handleLoginSuccess}
+              />
             )}
             {showPopUpPricePerDay && (
               <PopUpPricePerDay
