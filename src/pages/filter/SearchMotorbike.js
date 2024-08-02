@@ -31,7 +31,7 @@ const extractSecondAndThirdLastElements = (str) => {
 
 const SearchMotorbike = () => {
   const navigate = useNavigate();
-
+  const[searchError,setSearchError]=useState("");
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [rentalStartTime, setRentalStartTime] = useState(new Date());
   const [rentalEndTime, setRentalEndTime] = useState(addDays(new Date(), 1));
@@ -60,6 +60,11 @@ const SearchMotorbike = () => {
 
   };
   const handleSearchMotor = async () => {
+    if(!rentalStartTime||!rentalEndTime||!rentalAddress){
+      setSearchError("Vui lòng điền đầy đủ thông tin thuê")
+    }
+    else{
+      setSearchError("")
     const filterList = {
       startDate: dayjs(rentalStartTime).format('YYYY-MM-DDTHH:mm:ss'),
       endDate: dayjs(rentalEndTime).format('YYYY-MM-DDTHH:mm:ss'),
@@ -81,6 +86,7 @@ const SearchMotorbike = () => {
       setLoading(false);
     }
   };
+}
 
   const handleRequestError = (error) => {
     if (error.response) {
@@ -179,7 +185,9 @@ const SearchMotorbike = () => {
         <button className="bg-green-500 text-white px-4 py-2 rounded-lg" onClick={handleSearchMotor} >
           {loading ? "Đang tìm kiếm..." : "Tìm xe"}
         </button>
+        
       </div>
+      {searchError && <div className="text-red-500 font-bold text-center">{searchError}</div>}
     </div>
   );
 };

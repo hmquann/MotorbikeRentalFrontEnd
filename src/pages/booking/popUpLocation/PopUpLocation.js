@@ -88,6 +88,11 @@ const PopUpLocation = ({
 
   const updateCustomLocation = async () => {
     if (selectedOption === "map-location" && customLocation) {
+      console.log(motorbikeCoords)
+      console.log({
+        longitude: customLocation.long,
+        latitude: customLocation.lat,
+      })
       const calculatedDistance = await checkDistance(
         motorbikeCoords,
         {

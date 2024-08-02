@@ -58,7 +58,7 @@ const Homepage = () => {
         <img
           src="https://imgcdnblog.carbay.com/wp-content/uploads/2019/12/16150859/Ducati-Streetfighter-v4s2.jpg"
           alt="Hero Image"
-          className="w-full h-96 object-cover rounded-b-lg shadow-md"
+          className="w-full h-96 object-cover rounded-full-lg shadow-md"
           crossorigin="anonymous"
         />
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white p-4 bg-black bg-opacity-50 rounded-b-lg">

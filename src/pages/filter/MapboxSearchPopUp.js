@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Input, List, ListItem, Modal, InputAdornment, IconButton } from '@mui/material';
+import { Box, Typography, Input, List, ListItem, Modal, InputAdornment, IconButton,Button } from '@mui/material';
 import { Clear as ClearIcon } from '@mui/icons-material';
 
 const removeNumberWithFiveDigits = (str) => {
@@ -109,6 +109,15 @@ export default function MapboxSearchPopUp({ open, onClose, onSelect }) {
         ) : (
           <Typography>Không tìm thấy kết quả phù hợp</Typography>
         )}
+         <Button
+        variant="outlined"
+        color="secondary"
+        onClick={onClose}
+        sx={{ mt: 2 }}
+        fullWidth
+      >
+        Đóng
+      </Button>
       </Box>
     </Modal>
   );
