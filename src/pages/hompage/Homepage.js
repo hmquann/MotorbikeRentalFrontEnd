@@ -53,16 +53,16 @@ const Homepage = () => {
   };
 
   return (
-    <section className="relative bg-gray-100 dark:bg-gray-900 min-h-screen">
-      <div className="relative">
+    <section className="relative min-h-screen font-manrope">
+      <div className="relative flex justify-center">
         <img
           src="https://imgcdnblog.carbay.com/wp-content/uploads/2019/12/16150859/Ducati-Streetfighter-v4s2.jpg"
           alt="Hero Image"
           className="w-full h-96 object-cover rounded-full-lg shadow-md"
           crossorigin="anonymous"
         />
-        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white p-4 bg-black bg-opacity-50 rounded-b-lg">
-          <h1 className="text-4xl font-bold mb-4">
+        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white p-4  bg-opacity-50 rounded-2xl font-normal">
+          <h1 className="text-5xl font-bold text-center relative align-baseline">
             MiMotor - Cùng Bạn Đến Mọi Hành Trình
           </h1>
           <p className="mt-4 text-lg">
@@ -83,7 +83,7 @@ const Homepage = () => {
             </button>
           </div>
 
-          <div className="flex justify-center mt-8">
+          <div className="flex text-base p-4 align-baseline relative justify-center">
             <div style={{ width: "100%" }}>
               <SearchMotorbike />
             </div>

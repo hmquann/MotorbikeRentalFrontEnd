@@ -32,7 +32,7 @@ const VerifyChangeEmail = () => {
   return (
     <div>
       {showPopup && (
-        <PopupMessage message="Your account's email has been successfully changed!" />
+        <PopupMessage show={showPopup} onHide={() => setShowPopup(false)} message="Bạn đã đổi địa chỉ Email thành công" />
       )}
     </div>
   );

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Filter from "../filter/Filter";
 import { useNavigate } from "react-router";
+import apiClient from "../../axiosConfig";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faLocationDot,
@@ -42,14 +44,15 @@ const MotorbikeList = (listMotor) => {
     return parts.length > 2 ? parts.slice(2).join(", ") : parts.join(", ");
   };
 
-  const handleViewDetail = (id) => {
-    const selectedBike = motorbikeList.find((motorbike) => motorbike.id === id);
-    if (selectedBike) {
+  const handleViewDetail = async (id) => {
+    try {
+      const response = await apiClient(`/api/motorbike/${id}`);
+      const selectedBike = response.data;
       setSelectedMotorbike(selectedBike);
       localStorage.setItem("selectedMotorbike", JSON.stringify(selectedBike));
       navigate("/booking");
-    } else {
-      console.error("Selected motorbike not found");
+    } catch (error) {
+      console.error("Error fetching motorbike details:", error);
     }
   };
 

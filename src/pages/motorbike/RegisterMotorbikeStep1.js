@@ -263,8 +263,8 @@ const handleReturnNavigate=()=>{
  }
   return ( 
     <div className={`min-h-screen font-manrope bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 flex flex-col items-center justify-center`}>
-       <h1 className="text-3xl font-extrabold mb-6 font-encode">Đăng ký xe</h1>
-      <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-lg max-w-xl w-full">
+       <h1 className="text-3xl font-extrabold mb-6 mt-10 font-encode">Đăng ký xe</h1>
+      <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-lg max-w-xl w-full mb-10">
       <Form onSubmit={handleSunbmit}>
           {/* Biển số xe */}
           <Form.Group className="mb-4">
@@ -348,18 +348,18 @@ const handleReturnNavigate=()=>{
           {error && <div className="text-red-500 font-bold text-center">{error}</div>}
 
           {/* Buttons */}
-          <div className="flex justify-between mt-2">
+          <div className="flex justify-center mt-2">
             <button
               type="button"
               onClick={handleReturnNavigate}
-              className="w-5/12 py-2 text-base font-bold text-white bg-zinc-400 rounded-lg hover:bg-zinc-500 transition hover:scale-105"
+              className="w-6/12 py-3 mr-4 text-base font-bold text-white bg-zinc-400 rounded-lg hover:bg-zinc-500 transition hover:scale-105"
             >
               Quay lại
             </button>
           
             <button
               type="submit"
-             className="w-5/12 py-2 text-base font-bold text-white  bg-green-500 rounded-lg hover:bg-green-600 transition hover:scale-105"
+             className="w-6/12 py-2 text-base font-bold text-white  bg-green-500 rounded-lg hover:bg-green-600 transition hover:scale-105"
               disabled={loading}
             >
               {loading ? "Continue..." : "Tiếp tục"}

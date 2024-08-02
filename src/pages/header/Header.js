@@ -99,10 +99,11 @@ const Header = () => {
 
   return (
     <>
-      <header className="flex align-baseline justify-between items-center p-4 border-b ">
+      <header className="flex align-baseline justify-between lg:mx-28 items-center p-4 border-b ">
         <div className="flex items-center">
           <Nav.Link as={Link} to="/homepage">
-            <img className="w-24" src="/image/logo.jpg" alt="Logo" />
+            <img className="w-24" src="/image/logo.png
+            " alt="Logo" />
           </Nav.Link>
         </div>
         <nav className="flex space-x-4">

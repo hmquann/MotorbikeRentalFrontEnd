@@ -68,7 +68,7 @@ const FeedbackModal = ({ show, onHide, bookingId, onFeedbackSubmitted }) => {
   };
 
   return (
-    <Modal show={show} onHide={onHide}>
+    <Modal show={show} onHide={onHide} className='font-manrope'>
       <Modal.Header closeButton>
         <Modal.Title>{feedbackSent ? "Cảm ơn bạn!" : "Đánh giá chuyến đi của bạn"}</Modal.Title>
       </Modal.Header>
@@ -91,8 +91,8 @@ const FeedbackModal = ({ show, onHide, bookingId, onFeedbackSubmitted }) => {
         )}
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleSkip}>Bỏ qua</Button>
-        {!feedbackSent && <Button variant="primary" onClick={handleSendReview}>Gửi đánh giá</Button>}
+        <button className='text-white transition hover:scale-105 py-2 px-3 rounded-lg bg-zinc-400 hover:bg-zinc-500'  onClick={handleSkip}>Bỏ qua</button>
+        {!feedbackSent && <button className='text-white transition hover:scale-105 py-2 px-3 rounded-lg bg-green-500 hover:bg-green-600'  onClick={handleSendReview}>Gửi đánh giá</button>}
       </Modal.Footer>
     </Modal>
   );

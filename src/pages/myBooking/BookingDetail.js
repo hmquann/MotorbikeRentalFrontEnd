@@ -8,6 +8,7 @@ import PopUpConfirm from "./PopUpConfirm";
 import { useNavigate } from "react-router-dom";
 import PopUpSuccess from "./PopUpSuccess";
 import apiClient from "../../axiosConfig";
+import FeedbackModal from "../booking/FeedbackModal";
 
 const statusTranslations = {
   PENDING: "Chờ duyệt",
@@ -70,6 +71,8 @@ export default function Widget() {
   const [popupContent, setPopupContent] = useState("");
   const [action, setAction] = useState("");
   const [showPopupSuccess, setShowPopupSuccess] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [feedbackSent, setFeedbackSent] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -114,6 +117,14 @@ export default function Widget() {
     setShowPopup(true);
   };
 
+  const openFeedback = () => {
+    setShowFeedbackModal(true);
+  };
+
+  const closeFeedback = () => {
+    setShowFeedbackModal(false);
+  };
+
   const handleConfirm = async () => {
     try {
       let status;
@@ -138,18 +149,18 @@ export default function Widget() {
   };
 
   return (
-    <div className="p-12 bg-gray">
+    <div className="p-12 bg-gray font-manrope">
       <div
         className={`${statusStyle.bg} ${statusStyle.text} p-4 rounded-lg flex items-center mb-6`}
       >
-        <FontAwesomeIcon icon={statusStyle.icon} className="mr-2" />
+        <FontAwesomeIcon icon={statusStyles.icon} className="mr-2" />
         <span>{statusTranslations[booking.status]}</span>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="col-span-2 bg-white p-6 rounded-lg shadow-lg">
           <div className="flex items-center mb-6">
             <img
-              className="object-cover rounded-t-lg"
+              className="object-cover rounded-lg md:mr-4 mb-4 md:mb-0"
               style={{ height: "200px", width: "350px" }}
               src={urlImage}
               alt="Motorbike"
@@ -282,9 +293,9 @@ export default function Widget() {
           <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
             <div className="flex items-center mb-6">
               <img
-                src="https://placehold.co/48x48"
+                src="https://n1-cstg.mioto.vn/m/avatars/avatar-0.png"
                 alt="User avatar"
-                className="w-12 h-12 rounded-full mr-4"
+                className="w-14 h-14 rounded-full mr-4 mb-3"
               />
               <div>
                 <h4 className="font-semibold">{lessorName}</h4>
@@ -329,7 +340,7 @@ export default function Widget() {
               {booking.status === "PENDING" && (
                 <>
                   <button
-                    className="bg-red-500 text-white py-2 px-4 rounded mb-2 mr-4 w-full text-center"
+                    className="bg-red-500 text-white py-2 px-4 rounded mb-2 mr-4 w-full text-center transition hover:scale-105"
                     onClick={() => handleAction("canceled")}
                   >
                     Hủy chuyến
@@ -339,13 +350,13 @@ export default function Widget() {
               {booking.status === "PENDING_DEPOSIT" && (
                 <>
                   <button
-                    className="bg-red-500 text-white py-2 px-4 rounded mb-2 mr-4 w-full text-center"
+                    className="bg-red-500 text-white py-2 px-4 rounded mb-2 mr-4 w-full text-center transition hover:scale-105"
                     onClick={() => handleAction("canceled")}
                   >
                     Hủy chuyến
                   </button>
                   <button
-                    className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center"
+                    className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:scale-105"
                     onClick={() => handleAction("deposit_made")}
                   >
                     Đặt cọc
@@ -354,7 +365,9 @@ export default function Widget() {
               )}
 
               {booking.status === "DONE" && (
-                <button className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center">
+                <button
+                onClick={openFeedback}
+                className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:scale-105">
                   Đánh giá
                 </button>
               )}
@@ -374,6 +387,12 @@ export default function Widget() {
                 message="Bạn đã cập nhật thành công trạng thái chuyến !"
               />
             )}
+            <FeedbackModal
+              show={showFeedbackModal}
+              onHide={closeFeedback}
+              bookingId={booking.bookingId}
+              onFeedbackSubmitted={() => setFeedbackSent(true)}
+            />
           </div>
           <div className="bg-white p-6 rounded-lg shadow-lg">
             <h4 className="text-lg font-semibold mb-4">

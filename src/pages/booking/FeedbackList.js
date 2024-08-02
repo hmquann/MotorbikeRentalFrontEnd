@@ -6,6 +6,7 @@
   import StarRatings from 'react-star-ratings';
   import { Rating } from '@mui/material';
 import apiClient from '../../axiosConfig';
+import { Modal } from 'react-bootstrap';
 
   const modalOverlayClasses =
     "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 ";
@@ -136,12 +137,12 @@ import apiClient from '../../axiosConfig';
     };
 
     return (
-      <div className="p-4">
+      <div className="p-4 font-manrope">
         <div className="flex items-center  mb-4">
           <span className="text-yellow-500">⭐</span>
           <span className="ml-1 font-bold">{averageRating}</span>
           <span className="mx-2 font-thin">•</span>
-          <span>{feedbacks.length} Rating</span>
+          <span>{feedbacks.length} Đánh giá</span>
         </div>
         <div className="space-y-4">
           {feedbacks.map((feedback) => (
@@ -167,8 +168,8 @@ import apiClient from '../../axiosConfig';
                     />
                   </div>
                   <div className="flex justify-end mt-2">
-                    <button onClick={handleUpdate} className="bg-green-500 text-white px-4 py-2 rounded-lg mr-2">Save</button>
-                    <button onClick={() => setIsEditing(false)} className="bg-red-500 text-white px-4 py-2 rounded-lg">Cancel</button>
+                    <button onClick={handleUpdate} className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 font-semibold rounded-lg mr-2 transition hover:scale-105">Lưu</button>
+                    <button onClick={() => setIsEditing(false)} className="bg-red-500 hover:bg-red-600 font-semibold text-white px-4 py-2 rounded-lg transition hover:scale-105">Hủy</button>
                   </div>
                 </div>
               ) : (
@@ -200,29 +201,24 @@ import apiClient from '../../axiosConfig';
           ))}
         </div>
         {isModalOpen && (
-          <div className={modalOverlayClasses}>
-            <div className={modalContentClasses}>
-              <p className="text-lg text-zinc-800 mb-4">
-                Are you sure to delete this feedback?
-              </p>
-              <div className="flex justify-end">
-                <button
-                  className={yesButtonClasses}
-                  onClick={handleDelete}
-                  name="approve"
-                >
-                  Yes
-                </button>
-                <button
-                  className={cancelButtonClasses}
-                  onClick={closeModal}
-                  name="cancel"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
+          <Modal show={isModalOpen} onHide={() => setIsModalOpen(false)} className='font-manrope'>
+          <Modal.Header closeButton>
+            <Modal.Title>Xác nhận xóa</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p className="text-lg text-zinc-800 mb-4">
+              Bạn có chắc chắn muốn xóa đánh giá này?
+            </p>
+          </Modal.Body>
+          <Modal.Footer>
+            <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 font-semibold rounded-lg mr-2 transition hover:scale-105" onClick={() => setIsModalOpen(false)}>
+              Hủy
+            </button>
+            <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold transition hover:scale-105" onClick={handleDelete}>
+              Xóa
+            </button>
+          </Modal.Footer>
+        </Modal>
         )}
       </div>
     );
