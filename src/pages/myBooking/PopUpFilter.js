@@ -189,8 +189,7 @@ const PopUpFilter = ({ onClose, onApply, activeTab, initialFilters }) => {
             Xóa bộ lọc
           </button>
           <button
-            className="text-white px-4 py-2 rounded-lg"
-            style={{ backgroundColor: "#79d799" }}
+            className="text-white px-4 py-2 rounded-lg hover:bg-green-500 bg-green-400"
             onClick={handleApply}
           >
             Áp dụng

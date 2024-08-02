@@ -18,7 +18,7 @@ const sharedClasses = {
   button:
     "bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-white px-4 py-2 rounded-lg",
   blueButton:
-    "bg-zinc-200 blue:bg-zinc-700 text-zinc-900 dark:text-white px-4 py-2 rounded-lg",
+    "bg-zinc-200 bg-zinc-100 hover:bg-zinc-300 text-zinc-900 dark:text-white px-4 py-2 rounded-lg",
   note: "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 p-4 rounded-lg",
   info: "text-sm",
   image: "rounded-lg w-full object-contain h-48 w-96",
@@ -148,7 +148,9 @@ const License = () => {
       }
     }
     if (name === "birthOfDate") {
-      if (!isEnoughtEighteenYear(value)) {
+      if (value === "") {
+        setBirthOfDateError("");
+      } else if (!isEnoughtEighteenYear(value)) {
         setBirthOfDateError("Bạn chưa đủ 18 tuổi");
       } else {
         setBirthOfDateError("");
@@ -160,6 +162,15 @@ const License = () => {
     }));
   };
   console.log(formLicenseData);
+  const resetForm = () => {
+    setFormLicenseData({
+      licenseNumber: "",
+      birthOfDate: "",
+      // Reset other fields as necessary
+    });
+    setLicenseNumberError("");
+    setBirthOfDateError("");
+  };
   return (
     <div className={cardClasses}>
       <div className={sharedClasses.card}>
@@ -205,7 +216,7 @@ const License = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-3">
           <div>
             <h3 className={sharedClasses.title}>Hình ảnh</h3>
             {changeLicense ? (
@@ -251,20 +262,20 @@ const License = () => {
                 </label>
                 {changeLicense == false ? (
                   <div className={sharedClasses.content}>
-                    {license ? license.licenseNumber : "Not yet"}
+                    {license ? license.licenseNumber : "Chưa có"}
                   </div>
                 ) : (
                   <input
                     className={sharedClasses.content}
                     name="licenseNumber"
                     value={formLicenseData.licenseNumber}
-                    placeholder={license ? license.licenseNumber : "Not yet"}
+                    // placeholder={license ? license.licenseNumber : "Chưa có"}
                     onChange={handleChangeValue}
                   />
                 )}
               </div>
               {licenseNumberError && (
-                <div className="text-red-500">{licenseNumberError}</div>
+                <div className="text-red-500 font-bold">{licenseNumberError}</div>
               )}
               <div>
                 <label className={sharedClasses.label}>
@@ -272,7 +283,7 @@ const License = () => {
                 </label>
                 {changeLicense == false ? (
                   <div className={sharedClasses.content}>
-                    {license ? license.birthOfDate : "Not yet"}
+                    {license ? license.birthOfDate : "Chưa có"}
                   </div>
                 ) : (
                   <input
@@ -280,13 +291,13 @@ const License = () => {
                     className={sharedClasses.content}
                     name="birthOfDate"
                     value={formLicenseData.birthOfDate}
-                    placeholder={license ? license.birthOfDate : "Not yet"}
+                    placeholder={license ? license.birthOfDate : "Chưa có"}
                     onChange={handleChangeValue}
                   />
                 )}
               </div>
               {birthDateError && (
-                <div className="text-red-500">{birthDateError}</div>
+                <div className="text-red-500 font-bold">{birthDateError}</div>
               )}
               <div></div>
               <div>
@@ -305,7 +316,7 @@ const License = () => {
                 ) : (
                   <div>
                     <div className={sharedClasses.content}>
-                      {license ? license.licenseType : "Not yet"}
+                      {license ? license.licenseType : "Chưa có"}
                     </div>
                   </div>
                 )}
@@ -314,7 +325,7 @@ const License = () => {
               <div>
                 <label className={sharedClasses.label}>Họ và tên</label>
                 <div className={sharedClasses.content}>
-                  {license ? fullName : "Not yet"}
+                  {license ? fullName : "Chưa có"}
                 </div>
               </div>
             </div>
@@ -323,21 +334,26 @@ const License = () => {
               )}  
             {changeLicense && (
               <> 
-               <div>
-                Kiểm tra thông tin gplx<a href="https://gplx.gov.vn/?page=home" target="_blank"> tại đây</a>
-                </div>            
+               <div className="mt-2 font-bold text-md">
+                Kiểm tra thông tin giấy phép lái xe <a href="https://gplx.gov.vn/?page=home" target="_blank"> tại đây</a>
+                </div> 
+                <div className="mt-2 flex justify-center">        
                 <button
                   onClick={handleSubmit}
-                  className="mt-4 bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center text-white mr-4"
+                  className=" py-3 px-5 mr-3 text-sm w-full tracking-wide rounded-lg text-white bg-green-500 hover:bg-green-600 transition hover:scale-110"
                 >
                   Đăng ký
                 </button>
                 <button
-                  onClick={() => setChangeLicense(false)}
-                  className="mt-4 bg-gradient-to-r from-gray-400 via-gray-500 to-gray-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-gray-300 dark:focus:ring-gray-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center text-white"
+                 onClick={() => {
+                  resetForm();
+                  setChangeLicense(false);
+                }}
+                  className=" py-3 px-4 text-sm w-full tracking-wide rounded-lg text-white bg-zinc-500 hover:bg-zinc-600 transition hover:scale-110"
                 >
                   Trở về
                 </button>
+                </div>   
                
               </>
             )}

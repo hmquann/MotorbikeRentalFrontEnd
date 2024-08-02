@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { NavLink, Route, Routes, useNavigate } from "react-router-dom";
+import React, { useState, useEffect,useRef } from "react";
+import { NavLink, Route, Routes, useNavigate, useLocation } from "react-router-dom";
 import "./Menu.css";
 import Profile from "../profile/Profile";
 import { Modal } from "react-bootstrap";
@@ -25,6 +25,9 @@ const Menu = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isManageOpen, setIsManageOpen] = useState(false); // State for managing dropdown
   const navigate = useNavigate();
+  const location = useLocation();
+  const menuLeftRef = useRef(null);
+  const menuRightRef = useRef(null); 
 
   useEffect(() => {
     const roles = localStorage.getItem("roles");
@@ -38,6 +41,7 @@ const Menu = () => {
       navigate("/homepage");
     }
   }, [navigate]);
+
 
   const isAdmin = userRole && userRole.includes("ADMIN");
   const isLessor = userRole && userRole.includes("LESSOR");
@@ -60,18 +64,29 @@ const Menu = () => {
     setIsManageOpen(!isManageOpen);
   };
 
+  const handleLinkClick = () => {
+  
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  
+  
+    // if (menuRightRef.current) {
+    //   menuRightRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // }
+  };
+
   return (
     <div className="menu bg-zinc-100">
       {isAuthenticated && (
         <>
       
-          <div className="menu-left bg-zinc-100 font-manrope">
+          <div id="menu-left" className="menu-left bg-zinc-100 font-manrope" ref={menuLeftRef}>
             <h4 className="font-bold">Xin chào bạn !</h4>
           <hr></hr>
             <ul>
             <li>
                 <NavLink
                   to="/menu/profile"
+                  onClick={handleLinkClick}
                   className={({ isActive }) => (isActive ? "active" : "")}
                 >
                   Tài khoản của tôi
@@ -81,6 +96,7 @@ const Menu = () => {
                 <li>
                   <NavLink
                     to="/menu/dashboard"
+                    onClick={handleLinkClick}
                     className={({ isActive }) => (isActive ? "active" : "")}
                   >
                     Dashboard
@@ -90,6 +106,7 @@ const Menu = () => {
               <li>
                 <NavLink
                   to="/menu/myBooking"
+                  onClick={handleLinkClick}
                   className={({ isActive }) => (isActive ? "active" : "")}
                 >
                   Chuyến của tôi
@@ -98,6 +115,7 @@ const Menu = () => {
               <li>
                 <NavLink
                   to="/menu/wallet"
+                  onClick={handleLinkClick}
                   className={({ isActive }) => (isActive ? "active" : "")}
                 >
                   Ví của tôi
@@ -106,6 +124,7 @@ const Menu = () => {
               <li>
                 <NavLink
                   to="/menu/chatApp"
+                  onClick={handleLinkClick}
                   className={({ isActive }) => (isActive ? "active" : "")}
                 >
                   Chatting
@@ -139,6 +158,7 @@ const Menu = () => {
                           <li>
                             <NavLink
                               to="/menu/brand"
+                              onClick={handleLinkClick}
                               className={({ isActive }) =>
                                 isActive ? "active" : ""
                               }
@@ -149,6 +169,7 @@ const Menu = () => {
                           <li>
                             <NavLink
                               to="/menu/approveLicense"
+                              onClick={handleLinkClick}
                               className={({ isActive }) =>
                                 isActive ? "active" : ""
                               }
@@ -159,6 +180,7 @@ const Menu = () => {
                           <li>
                             <NavLink
                               to="/menu/model"
+                              onClick={handleLinkClick}
                               className={({ isActive }) =>
                                 isActive ? "active" : ""
                               }
@@ -169,6 +191,7 @@ const Menu = () => {
                           <li>
                             <NavLink
                               to="/menu/userData"
+                              onClick={handleLinkClick}
                               className={({ isActive }) =>
                                 isActive ? "active" : ""
                               }
@@ -179,6 +202,7 @@ const Menu = () => {
                           <li>
                             <NavLink
                               to="/menu/blogList"
+                              onClick={handleLinkClick}
                               className={({ isActive }) =>
                                 isActive ? "active" : ""
                               }
@@ -193,6 +217,7 @@ const Menu = () => {
                           <li>
                             <NavLink
                               to="/menu/approveMotorbike"
+                              onClick={handleLinkClick}
                               className={({ isActive }) =>
                                 isActive ? "active" : ""
                               }
@@ -203,6 +228,7 @@ const Menu = () => {
                           <li>
                             <NavLink
                               to="/menu/voucher"
+                              onClick={handleLinkClick}
                               className={({ isActive }) =>
                                 isActive ? "active" : ""
                               }
@@ -217,18 +243,18 @@ const Menu = () => {
                 </li>
               )}
               <hr></hr>
-              <li className="flex justify-center">
-                <button
+              <li>
+                <a
                   type="button"
                   onClick={handleLogout}
-                  className="py-2 px-4 text-sm w-36 tracking-wide rounded-lg text-white bg-red-600 hover:bg-red-700 transition hover:scale-105"
+                  className="log-out"
                 >
                   Đăng xuất
-                </button>
+                </a>
               </li>
             </ul>
           </div>
-          <div className="menu-right">
+          <div className="menu-right" ref={menuRightRef}>
             <Routes>
               <Route path="/profile" element={<Profile />} />
               <Route path="/myBooking" element={<MyBooking />} />

@@ -242,7 +242,7 @@ const BookingCard = ({ booking }) => {
                 </button>
               )}
               <button
-                className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:bg-green-600 hover:scale-105"
+                className="bg-orange-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:bg-orange-600 hover:scale-105"
                 onClick={openManageBooking}
               >
                 Xem chi tiết
@@ -267,8 +267,7 @@ const BookingCard = ({ booking }) => {
                 </button>
               )}
               <button
-                className="bg-green-500 text-white py-2 px-4 rounded w-full text-center transition hover:scale-105"
-                style={{ backgroundColor: "#5fcf86" }}
+                className="bg-orange-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:bg-orange-600 hover:scale-105"
                 onClick={openBookingDetail}
               >
                 Xem chi tiết

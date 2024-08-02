@@ -716,7 +716,7 @@ const Booking = () => {
             <hr className="my-3 border-gray-800"></hr>
             <div className="p-4 bg-white dark:bg-zinc-800  flex items-center space-x-4">
               <div className="flex flex-col items-center mb-4">
-                <h2 className="text-sm font-semibold mb-2">Motorbike Owner</h2>
+                <h2 className="text-sm font-semibold mb-2">Chủ xe</h2>
                 <img
                   src="https://n1-cstg.mioto.vn/m/avatars/avatar-2.png"
                   alt="User profile picture"
@@ -736,7 +736,7 @@ const Booking = () => {
                     <FaMotorcycle className="w-6 h-6" />
 
                     <span className="ml-2">
-                      {receiveData.user.totalTripCount} trips
+                      {receiveData.user.totalTripCount} chuyến đi
                     </span>
                   </span>
                 </div>
