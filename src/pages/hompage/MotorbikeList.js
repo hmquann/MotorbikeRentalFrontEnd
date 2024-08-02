@@ -4,6 +4,13 @@ import Filter from "../filter/Filter";
 import { useNavigate } from "react-router";
 import apiClient from "../../axiosConfig";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faLocationDot,
+  faCalendarDays,
+  faStar,
+  faSuitcase,
+} from "@fortawesome/free-solid-svg-icons";
 // Define CSS classes
 const cardClasses =
   "max-w-lg mx-auto bg-white dark:bg-zinc-800 rounded-xl shadow-md overflow-hidden";
@@ -55,7 +62,7 @@ const MotorbikeList = (listMotor) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {motorbikeList.length === 0 ? (
             <div className="col-span-full text-center text-zinc-500 dark:text-zinc-400">
-              No motorbikes available.
+              Không tìm thấy xe phù hợp.
             </div>
           ) : (
             motorbikeList.map((motorbike) => (
@@ -90,58 +97,44 @@ const MotorbikeList = (listMotor) => {
                   </div>
                   <h2 className="text-lg font-bold text-zinc-900 dark:text-white"></h2>
                   <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-2 inline-flex items-center space-x-2">
-                    <svg
-                      className="h-4 w-4 text-green-500"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2"
-                      stroke="currentColor"
-                      fill="none"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path stroke="none" d="M0 0h24v24H0z" />
-                      <circle cx="12" cy="11" r="3" />
-                      <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 0 1 -2.827 0l-4.244-4.243a8 8 0 1 1 11.314 0z" />
-                    </svg>
+                    <FontAwesomeIcon
+                      icon={faLocationDot}
+                      size="sm"
+                      style={{ color: "#0f0000" }}
+                    />
                     <span>{getAddress(motorbike.motorbikeAddress)}</span>
                   </p>
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center text-yellow-500">
-                      <svg
-                        className="w-4 h-4 mr-1"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M9.049 2.927C9.469 1.64 10.531 1.64 10.951 2.927l1.286 3.95a1 1 0 00.95.69h4.2c1.18 0 1.671 1.516.72 2.196l-3.4 2.47a1 1 0 00-.36 1.118l1.286 3.95c.42 1.287-.993 2.354-2.04 1.618l-3.4-2.47a1 1 0 00-1.18 0l-3.4 2.47c-1.047.736-2.46-.331-2.04-1.618l1.286-3.95a1 1 0 00-.36-1.118l-3.4-2.47c-.95-.68-.46-2.196.72-2.196h4.2a1 1 0 00.95-.69l1.286-3.95z"></path>
-                      </svg>
-                      <span className="text-sm">5.0</span>
-                    </div>
+                    {motorbike.tripCount > 0 && (
+                      <div className="flex items-center text-yellow-500">
+                        <FontAwesomeIcon
+                          icon={faStar}
+                          style={{ color: "#FFD43B" }}
+                        />
+                        <span className="text-sm">5.0</span>
+                      </div>
+                    )}
                     <div className="text-sm text-zinc-500 dark:text-zinc-400 flex items-center">
-                      <svg
-                        className="h-4 w-4 text-green-500"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                        stroke="currentColor"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path stroke="none" d="M0 0h24v24H0z" />
-                        <polyline points="8 16 10 10 16 8 14 14 8 16" />
-                        <circle cx="12" cy="12" r="9" />
-                      </svg>
-                      <span>{motorbike.tripCount} trips</span>
+                      <span>
+                        {motorbike.tripCount == 0 ? (
+                          "Chưa có "
+                        ) : (
+                          <>
+                            <FontAwesomeIcon
+                              icon={faSuitcase}
+                              style={{ color: "#63E6BE" }}
+                            />
+                            {motorbike.tripCount}
+                          </>
+                        )}{" "}
+                        chuyến
+                      </span>
                     </div>
                     <div>
                       <span className="text-green-500 font-semibold">
                         {formatNumber(motorbike.price)}
                       </span>{" "}
-                      VND/day
+                      VND/ngày
                     </div>
                   </div>
                 </div>

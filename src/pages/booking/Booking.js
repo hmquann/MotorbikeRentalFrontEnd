@@ -1,5 +1,14 @@
 import "./Booking.css";
 import { useLocation, useNavigate } from "react-router-dom";
+import {
+  doc,
+  setDoc,
+  collection,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
+import { db } from "../../firebase";
 import { FaMotorcycle } from "react-icons/fa";
 import {
   faArrowRight,
@@ -7,6 +16,7 @@ import {
   faGasPump,
   faOilCan,
   faX,
+  faMotorcycle
 } from "@fortawesome/free-solid-svg-icons";
 import { faCircleQuestion } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -27,6 +37,7 @@ import Login from "../login/Login";
 import PopupSuccess from "../myBooking/PopUpSuccess";
 import PopUpPricePerDay from "./popUpPricePerDay/PopUpPricePerDay";
 import apiClient from "../../axiosConfig";
+import { useNotification } from "../../NotificationContext";
 const sharedClasses = {
   rounded: "rounded",
   flex: "flex",
@@ -52,9 +63,9 @@ const sharedClasses = {
   p4: "p-4",
   maxW7xl: "max-w-7xl",
   wFull: "w-full",
-  w2_3: "w-2/3",
-  w1_3: "w-1/3",
-  gridCols2: "grid-cols-2",
+  w2_3: "w-3/4",
+  w1_3: "w-1/4",
+  gridCols2: "grid-cols-4",
   gridCols4: "grid-cols-4",
   grid: "grid",
   gap4: "gap-4",
@@ -81,15 +92,31 @@ const sharedClasses = {
   textZincDark: "text-zinc-900 dark:text-zinc-100",
   flexItemsCenter: "flex items-center",
 };
-
+const formatVehicleType = (description) => {
+  switch (description) {
+    case "XeTayGa":
+      return "Xe Tay Ga";
+    case "XeSo":
+      return "Xe Số";
+    case "XeGanMay":
+      return "Xe Gắn Máy";
+    case "XeDien":
+      return "Xe Điện";
+    case "XeConTay":
+      return "Xe Côn Tay";  
+    default:
+      return description;
+  }
+};
 const FeatureItem = ({ icon, altText, title, description }) => (
   <div className="flex items-center">
     <FontAwesomeIcon icon={icon} className="text-green-600 text-xl mr-2" />
     <div>
       <p className="text-zinc-500 font-bold">{title}</p>
       <p className="text-lg">
-        {description}
-        {title === "Nhiên liệu" ? "" : "l/100km"}
+        {title==="Nhiên liệu"?(description==="GASOLINE"?"Xăng":"Điện"):""}
+        {title === "Loại xe" ? formatVehicleType(description) : description}
+        {title === "Nhiên liệu tiêu hao" ?  " lít/100km":"" }
       </p>
     </div>
   </div>
@@ -133,6 +160,7 @@ const Booking = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [redirectUrl, setRedirectUrl] = useState(null);
   const [showPopupSuccess, setShowPopupSuccess] = useState(false);
+  const { incrementNotificationCount } = useNotification();
 
   const handleOpenLoginModal = () => {
     const currentPath = window.location.pathname;
@@ -141,6 +169,9 @@ const Booking = () => {
   };
 
   const [showPopUpPricePerDay, setShowPopUpPricePerDay] = useState(false);
+  const motorbikeAddress = receiveData.motorbikeAddress;
+  const [gettedLocation, setGettedLocation] = useState(motorbikeAddress);
+  
   const handleClosePopup = () => {
     setShowPopUp(false);
   };
@@ -203,7 +234,7 @@ const Booking = () => {
       setRentalDays(days);
     }
   }, [dateRange, receiveTime, returnTime]);
-  const motorbikeAddress = receiveData.motorbikeAddress;
+  
   console.log(motorbikeAddress);
 
   const [addressData, setAddressData] = useState([
@@ -213,7 +244,7 @@ const Booking = () => {
       address: "",
     },
   ]);
-  const [gettedLocation, setGettedLocation] = useState(motorbikeAddress);
+  
   const handleChangeLocation = (location) => {
     setGettedLocation(location);
     setAddressData((prevAddressData) =>
@@ -488,7 +519,7 @@ const Booking = () => {
         totalPrice: totalPrice,
         receiveLocation: gettedLocation,
       })
-      .then(() => {
+      .then(async () => {
         setShowPopupSuccess(true); // Hiển thị popup khi thành công
         const response3 = apiClient.post(
           "/api/booking/sendEmailSuccessBooking",
@@ -505,17 +536,30 @@ const Booking = () => {
             receiveLocation: gettedLocation,
           }
         );
-        console.log(userName);
-        console.log(userEmail);
-        console.log(
-          receiveData.model.modelName + " " + receiveData.yearOfManufacture
-        );
-        console.log(receiveData.motorbikePlate);
-        console.log(dayjs().format("YYYY-MM-DDTHH:mm:ss"));
-        console.log(dayjs(dateRange[0]).format("YYYY-MM-DDTHH:mm:ss"));
-        console.log(dayjs(dateRange[1]).format("YYYY-MM-DDTHH:mm:ss"));
-        console.log(totalPrice);
-        console.log(gettedLocation);
+
+        const now = new Date();
+
+        await setDoc(doc(collection(db, "notifications")), {
+          userId: userId,
+          message: JSON.stringify({
+            title: '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
+            content: `Yêu cầu đặt xe <strong>${receiveData.motorbikePlate}</strong> của bạn đã được gửi.`,
+          }),
+          timestamp: now,
+          seen: false,
+        });
+
+        await setDoc(doc(collection(db, "notifications")), {
+          userId: receiveData.userId,
+          message: JSON.stringify({
+            title: '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
+            content: `${userName} đã đặt xe <strong>${receiveData.motorbikePlate}</strong> của bạn.`,
+          }),
+          timestamp: now,
+          seen: false,
+        });
+
+
         setShowPopupBooking(true); // Hiển thị popup khi thành công
         setTimeout(() => {
           setShowPopupSuccess(false); // Ẩn popup sau 3 giây
@@ -627,12 +671,18 @@ const Booking = () => {
                 icon={faGasPump}
                 altText="fuel"
                 title="Nhiên liệu"
-                description={receiveData.model.fuelType}
+                description=""
+              />
+               <FeatureItem
+                icon={faMotorcycle}
+                altText="modelType"
+                title="Loại xe"
+                description={receiveData.model.modelType}
               />
               <FeatureItem
                 icon={faOilCan}
                 altText="consumption"
-                title="NL tiêu hao"
+                title="Nhiên liệu tiêu hao"
                 description={receiveData.model.fuelConsumption}
               />
             </div>
@@ -697,15 +747,16 @@ const Booking = () => {
 
           {/* Right Column - 40% width */}
           <div
-            className={`${sharedClasses.w1_3} bg-white-100 ${sharedClasses.p4} ${sharedClasses.rounded}`}
+            className={`${sharedClasses.w1_3} bg-blue-100 ${sharedClasses.p4} ${sharedClasses.rounded}`}
           >
             <form onSubmit={handleFormSubmit}>
               {/* Rental Section */}
-              <h2
-                className={`text-xl ${sharedClasses.fontSemibold} ${sharedClasses.mb4}`}
-              >
-                {receiveData.price / 1000}K/ngày
-              </h2>
+              <div className="text-center">
+  <h6 className="text-gray-500">Giá thuê</h6>
+  <h2 className={`text-xl font-semibold mb-4`}>
+    {receiveData.price / 1000}K/ngày
+  </h2>
+</div>
 
               <div className="mb-3">
                 <DateTimeRange
@@ -722,7 +773,7 @@ const Booking = () => {
                 <div className="relative">
                   <input
                     type="text"
-                    className={`w-full px-3 py-2 border border-zinc-300 rounded shadow-sm focus:outline-none focus:border-zinc-500 overflow-hidden text-ellipsis whitespace-nowrap`}
+                    className={`w-full px-3 py-2 border border-zinc-300 rounded shadow-sm focus:outline-none focus:border-zinc-500 overflow-hidden text-ellipsis whitespace-nowrap font-bold`}
                     value={gettedLocation}
                     readOnly
                     onClick={() => setShowPopUp(true)}
@@ -831,11 +882,11 @@ const Booking = () => {
               />
             )}
             {showPopupSuccess && (
-                 <PopupSuccess
-                 show={showPopupSuccess}
-                 onHide={() => setShowPopupSuccess(false)}
-                 message="Yêu cầu đặt xe của bạn đã được gửi đi !"
-                 />
+              <PopupSuccess
+                show={showPopupSuccess}
+                onHide={() => setShowPopupSuccess(false)}
+                message="Yêu cầu đặt xe của bạn đã được gửi đi !"
+              />
             )}
             {showPopUp && (
               <PopUpLocation

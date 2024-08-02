@@ -1,34 +1,36 @@
+// src/components/pages/header/Header.js
 import React, { useState, useEffect } from "react";
 import { Nav } from "react-bootstrap";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import "./Header.css";
 import Avatar from "./Avatar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell, faCaretDown } from "@fortawesome/free-solid-svg-icons";
 import NotificationDropdown from "./NotificationDropdown";
+import { useNotification } from "../../NotificationContext";
 import Login from "../login/Login";
 import Register from "../register/Register";
-import Forgotpassword from "../forgotpassword/Forgotpassword"; // Import Forgotpassword component
+import Forgotpassword from "../forgotpassword/Forgotpassword";
 
 const Header = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
-  const [showForgotPassword, setShowForgotPassword] = useState(false); // State for Forgotpassword modal
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [redirectPath, setRedirectPath] = useState("/");
+  const [username, setUsername] = useState("");
+  const [userId, setUserId] = useState("");
+  const { notificationCount, clearNotificationCount } = useNotification();
+
   const location = useLocation();
   const navigate = useNavigate();
-  const [username, setUsername] = useState(""); // State for username
+
+
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     const userDataString = localStorage.getItem("user");
-
-    // Parse JSON string to JavaScript object
     const userData = JSON.parse(userDataString);
-
-    // Get username from userData object
     userData
       ? setUsername(userData.firstName + " " + userData.lastName)
       : setUsername("");
@@ -67,7 +69,6 @@ const Header = () => {
   const handleLoginSuccess = (userInfo) => {
     setShowLoginModal(false);
     setIsLoggedIn(true);
-
     if (userInfo.roles.includes("ADMIN")) {
       navigate("/menu/dashboard");
     } else if (
@@ -135,7 +136,6 @@ const Header = () => {
             >
               Trở thành chủ xe
             </Nav.Link>
-
             {isLoggedIn ? (
               <>
                 <NotificationDropdown />
@@ -189,6 +189,7 @@ const Header = () => {
           </Nav>
         </nav>
       </header>
+
       {showLoginModal && (
         <Login
           show={showLoginModal}
