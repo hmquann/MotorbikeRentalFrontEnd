@@ -56,40 +56,29 @@ const Homepage = () => {
     <section className="relative min-h-screen font-manrope">
       <div className="relative flex justify-center">
         <img
-          src="https://imgcdnblog.carbay.com/wp-content/uploads/2019/12/16150859/Ducati-Streetfighter-v4s2.jpg"
+          src="/image/zero-dsr_x-header.webp"
           alt="Hero Image"
-          className="w-full max-w-screen-lg h-96 object-cover rounded-2xl"
+          className="w-full max-w-screen-lg h-auto object-cover rounded-2xl"
           crossorigin="anonymous"
         />
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white p-4  bg-opacity-50 rounded-2xl font-normal">
-          <h1 className="text-5xl font-bold text-center relative align-baseline">
+          <h1 className="text-5xl font-extrabold leading-tight text-center relative align-baseline max-w-xl">
             MiMotor - Cùng Bạn Đến Mọi Hành Trình
           </h1>
-          <p className="mt-4 text-lg">
+          <div className="w-72 bg-white h-px mx-auto"></div>
+          <p className="mt-8 text-xl text-center font-bold">
             Trải nghiệm sự khác biệt từ{" "}
-            <span className="text-green-500 font-bold">hơn 8000</span> xe máy
+            <span className="text-green-500 font-bold">hơn 200</span> xe máy
             đời mới khắp Việt Nam
           </p>
-          <div className="mt-6 flex space-x-4">
-            <button className={buttonClassesPrimary}>Xe tự lái</button>
-            <button className={`${buttonClasses} ${bgClasses} ${textClasses}`}>
-              Xe có tài xế
-            </button>
-            <button className={`${buttonClasses} ${bgClasses} ${textClasses}`}>
-              Thuê xe dài hạn{" "}
-              <span className="ml-2 bg-red-500 text-white px-2 py-1 text-xs rounded-full">
-                Mới
-              </span>
-            </button>
-          </div>
 
-          <div className="flex text-base p-4 align-baseline relative justify-center">
+        </div>
+      </div>
+      <div className="">
             <div style={{ width: "100%" }}>
               <SearchMotorbike />
             </div>
           </div>
-        </div>
-      </div>
       <div className="mt-8 px-4">
         <Swiper
           spaceBetween={10}
