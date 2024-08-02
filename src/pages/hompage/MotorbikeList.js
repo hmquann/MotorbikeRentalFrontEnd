@@ -67,78 +67,75 @@ const MotorbikeList = (listMotor) => {
           ) : (
             motorbikeList.map((motorbike) => (
               <div
-                key={motorbike.id}
-                className="relative p-4 bg-white rounded-lg shadow-md dark:bg-zinc-800"
-                onClick={() => handleViewDetail(motorbike.id)}
-              >
-                <div className="relative">
-                  <img
-                    className="w-full h-64 object-cover rounded-t-lg"
-                    src={motorbike.motorbikeImages[0].url}
-                    alt="Motorbike"
-                  />
-                  <div className="absolute top-2 left-2 space-y-1">
-                    {/* Thêm các badges ở đây nếu cần */}
-                  </div>
+              key={motorbike.id}
+              className="relative p-4 bg-white rounded-lg shadow-md dark:bg-zinc-800"
+              onClick={() => handleViewDetail(motorbike.id)}
+            >
+              <div className="relative">
+                <img
+                  className="w-full h-64 object-cover rounded-t-lg"
+                  src={motorbike.motorbikeImages[0].url}
+                  alt="Motorbike"
+                />
+                <img
+                  className="w-12 h-12 rounded-full object-cover absolute top-1/2 left-2 transform -translate-y-1/2 border-2 border-white dark:border-zinc-800"
+                  src="https://kenhmuabanxehoi.net/uploads/truong-the-vinh_1680594107/halinh2.jpg"
+                  alt="User Avatar"
+                />
+              </div>
+              <div className="p-4">
+                <div className="mb-2">
+                  <span className="block text-xl font-semibold text-green-400 dark:text-green-400">
+                    <span className="mr-2 ">{motorbike.model.modelName}</span>
+                    <span>{motorbike.yearOfManufacture}</span>
+                  </span>
                 </div>
-                <div className="p-4">
-                  <div className="flex items-center mb-2">
-                    <img
-                      className="w-8 h-8 rounded-full object-cover"
-                      src="https://kenhmuabanxehoi.net/uploads/truong-the-vinh_1680594107/halinh2.jpg"
-                      alt="User Avatar"
-                    />
-                    <div className="ml-2">
-                      <span className="block text-sm font-semibold text-green-600 dark:text-green-400">
-                        {motorbike.model.modelName}
-                      </span>
-                      <span className="block text-xs text-zinc-500 dark:text-zinc-400"></span>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-2 inline-flex items-center space-x-2">
+                  <FontAwesomeIcon
+                    icon={faLocationDot}
+                    size="sm"
+                    style={{ color: "#0f0000" }}
+                  />
+                  <span>{getAddress(motorbike.motorbikeAddress)}</span>
+                </p>
+                <hr className="my-2 border-gray-300 dark:border-zinc-600" />
+                <div className="flex items-center justify-between">
+                  {motorbike.tripCount > 0 && (
+                    <div className="flex items-center text-yellow-500">
+                      <FontAwesomeIcon
+                        icon={faStar}
+                        style={{ color: "#FFD43B" }}
+                      />
+                      <span className="text-sm">5.0</span>
                     </div>
+                  )}
+                  <div className="text-sm text-zinc-500 dark:text-zinc-400 flex items-center">
+                    <span>
+                      {motorbike.tripCount === 0 ? (
+                        "Chưa có "
+                      ) : (
+                        <>
+                          <FontAwesomeIcon
+                            icon={faSuitcase}
+                            style={{ color: "#63E6BE" }}
+                          />
+                          {motorbike.tripCount}
+                        </>
+                      )}{" "}
+                      chuyến
+                    </span>
                   </div>
-                  <h2 className="text-lg font-bold text-zinc-900 dark:text-white"></h2>
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-2 inline-flex items-center space-x-2">
-                    <FontAwesomeIcon
-                      icon={faLocationDot}
-                      size="sm"
-                      style={{ color: "#0f0000" }}
-                    />
-                    <span>{getAddress(motorbike.motorbikeAddress)}</span>
-                  </p>
-                  <div className="flex items-center justify-between">
-                    {motorbike.tripCount > 0 && (
-                      <div className="flex items-center text-yellow-500">
-                        <FontAwesomeIcon
-                          icon={faStar}
-                          style={{ color: "#FFD43B" }}
-                        />
-                        <span className="text-sm">5.0</span>
-                      </div>
-                    )}
-                    <div className="text-sm text-zinc-500 dark:text-zinc-400 flex items-center">
-                      <span>
-                        {motorbike.tripCount == 0 ? (
-                          "Chưa có "
-                        ) : (
-                          <>
-                            <FontAwesomeIcon
-                              icon={faSuitcase}
-                              style={{ color: "#63E6BE" }}
-                            />
-                            {motorbike.tripCount}
-                          </>
-                        )}{" "}
-                        chuyến
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-green-500 font-semibold">
-                        {formatNumber(motorbike.price)}
-                      </span>{" "}
-                      VND/ngày
-                    </div>
+                  <div>
+                    <span className="text-green-400 font-semibold text-xl">
+                      {motorbike.price / 1000}
+                    </span>
+                    K/ngày
                   </div>
                 </div>
               </div>
+            </div>
+            
+
             ))
           )}
         </div>

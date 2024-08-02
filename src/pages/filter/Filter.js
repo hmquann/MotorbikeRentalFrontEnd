@@ -49,7 +49,7 @@ function SetPriceRangeModal({ minValueProp, maxValueProp, modelTypeProp, onUpdat
 
   const getFillWidth = () => {
     const rangeWidth = values[1] - values[0];
-    const totalWidth = 100000; // max value of the range
+    const totalWidth = 200000; // max value of the range
     return (rangeWidth / totalWidth) * 100;
   };
   
@@ -66,7 +66,10 @@ function SetPriceRangeModal({ minValueProp, maxValueProp, modelTypeProp, onUpdat
             <label className={sharedClasses.label}>Sắp xếp</label>
             <div className={sharedClasses.selectContainer}>
               <select className={sharedClasses.input}>
-                <option>Tối ưu</option>
+                <option>Đánh giá cao nhất</option>
+                <option>Giá thấp đến cao</option>
+                <option>Giá cao đến thấp</option>
+                <option>Được thuê nhiều nhất</option>
               </select>
               <div className={sharedClasses.selectIcon}>
                 <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -97,7 +100,7 @@ function SetPriceRangeModal({ minValueProp, maxValueProp, modelTypeProp, onUpdat
             <Range
               step={10000}
               min={0}
-              max={100000}
+              max={200000}
               values={values}
               onChange={handleChange}
               renderTrack={({ props, children }) => (
@@ -109,7 +112,7 @@ function SetPriceRangeModal({ minValueProp, maxValueProp, modelTypeProp, onUpdat
                   <div
                     className="absolute bg-primary h-2 rounded-lg"
                     style={{
-                      left: `${values[0] / 100000 * 100}%`,
+                      left: `${values[0] / 200000 * 100}%`,
                       width: `${getFillWidth()}%`
                     }}
                   />
@@ -125,12 +128,12 @@ function SetPriceRangeModal({ minValueProp, maxValueProp, modelTypeProp, onUpdat
             <div className="flex justify-between mt-4">
               <div className="w-1/2">
                 <label className={sharedClasses.priceLabel}>Giá thấp nhất</label>
-                <div className={sharedClasses.priceContainer}>{values[0]}K</div>
+                <div className={sharedClasses.priceContainer}>{values[0]}đ</div>
               </div>
               <div className="flex items-center justify-center w-1/12 text-muted-foreground">-</div>
               <div className="w-1/2">
                 <label className={sharedClasses.priceLabel}>Giá cao nhất</label>
-                <div className={sharedClasses.priceContainer}>{values[1]}K</div>
+                <div className={sharedClasses.priceContainer}>{values[1]}đ</div>
               </div>
             </div>
           </div>
@@ -162,13 +165,9 @@ const Filter = () => {
   const[schedulePopUp,setSchedulePopUp]=useState(false);
   const [showBrandPopup, setShowBrandPopup] = useState(false);
   const [showModelPopup, setShowModelPopup] = useState(false);
-  const [selectedBrand, setSelectedBrand] = useState(null);
+
   const[loading,setLoading]=useState(false);
   const [error, setError] = useState(null);
-  const [provinces, setProvinces] = useState([]);
-  const [districts, setDistricts] = useState([]);
-  const [selectedProvince, setSelectedProvince] = useState("");
-  const [selectedDistrict, setSelectedDistrict] = useState("");
   const [modalShow, setModalShow] = useState(false);
   const location=useLocation();
   const filterAddressAndTime=location.state.filterList;
@@ -190,7 +189,7 @@ const Filter = () => {
     modelType:"",
     isDelivery:"",
     minPrice:0,
-    maxPrice:100000,
+    maxPrice:200000,
     isFiveStar:""
 }
   );
@@ -267,9 +266,8 @@ const Filter = () => {
     // Add more buttons as needed
   ];
   const handleBrandSelect = (brand) => {
-    setFilterList({...filterList,
-      brandId:brand.brandId})
-    setShowBrandPopup(false); // Close brand popup
+    filterList.brandId==brand.brandId? setFilterList({...filterList,brandId:""}):setFilterList({...filterList,brandId:brand.brandId})
+// Close brand popup
   };
 
   const handleModelPopupClose = () => {
@@ -282,51 +280,6 @@ const Filter = () => {
 
     // Perform any further actions here
   };
-  useEffect(() => {
-    fetch("https://vapi.vnappmob.com/api/province/")
-      .then(response => response.json())
-      .then(data => {
-        console.log('API response:', data); 
-        if (data && data.results) {
-          setProvinces(data.results); // Điều chỉnh theo cấu trúc dữ liệu thực tế
-        } else {
-          throw new Error('Invalid data format');
-        } 
-      })
-      .catch(error => {
-        setError(error);
-      });
-  }, []);
-  const handleProvinceChange = (event) => {
-    const provinceId = event.target.value;
-    setSelectedProvince(provinceId);
-    // Fetch districts based on selected province
-    fetch(`https://vapi.vnappmob.com/api/province/district/${provinceId}`)
-      .then((response) => response.json())
-      .then((data) => {
-
-        if (data && data.results) {           
-          setDistricts(data.results);
-        } else {
-          throw new Error("Invalid data format");
-        }
-      })
-      .catch((error) => {
-        setError(error);
-      });
-  };
-  const handleDistrictChange=(event)=>{
-    const districtId = event.target.value;
-    setSelectedDistrict(districtId);
-  }
-  const handleAddressSubmit=()=>{
-    console.log(selectedDistrict)
-    console.log(selectedProvince);
-    const province = provinces.find(d => d.province_id === selectedProvince).province_name;
-    const district = districts.find(d => d.district_id === selectedDistrict).district_name;
-  setFilterList({...filterList,address:district+","+province});
-  setAddressPopUp(false)
-  }
   const handleSearchMotor = async () => {
     const { modelType, ...newFilterList } = filterList;
     if (modelType) {
@@ -379,8 +332,8 @@ const Filter = () => {
   return (
 
   
-    <div>
-      <div className="relative">
+    <div className='bg-gray-200'>
+      <div className="relative ">
         <img
           src="https://imgcdnblog.carbay.com/wp-content/uploads/2019/12/16150859/Ducati-Streetfighter-v4s2.jpg"
           alt="Hero Image"
@@ -411,75 +364,93 @@ const Filter = () => {
     </div>
    
 </div>
-<div className="flex justify-center items-center mt-8" >
-  <div style={{ width: '100%' }}>
-    <div className="flex items-center justify-center space-x-4 text-foreground">
-      <div className='flex items-center space-x-2' onClick={() => setOpenMapBoxSearch(true)}>
-      <svg class="h-6 w-6 text-green-500"  width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">  
-      <path stroke="none" d="M0 0h24v24H0z"/>  <circle cx="12" cy="11" r="3" />  
-      <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 0 1 -2.827 0l-4.244-4.243a8 8 0 1 1 11.314 0z" /></svg>
+
+<div className="flex justify-center items-center mt-4">
+  <div style={{ width: '40%' }}>
+    <div className="flex items-center justify-center space-x-2 text-foreground border-2 border-gray-500 bg-gray-200 rounded-full px-2 py-1 text-sm">
+      <div className='flex items-center space-x-1' onClick={() => setOpenMapBoxSearch(true)}>
+        <svg className="h-4 w-4 text-green-500" width="16" height="16" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">  
+          <path stroke="none" d="M0 0h24v24H0z"/>  
+          <circle cx="12" cy="11" r="3" />  
+          <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 0 1 -2.827 0l-4.244-4.243a8 8 0 1 1 11.314 0z" />
+        </svg>
         <span>{filterList.address}</span>
       </div>
-      <div className='flex items-center space-x-2' onClick={(handleOpenSchedulePopup)}>
-      <svg class="h-6 w-6 text-green-500"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"> 
-       <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />  <line x1="16" y1="2" x2="16" y2="6" /> 
-       <line x1="8" y1="2" x2="8" y2="6" />  <line x1="3" y1="10" x2="21" y2="10" /></svg>
-        <span>{format(filterList.startDate, 'HH:mm, dd/MM/yyyy')} - {format(filterList.endDate, 'HH:mm, dd/MM/yyyy')}</span>
+      <div className='flex items-center space-x-1' onClick={handleOpenSchedulePopup}>
+        <svg className="h-4 w-4 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"> 
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />  
+          <line x1="16" y1="2" x2="16" y2="6" /> 
+          <line x1="8" y1="2" x2="8" y2="6" />  
+          <line x1="3" y1="10" x2="21" y2="10" />
+        </svg>
+        <span>
+          {format(filterList.startDate, 'HH:mm, dd/MM/yyyy')} - {format(filterList.endDate, 'HH:mm, dd/MM/yyyy')}
+        </span>
       </div>
     </div>
   </div>
-</div>           
   <MapboxSearchPopUp open={openMapboxSearch} onClose={() => setOpenMapBoxSearch(false)} onSelect={handleSelectLocation} />
-          <div className="flex justify-center mt-8" >
-          <MotorbikeSchedulePopUp isOpen={schedulePopUp} onClose={() => setSchedulePopUp(false)} onSubmit={handlePopUpSubmit} />
-          </div>    
- 
-    <div className="flex justify-center mt-8">
-    
-      <div className="flex flex-wrap gap-2 p-4">
-        {buttons.map(button => (
-          <button
-            key={button.name}
-            className={`flex items-center border rounded-full px-3 py-1 ${
-              selectedButtons.includes(button.name) ? 'bg-green-500 text-white' : 'bg-gray-200 text-black'
-            }`}
-            onClick={() => handleButtonClick(button.name)}
-          >
-            <span className={`mr-2 ${selectedButtons.includes(button.name) ? 'text-white' : 'text-green-500'}`}>
-              {button.svg}
-            </span>
-            {button.label}
-          </button>
-        ))}
-      </div>
-      
-  
+  <MotorbikeSchedulePopUp isOpen={schedulePopUp} onClose={() => setSchedulePopUp(false)} onSubmit={handlePopUpSubmit} />
+</div>
 
-    </div>
+
+
+
+
+
+<div className="flex justify-center mt-2">
+  <div className="flex flex-wrap gap-2 p-4">
+    {buttons.map(button => (
+      <button
+        key={button.name}
+        className={`flex items-center border rounded-full px-3 py-1 ${
+          selectedButtons.includes(button.name) ? 'bg-green-500 text-white border-white-500' : 'bg-white text-black border-gray-200'
+        }`}
+        onClick={() => handleButtonClick(button.name)}
+      >
+        <span className={`mr-2 ${selectedButtons.includes(button.name) ? 'text-white' : 'text-green-500'}`}>
+          {button.svg}
+        </span>
+        {button.label}
+      </button>
+    ))}
+  </div>
+</div>
+
+
     <div className="flex justify-center">
       <div style={{ width: '95%' }}>
       <MotorbikeList listMotor={listMotor}/>
       </div>
     </div>
     {showBrandPopup && (
-  <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
-    <div className="bg-white p-4 rounded-lg">
-      <h2 className="text-lg font-bold mb-4">Chọn hãng xe</h2>
-      {/* Render danh sách hãng xe từ state brands */}
-      {brands.map(brand => (
-        <div key={brand.brandId} className="flex items-center mb-2">
-          <button className="bg-gray-200 text-black rounded px-3 py-1 mr-2"
-            onClick={() => handleBrandSelect(brand)}>
-            {brand.brandName}
-          </button>
-        </div>
-      ))}
-      <button className="bg-green-500 text-white rounded px-3 py-1"
-        onClick={() => setShowBrandPopup(false)}>
-        Áp dụng
-      </button>
-    </div>
-  </div>
+ <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
+ <div className="bg-white p-4 rounded-lg">
+   <h2 className="text-lg font-bold mb-4">Chọn hãng xe</h2>
+   {/* Render danh sách hãng xe từ state brands */}
+   <div className="grid grid-cols-2 gap-2">
+     {brands.map((brand) => (
+       <button
+         key={brand.brandId}
+         className={`w-full text-black rounded px-3 py-1 ${
+           filterList.brandId && filterList.brandId === brand.brandId
+             ? "bg-green-500 text-white"
+             : "bg-gray-200"
+         }`}
+         onClick={() => handleBrandSelect(brand)}
+       >
+         {brand.brandName}
+       </button>
+     ))}
+   </div>
+   <button
+     className="bg-green-500 text-white rounded px-3 py-1 mt-4"
+     onClick={() => setShowBrandPopup(false)}
+   >
+     Áp dụng
+   </button>
+ </div>
+</div>
 )}
        <SetPriceRangeModal
         show={modalShow}
@@ -490,6 +461,7 @@ const Filter = () => {
           onUpdateModelType={handleUpdateModelType}
       />
     </div>
+
   );
 };
 

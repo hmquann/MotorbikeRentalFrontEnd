@@ -44,7 +44,7 @@ const ManageSchedulePopUp = ({ isOpen, onClose, motorbikeId }) => {
 
     setError('');
     try {
-      const response = await apiClient.post(`/api/schedules/toggle`, null, {
+      const response = await apiClient.post(`/api/booking/markBusyDays`, null, {
         params: {
           motorbikeId,
           date: format(selectedDate, 'yyyy-MM-dd'),
