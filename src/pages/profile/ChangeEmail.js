@@ -1,44 +1,32 @@
-import axios from "axios";
 import React, { useState } from "react";
+import { Modal, Button, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import PopupMessage from "./PopupMessage";
 import apiClient from "../../axiosConfig";
-const modalOverlayClasses =
-  "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50";
-const modalContentClasses =
-  "bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-6 w-80";
-const buttonClasses =
-  "text-zinc-500 dark:text-zinc-300 hover:text-zinc-700 dark:hover:text-zinc-100";
-const inputClasses =
-  "w-full p-2 mb-4 bg-zinc-200 rounded-lg light:bg-zinc-700 dark:text-zinc-200-dark";
-const submitButtonClasses =
-  "w-full p-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600";
-const ChangeEmail = ({ onClose, isOpen }) => {
+import PopupMessage from "./PopupMessage";
+
+const ChangeEmail = ({ show, handleClose }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [error, setError] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
+
   const userDataString = localStorage.getItem("user");
   const userData = JSON.parse(userDataString);
-
-  const handleClose = () => {
-    onClose();
-  };
 
   const handleChange = (event) => {
     setEmail(event.target.value);
   };
 
   const handleSubmit = (e) => {
+    e.preventDefault();
     if (!email.trim()) {
-      setError("Email cannot be empty.");
+      setError("Email không được để trống");
       setLoading(false);
       return;
     }
-    e.preventDefault();
+
     setLoading(true);
-    console.log("123123213");
     apiClient
       .post(
         "/api/auth/changeEmail",
@@ -53,62 +41,61 @@ const ChangeEmail = ({ onClose, isOpen }) => {
         }
       )
       .then((response) => {
-        console.log(response.data);
-        setShowPopup(true); // Hiển thị popup khi thành công
+        setShowPopup(true); // Show popup on success
         setTimeout(() => {
-          setShowPopup(false); // Ẩn popup sau 3 giây
-          localStorage.clear();
-          navigate("/login"); //chuyển sang trang login sau khi thông báo
-        }, 3000);
-        // Xử lý phản hồi thành công
+          setShowPopup(false); // Hide popup after 3 seconds // Redirect to login after popup
+        }, 2000);
       })
       .catch((error) => {
         console.error(error);
-        setError(error.response.data);
-        // Xử lý lỗi
+        setError(translations[error.response.data]);
       })
       .finally(() => {
         setLoading(false);
       });
   };
-
-  if (!isOpen) return null;
+  const translations = {
+    "Email existed": "Email này đã tồn tại. Vui lòng thử lại",
+    // Add other translations here
+  };
 
   return (
-    <div className={modalOverlayClasses}>
-      <div className={modalContentClasses}>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100-dark">
-            Change Email
-          </h2>
+    <Modal show={show} onHide={handleClose} className="font-manrope">
+      <Modal.Header closeButton>
+        <Modal.Title>Cập nhật email</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Form onSubmit={handleSubmit}>
+          <Form.Group controlId="formEmail">
+            <Form.Control
+              type="email"
+              value={email}
+              onChange={handleChange}
+              placeholder="Email mới"
+              className="mb-2 py-2 px-3"
+            />
+            {error && (
+              <Form.Text className="text-danger ml-1 text-xl mb-1 font-semibold" >
+                {error}
+              </Form.Text>
+            )}
+          </Form.Group>
           <button
-            onClick={handleClose}
-            className={`text-zinc-400 dark:text-zinc-300 hover:text-zinc-600 dark:hover:text-zinc-500 ${buttonClasses}`}
+            type="submit"
+            className="w-full py-3 px-4 text-sm tracking-wide rounded-lg text-white bg-green-600 hover:bg-green-700 transition hover:scale-105"
           >
-            <span className="sr-only">Close</span>
-            &times;
+            {loading ? "Đang xử lý..." : "Cập nhật"}
           </button>
-        </div>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="email"
-            onChange={handleChange}
-            placeholder="Enter your email"
-            className={inputClasses}
-          />
-
-          <button type="submit" className={submitButtonClasses}>
-            {loading ? "Submitting..." : "Submit"}
-          </button>
-          {error && (
-            <div className="text-red-500 text-center mt-4">{error}</div>
-          )}
-        </form>
+        </Form>
         {showPopup && (
-          <PopupMessage message="Your request sent successfully! Please check your email!"></PopupMessage>
+          <PopupMessage
+            show={showPopup}
+            onHide={() => setShowPopup(false)}
+            message="Yêu cầu thay đổi đã được gửi đến Email của bạn. Vui lòng xác nhận"
+          />
         )}
-      </div>
-    </div>
+      </Modal.Body>
+    </Modal>
   );
 };
 

@@ -48,11 +48,11 @@ const Profile = () => {
   }, [location]);
 
   return (
-    <div>
+    <div className="font-manrope">
       <div className={cardClasses}>
         <div className="flex justify-between items-start">
           <h2 className={`text-xl font-semibold ${textClasses}`}>
-            Personal information
+            Thông tin cá nhân
           </h2>
         </div>
         <div className="flex mt-4 items-center">
@@ -73,9 +73,9 @@ const Profile = () => {
             <FontAwesomeIcon icon={faMotorcycle} />
             <br />
             <span className={`text-lg font-semibold ${greenTextClasses}`}>
-            {user.totalTrip} 
+              {user.totalTrip}
             </span>
-            <span className={smallTextClasses}> trip</span>
+            <span className={smallTextClasses}> chuyến</span>
           </div>
         </div>
 
@@ -84,11 +84,11 @@ const Profile = () => {
             <div className="flex items-center">
               <div className={textClasses}>Email</div>
               <span className="ml-2 bg-green-100 dark:bg-green-700 text-green-800 dark:text-green-300 text-xs px-2 py-1 rounded-full">
-                Verified
+                Đã xác thực
               </span>
             </div>
             <div className="flex items-center">
-              <div className={textClasses}>{user.email}</div>
+              <div className="font-bold">{user.email}</div>
               <button
                 className={`ml-2 ${buttonClasses}`}
                 onClick={() => setShowPopUpEmail(true)}
@@ -97,21 +97,21 @@ const Profile = () => {
               </button>
               {showPopUpEmail && (
                 <ChangeEmail
-                  onClose={() => setShowPopUpEmail(false)}
-                  isOpen={showPopUpEmail}
+                  show={showPopUpEmail}
+                  handleClose={() => setShowPopUpEmail(false)}
                 />
               )}
             </div>
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <div className={textClasses}>Phone Number</div>
+              <div className={textClasses}>Số điện thoại</div>
               <span className="ml-2 bg-red-100 dark:bg-green-700 text-green-800 dark:text-green-300 text-xs px-2 py-1 rounded-full">
-                Not verified
+                Chưa xác thực
               </span>
             </div>
             <div className="flex items-center">
-              <div className={textClasses}>{user.phone}</div>
+              <div className="font-bold">{user.phone}</div>
               <button className={`ml-2 ${buttonClasses}`}>
                 <FontAwesomeIcon icon={faPenToSquare} />
               </button>
@@ -120,15 +120,15 @@ const Profile = () => {
           <div className="flex justify-center mt-4">
             <button
               type="button"
-              className={changePasswordButtonClasses}
+              className=" py-3 px-4 text-sm tracking-wide rounded-lg text-white bg-green-500 hover:bg-green-600 transition hover:scale-110"
               onClick={() => setShowPopUpPassword(true)}
             >
-              Change Password
+              Đổi mật khẩu
             </button>
             {showPopUpPassword && (
               <UpdatePassword
-                onClose={() => setShowPopUpPassword(false)}
-                isOpen={showPopUpPassword}
+                show={() => setShowPopUpPassword(true)}
+                handleClose={() => setShowPopUpPassword(false)}
               />
             )}
           </div>

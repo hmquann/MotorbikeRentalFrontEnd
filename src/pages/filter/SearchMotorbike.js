@@ -149,7 +149,7 @@ const SearchMotorbike = () => {
     };
   return (
     <div>
-      <div className="bg-white dark:bg-zinc-800 p-4 rounded-lg shadow-md flex items-center justify-between">
+      <div className="bg-white relative p-4 rounded-2xl  shadow-md flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
