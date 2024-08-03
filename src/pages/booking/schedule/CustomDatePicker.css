@@ -1,6 +1,6 @@
 .disabled-day {
   background-color: #f0f0f0 !important;
-  color: #d0d0d0 !important;
+  color: #949494 !important;
   pointer-events: none;
 }
 .disabled-day:hover::after {
@@ -18,5 +18,82 @@
 }
 .selected-day-range {
   background-color: #e6f7ff !important;
-  color: #1890ff !important;
+  color: #22C55E !important;
+}
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.popupContainer {
+  background-color: white;
+  border-radius: 8px;
+  padding: 16px;
+  max-width: 100%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.date-picker-container {
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically if needed */
+}
+
+.date-picker {
+  width: 100%; /* Adjust width as needed */
+  max-width: 400px; /* Set a max width to avoid stretching */
+}
+.DatePicker {
+  width: 100%;
+  font-size: 16px;
+}
+
+.DatePicker__month {
+  font-size: 2.4rem;
+}
+.date-picker-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.date-picker {
+  width: 100%;
+  max-width: 400px; /* Adjust as needed */
+}
+
+.react-datepicker__week {
+  display: flex;
+  justify-content: space-between; /* Equal spacing between days */
+}
+
+.react-datepicker__day {
+  width: 100%;
+  text-align: center;
+  line-height: 2; /* Adjust as needed */
+}
+
+.react-datepicker__day-names   {
+  text-align: center;
+  display: flex;
+  justify-content: space-around;
+}
+.react-datepicker__day--weekend {
+  color: #f00; /* Optional: style weekends differently */
+}
+
+.react-datepicker__day {
+  display: flex;
+  justify-content: center;
+}
+
+.react-datepicker__week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr); /* Create a grid with equal columns */
 }

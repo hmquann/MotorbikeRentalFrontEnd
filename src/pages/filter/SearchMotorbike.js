@@ -34,7 +34,7 @@ const extractSecondAndThirdLastElements = (str) => {
 
 const SearchMotorbike = () => {
   const navigate = useNavigate();
-
+  const[searchError,setSearchError]=useState("");
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [rentalStartTime, setRentalStartTime] = useState(new Date());
   const [rentalEndTime, setRentalEndTime] = useState(addDays(new Date(), 1));
@@ -68,6 +68,11 @@ const SearchMotorbike = () => {
     setRentalEndTime(data.endDateTime);
   };
   const handleSearchMotor = async () => {
+    if(!rentalStartTime||!rentalEndTime||!rentalAddress){
+      setSearchError("Vui lòng điền đầy đủ thông tin thuê")
+    }
+    else{
+      setSearchError("")
     const filterList = {
       startDate: dayjs(rentalStartTime).format("YYYY-MM-DDTHH:mm:ss"),
       endDate: dayjs(rentalEndTime).format("YYYY-MM-DDTHH:mm:ss"),
@@ -93,6 +98,7 @@ const SearchMotorbike = () => {
       setLoading(false);
     }
   };
+}
 
   const handleRequestError = (error) => {
     if (error.response) {
@@ -129,7 +135,7 @@ const SearchMotorbike = () => {
   };
 
   return (
-    <div  className="bg-white relative align-baseline pt-4 px-3 rounded-2xl mx-36 lg:mx-80 bottom-16 shadow-md">
+    <div  className="bg-white relative pt-4 px-3 rounded-2xl mx-auto bottom-16 shadow-md max-w-full lg:max-w-5xl">
       <div className="flex flex-col md:flex-row justify-evenly">
       <div className="flex flex-col max-w-full md:max-w-80 mb-4 md:mb-0">
 
@@ -166,8 +172,8 @@ const SearchMotorbike = () => {
             onClick={() => setOpenMapBoxSearch(true)}
           >
           <div className="flex ml-10 text-base pr-6 cursor-pointer leading-7">
-            <span className="text-black font-bold dark:text-white">
-              {rentalAddress ? rentalAddress : "Chọn địa điểm"}
+            <span className="text-black font-bold dark:text-white" >
+              {rentalAddress ? rentalAddress : "Chọn địa điểm"} 
             </span>
           </div>
           </div>
@@ -288,7 +294,9 @@ const SearchMotorbike = () => {
         >
           {loading ? "Đang tìm kiếm..." : "Tìm xe"}
         </button>
+        
       </div>
+      {searchError && <div className="text-red-500 font-bold text-center">{searchError}</div>}
     </div>
   );
 };

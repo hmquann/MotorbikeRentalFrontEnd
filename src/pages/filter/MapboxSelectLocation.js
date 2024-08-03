@@ -106,78 +106,89 @@ export default function MapboxSelectLocation({ open, onClose, onSelect }) {
 
   return (
     <Modal
-      open={open}
-      onClose={onClose}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-    >
-      <Box sx={style}>
+    open={open}
+    onClose={onClose}
+    aria-labelledby="modal-modal-title"
+    aria-describedby="modal-modal-description"
+  >
+    <Box sx={{ p: 2, width: '90%', maxWidth: 600, mx: 'auto', bgcolor: 'background.paper' }}>
       <Typography id="modal-modal-title" variant="h6" component="h2">
-          Địa điểm
-        </Typography>
-        <Input
-          name="search"
-          onChange={handleSearchQuery}
-          value={searchQuery}
-          fullWidth
-          placeholder="Nhập điểm đến của bạn"
-          sx={{ my: 2 }}
-          endAdornment={
-            <InputAdornment position="end">
-              <IconButton onClick={handleClearSearch}>
-                <ClearIcon />
-              </IconButton>
-            </InputAdornment>
-          }
-        />
-        {listResults.length > 0 ? (
-          <List>
-            {listResults.map((result) => (
-              <ListItem
-                key={result.id}
-                onClick={() => handleSelectResult(result)}
-                sx={{
-                  cursor: 'pointer',
-                  backgroundColor: selectedResult && selectedResult.id === result.id ? '#ddd' : 'transparent',
-                }}
-              >
-                {result.place_name}
-              </ListItem>
-            ))}
-          </List>
-        ) : (
-          <Typography></Typography>
-        )}
-        <Box sx={{ width: '100%', height: '300px', mt: 2 }}>
-          <ReactMapGL
-            {...viewport}
-            width="100%"
-            height="100%"
-            mapStyle="mapbox://styles/mapbox/streets-v11"
-            mapboxApiAccessToken={access_token}
-            onClick={handleClick}
-            onViewportChange={(nextViewport) => setViewport(nextViewport)}
-          >
-            {newPlace && (
-              <Marker latitude={newPlace.lat} longitude={newPlace.long}>
-                <div style={{ position: 'relative', width: '24px', height: '24px' }}>
-                  <FontAwesomeIcon icon={faLocationDot} style={{ color: "#e62214", fontSize: '24px' }} />
-                </div>
-              </Marker>
-            )}
-          </ReactMapGL>
-        </Box>
-        <Typography sx={{ color: 'red' }}>{error}</Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleSubmit}
-          sx={{ mt: 2 }}
-          fullWidth
+        Địa điểm
+      </Typography>
+      <Input
+        name="search"
+        onChange={handleSearchQuery}
+        value={searchQuery}
+        fullWidth
+        placeholder="Nhập điểm đến của bạn"
+        sx={{ my: 2 }}
+        endAdornment={
+          <InputAdornment position="end">
+            <IconButton onClick={handleClearSearch}>
+              <ClearIcon />
+            </IconButton>
+          </InputAdornment>
+        }
+      />
+      {listResults.length > 0 ? (
+        <List>
+          {listResults.map((result) => (
+            <ListItem
+              key={result.id}
+              onClick={() => handleSelectResult(result)}
+              sx={{
+                cursor: 'pointer',
+                backgroundColor: selectedResult && selectedResult.id === result.id ? '#ddd' : 'transparent',
+                borderRadius: 1, // Thêm border radius để các item trông mềm mại hơn
+                mb: 1 // Thêm margin-bottom giữa các item
+              }}
+            >
+              {result.place_name}
+            </ListItem>
+          ))}
+        </List>
+      ) : (
+        <Typography>Không có kết quả nào.</Typography>
+      )}
+      <Box sx={{ width: '100%', height: '300px', mt: 2 }}>
+        <ReactMapGL
+          {...viewport}
+          width="100%"
+          height="100%"
+          mapStyle="mapbox://styles/mapbox/streets-v11"
+          mapboxApiAccessToken={access_token}
+          onClick={handleClick}
+          onViewportChange={(nextViewport) => setViewport(nextViewport)}
         >
-          Xác nhận
-        </Button>
+          {newPlace && (
+            <Marker latitude={newPlace.lat} longitude={newPlace.long}>
+              <div style={{ position: 'relative', width: '24px', height: '24px' }}>
+                <FontAwesomeIcon icon={faLocationDot} style={{ color: "#e62214", fontSize: '24px' }} />
+              </div>
+            </Marker>
+          )}
+        </ReactMapGL>
       </Box>
-    </Modal>
+      <Typography sx={{ color: 'red' }}>{error}</Typography>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleSubmit}
+        sx={{ mt: 2 }}
+        fullWidth
+      >
+        Xác nhận
+      </Button>
+      <Button
+        variant="outlined"
+        color="secondary"
+        onClick={onClose}
+        sx={{ mt: 2 }}
+        fullWidth
+      >
+        Đóng
+      </Button>
+    </Box>
+  </Modal>
   );
 }

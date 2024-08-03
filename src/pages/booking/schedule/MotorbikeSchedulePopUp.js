@@ -2,13 +2,18 @@ import React, { useState } from "react";
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import './CustomDatePicker.css';
+import { registerLocale, setDefaultLocale } from 'react-datepicker';
+import vi from 'date-fns/locale/vi';
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {faClock} from "@fortawesome/free-solid-svg-icons";
 const sharedClasses = {
   flex: 'flex',
   justifyBetween: 'justify-between',
   itemsCenter: 'items-center',
   textZinc300: 'text-zinc-300',
   textZinc500: 'text-zinc-500',
-  zinc700: 'text-zinc-700',
+  zinc700: 'text-zinc-700 font-bold',
   zinc100: 'bg-zinc-100',
   zinc200: 'bg-green-200',
   green600: 'text-green-600',
@@ -36,7 +41,7 @@ const sharedClasses = {
   textLg: 'text-lg',
   fontSemiBold: 'font-semibold',
   zinc500: 'text-zinc-500',
-  overlay: 'fixed inset-0 bg-black bg-opacity-50 z-50',
+  overlay: 'fixed inset-0 bg-black bg-opacity-50 z-50 font-manrope pt-10',
   popupContainer: 'relative bg-white rounded-lg shadow p-4 max-w-[32rem] mx-auto',
   closeButton: 'absolute top-2 right-2 text-black cursor-pointer',
 };
@@ -91,9 +96,9 @@ const MotorbikeSchedulePopUp = ({ isOpen, onClose, onSubmit }) => {
   const [receiveTime, setReceiveTime] = useState('10:00');
   const [returnTime, setReturnTime] = useState('12:00');
   const [timeError, setTimeError] = useState("");
-
   const timePickUp = generateTimeSlots();
-  
+  registerLocale('vi', vi);
+  setDefaultLocale('vi');
   const onChange = (dates) => {
     const [start, end] = dates;
     setStartDate(start);
@@ -109,17 +114,12 @@ const MotorbikeSchedulePopUp = ({ isOpen, onClose, onSubmit }) => {
       setReturnTime(value);
     }
   };
-  const disableDates = [
-    new Date(2024, 6, 22), 
-    new Date(2024, 6, 23), 
-  ];
   const isDateDisabled = (date) => {
-    return disableDates.some(
-      (disableDate) =>
-        date.getDate() === disableDate.getDate() &&
-        date.getMonth() === disableDate.getMonth() &&
-        date.getFullYear() === disableDate.getFullYear()
-    );
+    const today = new Date(); // Get the current date
+    today.setHours(0, 0, 0, 0); // Set time to the start of the day
+    
+    // Disable if the date is before today or is in the list of disabled dates
+    return date < today
   };
 
   const dayClassName = (date) => {
@@ -127,12 +127,12 @@ const MotorbikeSchedulePopUp = ({ isOpen, onClose, onSubmit }) => {
   };
   const handleSubmit = () => {
     if (!endDate) {
-      setTimeError("End date is required.");
+      setEndDate(startDate);
       return;
     }
 
     if (!isStartBeforeEnd(startDate, receiveTime, endDate, returnTime)) {
-      setTimeError("Receive date must be less than return date");
+      setTimeError("Thời gian nhận xe phải trước thời gian trả xe");
       return;
     }
     const startDateTime = parseDateTime(startDate, receiveTime);
@@ -140,7 +140,7 @@ const MotorbikeSchedulePopUp = ({ isOpen, onClose, onSubmit }) => {
     const endDateTime = parseDateTime(endDate, returnTime);
     console.log(startDateTime+endDateTime)
     if (!checkTimeDifference(endDateTime)) {
-      setTimeError("Return date and time must be at least 6 hours from now.");
+      setTimeError("Thời gian nhận và trả xe phải ít nhất 6 giờ");
       return;
     }
     
@@ -155,63 +155,81 @@ const MotorbikeSchedulePopUp = ({ isOpen, onClose, onSubmit }) => {
 
   return (
     <div className={sharedClasses.overlay}>
-      <div className={sharedClasses.popupContainer}>
-        <button className={sharedClasses.closeButton} onClick={onClose}>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-           <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-          </svg>
-        </button>
-        <h2 className={`text-center ${sharedClasses.textLg} ${sharedClasses.fontSemiBold} ${sharedClasses.mb4}`}>Chọn thời gian thuê xe</h2>
-
-        <DatePicker
-      className="justify-content"
-      selected={startDate}
-      onChange={onChange}
-      startDate={startDate}
-      endDate={endDate}
-      selectsRange
-      inline
-      dayClassName={dayClassName}
-      filterDate={(date) => !isDateDisabled(date)} // Disable các ngày cụ thể
-    />
-
-        <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.mb4}`}>
-          <div className="flex-1">
-            <label className={sharedClasses.zinc700}>Thời gian nhận xe</label>
-            <select name="receiveTime" onChange={handleTimeChange} value={receiveTime}
-              className={`${sharedClasses.block} ${sharedClasses.wFull} ${sharedClasses.m1} ${sharedClasses.borderZinc300} ${sharedClasses.rounded} ${sharedClasses.zinc700}`}>
-              {timePickUp.map((time, index) => (
-                <option key={index} value={time}>{time}</option>
-              ))}
-            </select>
-          </div>
-          <div className={sharedClasses.p2}>
-            <img aria-hidden="true" alt="arrow" src="https://placehold.co/24x24" />
-          </div>
-          <div className="flex-1">
-            <label className={sharedClasses.zinc700}>Thời gian trả xe</label>
-            <select name="returnTime" onChange={handleTimeChange} value={returnTime}
-              className={`${sharedClasses.block} ${sharedClasses.wFull} ${sharedClasses.m1} ${sharedClasses.borderZinc300} ${sharedClasses.rounded} ${sharedClasses.zinc700}`}>
-              {timePickUp.map((time, index) => (
-                <option key={index} value={time}>{time}</option>
-              ))}
-            </select>
-          </div>
+    <div className={`${sharedClasses.popupContainer} flex flex-col justify-center items-center p-4 max-w-sm mx-auto`}>
+      <button className={`${sharedClasses.closeButton} self-end`} onClick={onClose}>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+          <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+        </svg>
+      </button>
+      <h2 className={`text-center ${sharedClasses.textLg} ${sharedClasses.fontSemiBold} mb-2 text-black`}>Chọn thời gian thuê xe</h2>
+  
+      <div className="flex justify-center my-2 w-full">
+  <DatePicker
+    className="w-full max-w-md"
+    selected={startDate}
+    onChange={onChange}
+    startDate={startDate}
+    endDate={endDate}
+    selectsRange
+    inline
+    locale="vi"
+    dayClassName={dayClassName}
+    filterDate={(date) => !isDateDisabled(date)}
+  />
+</div>
+  
+      <div className={`grid grid-cols-2 gap-2 mb-2 w-full`}>
+      <div>
+        <label className={sharedClasses.zinc700}>Nhận xe</label>
+        <div className="flex items-center border rounded-full border-zinc-300">
+          <FontAwesomeIcon icon={faClock} className="p-1" />
+          <select
+            name="receiveTime"
+            onChange={handleTimeChange}
+            value={receiveTime}
+            className={`w-full p-1 ${sharedClasses.zinc700} border-none rounded-full`}
+          >
+            {timePickUp.map((time, index) => (
+              <option key={index} value={time}>{time}</option>
+            ))}
+          </select>
         </div>
-
-        <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter}`}>
-          <div>
-            <p  class="justify-content text-center text-black">Thời gian thuê</p>
-            <p class="text-black">{receiveTime}, {startDate.toLocaleDateString()} - {returnTime}, {endDate ? endDate.toLocaleDateString() : ''}</p>
-            <p className={sharedClasses.textZinc500}>
-            {endDate ? `Số ngày thuê: ${calculateDaysDifference(startDate, receiveTime, endDate, returnTime)} ngày` : " Số ngày thuê: 0 ngày"}</p>
-            {timeError && <p className={sharedClasses.red500}>{timeError}</p>}
-          </div>
+      </div>
+      <div>
+        <label className={sharedClasses.zinc700}>Trả xe</label>
+        <div className="flex items-center border rounded-full border-zinc-300">
+          <FontAwesomeIcon icon={faClock} className="p-1" />
+          <select
+            name="returnTime"
+            onChange={handleTimeChange}
+            value={returnTime}
+            className={`w-full p-1 ${sharedClasses.zinc700} border-none rounded-full`}
+          >
+            {timePickUp.map((time, index) => (
+              <option key={index} value={time}>{time}</option>
+            ))}
+          </select>
         </div>
-
-        <button className={`w-full mt-4 ${sharedClasses.green500} ${sharedClasses.textWhite} ${sharedClasses.p2} ${sharedClasses.rounded}`} onClick={handleSubmit}>Submit</button>
       </div>
     </div>
+  
+      <div className="border-t border-gray-300 pt-2 w-full bg-white-100">
+        <div className="text-center">
+          <p className="text-black text-sm">Thời gian thuê: {receiveTime}, {startDate.toLocaleDateString()} - {returnTime}, {endDate ? endDate.toLocaleDateString() : ''}</p>
+        </div>
+        <div className="text-center mt-1">
+          <p className="text-sm text-gray-500">
+            {endDate ? `Số ngày thuê: ${calculateDaysDifference(startDate, receiveTime, endDate, returnTime)} ngày` : "Số ngày thuê: 0 ngày"}
+          </p>
+          {timeError && <p className="text-sm text-red-500">{timeError}</p>}
+        </div>
+      </div>
+  
+      <button className={`w-6/12 mt-2 hover:bg-green-600 transition-shadow hover:shadow-2xl ${sharedClasses.green500} ${sharedClasses.white} ${sharedClasses.p2} ${sharedClasses.rounded}`} onClick={handleSubmit}>
+        Áp dụng
+      </button>
+    </div>
+  </div>
   );
 };
 

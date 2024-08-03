@@ -736,7 +736,7 @@ const Booking = () => {
                     <FaMotorcycle className="w-6 h-6" />
 
                     <span className="ml-2">
-                      {receiveData.user.totalTripCount} chuyến đi
+                      {receiveData.user.totalTripCount>0?receiveData.user.totalTripCount:"Chưa có"} chuyến
                     </span>
                   </span>
                 </div>
