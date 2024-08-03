@@ -99,10 +99,11 @@ const Header = () => {
 
   return (
     <>
-      <header className="flex align-baseline justify-between items-center p-4 border-b ">
+      <header className="flex align-baseline justify-between lg:mx-28 items-center p-4 ">
         <div className="flex items-center">
           <Nav.Link as={Link} to="/homepage">
-            <img className="w-24" src="/image/logo.jpg" alt="Logo" />
+            <img className="w-24" src="/image/logo.png
+            " alt="Logo" />
           </Nav.Link>
         </div>
         <nav className="flex space-x-4">
@@ -123,18 +124,30 @@ const Header = () => {
             <Nav.Link
               as={Link}
               to="/registermotorbike"
-              style={{
+              style={{ 
                 color: "#000" /* text-black */,
                 fontSize: "0.875rem" /* text-sm */,
                 fontWeight: "700" /* font-bold */,
                 fontFamily: '"Manrope", sans-serif' /* font-manrope */,
-                borderRight: "1px solid #d8dae5", /* border-r-2 */
-                height : '34px',
-               
-                
+                borderRight: isLoggedIn ? "none" : "1px solid #d8dae5", /* border-r-2 */
+                height : '34px',  
               }}
             >
               Trở thành chủ xe
+            </Nav.Link>
+            <Nav.Link
+              as={Link}
+              to="/menu/myBooking"
+              style={{ 
+                color: "#000" /* text-black */,
+                fontSize: "0.875rem" /* text-sm */,
+                fontWeight: "700" /* font-bold */,
+                fontFamily: '"Manrope", sans-serif' /* font-manrope */,
+                borderRight: isLoggedIn ? "1px solid #d8dae5" : "none", /* border-r-2 */
+                height : '34px',  
+              }}
+            >
+              Chuyến của tôi
             </Nav.Link>
             {isLoggedIn ? (
               <>

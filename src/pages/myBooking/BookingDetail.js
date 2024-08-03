@@ -19,6 +19,8 @@ import PopUpSuccess from "./PopUpSuccess";
 import apiClient from "../../axiosConfig";
 import { CircularProgress, LinearProgress } from "@mui/material";
 import { styled } from "@mui/system";
+import FeedbackModal from "../booking/FeedbackModal";
+
 const statusTranslations = {
   PENDING: "Chờ duyệt",
   PENDING_DEPOSIT: "Chờ đặt cọc",
@@ -83,14 +85,14 @@ export default function Widget() {
   const [action, setAction] = useState("");
   const [showPopupSuccess, setShowPopupSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-
   const userDataString = localStorage.getItem("user");
   const userData = JSON.parse(userDataString);
   const userId = userData ? userData.userId : null;
   const userName = userData
     ? userData.firstName + " " + userData.lastName
     : null;
-
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [feedbackSent, setFeedbackSent] = useState(false);
   const navigate = useNavigate();
 
   const CustomLinearProgress = styled(LinearProgress)(
@@ -149,6 +151,14 @@ export default function Widget() {
     );
     setAction(actionType);
     setShowPopup(true);
+  };
+
+  const openFeedback = () => {
+    setShowFeedbackModal(true);
+  };
+
+  const closeFeedback = () => {
+    setShowFeedbackModal(false);
   };
 
   const handleConfirm = async () => {
@@ -248,7 +258,7 @@ export default function Widget() {
           </div>
         </>
       )}
-      <div className="p-12 bg-gray-100">
+      <div className="p-12 bg-gray-100 font-manrope">
         <div
           className={`${statusStyle.bg} ${statusStyle.text} p-4 rounded-lg flex items-center mb-6`}
         >
@@ -260,10 +270,9 @@ export default function Widget() {
           <div className="col-span-2 bg-white p-6 rounded-lg shadow-lg">
             <div className="flex items-center mb-6">
               <img
-                className="object-cover rounded-t-lg"
-                style={{ height: "200px", width: "350px" }}
-                src={urlImage}
-                alt="Motorbike"
+                src="https://n1-cstg.mioto.vn/m/avatars/avatar-0.png"
+                alt="User avatar"
+                className="w-14 h-14 rounded-full mr-4 mb-3"
               />
               <div>
                 <h2 className="text-2xl font-bold">{motorbikeName}</h2>
@@ -461,10 +470,12 @@ export default function Widget() {
                 )}
 
                 {booking.status === "DONE" && (
-                  <button className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center">
-                    Đánh giá
-                  </button>
-                )}
+                <button
+                onClick={openFeedback}
+                className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:scale-105">
+                  Đánh giá
+                </button>
+              )}
               </div>
 
               {showPopup && (
@@ -476,7 +487,6 @@ export default function Widget() {
                   onLoading={true}
                 />
               )}
-
               {showPopupSuccess && (
                 <PopUpSuccess
                   show={showPopupSuccess}
@@ -484,6 +494,12 @@ export default function Widget() {
                   message="Bạn đã cập nhật thành công trạng thái chuyến !"
                 />
               )}
+              <FeedbackModal
+              show={showFeedbackModal}
+              onHide={closeFeedback}
+              bookingId={booking.bookingId}
+              onFeedbackSubmitted={() => setFeedbackSent(true)}
+            />
             </div>
             <div className="bg-white p-6 rounded-lg shadow-lg">
               <h4 className="text-lg font-semibold mb-4">

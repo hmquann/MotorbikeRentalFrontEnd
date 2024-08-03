@@ -149,7 +149,7 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
       })
       .catch((error) => {
         if (error.response.status === 400) {
-          setErrorsMess("Model has been existed");
+          setErrorsMess("Mẫu xe này đã tồn tại");
         }
         console.error("There was an error creating the model!", error);
       });

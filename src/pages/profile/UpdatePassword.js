@@ -1,22 +1,9 @@
-import axios from "axios";
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Popup from "./PopupMessage";
+import { Modal, Button, Form } from "react-bootstrap";
 import apiClient from "../../axiosConfig";
+import PopupMessage from "./PopupMessage";
 
-const modalOverlayClasses =
-  "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50";
-const modalContentClasses =
-  "bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-6 w-80";
-const buttonClasses =
-  "text-zinc-500 dark:text-zinc-300 hover:text-zinc-700 dark:hover:text-zinc-100";
-const inputClasses =
-  "w-full p-2 mb-4 bg-zinc-200 rounded-lg light:bg-zinc-700 dark:text-zinc-200-dark";
-const submitButtonClasses =
-  "w-full p-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600";
-
-const UpdatePassword = ({ onClose, isOpen }) => {
-  const navigate = useNavigate();
+const UpdatePassword = ({ show, handleClose }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
@@ -27,9 +14,6 @@ const UpdatePassword = ({ onClose, isOpen }) => {
   const [passwordError, setPasswordError] = useState("");
   const [oldPasswordError, setOldPasswordError] = useState("");
 
-  const handleClose = () => {
-    onClose();
-  };
   const validatePassword = (password) => {
     return !(
       password.length < 8 ||
@@ -46,35 +30,36 @@ const UpdatePassword = ({ onClose, isOpen }) => {
     setOldPassword(oldPasswordValue);
     if (!validatePassword(oldPasswordValue)) {
       setOldPasswordError(
-        "Password length 8-20 characters and contains upper character and number."
+        "Mật khẩu phải bao gồm từ 8-20 kí tự bao gồm cả chữ số và chữ in hoa"
       );
     } else {
       setOldPasswordError("");
-      setOldPassword(oldPasswordValue); // Cập nhật giá trị của newPassword
+      setOldPassword(oldPasswordValue);
     }
   };
 
   const handleChangeNewPassWord = (e) => {
-    if (newPassword !== renewPassword) {
-      setRepasswordError("Password does not match");
-    }
     const newPasswordValue = e.target.value;
     setNewPassword(newPasswordValue);
     if (!validatePassword(newPasswordValue)) {
       setPasswordError(
-        "Password length 8-20 characters and contains upper character and number."
+        "Mật khẩu phải bao gồm từ 8-20 kí tự bao gồm cả chữ số và chữ in hoa"
       );
     } else {
       setPasswordError("");
-      setNewPassword(newPasswordValue); // Cập nhật giá trị của newPassword
+    }
+    if (newPasswordValue !== renewPassword) {
+      setRepasswordError("Mật khẩu không trùng khớp");
+    } else {
+      setRepasswordError("");
     }
   };
 
   const handleChangeRenewPassword = (e) => {
     const renewPasswordValue = e.target.value;
-    setRenewPassword(renewPasswordValue); // Cập nhật giá trị của renewPassword
+    setRenewPassword(renewPasswordValue);
     if (renewPasswordValue !== newPassword) {
-      setRepasswordError("Password does not match!");
+      setRepasswordError("Mật khẩu không trùng khớp");
     } else {
       setRepasswordError("");
     }
@@ -83,17 +68,17 @@ const UpdatePassword = ({ onClose, isOpen }) => {
   const userDataString = localStorage.getItem("user");
   const userData = JSON.parse(userDataString);
   const token = userData.token;
+
   const handleSubmit = (e) => {
+    e.preventDefault();
     if (renewPassword !== newPassword) {
-      setError("Password should not be empty!");
+      setError("Mật khẩu không trùng khớp");
       return;
     }
     if (!newPassword || newPassword.trim() === "") {
       setError("Password should not be empty!");
       return;
     }
-    console.log(333333);
-    e.preventDefault();
     setLoading(true);
 
     apiClient
@@ -111,80 +96,80 @@ const UpdatePassword = ({ onClose, isOpen }) => {
         }
       )
       .then((response) => {
-        console.log(response.data);
-        setShowPopup(true); // Hiển thị popup khi thành công
+        setShowPopup(true);
         setTimeout(() => {
-          setShowPopup(false); // Ẩn popup sau 3 giây
-          navigate("/login"); //chuyển sang trang login sau khi thông báo
-          localStorage.clear();
-        }, 3000);
-        // Xử lý phản hồi thành công
+          setShowPopup(false);
+          handleClose(); // Close the modal
+        }, 2000);
       })
       .catch((error) => {
         console.error(error);
         setOldPasswordError(error.response.data);
-        // Xử lý lỗi
       })
       .finally(() => {
         setLoading(false);
       });
   };
 
-  if (!isOpen) return null;
   return (
-    <div className={modalOverlayClasses}>
-      <div className={modalContentClasses}>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100-dark">
-            Change Password
-          </h2>
-          <button
-            onClick={handleClose}
-            className={`text-zinc-400 dark:text-zinc-300 hover:text-zinc-600 dark:hover:text-zinc-500 ${buttonClasses}`}
-          >
-            <span className="sr-only">Close</span>
-            &times;
-          </button>
-        </div>
-        <form onSubmit={handleSubmit}>
-          <label>Enter old password</label>
-          <input
-            type="password"
-            value={oldPassword}
-            onChange={handleChangeOldPassWord}
-            className={inputClasses}
-          />
-          {oldPasswordError && (
-            <div className="text-red-500">{oldPasswordError}</div>
-          )}
-          <label>Enter new password</label>
-          <input
-            type="password"
-            value={newPassword}
-            onChange={handleChangeNewPassWord}
-            className={inputClasses}
-          />
-          {passwordError && <div className="text-red-500">{passwordError}</div>}
-          <label>Enter renew password</label>
-          <input
-            type="password"
-            onChange={handleChangeRenewPassword}
-            value={renewPassword}
-            className={inputClasses}
-          />
-          {repasswordError && (
-            <div className="text-red-500">{repasswordError}</div>
-          )}
-          <button type="submit" className={submitButtonClasses}>
-            {loading ? "Submitting..." : "Submit"}
-          </button>
+    <Modal show={show} onHide={handleClose} className="font-manrope">
+      <Modal.Header closeButton>
+        <Modal.Title>Đổi mật khẩu</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Form onSubmit={handleSubmit}>
+          <Form.Group controlId="formOldPassword">
+            <Form.Label>Nhập mật khẩu hiện tại</Form.Label>
+            <Form.Control
+              type="password"
+              value={oldPassword}
+              onChange={handleChangeOldPassWord}
+              isInvalid={!!oldPasswordError}
+              className="px-3 py-2"
+            />
+            <Form.Control.Feedback type="invalid">
+              {oldPasswordError}
+            </Form.Control.Feedback>
+          </Form.Group>
+          <Form.Group controlId="formNewPassword">
+            <Form.Label>Nhập mật khẩu mới</Form.Label>
+            <Form.Control
+              type="password"
+              value={newPassword}
+              onChange={handleChangeNewPassWord}
+              isInvalid={!!passwordError}
+              className="px-3 py-2"
+            />
+            <Form.Control.Feedback type="invalid">
+              {passwordError}
+            </Form.Control.Feedback>
+          </Form.Group>
+          <Form.Group controlId="formRenewPassword">
+            <Form.Label>Xác thực lại mật khẩu mới</Form.Label>
+            <Form.Control
+              type="password"
+              value={renewPassword}
+              onChange={handleChangeRenewPassword}
+              isInvalid={!!repasswordError}
+              className="px-3 py-2"
+            />
+            <Form.Control.Feedback type="invalid">
+              {repasswordError}
+            </Form.Control.Feedback>
+          </Form.Group>
           {error && (
             <div className="text-red-500 text-center mt-4">{error}</div>
           )}
-        </form>
-        {showPopup && <Popup message="Your password has been successfully changed!" />}
-      </div>
-    </div>
+          <button
+            type="submit"
+            className="w-full mt-3 py-3 px-4 text-sm tracking-wide rounded-lg text-white bg-green-600 hover:bg-green-700 transition hover:scale-105"
+          >
+            {loading ? "Đang xác nhận..." : "Đổi mật khẩu"}
+          </button>
+        </Form>
+        {showPopup && <PopupMessage show={showPopup} onHide={() => setShowPopup(false)} message="Bạn đã thay đổi mật khẩu thành công" />}
+      </Modal.Body>
+    </Modal>
   );
 };
 

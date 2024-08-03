@@ -20,9 +20,9 @@ function ImageUploader({ sendDataToParent }) {
 
     return (
         <div className="p-6 bg-white dark:bg-zinc-800 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">Image</h2>
+            <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Hỉnh ảnh</h2>
             <p className="text-zinc-600 dark:text-zinc-300 mt-2">
-                Post 4 pictures from different angles to increase information about your vehicle.
+            Đăng 4 hình ở các góc độ khác nhau để tăng thông tin cho xe của bạn.
             </p>
             <div className="mt-4">
                 <div className="w-full bg-zinc-100 dark:bg-zinc-700 rounded-lg flex flex-col items-center justify-center p-4">
@@ -36,9 +36,9 @@ function ImageUploader({ sendDataToParent }) {
                     />
                     <label
                         htmlFor="imageUpload"
-                        className="bg-teal-500 text-white py-2 px-4 rounded-lg cursor-pointer"
+                        className="bg-green-500 text-white py-2 px-4 rounded-lg cursor-pointer"
                     >
-                        Choose image
+                        Chọn ảnh
                     </label>
                 </div>
                 {error && <p className="text-red-500 mt-2">{error}</p>}

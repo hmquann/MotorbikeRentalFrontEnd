@@ -430,15 +430,46 @@ const BookingCard = ({ booking }) => {
                 >
                   Xem chi tiết
                 </button>
-              </>
-            )}
-            <FeedbackModal
-              show={showFeedbackModal}
-              onHide={closeFeedback}
-              bookingId={booking.bookingId}
-              onFeedbackSubmitted={() => setFeedbackSent(true)}
-            />
-          </div>
+              )}
+              <button
+                className="bg-orange-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:bg-orange-600 hover:scale-105"
+                onClick={openManageBooking}
+              >
+                Xem chi tiết
+              </button>
+            </>
+          ) : (
+            <>
+              {booking.status === "DONE" && (
+                <button
+                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:bg-green-600 hover:scale-105"
+                  onClick={openFeedback}
+                >
+                  Đánh giá
+                </button>
+              )}
+              {booking.status === "PENDING_DEPOSIT" && (
+                <button
+                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:bg-green-600 hover:scale-105"
+                  onClick={() => handleAction("deposit_made")}
+                >
+                  Đặt cọc
+                </button>
+              )}
+              <button
+                className="bg-orange-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:bg-orange-600 hover:scale-105"
+                onClick={openBookingDetail}
+              >
+                Xem chi tiết
+              </button>
+            </>
+          )}
+          <FeedbackModal
+            show={showFeedbackModal}
+            onHide={closeFeedback}
+            bookingId={booking.bookingId}
+            onFeedbackSubmitted={() => setFeedbackSent(true)}
+          />
         </div>
 
         {showPopUp && (
