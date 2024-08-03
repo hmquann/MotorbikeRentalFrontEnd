@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import ImageUploader from "./ImageUploader";
 import apiClient from "../../axiosConfig";
+import { CircularProgress } from "@mui/material";
 const inputClasses =
   "w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500";
 const buttonClasses =
@@ -21,8 +22,9 @@ const RegisterMotorbikeStep2 = (files) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const location = useLocation();
-  const receiveData = location.state?.formData || {};
+  const receiveData = location.state.formData;
   const [checkDelivery, setCheckDelivery] = useState(true);
+  const [spinner, setSpinner] = useState(false);
   const [checkLocation, setCheckLocation] = useState(true);
   const [formData, setFormData] = useState(receiveData);
   const [overtimeFeeError, setOvertimeFeeError] = useState();
@@ -183,6 +185,7 @@ const RegisterMotorbikeStep2 = (files) => {
     navigate("/registermotorbike", { state: { receiveData } });
   };
   const handleSubmitClick = () => {
+    setSpinner(true);
     if (
       deliveryFeeError ||
       overtimeFeeError ||
@@ -307,19 +310,13 @@ const RegisterMotorbikeStep2 = (files) => {
               Your default address
             </label>
           </div>
-          <div className="pl-6 mb-4 text-sm text-zinc-700">
-            Royal City, Nguyễn Trãi, Thanh Xuân, Hà Nội
-          </div>
-          <div className="flex items-center mb-3">
-            <input
-              type="radio"
-              name="address"
-              id="newAddress"
-              className="mr-2 focus:ring-green-500"
-              onClick={handleCheckLocation}
-            />
-            <label htmlFor="newAddress" className="text-sm text-zinc-700">
-              New Address
+        </>
+      )}
+      <div className="min-h-screen bg-zinc-50 p-6 flex items-center justify-center">
+        <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-screen-lg">
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-zinc-700 mb-2">
+              Default price
             </label>
           </div>
 
@@ -378,16 +375,16 @@ const RegisterMotorbikeStep2 = (files) => {
               type="text"
               className="w-full p-2 border rounded mr-2 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
+            {priceError && <div className="text-red-500">{priceError}</div>}
           </div>
         </div>
-
         <div className="flex flex-wrap mb-9">
           {/* Overtime fee section */}
           <div className="w-full sm:w-1/2 pr-3 mb-6 sm:mb-0">
             <label className="block text-sm font-medium text-zinc-700 mb-2">
-              Overtime fee
+              Vehicle address
             </label>
-            <div className="flex items-center">
+            <div className="flex items-center mb-3">
               <input
                 type="text"
                 name="overtimeFee"
@@ -396,19 +393,14 @@ const RegisterMotorbikeStep2 = (files) => {
                 onChange={handleChange}
               />
 
-              <span className="text-sm text-zinc-700">VND/hour</span>
+              <label htmlFor="defaultAddress" className="text-sm text-zinc-700">
+                Your default address
+              </label>
             </div>
-            {overtimeFeeError && (
-              <div className="text-red-500">{overtimeFeeError}</div>
-            )}
-          </div>
-
-          {/* Overtime limit section */}
-          <div className="w-full sm:w-1/2 pl-3">
-            <label className="block text-sm font-medium text-zinc-700 mb-2">
-              Overtime limit
-            </label>
-            <div className="flex items-center">
+            <div className="pl-6 mb-4 text-sm text-zinc-700">
+              Royal City, Nguyễn Trãi, Thanh Xuân, Hà Nội
+            </div>
+            <div className="flex items-center mb-3">
               <input
                 type="text"
                 name="overtimeLimit"
@@ -416,14 +408,10 @@ const RegisterMotorbikeStep2 = (files) => {
                 value={formData.overtimeLimit}
                 onChange={handleChange}
               />
-              <span className="text-sm text-zinc-700">hour</span>
+              <label htmlFor="newAddress" className="text-sm text-zinc-700">
+                New Address
+              </label>
             </div>
-            {overtimeLimitError && (
-              <div className="text-red-500">{overtimeLimitError}</div>
-            )}
-          </div>
-        </div>
-
         <div className="flex justify-between mb-6">
           <div className="w-full sm:w-1/2 pr-3 mb-6 sm:mb-0 flex justify-between items-center">
             <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
@@ -447,21 +435,64 @@ const RegisterMotorbikeStep2 = (files) => {
             </label>
             <div className="flex items-center">
               <input
+                placeholder="Enter address detail"
+                name="addressDetail"
+                value={addressDetail}
+                onChange={handleAddressChange}
+                disabled={checkLocation}
                 type="text"
-                name="freeshipLimit"
                 className="w-2/3 p-2 border rounded mr-2 focus:outline-none focus:ring-2 focus:ring-green-500"
                 value={formData.freeshipLimit}
                 disabled={checkDelivery}
                 onChange={handleChange}
               />
-
-              <span className="text-sm text-zinc-700">km</span>
             </div>
-            {freeshipError && (
-              <div className="text-red-500">{freeshipError}</div>
-            )}
           </div>
 
+          <div className="flex flex-wrap mb-6">
+            {/* Overtime fee section */}
+            <div className="w-full sm:w-1/2 pr-3 mb-6 sm:mb-0">
+              <label className="block text-sm font-medium text-zinc-700 mb-2">
+                Overtime fee
+              </label>
+              <div className="flex items-center">
+                <input
+                  type="text"
+                  name="overtimeFee"
+                  className="w-2/3 p-2 border rounded mr-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  placeholder="Enter fee"
+                  value={formData.overtimeFee}
+                  onChange={handleChange}
+                />
+
+                <span className="text-sm text-zinc-700">VND/hour</span>
+              </div>
+              {overtimeFeeError && (
+                <div className="text-red-500">{overtimeFeeError}</div>
+              )}
+            </div>
+
+            {/* Overtime limit section */}
+            <div className="w-full sm:w-1/2 pl-3">
+              <label className="block text-sm font-medium text-zinc-700 mb-2">
+                Overtime limit
+              </label>
+              <div className="flex items-center">
+                <input
+                  type="text"
+                  name="overtimeLimit"
+                  className="w-2/3 p-2 border rounded mr-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  placeholder="Enter limit"
+                  value={formData.overtimeLimit}
+                  onChange={handleChange}
+                />
+                <span className="text-sm text-zinc-700">hour</span>
+              </div>
+              {overtimeLimitError && (
+                <div className="text-red-500">{overtimeLimitError}</div>
+              )}
+            </div>
+          </div>
           <div className="w-full md:w-1/2 pr-2">
             <label className="block text-sm font-medium text-zinc-700 mb-1">
               Phí giao xe cho mỗi km
@@ -477,13 +508,9 @@ const RegisterMotorbikeStep2 = (files) => {
               />
               <span className="text-sm text-zinc-700">VND/km</span>
             </div>
-            {deliveryFeeError && (
-              <div className="text-red-500">{deliveryFeeError}</div>
-            )}
           </div>
         </div>
         <ImageUploader sendDataToParent={handleImageUpload} />
-
         <div className="flex justify-center mt-4">
           <button
             type="button"

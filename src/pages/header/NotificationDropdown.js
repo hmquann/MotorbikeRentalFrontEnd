@@ -21,6 +21,7 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import { styled } from "@mui/system";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import "dayjs/locale/vi";
 
 dayjs.extend(relativeTime);
 dayjs.locale("vi");
@@ -69,6 +70,10 @@ const NotificationDropdown = () => {
           timestamp: data.timestamp.toDate(),
         };
       });
+
+      // Sort notifications by timestamp (newest first)
+      notificationsData.sort((a, b) => b.timestamp - a.timestamp);
+
       setNotifications(notificationsData);
 
       // Calculate unseen notifications
@@ -78,7 +83,7 @@ const NotificationDropdown = () => {
       setNotificationCount(unseenCount);
       setLoading(false); // Set loading to false after data is loaded
     });
-
+    console.log(notifications);
     return () => unsubscribe(); // Cleanup subscription on unmount
   }, [userId]);
 
@@ -130,7 +135,7 @@ const NotificationDropdown = () => {
         <PopoverContent>
           {loading ? (
             <div style={{ display: "flex", justifyContent: "center" }}>
-              <CircularProgress />
+              <CircularProgress color="inherit" />
             </div>
           ) : !userId || notifications.length === 0 ? (
             <Typography variant="body2" color="textSecondary">

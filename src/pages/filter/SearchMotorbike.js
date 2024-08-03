@@ -80,16 +80,12 @@ const SearchMotorbike = () => {
     };
     setLoading(true);
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/motorbike/filter",
-        filterList,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      console.log("Data sent successfully:", response.data);
+      const response = await apiClient.post('/api/motorbike/filter', filterList, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log('Data sent successfully:', response.data);
       const listMotor = response.data;
       navigate("/filter", { state: { filterList, listMotor } });
     } catch (error) {
