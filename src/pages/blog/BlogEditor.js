@@ -100,7 +100,7 @@ const BlogEditor = ({ onSave }) => {
           }}
         />
       </EditorWrapper>
-      <SaveButton onClick={handleSave}>Save Blog</SaveButton>
+      <SaveButton onClick={handleSave}>Lưu</SaveButton>
     </BlogEditorWrapper>
   );
 };

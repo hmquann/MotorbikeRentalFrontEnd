@@ -2,7 +2,7 @@ import React from 'react';
 
 const Footer = () => {
   return (
-<footer className="p-4 bg-white sm:p-6 font-manrope">
+<footer className="p-4 bg-white sm:p-6 font-manrope border-t border-t-gray-200">
     <div className="mx-auto max-w-screen-xl">
         <div className="md:flex md:justify-between">
             <div className="mb-6 md:mb-0">
@@ -13,7 +13,7 @@ const Footer = () => {
                 fontFamily: '"Manrope", sans-serif' /* font-manrope */,
                 textDecoration : 'none'
               }}>
-                <img className="w-24 py-10 mr-3" src="/image/logo.jpg" alt="Logo" />
+                <img className="w-24 py-10 mr-3" src="/image/logo.png" alt="Logo" />
                     <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">MiMotor</span>
                 </a>
             </div>

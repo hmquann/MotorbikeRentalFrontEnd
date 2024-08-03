@@ -79,8 +79,10 @@
   line-height: 2; /* Adjust as needed */
 }
 
-.react-datepicker__day-name {
+.react-datepicker__day-names   {
   text-align: center;
+  display: flex;
+  justify-content: space-around;
 }
 .react-datepicker__day--weekend {
   color: #f00; /* Optional: style weekends differently */

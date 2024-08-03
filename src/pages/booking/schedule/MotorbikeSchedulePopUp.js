@@ -13,7 +13,7 @@ const sharedClasses = {
   itemsCenter: 'items-center',
   textZinc300: 'text-zinc-300',
   textZinc500: 'text-zinc-500',
-  zinc700: 'text-zinc-700',
+  zinc700: 'text-zinc-700 font-bold',
   zinc100: 'bg-zinc-100',
   zinc200: 'bg-green-200',
   green600: 'text-green-600',
@@ -41,7 +41,7 @@ const sharedClasses = {
   textLg: 'text-lg',
   fontSemiBold: 'font-semibold',
   zinc500: 'text-zinc-500',
-  overlay: 'fixed inset-0 bg-black bg-opacity-50 z-50',
+  overlay: 'fixed inset-0 bg-black bg-opacity-50 z-50 font-manrope pt-10',
   popupContainer: 'relative bg-white rounded-lg shadow p-4 max-w-[32rem] mx-auto',
   closeButton: 'absolute top-2 right-2 text-black cursor-pointer',
 };
@@ -132,7 +132,7 @@ const MotorbikeSchedulePopUp = ({ isOpen, onClose, onSubmit }) => {
     }
 
     if (!isStartBeforeEnd(startDate, receiveTime, endDate, returnTime)) {
-      setTimeError("Receive date must be less than return date");
+      setTimeError("Thời gian nhận xe phải trước thời gian trả xe");
       return;
     }
     const startDateTime = parseDateTime(startDate, receiveTime);
@@ -140,7 +140,7 @@ const MotorbikeSchedulePopUp = ({ isOpen, onClose, onSubmit }) => {
     const endDateTime = parseDateTime(endDate, returnTime);
     console.log(startDateTime+endDateTime)
     if (!checkTimeDifference(endDateTime)) {
-      setTimeError("Return date and time must be at least 6 hours from now.");
+      setTimeError("Thời gian nhận và trả xe phải ít nhất 6 giờ");
       return;
     }
     
@@ -225,7 +225,7 @@ const MotorbikeSchedulePopUp = ({ isOpen, onClose, onSubmit }) => {
         </div>
       </div>
   
-      <button className={`w-6/12 mt-2 ${sharedClasses.green500} ${sharedClasses.white} ${sharedClasses.p2} ${sharedClasses.rounded}`} onClick={handleSubmit}>
+      <button className={`w-6/12 mt-2 hover:bg-green-600 transition-shadow hover:shadow-2xl ${sharedClasses.green500} ${sharedClasses.white} ${sharedClasses.p2} ${sharedClasses.rounded}`} onClick={handleSubmit}>
         Áp dụng
       </button>
     </div>
