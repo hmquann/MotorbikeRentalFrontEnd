@@ -17,6 +17,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-regular-svg-icons";
+import apiClient from "../../axiosConfig";
 
 const ChatComponent = () => {
   const [messages, setMessages] = useState([]);
@@ -75,8 +76,8 @@ const ChatComponent = () => {
     const fetchUsers = async () => {
       if (userEmail) {
         try {
-          const response = await axios.get(
-            `http://localhost:8080/api/booking/getListUserFromBookingToChat/${userData.userId}`
+          const response = await apiClient.get(
+            `/api/booking/getListUserFromBookingToChat/${userData.userId}`
           );
           const uniqueUsers = response.data.map((user) => ({
             email: user.email,
