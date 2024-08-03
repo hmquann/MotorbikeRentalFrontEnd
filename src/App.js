@@ -1,7 +1,13 @@
 import "./App.css";
 import Dashboard from "./pages/dashboard/Dashboard";
 import Header from "./pages/header/Header";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
 import NoMatch from "./pages/noMatch/NoMatch";
 import PostUser from "./pages/employee/PostUser";
 import UpdateUser from "./pages/employee/UpdateUser";
@@ -9,7 +15,7 @@ import Login from "./pages/login/Login";
 import Forgotpassword from "./pages/forgotpassword/Forgotpassword";
 import Register from "./pages/register/Register";
 import Homepage from "./pages/hompage/Homepage";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Privacy from "./pages/privacy/Privacy";
 import PrivacyList from "./pages/privacy/PrivacyList";
 import UserInformation from "./pages/dashboard/UserInformation";
@@ -46,12 +52,14 @@ import BlogDetail from "./pages/blog/BlogDetail";
 import Filter from "./pages/filter/Filter";
 import FeedbackModal from "./pages/booking/FeedbackModal";
 import Footer from "./pages/footer/Footer";
+import ChatWithFirebase from "./pages/chatWithFirebase/ChatWithFirebase";
 
 import MapboxSearchPopUp from "./pages/filter/MapboxSearchPopUp";
 
-
-
 function App() {
+  const location = useLocation();
+  const isChatPage = location.pathname === "/menu/chatting";
+
   return (
     <>
       <Header />
@@ -67,22 +75,22 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/blog/:id" element={<BlogDetail />} />
         <Route path="/verify/:token" element={<RegisterSuccess />} />
-        <Route
-          path="/registermotorbike"
-          element={<RegisterMotorbikeStep1 />}
-        />
+        <Route path="/registermotorbike" element={<RegisterMotorbikeStep1 />} />
         <Route path="/sendFeedback" element={<FeedbackModal />} />
-        <Route path="/registermotorbike/step2"element={<RegisterMotorbikeStep2/>}/>
+        <Route
+          path="/registermotorbike/step2"
+          element={<RegisterMotorbikeStep2 />}
+        />
         <Route path="/" element={<Navigate to="/homepage" />} />
         <Route path="/homepage" element={<Homepage />} />
         <Route path="/privacy" element={<Privacy />} />
-        <Route path="/filter" element={<Filter/>}/>
+        <Route path="/filter" element={<Filter />} />
         <Route path="/privacyList" element={<PrivacyList />} />
         <Route path="/userInformation" element={<UserInformation />} />
         <Route path="/bookingDetail" element={<BookingDetail />} />
         <Route path="/manageBooking" element={<ManageBooking />} />
         <Route path="/menu" element={<Menu />}>
-          <Route path="/menu/chatApp" element={<ChatApp />} />
+          <Route path="/menu/chatting" element={<ChatWithFirebase />} />
           <Route path="/menu/myBooking" element={<MyBooking />} />
           <Route path="/menu/wallet" element={<UserWallet />} />
           <Route
@@ -114,9 +122,9 @@ function App() {
           element={<VerifyChangeEmail />}
         />
         <Route path="/chatapp" element={<ChatApp />} />
-        <Route path="/mapboxSearch" element={<MapboxSearchPopUp/>}/>
+        <Route path="/mapboxSearch" element={<MapboxSearchPopUp />} />
       </Routes>
-      <Footer />
+      {!isChatPage && <Footer />}
     </>
   );
 }

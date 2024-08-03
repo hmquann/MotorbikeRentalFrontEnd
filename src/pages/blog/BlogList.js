@@ -56,7 +56,7 @@ const BlogList = () => {
           className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700 transition duration-300"
           onClick={() => setShowCreateBlog(true)}
         >
-          + Create Blog
+          + Tạo Blog
         </button>
       </div>
       {blogs.map((blog) => (
@@ -69,7 +69,7 @@ const BlogList = () => {
               className="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-700 transition duration-300"
               onClick={() => setShowCreateBlog(false)}
             >
-              Close
+              Đóng
             </button>
             <BlogEditor onSave={handleSave} />
           </div>

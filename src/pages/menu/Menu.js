@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { NavLink, Route, Routes, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { NavLink, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import "./Menu.css";
 import Profile from "../profile/Profile";
 import { Modal } from "react-bootstrap";
@@ -18,6 +18,7 @@ import BlogEditor from "../blog/BlogEditor";
 import BlogList from "../blog/BlogList";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faList } from "@fortawesome/free-solid-svg-icons";
+import ChatWithFirebase from "../chatWithFirebase/ChatWithFirebase";
 
 const Menu = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -64,12 +65,11 @@ const Menu = () => {
     <div className="menu bg-zinc-100">
       {isAuthenticated && (
         <>
-      
           <div className="menu-left bg-zinc-100 font-manrope">
             <h4 className="font-bold">Xin chào bạn !</h4>
-          <hr></hr>
+            <hr></hr>
             <ul>
-            <li>
+              <li>
                 <NavLink
                   to="/menu/profile"
                   className={({ isActive }) => (isActive ? "active" : "")}
@@ -105,10 +105,10 @@ const Menu = () => {
               </li>
               <li>
                 <NavLink
-                  to="/menu/chatApp"
+                  to="/menu/chatting"
                   className={({ isActive }) => (isActive ? "active" : "")}
                 >
-                  Chatting
+                  Tin nhắn
                 </NavLink>
               </li>
               <hr></hr>
@@ -118,102 +118,101 @@ const Menu = () => {
                     type="button"
                     onClick={handleManageClick}
                     style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      width: '100%',
-                      padding: '8px 16px',
-                      textDecoration: 'none',
-                      color: 'inherit',
-                      marginBottom : '3px'
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      width: "100%",
+                      padding: "8px 16px",
+                      textDecoration: "none",
+                      color: "inherit",
+                      marginBottom: "3px",
                     }}
                     className={({ isActive }) => (isActive ? "active" : "")}
                   >
                     <span>Quản lý</span>
                     <FontAwesomeIcon icon={faList} />
                   </a>
-                
-                    <ol className={`sub-menu ${isManageOpen ? 'open' : ''}`}>
-                      {isAdmin && (
-                        <>
-                          <li>
-                            <NavLink
-                              to="/menu/brand"
-                              className={({ isActive }) =>
-                                isActive ? "active" : ""
-                              }
-                            >
-                              Quản lý thương hiệu xe
-                            </NavLink>
-                          </li>
-                          <li>
-                            <NavLink
-                              to="/menu/approveLicense"
-                              className={({ isActive }) =>
-                                isActive ? "active" : ""
-                              }
-                            >
-                              Quản lý bằng lái xe
-                            </NavLink>
-                          </li>
-                          <li>
-                            <NavLink
-                              to="/menu/model"
-                              className={({ isActive }) =>
-                                isActive ? "active" : ""
-                              }
-                            >
-                              Quản lý mẫu xe
-                            </NavLink>
-                          </li>
-                          <li>
-                            <NavLink
-                              to="/menu/userData"
-                              className={({ isActive }) =>
-                                isActive ? "active" : ""
-                              }
-                            >
-                              Quản lý người dùng
-                            </NavLink>
-                          </li>
-                          <li>
-                            <NavLink
-                              to="/menu/blogList"
-                              className={({ isActive }) =>
-                                isActive ? "active" : ""
-                              }
-                            >
-                              Quản lí blog
-                            </NavLink>
-                          </li>
-                        </>
-                      )}
-                      {(isAdmin || isLessor) && (
-                        <>
-                          <li>
-                            <NavLink
-                              to="/menu/approveMotorbike"
-                              className={({ isActive }) =>
-                                isActive ? "active" : ""
-                              }
-                            >
-                              {isAdmin ? "Quản lý xe" : "Xe của tôi"}
-                            </NavLink>
-                          </li>
-                          <li>
-                            <NavLink
-                              to="/menu/voucher"
-                              className={({ isActive }) =>
-                                isActive ? "active" : ""
-                              }
-                            >
-                              Quản lý khuyến mãi
-                            </NavLink>
-                          </li>
-                        </>
-                      )}
-                    </ol>
-                  
+
+                  <ol className={`sub-menu ${isManageOpen ? "open" : ""}`}>
+                    {isAdmin && (
+                      <>
+                        <li>
+                          <NavLink
+                            to="/menu/brand"
+                            className={({ isActive }) =>
+                              isActive ? "active" : ""
+                            }
+                          >
+                            Quản lý thương hiệu xe
+                          </NavLink>
+                        </li>
+                        <li>
+                          <NavLink
+                            to="/menu/approveLicense"
+                            className={({ isActive }) =>
+                              isActive ? "active" : ""
+                            }
+                          >
+                            Quản lý bằng lái xe
+                          </NavLink>
+                        </li>
+                        <li>
+                          <NavLink
+                            to="/menu/model"
+                            className={({ isActive }) =>
+                              isActive ? "active" : ""
+                            }
+                          >
+                            Quản lý mẫu xe
+                          </NavLink>
+                        </li>
+                        <li>
+                          <NavLink
+                            to="/menu/userData"
+                            className={({ isActive }) =>
+                              isActive ? "active" : ""
+                            }
+                          >
+                            Quản lý người dùng
+                          </NavLink>
+                        </li>
+                        <li>
+                          <NavLink
+                            to="/menu/blogList"
+                            className={({ isActive }) =>
+                              isActive ? "active" : ""
+                            }
+                          >
+                            Quản lí blog
+                          </NavLink>
+                        </li>
+                      </>
+                    )}
+                    {(isAdmin || isLessor) && (
+                      <>
+                        <li>
+                          <NavLink
+                            to="/menu/approveMotorbike"
+                            className={({ isActive }) =>
+                              isActive ? "active" : ""
+                            }
+                          >
+                            {isAdmin ? "Quản lý xe" : "Xe của tôi"}
+                          </NavLink>
+                        </li>
+                        <li>
+                          <NavLink
+                            to="/menu/voucher"
+                            className={({ isActive }) =>
+                              isActive ? "active" : ""
+                            }
+                          >
+                            Quản lý khuyến mãi
+                          </NavLink>
+                        </li>
+                      </>
+                    )}
+                  </ol>
                 </li>
               )}
               <hr></hr>
@@ -232,7 +231,7 @@ const Menu = () => {
             <Routes>
               <Route path="/profile" element={<Profile />} />
               <Route path="/myBooking" element={<MyBooking />} />
-              <Route path="/chatApp" element={<ChatApp />} />
+              <Route path="/chatting" element={<ChatWithFirebase />} />
               <Route path="/wallet" element={<UserWallet />} />
               {isAdmin && (
                 <>

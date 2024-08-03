@@ -7,6 +7,7 @@ import {
   getDocs,
   query,
   where,
+  addDoc,
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import { FaMotorcycle } from "react-icons/fa";
@@ -506,8 +507,13 @@ const Booking = () => {
       }
     }
   };
+  const getRoomId = (user1, user2) => {
+    if (!user1 || !user2) return null;
+    return [user1, user2].sort().join("_");
+  };
 
   const handleConfirmBooking = async (e) => {
+    const roomId = getRoomId(userEmail, receiveData.user.email);
     try {
       setLoading(true);
       e.preventDefault();
@@ -566,6 +572,14 @@ const Booking = () => {
               content: ` <strong>${userName}</strong> đã đặt xe <strong>${receiveData.motorbikePlate}</strong> của bạn.`,
             }),
             timestamp: now,
+            seen: false,
+          });
+
+          await addDoc(collection(db, `rooms/${roomId}/messages`), {
+            createdAt: new Date(),
+            content:
+              "Cảm ơn bạn đã đặt xe, chúng tôi sẽ liên hệ lại với bạn trong thời gian sớm nhất!",
+            userEmail: receiveData.user.email,
             seen: false,
           });
 
