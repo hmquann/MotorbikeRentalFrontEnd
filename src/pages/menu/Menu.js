@@ -149,7 +149,7 @@ const Menu = () => {
                   >
                     <span>Quản lý</span>
                     <FontAwesomeIcon icon={faList} />
-                  </a
+                  </a>
                     <ol className={`sub-menu ${isManageOpen ? 'open' : ''}`}>
                       {isAdmin && (
                         <>

@@ -316,17 +316,11 @@ const BookingCard = ({ booking }) => {
         className="bg-card p-4 rounded-lg mb-4 border border-gray-300"
         style={{ backgroundColor: "white" }}
       >
-        <div className=" flex justify-between items-center mb-4 border-b border-gray-300 pb-2 overflow-hidden">
-          <div className="">
-            <span className={`text-sm text-muted-foreground ${color}`}>
-              <FontAwesomeIcon icon={icon} style={{ color }} /> {text}
-            </span>
-          </div>
-          <div className="">
-            <span>
-              {dayjs(booking.bookingTime).format("HH:mm, DD/MM/YYYY")}
-            </span>
-          </div>
+        <div className="flex justify-between items-center mb-4 border-b border-gray-300 pb-2">
+          <span className={`text-sm text-muted-foreground ${color}`}>
+            <FontAwesomeIcon icon={icon} style={{ color }} /> {text}
+          </span>
+          <span>{dayjs(booking.bookingTime).format("HH:mm, DD/MM/YYYY")}</span>
         </div>
         <div className="flex flex-wrap w-full">
           <div className="flex-1 w-full md:w-2/3 lg:w-3/4">
@@ -365,7 +359,6 @@ const BookingCard = ({ booking }) => {
                     Chủ xe: {lessorName}
                   </span>
                 </div>
-                
                 <div className="font-bold text-lg">
                   Tổng chi phí: {booking.totalPrice.toLocaleString("vi-VN")} vnd
                 </div>
@@ -400,7 +393,7 @@ const BookingCard = ({ booking }) => {
                   </button>
                 )}
                 <button
-                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:bg-green-600 hover:scale-105"
+                  className="bg-orange-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:bg-orange-600 hover:scale-105"
                   onClick={openManageBooking}
                 >
                   Xem chi tiết
@@ -425,51 +418,20 @@ const BookingCard = ({ booking }) => {
                   </button>
                 )}
                 <button
-                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:bg-green-600 hover:scale-105"
+                  className="bg-orange-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:bg-orange-600 hover:scale-105"
                   onClick={openBookingDetail}
                 >
                   Xem chi tiết
                 </button>
-              )}
-              <button
-                className="bg-orange-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:bg-orange-600 hover:scale-105"
-                onClick={openManageBooking}
-              >
-                Xem chi tiết
-              </button>
-            </>
-          ) : (
-            <>
-              {booking.status === "DONE" && (
-                <button
-                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:bg-green-600 hover:scale-105"
-                  onClick={openFeedback}
-                >
-                  Đánh giá
-                </button>
-              )}
-              {booking.status === "PENDING_DEPOSIT" && (
-                <button
-                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:bg-green-600 hover:scale-105"
-                  onClick={() => handleAction("deposit_made")}
-                >
-                  Đặt cọc
-                </button>
-              )}
-              <button
-                className="bg-orange-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:bg-orange-600 hover:scale-105"
-                onClick={openBookingDetail}
-              >
-                Xem chi tiết
-              </button>
-            </>
-          )}
-          <FeedbackModal
-            show={showFeedbackModal}
-            onHide={closeFeedback}
-            bookingId={booking.bookingId}
-            onFeedbackSubmitted={() => setFeedbackSent(true)}
-          />
+              </>
+            )}
+            <FeedbackModal
+              show={showFeedbackModal}
+              onHide={closeFeedback}
+              bookingId={booking.bookingId}
+              onFeedbackSubmitted={() => setFeedbackSent(true)}
+            />
+          </div>
         </div>
 
         {showPopUp && (
