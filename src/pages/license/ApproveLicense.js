@@ -102,43 +102,47 @@ const ApproveLicense = () => {
     setActionType(action);
     setIsModalOpen(true);
   };
-  const 
-  handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     const action =
-      actionType === "approve"
-        ? "https://rentalmotorbikewebapp.azurewebsites.net/api/license/approve"
-        : "https://rentalmotorbikewebapp.azurewebsites.net/api/license/reject";
-        if(e.target.name==="approve"){
-    fetch(action,{
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-      body: JSON.stringify({ licenseNumber: selectedLicense.licenseNumber }),
-     
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Success:", data);
-        setIsModalOpen(true)
-         
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+      actionType === "approve" ? "/api/license/approve" : "/api/license/reject";
+
+    try {
+      // Gọi API sử dụng apiClient với headers
+      const response = await apiClient.post(
+        action,
+        { licenseNumber: selectedLicense.licenseNumber },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      // Xử lý thành công
+      console.log("Success:", response.data);
+      setIsModalOpen(true);
+
+      // Xóa giấy phép đã chọn khỏi danh sách
+      const updatedLicenses = licenses.filter(
+        (license) => license !== selectedLicense
+      );
+      setLicenses(updatedLicenses);
+
+      setIsModalOpen(false);
+    } catch (error) {
+      // Xử lý lỗi
+      console.error("Error:", error);
     }
-    licenses.pop(selectedLicense);
-    setIsModalOpen(false)
   };
-  const handleClick=(license)=>{
+  const handleClick = (license) => {
     setSelectedLicense(license);
-  }
+  };
 
   const actionTypeMap = {
-    'approve' : "Chấp nhận",
-    'rejected' : 'Từ chối'
+    approve: "Chấp nhận",
+    rejected: "Từ chối",
   };
   return (
     <div className="p-4 rounded-lg max-w-5xl mx-auto font-manrope">
@@ -193,8 +197,11 @@ const ApproveLicense = () => {
               </tr>
             ) : licenses.length === 0 ? (
               <tr>
-                <td colSpan="6" className="p-4 text-center text-amber-700 font-bold">
-                 Không có bản ghi nào
+                <td
+                  colSpan="6"
+                  className="p-4 text-center text-amber-700 font-bold"
+                >
+                  Không có bản ghi nào
                 </td>
               </tr>
             ) : (
@@ -208,18 +215,19 @@ const ApproveLicense = () => {
                       {license.licenseNumber}
                     </td>
                     <td className={tableCellClasses}>{license.birthOfDate}</td>
-     
 
                     <td className={tableCellClasses}>
-                       <ModalImage
-                  small={license.licenseImageUrl}
-                  large={license.licenseImageUrl}
-                  className="w-28 h-14 object-cover rounded-md mr-2 mb-2"
-                />
-
+                      <ModalImage
+                        small={license.licenseImageUrl}
+                        large={license.licenseImageUrl}
+                        className="w-28 h-14 object-cover rounded-md mr-2 mb-2"
+                      />
                     </td>
 
-                    <td className={tableCellClasses} onClick={()=>handleClick(license)}>
+                    <td
+                      className={tableCellClasses}
+                      onClick={() => handleClick(license)}
+                    >
                       <>
                         <button
                           className={`hover:bg-green-600 bg-green-500 text-white mr-2 ${buttonClasses}`}
@@ -242,14 +250,12 @@ const ApproveLicense = () => {
           </tbody>
         </table>
       ) : (
-        <p className="text-red-500">
-          Bạn không có quyền truy cập trang này
-        </p>
+        <p className="text-red-500">Bạn không có quyền truy cập trang này</p>
       )}
       <div className="px-6 py-3 bg-zinc-50 flex justify-between items-center">
         <div className="text-sm text-zinc-700">
-          Đang hiển thị <span className="font-medium">{licenses.length}</span> trên{" "}
-          <span className="font-medium">{licenses.length}</span> bản ghi
+          Đang hiển thị <span className="font-medium">{licenses.length}</span>{" "}
+          trên <span className="font-medium">{licenses.length}</span> bản ghi
         </div>
         <div className="flex space-x-1">
           {currentPage > 0 && (
@@ -274,7 +280,11 @@ const ApproveLicense = () => {
       </div>
 
       {isModalOpen && (
-        <Modal show={isModalOpen} onHide={() => setIsModalOpen(false)} backdrop="static">
+        <Modal
+          show={isModalOpen}
+          onHide={() => setIsModalOpen(false)}
+          backdrop="static"
+        >
           <Modal.Header closeButton>
             <Modal.Title>Xác nhận</Modal.Title>
           </Modal.Header>
@@ -288,10 +298,18 @@ const ApproveLicense = () => {
             </p>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="success" className="transition hover:scale-105" onClick={handleSubmit}>
+            <Button
+              variant="success"
+              className="transition hover:scale-105"
+              onClick={handleSubmit}
+            >
               Có
             </Button>
-            <Button variant="secondary" className="transition hover:scale-105" onClick={() => setIsModalOpen(false)}>
+            <Button
+              variant="secondary"
+              className="transition hover:scale-105"
+              onClick={() => setIsModalOpen(false)}
+            >
               Hủy
             </Button>
           </Modal.Footer>
@@ -300,6 +318,5 @@ const ApproveLicense = () => {
     </div>
   );
 };
-
 
 export default ApproveLicense;

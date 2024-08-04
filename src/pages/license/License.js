@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import apiClient from "../../axiosConfig";
+import { CircularProgress } from "@mui/material";
+import PopupSuccessLicense from "./PopupSuccessLicense.js";
 
 const cardClasses =
   "bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-md max-w-4xl mx-auto border border-zinc-300 dark:border-zinc-700 mt-8";
@@ -54,11 +56,11 @@ const License = () => {
   const [error, setError] = useState("");
   const [licenseNumberError, setLicenseNumberError] = useState("");
   const [birthDateError, setBirthOfDateError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showPopupSuccess, setShowPopupSuccess] = useState(false);
   useEffect(() => {
     apiClient
-      .get(
-        `/api/license/getLicenseByUserId/${user.userId}`
-      )
+      .get(`/api/license/getLicenseByUserId/${user.userId}`)
       .then((response) => setLicense(response.data))
       .catch((error) => console.error("Error fetching motorbikes:", error));
   }, []);
@@ -69,57 +71,78 @@ const License = () => {
     licenseType: "",
   });
   const handleSubmit = async () => {
-    const formData = new FormData();
-    formData.append("licenseNumber", formLicenseData.licenseNumber);
-    formData.append("birthOfDate", formLicenseData.birthOfDate);
-    formData.append("licenseImageFile", formLicenseData.licenseImageFile);
-    formData.append("licenseType", formLicenseData.licenseType);
-    if (licenseNumberError || birthDateError || !formLicenseData.licenseType||!formLicenseData.birthOfDate||!formLicenseData.licenseNumber) {
-      setError("Hãy kiểm tra thông tin bạn nhập vào");
-    } else {
-      apiClient
-        .post("/api/license/uploadLicense", formData, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        })
-        .then((response) => {
-          console.log("Data sent successfully:", response.data);
-          setChangeLicense(false);
-        })
-        .catch((error) => {
-          if (error.response) {
-            // The request was made and the server responded with a status code
-            // that falls out of the range of 2xx
-            console.error("Error response:", error.response);
-            console.error("Status code:", error.response.status);
-            console.error("Data:", error.response.data);
+    setLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const formData = new FormData();
+      formData.append("licenseNumber", formLicenseData.licenseNumber);
+      formData.append("birthOfDate", formLicenseData.birthOfDate);
+      formData.append("licenseImageFile", formLicenseData.licenseImageFile);
+      formData.append("licenseType", formLicenseData.licenseType);
+      if (
+        licenseNumberError ||
+        birthDateError ||
+        !formLicenseData.licenseType ||
+        !formLicenseData.birthOfDate ||
+        !formLicenseData.licenseNumber
+      ) {
+        setError("Hãy kiểm tra thông tin bạn nhập vào");
+      } else {
+        apiClient
+          .post("/api/license/uploadLicense", formData, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          })
+          .then((response) => {
+            console.log("Data sent successfully:", response.data);
+            setChangeLicense(false);
+          })
+          .catch((error) => {
+            if (error.response) {
+              // The request was made and the server responded with a status code
+              // that falls out of the range of 2xx
+              console.error("Error response:", error.response);
+              console.error("Status code:", error.response.status);
+              console.error("Data:", error.response.data);
 
-            if (error.response.status === 404) {
+              if (error.response.status === 404) {
+                setError(
+                  "Error 404: Not Found. The requested resource could not be found."
+                );
+              } else if (error.response.status === 409) {
+                setError(error.response.data);
+              } else {
+                setError(
+                  `Error ${error.response.status}: ${
+                    error.response.data.message || "An error occurred."
+                  }`
+                );
+              }
+            } else if (error.request) {
+              // The request was made but no response was received
+              console.error("Error request:", error.request);
               setError(
-                "Error 404: Not Found. The requested resource could not be found."
-              );
-            } else if (error.response.status === 409) {
-              setError(error.response.data);
-            } else {
-              setError(
-                `Error ${error.response.status}: ${
-                  error.response.data.message || "An error occurred."
-                }`
+                "No response received. Please check your network connection."
               );
             }
-          } else if (error.request) {
-            // The request was made but no response was received
-            console.error("Error request:", error.request);
-            setError(
-              "No response received. Please check your network connection."
-            );
-          }
 
-          setChangeLicense(false);
-        });
+            setChangeLicense(false);
+          });
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+      setShowPopupSuccess(true);
     }
   };
+
+  const handlePopUpSuccess = () => {
+    setShowPopupSuccess(false);
+    window.location.reload();
+  };
+
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -174,191 +197,209 @@ const License = () => {
   return (
     <div className={cardClasses}>
       <div className={sharedClasses.card}>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className={sharedClasses.title}>
-            Giấy phép lái xe{" "}
-            {license ? (
-              license.status === "APPROVED" ? (
-                <span className="ml-2 bg-green-100 dark:bg-green-700 text-green-800 dark:text-green-300 text-xs px-2 py-1 rounded-full">
-                  Đã xác thực
-                </span>
+        <div className="relative">
+          {loading && (
+            <div className="absolute inset-0 flex justify-center items-center bg-white bg-opacity-75 z-10">
+              <CircularProgress color="inherit" />
+            </div>
+          )}
+          <div className="flex justify-between items-center mb-4">
+            <h2 className={sharedClasses.title}>
+              Giấy phép lái xe{" "}
+              {license ? (
+                license.status === "APPROVED" ? (
+                  <span className="ml-2 bg-green-100 dark:bg-green-700 text-green-800 dark:text-green-300 text-xs px-2 py-1 rounded-full">
+                    Đã xác thực
+                  </span>
+                ) : (
+                  <span className="ml-2 bg-red-100 dark:bg-green-700 text-green-800 dark:text-green-300 text-xs px-2 py-1 rounded-full">
+                    Chưa xác thực
+                  </span>
+                )
               ) : (
                 <span className="ml-2 bg-red-100 dark:bg-green-700 text-green-800 dark:text-green-300 text-xs px-2 py-1 rounded-full">
-                  Chưa xác thực
+                  Chưa đăng ký
                 </span>
-              )
-            ) : (
-              <span className="ml-2 bg-red-100 dark:bg-green-700 text-green-800 dark:text-green-300 text-xs px-2 py-1 rounded-full">
-                Chưa đăng ký
+              )}
+            </h2>
+
+            <div className="flex items-center space-x-2">
+              <button
+                className={sharedClasses.blueButton}
+                onClick={handleChangeLicense}
+              >
+                {license ? "Chỉnh sửa" : "Đăng ký"}
+              </button>
+            </div>
+          </div>
+          <div className={sharedClasses.note}>
+            <p className={sharedClasses.info}>
+              Lưu ý: Để tránh mọi vấn đề trong quá trình thuê,{" "}
+              <span className="font-semibold"> người đặt chỗ</span> trên
+              MiMOTORBIKE bắt buộc phải có bằng lái xe đã được xác minh{" "}
+              <span className="font-semibold">
+                {" "}
+                (không áp dụng với các loại xe gắn máy)
               </span>
-            )}
-          </h2>
-
-          <div className="flex items-center space-x-2">
-            <button
-              className={sharedClasses.blueButton}
-              onClick={handleChangeLicense}
-            >
-              {license ? "Chỉnh sửa" : "Đăng ký"}
-            </button>
+              .
+            </p>
           </div>
-        </div>
-        <div className={sharedClasses.note}>
-          <p className={sharedClasses.info}>
-            Lưu ý: Để tránh mọi vấn đề trong quá trình thuê,{" "}
-            <span className="font-semibold"> người đặt chỗ</span> trên
-            MiMOTORBIKE bắt buộc phải có bằng lái xe đã được xác minh{" "}
-            <span className="font-semibold">
-              {" "}
-              (không áp dụng với các loại xe gắn máy)
-            </span>
-            .
-          </p>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-3">
-          <div>
-            <h3 className={sharedClasses.title}>Hình ảnh</h3>
-            {changeLicense ? (
-              <>
-                <input
-                  type="file"
-                  name="licenseImageFile"
-                  accept="image/*" // Chỉ chấp nhận tệp hình ảnh
-                  onChange={handleFileChange}
-                  className={sharedClasses.inputFile}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-3">
+            <div>
+              <h3 className={sharedClasses.title}>Hình ảnh</h3>
+              {changeLicense ? (
+                <>
+                  <input
+                    type="file"
+                    name="licenseImageFile"
+                    accept="image/*" // Chỉ chấp nhận tệp hình ảnh
+                    onChange={handleFileChange}
+                    className={sharedClasses.inputFile}
+                  />
+                  {previewImage && (
+                    <img
+                      src={previewImage}
+                      alt="Preview"
+                      style={{
+                        width: "200px",
+                        height: "auto",
+                        marginTop: "10px",
+                      }}
+                      className={sharedClasses.imagePreview}
+                    />
+                  )}
+                </>
+              ) : (
+                <img
+                  src={
+                    license && license.licenseImageUrl
+                      ? license.licenseImageUrl
+                      : "https://placehold.co/600x400"
+                  }
+                  alt="License Image"
+                  className={sharedClasses.image}
                 />
-                {previewImage && (
-                  <img
-                    src={previewImage}
-                    alt="Preview"
-                    style={{
-                      width: "200px",
-                      height: "auto",
-                      marginTop: "10px",
-                    }}
-                    className={sharedClasses.imagePreview}
-                  />
-                )}
-              </>
-            ) : (
-              <img
-                src={
-                  license && license.licenseImageUrl
-                    ? license.licenseImageUrl
-                    : "https://placehold.co/600x400"
-                }
-                alt="License Image"
-                className={sharedClasses.image}
-              />
-            )}
-          </div>
-          <div>
-            <h3 className={sharedClasses.title}>Thông tin</h3>
-            <div className="space-y-4">
-              <div>
-                <label className={sharedClasses.label}>
-                  Số đăng ký bằng lái xe
-                </label>
-                {changeLicense == false ? (
-                  <div className={sharedClasses.content}>
-                    {license ? license.licenseNumber : "Chưa có"}
-                  </div>
-                ) : (
-                  <input
-                    className={sharedClasses.content}
-                    name="licenseNumber"
-                    value={formLicenseData.licenseNumber}
-                    // placeholder={license ? license.licenseNumber : "Chưa có"}
-                    onChange={handleChangeValue}
-                  />
-                )}
-              </div>
-              {licenseNumberError && (
-                <div className="text-red-500 font-bold">{licenseNumberError}</div>
               )}
-              <div>
-                <label className={sharedClasses.label}>
-                  Ngày tháng năm sinh
-                </label>
-                {changeLicense == false ? (
-                  <div className={sharedClasses.content}>
-                    {license ? license.birthOfDate : "Chưa có"}
-                  </div>
-                ) : (
-                  <input
-                    type="date"
-                    className={sharedClasses.content}
-                    name="birthOfDate"
-                    value={formLicenseData.birthOfDate}
-                    placeholder={license ? license.birthOfDate : "Chưa có"}
-                    onChange={handleChangeValue}
-                  />
-                )}
-              </div>
-              {birthDateError && (
-                <div className="text-red-500 font-bold">{birthDateError}</div>
-              )}
-              <div></div>
-              <div>
-                <label className={sharedClasses.label}>Loại bằng lái xe</label>
-                {changeLicense ? (
-                  <select
-                    name="licenseType"
-                    value={formLicenseData.licenseType}
-                    onChange={handleChangeValue}
-                    className={sharedClasses.content}
-                  >
-                    <option value="">Chọn loại bằng lái xe</option>
-                    <option value="A">A</option>
-                    <option value="A1">A1</option>
-                  </select>
-                ) : (
-                  <div>
+            </div>
+            <div>
+              <h3 className={sharedClasses.title}>Thông tin</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className={sharedClasses.label}>
+                    Số đăng ký bằng lái xe
+                  </label>
+                  {changeLicense == false ? (
                     <div className={sharedClasses.content}>
-                      {license ? license.licenseType : "Chưa có"}
+                      {license ? license.licenseNumber : "Chưa có"}
                     </div>
+                  ) : (
+                    <input
+                      className={sharedClasses.content}
+                      name="licenseNumber"
+                      value={formLicenseData.licenseNumber}
+                      // placeholder={license ? license.licenseNumber : "Chưa có"}
+                      onChange={handleChangeValue}
+                    />
+                  )}
+                </div>
+                {licenseNumberError && (
+                  <div className="text-red-500 font-bold">
+                    {licenseNumberError}
                   </div>
                 )}
-              </div>
+                <div>
+                  <label className={sharedClasses.label}>
+                    Ngày tháng năm sinh
+                  </label>
+                  {changeLicense == false ? (
+                    <div className={sharedClasses.content}>
+                      {license ? license.birthOfDate : "Chưa có"}
+                    </div>
+                  ) : (
+                    <input
+                      type="date"
+                      className={sharedClasses.content}
+                      name="birthOfDate"
+                      value={formLicenseData.birthOfDate}
+                      placeholder={license ? license.birthOfDate : "Chưa có"}
+                      onChange={handleChangeValue}
+                    />
+                  )}
+                </div>
+                {birthDateError && (
+                  <div className="text-red-500 font-bold">{birthDateError}</div>
+                )}
+                <div></div>
+                <div>
+                  <label className={sharedClasses.label}>
+                    Loại bằng lái xe
+                  </label>
+                  {changeLicense ? (
+                    <select
+                      name="licenseType"
+                      value={formLicenseData.licenseType}
+                      onChange={handleChangeValue}
+                      className={sharedClasses.content}
+                    >
+                      <option value="">Chọn loại bằng lái xe</option>
+                      <option value="A">A</option>
+                      <option value="A1">A1</option>
+                    </select>
+                  ) : (
+                    <div>
+                      <div className={sharedClasses.content}>
+                        {license ? license.licenseType : "Chưa có"}
+                      </div>
+                    </div>
+                  )}
+                </div>
 
-              <div>
-                <label className={sharedClasses.label}>Họ và tên</label>
-                <div className={sharedClasses.content}>
-                  {license ? fullName : "Chưa có"}
+                <div>
+                  <label className={sharedClasses.label}>Họ và tên</label>
+                  <div className={sharedClasses.content}>
+                    {license ? fullName : "Chưa có"}
+                  </div>
                 </div>
               </div>
+              {error && <div className="text-red-500">{error}</div>}
+              {changeLicense && (
+                <>
+                  <div className="mt-2 font-bold text-md">
+                    Kiểm tra thông tin giấy phép lái xe{" "}
+                    <a href="https://gplx.gov.vn/?page=home" target="_blank">
+                      {" "}
+                      tại đây
+                    </a>
+                  </div>
+                  <div className="mt-2 flex justify-center">
+                    <button
+                      onClick={handleSubmit}
+                      className=" py-3 px-5 mr-3 text-sm w-full tracking-wide rounded-lg text-white bg-green-500 hover:bg-green-600 transition hover:scale-110"
+                    >
+                      Đăng ký
+                    </button>
+                    <button
+                      onClick={() => {
+                        resetForm();
+                        setChangeLicense(false);
+                      }}
+                      className=" py-3 px-4 text-sm w-full tracking-wide rounded-lg text-white bg-zinc-500 hover:bg-zinc-600 transition hover:scale-110"
+                    >
+                      Trở về
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
-            {error && (
-                <div className="text-red-500">{error}</div>
-              )}  
-            {changeLicense && (
-              <> 
-               <div className="mt-2 font-bold text-md">
-                Kiểm tra thông tin giấy phép lái xe <a href="https://gplx.gov.vn/?page=home" target="_blank"> tại đây</a>
-                </div> 
-                <div className="mt-2 flex justify-center">        
-                <button
-                  onClick={handleSubmit}
-                  className=" py-3 px-5 mr-3 text-sm w-full tracking-wide rounded-lg text-white bg-green-500 hover:bg-green-600 transition hover:scale-110"
-                >
-                  Đăng ký
-                </button>
-                <button
-                 onClick={() => {
-                  resetForm();
-                  setChangeLicense(false);
-                }}
-                  className=" py-3 px-4 text-sm w-full tracking-wide rounded-lg text-white bg-zinc-500 hover:bg-zinc-600 transition hover:scale-110"
-                >
-                  Trở về
-                </button>
-                </div>   
-               
-              </>
-            )}
-          
           </div>
+          {showPopupSuccess && (
+            <PopupSuccessLicense
+              show={showPopupSuccess}
+              onHide={handlePopUpSuccess}
+              message="Bạn đã cập nhật thành công GPLX !"
+            />
+          )}
         </div>
       </div>
     </div>

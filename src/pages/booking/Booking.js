@@ -788,6 +788,7 @@ const Booking = () => {
                     <span className="ml-2">
                       {receiveData.user.totalTripCount>0?receiveData.user.totalTripCount:"Chưa có"} chuyến
                     </span>
+                  </span>  
                   </div>
                 </div>
               </div>
