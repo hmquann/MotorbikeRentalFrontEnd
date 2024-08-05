@@ -351,7 +351,7 @@ const ApproveMotorbikeRegistration = () => {
         <h1 className="text-4xl font-semibold mb-4">Quản lý xe</h1>
       </div>
       <div className="mt-1 mb-1 flex justify-end flex-wrap mx-auto">
-        <div className="p-2 w-1/5">
+        <div className="p-2 w-full md:w-1/5">
           <input
             type="text"
             placeholder="Tìm theo biển"
@@ -366,6 +366,7 @@ const ApproveMotorbikeRegistration = () => {
         />
       </div>
       {isAdmin || isLessor ? (
+        <div className="overflow-x-auto">
         <table className="min-w-full table-fixed divide-y divide-gray-400  ">
           <thead className="bg-gray-50 ">
             <tr>
@@ -528,6 +529,7 @@ const ApproveMotorbikeRegistration = () => {
             )}
           </tbody>
         </table>
+        </div>
       ) : (
         <p className="text-red-500">Bạn không có quyền truy cập trang này.</p>
       )}

@@ -34,7 +34,7 @@ const TransactionListModal = ({ transactions, onClose }) => {
         <Modal.Title>Lịch sử giao dịch</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <div className="overflow-x-auto font-manrope">
+        <div className="overflow-x-auto font-manrope w-full">
           <table className="min-w-full border-collapse border border-gray-300 table-fixed">
             <thead>
               <tr className="bg-gray-100">

@@ -52,7 +52,9 @@ import BlogDetail from "./pages/blog/BlogDetail";
 import Filter from "./pages/filter/Filter";
 import FeedbackModal from "./pages/booking/FeedbackModal";
 import Footer from "./pages/footer/Footer";
+import UserCard from "./pages/booking/UserCard"
 import ChatWithFirebase from "./pages/chatWithFirebase/ChatWithFirebase";
+
 
 import MapboxSearchPopUp from "./pages/filter/MapboxSearchPopUp";
 
@@ -63,7 +65,7 @@ function App() {
   return (
     <>
       <Header />
-      <Routes>
+      <Routes><Route path="/userCard/:userId" element={<UserCard />} />
         <Route path="/employee" element={<PostUser />} />
         <Route path="/employee/:id" element={<UpdateUser />} />
         <Route path="/login" element={<Login />} />

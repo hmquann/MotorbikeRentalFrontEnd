@@ -619,6 +619,9 @@ const Booking = () => {
     }
   }, [userId]);
 
+  const handleClick = (userId) => {
+    navigate(`/userCard/${userId}`);
+  };
   return (
     <div className="relative">
       <div>

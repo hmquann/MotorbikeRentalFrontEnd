@@ -211,7 +211,7 @@ const UserWallet = () => {
         </button>
       </div>
       <h2 className="mt-8 text-3xl font-bold">Giao dịch</h2>
-      <div className="mt-4 flex space-x-4">
+      <div className="mt-4 flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0">
         <div className="flex items-center space-x-2">
           <label htmlFor="from-date" className="text-lg">
             Từ

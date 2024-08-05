@@ -83,7 +83,7 @@ const Register = ({ show, handleClose, showLogin }) => {
     }
     if (name === "lastname") {
       if (!validateName(value)) {
-        setlastNameError("Last name must only have alphabet characters.");
+        setlastNameError("Tên không hợp lệ");
       } else {
         setlastNameError("");
       }
