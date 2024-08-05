@@ -25,8 +25,6 @@ const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-
-
   useEffect(() => {
     const token = localStorage.getItem("token");
     const userDataString = localStorage.getItem("user");
@@ -102,8 +100,12 @@ const Header = () => {
       <header className="flex align-baseline justify-between lg:mx-28 items-center p-4 ">
         <div className="flex items-center">
           <Nav.Link as={Link} to="/homepage">
-            <img className="w-24" src="/image/logo.png
-            " alt="Logo" />
+            <img
+              className="w-24"
+              src="/image/logo.png
+            "
+              alt="Logo"
+            />
           </Nav.Link>
         </div>
         <nav className="flex space-x-4">
@@ -120,39 +122,46 @@ const Header = () => {
             >
               Về MiMotor
             </Nav.Link>
-            
+
             <Nav.Link
               as={Link}
               to="/registermotorbike"
-              style={{ 
+              style={{
                 color: "#000" /* text-black */,
                 fontSize: "0.875rem" /* text-sm */,
                 fontWeight: "700" /* font-bold */,
                 fontFamily: '"Manrope", sans-serif' /* font-manrope */,
-                borderRight: isLoggedIn ? "none" : "1px solid #d8dae5", /* border-r-2 */
-                height : '34px',  
+                borderRight: isLoggedIn
+                  ? "none"
+                  : "1px solid #d8dae5" /* border-r-2 */,
+                height: "34px",
               }}
             >
               Trở thành chủ xe
             </Nav.Link>
-            <Nav.Link
-              as={Link}
-              to="/menu/myBooking"
-              style={{ 
-                color: "#000" /* text-black */,
-                fontSize: "0.875rem" /* text-sm */,
-                fontWeight: "700" /* font-bold */,
-                fontFamily: '"Manrope", sans-serif' /* font-manrope */,
-                borderRight: isLoggedIn ? "1px solid #d8dae5" : "none", /* border-r-2 */
-                height : '34px',  
-              }}
-            >
-              Chuyến của tôi
-            </Nav.Link>
             {isLoggedIn ? (
               <>
+                <Nav.Link
+                  as={Link}
+                  to="/menu/myBooking"
+                  style={{
+                    color: "#000" /* text-black */,
+                    fontSize: "0.875rem" /* text-sm */,
+                    fontWeight: "700" /* font-bold */,
+                    fontFamily: '"Manrope", sans-serif' /* font-manrope */,
+                    borderRight: isLoggedIn
+                      ? "1px solid #d8dae5"
+                      : "none" /* border-r-2 */,
+                    height: "34px",
+                  }}
+                >
+                  Chuyến của tôi
+                </Nav.Link>
                 <NotificationDropdown />
-                <img src="https://n1-cstg.mioto.vn/m/avatars/avatar-0.png" className="w-10 h-10 rounded-full mr-3" />
+                <img
+                  src="https://n1-cstg.mioto.vn/m/avatars/avatar-0.png"
+                  className="w-10 h-10 rounded-full mr-3"
+                />
                 <div
                   className="flex items-center cursor-pointer"
                   onClick={handleAccount}
@@ -189,10 +198,9 @@ const Header = () => {
                     fontWeight: "700" /* font-bold */,
                     fontFamily: '"Manrope", sans-serif' /* font-manrope */,
                     borderRadius: "8px",
-                    border : '1px solid black'
+                    border: "1px solid black",
                   }}
                   className="hover:bg-zinc-200"
-                  
                   onClick={handleLoginOpen}
                 >
                   Đăng nhập

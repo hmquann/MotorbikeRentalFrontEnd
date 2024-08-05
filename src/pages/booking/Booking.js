@@ -585,6 +585,9 @@ const Booking = () => {
     }
   }, [userId]);
 
+  const handleClick = (userId) => {
+    navigate(`/userCard/${userId}`);
+  };
   return (
     <div>
       <div class="cover-car">
@@ -714,9 +717,9 @@ const Booking = () => {
 
             <RentalDocument />
             <hr className="my-3 border-gray-800"></hr>
-            <div className="p-4 bg-white dark:bg-zinc-800  flex items-center space-x-4">
-              <div className="flex flex-col items-center mb-4">
-                <h2 className="text-sm font-semibold mb-2">Chủ xe</h2>
+            <div className="p-4 bg-white dark:bg-zinc-800  flex items-center space-x-4 cursor-pointer" onClick={() => handleClick(receiveData.user.id)}>
+              <div className="flex flex-col items-center mb-4 ">
+                <h2 className="text-sm font-semibold mb-2" >Chủ xe</h2>
                 <img
                   src="https://n1-cstg.mioto.vn/m/avatars/avatar-2.png"
                   alt="User profile picture"

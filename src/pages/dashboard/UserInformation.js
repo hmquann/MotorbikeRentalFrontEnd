@@ -155,7 +155,7 @@ const UserInformation = ({
               ) : users.length === 0 ? (
                 <tr>
                   <td colSpan="6" className="p-4 text-center text-amber-700">
-                    No user information found
+                    Không có thông tin người dùng nào
                   </td>
                 </tr>
               ) : (
