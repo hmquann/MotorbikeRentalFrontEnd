@@ -7,6 +7,7 @@
   import { Rating } from '@mui/material';
 import apiClient from '../../axiosConfig';
 import { Modal } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
   const modalOverlayClasses =
     "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 ";
@@ -25,6 +26,7 @@ import { Modal } from 'react-bootstrap';
     const [editingContent, setEditingContent] = useState('');
     const [editingRate, setEditingRate] = useState(0);
     const [editingFeedbackId, setEditingFeedbackId] = useState(null);
+    const navigate = useNavigate()
 
     useEffect(() => {
       const fetchFeedbacks = async () => {
@@ -78,6 +80,9 @@ import { Modal } from 'react-bootstrap';
     const closeModal = () => {
       setFeedbackToDelete(null);
       setIsModalOpen(false);
+    };
+    const handleClick = (userId) => {
+      navigate(`/userCard/${userId}`);
     };
 
     const handleDelete = async () => {
@@ -146,7 +151,7 @@ import { Modal } from 'react-bootstrap';
         </div>
         <div className="space-y-4">
           {feedbacks.map((feedback) => (
-            <div key={feedback.id} className="bg-card p-4 rounded-lg shadow-sm border border-border">
+            <div key={feedback.id} className="bg-card p-4 rounded-lg shadow-sm border border-border cursor-pointer" onClick={() => handleClick(feedback.renterId)}>
             {isEditing && editingFeedbackId === feedback.id ? (
                 <div>
                   <div className='flex justify-start items-center mb-3'>
