@@ -19,6 +19,7 @@ import {
   faX,
   faMotorcycle,
 } from "@fortawesome/free-solid-svg-icons";
+import { faMessage } from "@fortawesome/free-regular-svg-icons";
 import { faCircleQuestion } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState, useEffect } from "react";
@@ -203,6 +204,19 @@ const Booking = () => {
 
   const handleClosePopUpPricePerDay = () => {
     setShowPopUpPricePerDay(false);
+  };
+
+  const handleChatting = () => {
+    try {
+      const response4 = apiClient.post("/api/chatting/create", {
+        emailUser1: receiveData.user.email,
+        emailUser2: userEmail,
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      navigate("/menu/chatting");
+    }
   };
 
   const [dateRange, setDateRange] = useState([null, null]);
@@ -553,6 +567,11 @@ const Booking = () => {
             }
           );
 
+          const response4 = apiClient.post("/api/chatting/create", {
+            emailUser1: receiveData.user.email,
+            emailUser2: userEmail,
+          });
+
           const now = new Date();
 
           await setDoc(doc(collection(db, "notifications")), {
@@ -766,9 +785,7 @@ const Booking = () => {
               <hr className="my-3 border-gray-800"></hr>
               <div className="p-4 bg-white dark:bg-zinc-800  flex items-center space-x-4">
                 <div className="flex flex-col items-center mb-4">
-                  <h2 className="text-sm font-semibold mb-2">
-                    Chủ xe
-                  </h2>
+                  <h2 className="text-sm font-semibold mb-2">Chủ xe</h2>
                   <img
                     src="https://n1-cstg.mioto.vn/m/avatars/avatar-2.png"
                     alt="User profile picture"
@@ -776,22 +793,49 @@ const Booking = () => {
                   />
                 </div>
                 <div className="flex-1">
-                  <h2
-                    className={`text-lg font-semibold ${sharedClasses.textZincDark}`}
+                  <div
+                    className="flex items-center justify-between"
+                    onClick={handleChatting}
                   >
-                    {receiveData.user.firstName +
-                      " " +
-                      receiveData.user.lastName}
-                  </h2>
+                    <h2
+                      className={`text-lg font-semibold ${sharedClasses.textZincDark}`}
+                    >
+                      {receiveData.user.firstName +
+                        " " +
+                        receiveData.user.lastName}
+                      &nbsp;&nbsp;&nbsp;
+                      <span
+                        style={{
+                          border: "1px solid #ee4d2d", // Màu viền
+                          padding: "2px 5px", // Khoảng cách giữa nội dung và viền
+                          display: "inline-flex", // Để icon và text nằm trên cùng một dòng
+                          alignItems: "center", // Căn giữa icon và text theo chiều dọc
+                          cursor: "pointer", // Thay đổi con trỏ chuột khi hover
+                          color: "#ee4d2d",
+                          fontSize: "0.875rem",
+                        }}
+                      >
+                        <FontAwesomeIcon
+                          icon={faMessage}
+                          color="#ee4d2d"
+                          style={{ marginRight: "5px", fontSize: "0.875rem" }}
+                        />
+                        Trò chuyện...
+                      </span>
+                    </h2>
+                  </div>
                   <div
                     className={`${sharedClasses.flexItemsCenter} space-x-2 ${sharedClasses.textZincLight}`}
                   >
                     <span className={sharedClasses.flexItemsCenter}>
                       <FaMotorcycle className="w-6 h-6" />
-                    <span className="ml-2">
-                      {receiveData.user.totalTripCount>0?receiveData.user.totalTripCount:"Chưa có"} chuyến
+                      <span className="ml-2">
+                        {receiveData.user.totalTripCount > 0
+                          ? receiveData.user.totalTripCount
+                          : "Chưa có"}{" "}
+                        chuyến
+                      </span>
                     </span>
-                  </span>  
                   </div>
                 </div>
               </div>
@@ -899,7 +943,6 @@ const Booking = () => {
                     </span>
                   </div>
                 )}
-
                 <div
                   className={`flex justify-between text-lg ${sharedClasses.mb1}`}
                 >

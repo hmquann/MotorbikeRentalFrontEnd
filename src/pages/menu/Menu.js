@@ -126,7 +126,7 @@ const Menu = () => {
                   to="/menu/chatting"
                   className={({ isActive }) => (isActive ? "active" : "")}
                 >
-                  Tin nhắn
+                  Trò chuyện
                 </NavLink>
               </li>
               <hr></hr>

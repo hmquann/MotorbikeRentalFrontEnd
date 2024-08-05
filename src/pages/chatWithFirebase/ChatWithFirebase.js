@@ -40,6 +40,12 @@ const ChatComponent = () => {
   };
 
   useEffect(() => {
+    if (chatRef.current) {
+      chatRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, []);
+
+  useEffect(() => {
     const fetchMessages = async () => {
       setLoading(true);
       try {

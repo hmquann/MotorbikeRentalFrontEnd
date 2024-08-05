@@ -57,6 +57,10 @@ import ChatWithFirebase from "./pages/chatWithFirebase/ChatWithFirebase";
 
 
 import MapboxSearchPopUp from "./pages/filter/MapboxSearchPopUp";
+import GeneralPolicy from "./pages/privacy/GeneralPolicy";
+import Regulations from "./pages/privacy/Regulations";
+import PrivacyPolicy from "./pages/privacy/PrivacyPolicy";
+import Complaints from "./pages/privacy/Complaints";
 
 function App() {
   const location = useLocation();
@@ -85,7 +89,12 @@ function App() {
         />
         <Route path="/" element={<Navigate to="/homepage" />} />
         <Route path="/homepage" element={<Homepage />} />
-        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/privacy/*" element={<Privacy />}>
+          <Route path="general" element={<GeneralPolicy />} />
+          <Route path="regulation" element={<Regulations />} />
+          <Route path="policy" element={<PrivacyPolicy />} />
+          <Route path="complaint" element={<Complaints />} />
+        </Route>
         <Route path="/filter" element={<Filter />} />
         <Route path="/privacyList" element={<PrivacyList />} />
         <Route path="/userInformation" element={<UserInformation />} />

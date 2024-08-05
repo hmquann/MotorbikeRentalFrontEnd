@@ -397,7 +397,8 @@ const License = () => {
             <PopupSuccessLicense
               show={showPopupSuccess}
               onHide={handlePopUpSuccess}
-              message="Bạn đã cập nhật thành công GPLX !"
+              message="Bạn đã cập nhật thành công GPLX.
+              Vui lòng đợi hệ thống duyệt hoặc liên hệ 1900-1009 nếu cần gấp!"
             />
           )}
         </div>
