@@ -56,7 +56,7 @@ const BlogList = () => {
           className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700 transition duration-300"
           onClick={() => setShowCreateBlog(true)}
         >
-          + Tạo blog mới
+          + Tạo Blog
         </button>
       </div>
       {blogs.map((blog) => (

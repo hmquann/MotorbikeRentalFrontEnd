@@ -2,32 +2,33 @@ import React, { useState, useEffect } from "react";
 import BookingCard from "./BookingCard";
 import apiClient from "../../axiosConfig";
 import NoBooking from "./NoBooking";
+import { Stack, Pagination } from "@mui/material"; 
 
 const CurrentBooking = ({ filters }) => {
   const [bookings, setBookings] = useState([]);
   const userDataString = localStorage.getItem("user");
   const userData = JSON.parse(userDataString);
+  const [page, setPage] = useState(1); 
+  const itemsPerPage = 5; 
 
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const response = await apiClient.post(
-          "/api/booking/filter",
-          {
-            tripType: filters.tripType,
-            userId: filters.userId,
-            status: filters.status,
-            sort: filters.sort,
-            startTime: filters.startTime,
-            endTime: filters.endTime,
-          }
-        );
+        const response = await apiClient.post("/api/booking/filter", {
+          tripType: filters.tripType,
+          userId: filters.userId,
+          status: filters.status,
+          sort: filters.sort,
+          startTime: filters.startTime,
+          endTime: filters.endTime,
+        });
         const currentBookings = response.data.filter((booking) =>
           ["PENDING", "PENDING_DEPOSIT", "DEPOSIT_MADE", "RENTING"].includes(
             booking.status
           )
         );
         setBookings(currentBookings);
+        console.log(bookings);
       } catch (error) {
         console.error("Error:", error);
       }
@@ -36,15 +37,33 @@ const CurrentBooking = ({ filters }) => {
     fetchBookings();
   }, [filters]);
 
+  const handlePageChange = (event, value) => {
+    setPage(value);
+  };
+
+  const paginatedBookings = bookings.slice(
+    (page - 1) * itemsPerPage,
+    page * itemsPerPage
+  );
+
   return (
     <div>
-      {bookings.length === 0 ? (
+      {paginatedBookings.length === 0 ? (
         <NoBooking />
       ) : (
-        bookings.map((booking) => (
+        paginatedBookings.map((booking) => (
           <BookingCard key={booking.id} booking={booking} />
         ))
       )}
+      <Stack spacing={2}>
+        <Pagination
+          count={Math.ceil(bookings.length / itemsPerPage)}
+          page={page}
+          onChange={handlePageChange}
+          variant="outlined"
+          color="success"
+        />
+      </Stack>
     </div>
   );
 };

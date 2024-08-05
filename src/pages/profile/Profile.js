@@ -31,12 +31,16 @@ const sharedClasses = {
 };
 
 const Profile = () => {
+  const getFirstLetter = (name) => {
+    return name.charAt(0).toUpperCase();
+  };
   const user = JSON.parse(localStorage.getItem("user"));
 
   const [showPopUpPassword, setShowPopUpPassword] = useState(false);
   const [showPopUpEmail, setShowPopUpEmail] = useState(false);
 
   const location = useLocation();
+  const firstLetter = getFirstLetter(user.lastName);
 
   useEffect(() => {
     if (location.hash) {
@@ -58,12 +62,12 @@ const Profile = () => {
         <div className="flex mt-4 items-center">
           <div className="flex-shrink-0">
             <div className="w-24 h-24 bg-pink-600 text-white text-4xl flex items-center justify-center rounded-full">
-              XXX
+              {firstLetter}
             </div>
           </div>
           <div className="ml-6 flex flex-col justify-center">
             <div className={`text-lg font-semibold ${textClasses}`}>
-              {(user.gender ? "Mr. " : "Mrs. ") +
+              {(!user.gender ? "Anh " : "Chị ") +
                 user.lastName +
                 " " +
                 user.firstName}
@@ -138,6 +142,7 @@ const Profile = () => {
         <License />
       </div>
     </div>
+    
   );
 };
 

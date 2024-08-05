@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import ImageUploader from "./ImageUploader";
 import apiClient from "../../axiosConfig";
+import { CircularProgress } from "@mui/material";
 const inputClasses =
   "w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500";
 const buttonClasses =
@@ -21,8 +22,9 @@ const RegisterMotorbikeStep2 = (files) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const location = useLocation();
-  const receiveData = location.state?.formData || {};
+  const receiveData = location.state.formData;
   const [checkDelivery, setCheckDelivery] = useState(true);
+  const [spinner, setSpinner] = useState(false);
   const [checkLocation, setCheckLocation] = useState(true);
   const [formData, setFormData] = useState(receiveData);
   const [overtimeFeeError, setOvertimeFeeError] = useState();
@@ -183,6 +185,7 @@ const RegisterMotorbikeStep2 = (files) => {
     navigate("/registermotorbike", { state: { receiveData } });
   };
   const handleSubmitClick = () => {
+    setSpinner(true);
     if (
       deliveryFeeError ||
       overtimeFeeError ||
@@ -505,4 +508,3 @@ const RegisterMotorbikeStep2 = (files) => {
 };
 
 export default RegisterMotorbikeStep2;
-
