@@ -1,10 +1,10 @@
 // src/components/pages/header/Header.js
 import React, { useState, useEffect } from "react";
-import { Nav } from "react-bootstrap";
+import { Modal, Nav } from "react-bootstrap";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import Avatar from "./Avatar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBell, faCaretDown } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faBell, faCaretDown, faTimes } from "@fortawesome/free-solid-svg-icons";
 import NotificationDropdown from "./NotificationDropdown";
 import { useNotification } from "../../NotificationContext";
 import Login from "../login/Login";
@@ -37,6 +37,7 @@ const Header = () => {
 
   const handleAccount = () => {
     navigate("/menu/profile");
+    setIsMenuOpen(false)
   };
 
   const handleConfirmLogout = () => {
@@ -95,6 +96,28 @@ const Header = () => {
     setShowForgotPassword(true);
   };
 
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleMenuToggle = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+  const handleMenuClose = () => {
+    setIsMenuOpen(false);
+  };
+
+  const handleLogout = () => {
+    setShowLogoutModal(true);
+  };
+
+  // const handleConfirmLogout = () => {
+  //   localStorage.clear();
+  //   navigate("/homepage");
+  //   setShowLogoutModal(false);
+  // };
+
+  // const handleCancelLogout = () => {
+  //   setShowLogoutModal(false);
+  // };
   return (
     <>
       <header className="flex align-baseline justify-between lg:mx-28 items-center p-4 ">
@@ -108,7 +131,7 @@ const Header = () => {
             />
           </Nav.Link>
         </div>
-        <nav className="flex space-x-4">
+        <nav className="hidden md:flex space-x-4 items-center">
           <Nav className="ml-auto">
             <Nav.Link
               as={Link}
@@ -209,7 +232,158 @@ const Header = () => {
             )}
           </Nav>
         </nav>
+        <div className="md:hidden flex items-center space-x-4">
+          <NotificationDropdown />
+          <button
+            className="text-black text-lg"
+            onClick={handleMenuToggle}
+          >
+            <FontAwesomeIcon icon={isMenuOpen ? faTimes : faBars} />
+          </button>
+        </div>
       </header>
+     
+      <div
+        className={`fixed top-0 left-0 w-full h-full p-4 flex flex-col items-center justify-center bg-zinc-100 z-50 transition-transform duration-300 transform ${
+          isMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <button
+          className="absolute top-4 right-4 text-lg"
+          onClick={handleMenuToggle}
+        >
+          <FontAwesomeIcon icon={faTimes} />
+        </button>
+        <div className="bg-white w-full flex flex-col items-center justify-center p-4 rounded-xl gap-2"> 
+        {isLoggedIn ? (
+              <>
+        <div className="flex items-center text-center cursor-pointer" onClick={handleAccount}>
+          <img
+            src="https://n1-cstg.mioto.vn/m/avatars/avatar-0.png"
+            className="w-20 h-20 rounded-full mb-4"
+            alt="User Avatar"
+          />
+          <p className="font-manrope font-bold text-lg ml-8">{username}</p>
+        </div>
+        <div className="w-full border-b border-b-gray-300"></div>
+        <Nav.Link
+          as={Link}
+          to=""
+          className="text-black text-lg font-bold font-manrope"
+          onClick={handleMenuClose}
+          style={{
+            fontWeight : 700,
+            fontSize : 20,
+            padding : 10
+          }}
+        >
+          Về MiMotor
+        </Nav.Link>
+        <div className="w-full border-b border-b-gray-300"></div>
+        <Nav.Link
+          as={Link}
+          to="/registermotorbike"
+          className="text-black text-xl font-extrabold font-manrope"
+          onClick={handleMenuClose}
+          style={{
+            fontWeight : 700,
+            fontSize : 20,
+            padding : 10
+          }}
+        >
+          Trở thành chủ xe
+        </Nav.Link>
+        <div className="w-full border-b border-b-gray-300"></div>
+        <Nav.Link
+          as={Link}
+          to="/menu/myBooking"
+          className="text-black text-lg font-bold font-manrope hover:text-green-600"
+          onClick={handleMenuClose}
+          style={{
+            fontWeight : 700,
+            fontSize : 20,
+            padding : 10
+          }}
+        >
+          Chuyến của tôi
+        </Nav.Link>
+        <div className="w-full border-b border-b-gray-300"></div>
+        <Nav.Link
+          as={Link}
+          to="/logout"
+          className="text-red-500 text-lg font-bold font-manrope"
+          onClick={handleLogout}
+          style={{
+            fontWeight : 700,
+            fontSize : 20,
+            padding : 10,
+            color : 'red'
+          }}
+        >
+          Đăng xuất
+        </Nav.Link>
+        </>
+        ) :(
+          <>
+        <Nav.Link
+          as={Link}
+          to=""
+          className="text-black text-lg font-bold font-manrope"
+          onClick={handleMenuClose}
+          style={{
+            fontWeight : 700,
+            fontSize : 20,
+            padding : 10
+          }}
+        >
+          Về MiMotor
+        </Nav.Link>
+        <div className="w-full border-b border-b-gray-300"></div>
+        <Nav.Link
+          as={Link}
+          to="/registermotorbike"
+          className="text-black text-xl font-extrabold font-manrope"
+          onClick={handleMenuClose}
+          style={{
+            fontWeight : 700,
+            fontSize : 20,
+            padding : 10
+          }}
+        >
+          Trở thành chủ xe
+        </Nav.Link>
+
+        <div className="w-full border-b border-b-gray-300"></div>
+        <Nav.Link
+          as={Link}
+          className="text-red-500 text-lg font-bold font-manrope"
+          onClick={handleShowLogin}
+          style={{
+            fontWeight : 700,
+            fontSize : 20,
+            padding : 10
+          }}
+        >
+          Đăng nhập
+        </Nav.Link>
+        <div className="w-full border-b border-b-gray-300"></div>
+        <Nav.Link
+          as={Link}
+          to="/logout"
+          className="text-red-500 text-lg font-bold font-manrope"
+          onClick={handleRegisterOpen}
+          style={{
+            fontWeight : 700,
+            fontSize : 20,
+            padding : 10
+          }}
+        >
+          Đăng ký
+        </Nav.Link>
+        </>
+        )}
+        </div>
+      </div>
 
       {showLoginModal && (
         <Login
@@ -234,6 +408,32 @@ const Header = () => {
           showLogin={handleShowLogin}
         />
       )}
+         <Modal show={showLogoutModal} onHide={handleCancelLogout}>
+            <div className="p-8 rounded bg-gray-50 font-[sans-serif]">
+              <h1 className="text-gray-800 text-center text-2xl font-bold">
+                Đăng xuất
+              </h1>
+              <p className="text-gray-800 text-sm mt-4 text-center">
+                Bạn có chắc muốn đăng xuất khỏi tài khoản?
+              </p>
+              <div className="text-center mt-3">
+                <button
+                  type="button"
+                  onClick={handleConfirmLogout}
+                  className="py-2 px-4 text-sm w-32 tracking-wide rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none transition hover:scale-105"
+                >
+                  Đăng xuất
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCancelLogout}
+                  className="py-2 px-4 text-sm w-32 tracking-wide rounded-lg text-white bg-red-600 hover:bg-red-700 focus:outline-none ml-2 transition hover:scale-105"
+                >
+                  Hủy
+                </button>
+              </div>
+            </div>
+          </Modal>
     </>
   );
 };
