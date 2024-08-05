@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import apiClient from "../../axiosConfig";
 import { fontFamily } from "@mui/system";
 import { Form, Button } from 'react-bootstrap';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {faCircleInfo} from "@fortawesome/free-solid-svg-icons";
 
 const sharedClasses = {
   bgGreen: 'bg-green-500',
@@ -42,8 +44,13 @@ const sharedClasses = {
   border: 'border',
   borderZinc300: 'border-zinc-300',
   roundedFull: 'rounded-full',
+  cursorPointer: 'cursor-pointer',
+  textPrimary: 'text-primary',
+  bgWhite: 'bg-white',
+  absolute: 'absolute',
+  zIndex50: 'z-50',
+  tooltipText: 'absolute top-[-120%] left-0 z-50 bg-[#f5f5dc] border border-gray-300 p-2 rounded shadow text-xs',
 };
-
 // const Navbar = () => {
 //   return (
 //     <nav className={`bg-white dark:bg-zinc-800 ${sharedClasses.shadow} ${sharedClasses.p4} ${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter}`}>
@@ -163,6 +170,7 @@ const RegisterMotorbikeStep1 = () => {
   const[motorbikeBrandError,setMotorbikeBrandError]=useState('');
   const[motorbikeModelError,setMotorbikeModelError]=useState('');
   const[manufactureYearError,setManufactureYearError]=useState('');
+  const [showTooltip, setShowTooltip] = useState(false);
   useEffect(() => {
       apiClient.get('/api/model/getAllModel')
           .then(response => setModels(response.data))
@@ -261,6 +269,21 @@ const handleReturnNavigate=()=>{
     navigate('/registermotorbike/step2', { state: {formData} });
   }
  }
+ const CustomFormLabel = ({ children }) => {
+  return (
+    <Form.Label>
+      {children} <span style={{ color: 'red' }}>(*)</span>
+    </Form.Label>
+  );
+};
+const handleIconClick = () => {
+
+  setShowTooltip(true);
+  setTimeout(() => {
+    setShowTooltip(false);
+  }, 5000); // 5 seconds
+};
+
   return ( 
     <div className={`min-h-screen font-manrope bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 flex flex-col items-center justify-center`}>
        <h1 className="text-3xl font-extrabold mb-6 mt-10 font-encode">Đăng ký xe</h1>
@@ -268,7 +291,7 @@ const handleReturnNavigate=()=>{
       <Form onSubmit={handleSunbmit}>
           {/* Biển số xe */}
           <Form.Group className="mb-4">
-            <Form.Label>Biển số xe</Form.Label>
+          <CustomFormLabel>Biển số xe</CustomFormLabel>
             <Form.Control
               type="text"
               name="motorbikePlate"
@@ -283,7 +306,7 @@ const handleReturnNavigate=()=>{
 
           {/* Hãng xe */}
           <Form.Group className="mb-4">
-      <Form.Label>Hãng xe</Form.Label>
+      <CustomFormLabel>Hãng xe</CustomFormLabel>
       <Form.Select
         name="brand"
         value={formData.brand}
@@ -302,7 +325,7 @@ const handleReturnNavigate=()=>{
 
           {/* Mẫu xe */}
           <Form.Group className="mb-4">
-      <Form.Label>Mẫu xe</Form.Label>
+      <CustomFormLabel>Mẫu xe</CustomFormLabel>
       <Form.Select
         name="model"
         value={formData.model}
@@ -321,7 +344,7 @@ const handleReturnNavigate=()=>{
 
           {/* Năm sản xuất */}
           <Form.Group className="mb-4">
-            <Form.Label>Năm sản xuất</Form.Label>
+            <CustomFormLabel>Năm sản xuất</CustomFormLabel>
             <Form.Control
               type="text"
               name="yearOfManufacture"
@@ -336,7 +359,17 @@ const handleReturnNavigate=()=>{
 
           {/* Điều kiện ràng buộc */}
           <Form.Group className="mb-4">
-            <Form.Label>Điều kiện ràng buộc thuê xe</Form.Label>
+            <CustomFormLabel>Điều kiện ràng buộc thuê xe</CustomFormLabel>
+            <FontAwesomeIcon
+          icon={faCircleInfo}
+          className={`ml-2 ${sharedClasses.cursorPointer} ${sharedClasses.textPrimary}`}
+          onClick={handleIconClick}
+        />
+        {showTooltip && (
+            <div className={sharedClasses.tooltipText}>
+              Các tài sản thế chấp thường được sử dụng như:
+            </div>
+        )}
             <Form.Control
               as="textarea"
               name="constraintMotorbike"
@@ -362,7 +395,7 @@ const handleReturnNavigate=()=>{
              className="w-6/12 py-2 text-base font-bold text-white  bg-green-500 rounded-lg hover:bg-green-600 transition hover:scale-105"
               disabled={loading}
             >
-              {loading ? "Continue..." : "Tiếp tục"}
+              {loading ? "Tiếp tục..." : "Tiếp tục"}
             </button>
           </div>
         </Form>
