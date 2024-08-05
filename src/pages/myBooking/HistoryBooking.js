@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react";
 import BookingCard from "./BookingCard";
 import apiClient from "../../axiosConfig";
 import NoBooking from "./NoBooking";
-
+import { Stack, Pagination } from "@mui/material";
 const HistoryBooking = ({ filters }) => {
   const [bookings, setBookings] = useState([]);
   const userDataString = localStorage.getItem("user");
   const userData = JSON.parse(userDataString);
-
+  const [page, setPage] = useState(1); 
+  const itemsPerPage = 5;
   useEffect(() => {
     const fetchBookings = async () => {
       try {
@@ -34,13 +35,32 @@ const HistoryBooking = ({ filters }) => {
     fetchBookings();
   }, [filters]);
 
+
+  const handlePageChange = (event, value) => {
+    setPage(value);
+  };
+
+  const paginatedBookings = bookings.slice(
+    (page - 1) * itemsPerPage,
+    page * itemsPerPage
+  );
+
   return (
     <div>
-      {bookings.length === 0 ? (
+      {paginatedBookings.length === 0 ? (
         <NoBooking />
       ) : (
-        bookings.map((booking) => <BookingCard key={booking.id} booking={booking} />)
+        paginatedBookings.map((booking) => <BookingCard key={booking.id} booking={booking} />)
       )}
+      <Stack spacing={2}>
+        <Pagination
+          count={Math.ceil(bookings.length / itemsPerPage)}
+          page={page}
+          onChange={handlePageChange}
+          variant="outlined"
+          color="success"
+        />
+      </Stack>
     </div>
   );
 };

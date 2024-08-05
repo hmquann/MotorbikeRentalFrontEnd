@@ -51,7 +51,7 @@ function ImageUploader({ sendDataToParent }) {
                                     alt={`Uploaded Preview ${index + 1}`}
                                     className={`object-cover ${index === 0 ? 'w-full h-48' : 'w-full h-24'}`}
                                 />
-                                {index === 0 && <span className="absolute top-2 left-2 text-white bg-teal-500 p-1 text-sm rounded">Main</span>}
+                                {index === 0 && <span className="absolute top-2 left-2 text-white bg-teal-500 p-1 text-sm rounded">Ảnh chính</span>}
                             </div>
                         ))}
                     </div>

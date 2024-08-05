@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import ImageUploader from "./ImageUploader";
 import apiClient from "../../axiosConfig";
+import { CircularProgress } from "@mui/material";
 const inputClasses =
   "w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500";
 const buttonClasses =
@@ -21,9 +22,9 @@ const RegisterMotorbikeStep2 = (files) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const location = useLocation();
-  const receiveData = location.state?.formData || {};
+  const receiveData = location.state.formData;
   const [checkDelivery, setCheckDelivery] = useState(true);
-  const [checkLocation, setCheckLocation] = useState(true);
+  const [spinner, setSpinner] = useState(false);
   const [formData, setFormData] = useState(receiveData);
   const [overtimeFeeError, setOvertimeFeeError] = useState();
   const [priceError, setPriceError] = useState();
@@ -59,9 +60,6 @@ const RegisterMotorbikeStep2 = (files) => {
       ...formData,
       delivery: checkDelivery,
     });
-  };
-  const handleCheckLocation = (event) => {
-    setCheckLocation(!event.target.checked);
   };
   const handleProvinceChange = (event) => {
     const provinceId = event.target.value;
@@ -115,58 +113,61 @@ const RegisterMotorbikeStep2 = (files) => {
     setSelectedWard(wardId);
   };
   const regexValueInput = (input) => {
+
+    const numericValue = parseInt(input, 10);
     const regex = /^(?:[0-9]|[1-9][0-9]{0,5}|1000000)$/;
-    return regex.test(input);
+    return regex.test(input) && numericValue >= 0 && numericValue <= 1000000;
   };
   const handleChange = (e) => {
     const { name, value } = e.target;
     console.log(formData);
     if (name === "overtimeFee") {
       if (!regexValueInput(value)) {
-        setOvertimeFeeError("Must be number");
+        setOvertimeFeeError("Hãy nhập vào 1 số");
       }
-      if (value === "") {
-        setOvertimeFeeError("Not null");
+      else if (value === "") {
+        setOvertimeFeeError("Không được bỏ trống");
       } else {
         setOvertimeFeeError("");
       }
     }
     if (name === "price") {
+      console.log(value)
       if (!regexValueInput(value)) {
-        setPriceError("Must be number");
+        setPriceError("Hãy nhập vào 1 số");
       }
-      if (value === "") {
-        setPriceError("Not null");
+      else if (value === "") {
+        setPriceError("Không được bỏ trống");
       } else {
         setPriceError("");
       }
     }
     if (name === "overtimeLimit") {
       if (!regexValueInput(value)) {
-        setOvertimeLimitError("Must be number");
+        setOvertimeLimitError("Hãy nhập vào 1 số");
       }
-      if (value === "") {
-        setOvertimeLimitError("Not null");
+      else if (value === "") {
+        setOvertimeLimitError("Không được bỏ trống");
       } else {
         setOvertimeLimitError("");
       }
     }
     if (name === "freeshipDistance") {
-      if (!regexValueInput(value)) {
-        setFreeshipError("Must be number");
+      if (!regexValueInput(value)&&checkDelivery==true) {
+        setFreeshipError("Phải là 1 số");
       }
-      if (value === "") {
-        setFreeshipError("Not null");
+      else if (value === ""&&checkDelivery==true) {
+        setFreeshipError("Không được bỏ trống");
       } else {
         setFreeshipError("");
       }
     }
     if (name === "deliveryFeePerKilometer") {
-      if (!regexValueInput(value)) {
-        setDeliveryFeeError("Must be number");
+      if (!regexValueInput(value)&&checkDelivery==true) {
+        setDeliveryFeeError("Phải là 1 số");
       }
-      if (value === "") {
-        setDeliveryFeeError("Not null");
+      else if (value === ""&&checkDelivery==true) {
+        setDeliveryFeeError("Không được bỏ trống");
       } else {
         setDeliveryFeeError("");
       }
@@ -182,29 +183,24 @@ const RegisterMotorbikeStep2 = (files) => {
   const handleReturnClick = () => {
     navigate("/registermotorbike", { state: { receiveData } });
   };
-  const handleSubmitClick = () => {
-    if (
-      deliveryFeeError ||
-      overtimeFeeError ||
-      overtimeLimitError ||
-      freeshipError
-    ) {
-      setError("Please enter correct  before submitting.");
+  const handleSubmitClick = async () => {
+    setSpinner(true);
+  
+    // Kiểm tra lỗi trước khi gửi dữ liệu
+    if (deliveryFeeError || overtimeFeeError || overtimeLimitError || freeshipError) {
+      setError("Hoàn thành form đăng ký trước khi ấn 'Đăng ký'.");
+      setSpinner(false);
+      return; // Dừng hàm nếu có lỗi
     }
-    const province = provinces.find(
-      (d) => d.province_id === selectedProvince
-    ).province_name;
-    const district = districts.find(
-      (d) => d.district_id === selectedDistrict
-    ).district_name;
-    const ward = wards.find((d) => d.ward_id === selectedWard).ward_name;
-    const address =
-      addressDetail + "," + ward + "," + district + "," + province;
-
-    console.log(formData);
-    console.log(JSON.parse(localStorage.getItem("user")).userId);
+  
+    // Lấy tên tỉnh, huyện, và xã từ các giá trị đã chọn
+    const province = provinces.find(d => d.province_id === selectedProvince)?.province_name || '';
+    const district = districts.find(d => d.district_id === selectedDistrict)?.district_name || '';
+    const ward = wards.find(d => d.ward_id === selectedWard)?.ward_name || '';
+    const address = `${addressDetail}, ${ward}, ${district}, ${province}`;
+  
+    // Tạo đối tượng FormData
     const newFormData = new FormData();
-
     newFormData.append("motorbikePlate", formData.motorbikePlate);
     newFormData.append("yearOfManufacture", formData.yearOfManufacture);
     newFormData.append("constraintMotorbike", formData.constraintMotorbike);
@@ -216,56 +212,64 @@ const RegisterMotorbikeStep2 = (files) => {
     newFormData.append("deliveryFee", formData.deliveryFee);
     newFormData.append("modelId", formData.modelId);
     newFormData.append("motorbikeAddress", address);
-    newFormData.append(
-      "userId",
-      JSON.parse(localStorage.getItem("user")).userId
-    );
+    newFormData.append("userId", JSON.parse(localStorage.getItem("user")).userId);
+  
     uploadedImages.forEach((image, index) => {
-      newFormData.append("motorbikeImages", image, `image-${index}.jpg`);
+      const fileName = image.name;
+      const fileExtension = fileName.split('.').pop();   
+      const newFileName = `image-${index}.${fileExtension}`;    
+      newFormData.append("motorbikeImages", image, newFileName);
     });
-    setFormData(newFormData);
-    apiClient
-      .post("/api/motorbike/register", newFormData, {
+  
+    try {
+      // Gọi API Mapbox để lấy tọa độ
+      const response = await axios.get(
+        `https://api.mapbox.com/search/geocode/v6/forward?q=${encodeURIComponent(address)}&access_token=pk.eyJ1Ijoibmd1eWVua2llbjAyIiwiYSI6ImNseDNpem83bjByM3cyaXF4NTZqOWFhZWIifQ.pVT0I74tSdI290kImTlphQ`
+      );
+  
+      if (response.status === 200 && response.data && response.data.features.length > 0) {
+        const coordinates = response.data.features[0].geometry.coordinates;
+        console.log(coordinates);
+        newFormData.append("longitude", coordinates[0]);
+        newFormData.append("latitude", coordinates[1]);
+      } else {
+        console.error('Error: Invalid response status or data.');
+      }
+    } catch (error) {
+      console.error("Error making Axios request:", error);
+    }
+  
+    // Gửi dữ liệu đến server
+    try {
+      const response = await apiClient.post("/api/motorbike/register", newFormData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-      })
-      .then((response) => {
-        console.log("Data sent successfully:", response.data);
-        navigate("/homepage");
-        setLoading(false);
-      })
-      .catch((error) => {
-        if (error.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
-          console.error("Error response:", error.response);
-          console.error("Status code:", error.response.status);
-          console.error("Data:", error.response.data);
-
-          if (error.response.status === 404) {
-            setError(
-              "Error 404: Not Found. The requested resource could not be found."
-            );
-          } else if (error.response.status === 409) {
-            setError(error.response.data);
-          } else {
-            setError(
-              `Error ${error.response.status}: ${
-                error.response.data.message || "An error occurred."
-              }`
-            );
-          }
-        } else if (error.request) {
-          // The request was made but no response was received
-          console.error("Error request:", error.request);
-          setError(
-            "No response received. Please check your network connection."
-          );
-        }
-        setLoading(false);
       });
+      console.log("Data sent successfully:", response.data);
+      navigate("/homepage");
+    } catch (error) {
+      if (error.response) {
+        console.error("Error response:", error.response);
+        console.error("Status code:", error.response.status);
+        console.error("Data:", error.response.data);
+  
+        if (error.response.status === 404) {
+          setError("Error 404: Not Found. The requested resource could not be found.");
+        } else if (error.response.status === 409) {
+          setError(error.response.data);
+        } else {
+          setError(`Error ${error.response.status}: ${error.response.data.message || "An error occurred."}`);
+        }
+      } else if (error.request) {
+        console.error("Error request:", error.request);
+        setError("No response received. Please check your network connection.");
+      }
+    } finally {
+      setSpinner(false); // Đảm bảo tắt spinner bất kể có lỗi hay không
+    }
   };
+  
 
   return (
     <div className="min-h-screen bg-zinc-50 p-6 flex flex-col items-center justify-center font-manrope">
@@ -276,9 +280,7 @@ const RegisterMotorbikeStep2 = (files) => {
             Đơn giá thuê mặc định
           </label>
           <p className="text-sm text-zinc-500 mb-6">
-            Đơn giá áp dụng cho tất cả các ngày. Bạn có thuể tuỳ chỉnh giá khác
-            cho các ngày đặc biệt (cuối tuần, lễ, tết...) trong mục quản lý xe
-            sau khi đăng ký.
+            Đơn giá áp dụng cho tất cả các ngày. 
           </p>
           <input
             type="text"
@@ -293,35 +295,6 @@ const RegisterMotorbikeStep2 = (files) => {
           <label className="block text-2xl font-bold text-zinc-700 mb-2">
             Địa chỉ xe
           </label>
-          <div className="flex items-center mb-3">
-            <input
-              type="radio"
-              name="address"
-              id="defaultAddress"
-              defaultChecked
-              className="mr-2 focus:ring-green-500"
-              onClick={handleCheckLocation}
-            />
-
-            <label htmlFor="defaultAddress" className="text-sm text-zinc-700">
-              Your default address
-            </label>
-          </div>
-          <div className="pl-6 mb-4 text-sm text-zinc-700">
-            Royal City, Nguyễn Trãi, Thanh Xuân, Hà Nội
-          </div>
-          <div className="flex items-center mb-3">
-            <input
-              type="radio"
-              name="address"
-              id="newAddress"
-              className="mr-2 focus:ring-green-500"
-              onClick={handleCheckLocation}
-            />
-            <label htmlFor="newAddress" className="text-sm text-zinc-700">
-              New Address
-            </label>
-          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
             <select
@@ -330,7 +303,7 @@ const RegisterMotorbikeStep2 = (files) => {
               name="province"
               value={selectedProvince}
               onChange={handleProvinceChange}
-              disabled={checkLocation}
+
             >
               <option value="">Tỉnh/ Thành phố</option>
               {provinces.map((province) => (
@@ -370,11 +343,11 @@ const RegisterMotorbikeStep2 = (files) => {
             </select>
 
             <input
-              placeholder="Nhập tên đường"
+              placeholder="Nhập địa chỉ chi tiết"
               name="addressDetail"
               value={addressDetail}
               onChange={handleAddressChange}
-              disabled={checkLocation}
+              disabled={!selectedWard}
               type="text"
               className="w-full p-2 border rounded mr-2 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
@@ -385,7 +358,7 @@ const RegisterMotorbikeStep2 = (files) => {
           {/* Overtime fee section */}
           <div className="w-full sm:w-1/2 pr-3 mb-6 sm:mb-0">
             <label className="block text-sm font-medium text-zinc-700 mb-2">
-              Overtime fee
+              Phí trả xe muộn
             </label>
             <div className="flex items-center">
               <input
@@ -396,7 +369,7 @@ const RegisterMotorbikeStep2 = (files) => {
                 onChange={handleChange}
               />
 
-              <span className="text-sm text-zinc-700">VND/hour</span>
+              <span className="text-sm text-zinc-700">VND/giờ</span>
             </div>
             {overtimeFeeError && (
               <div className="text-red-500">{overtimeFeeError}</div>
@@ -406,7 +379,7 @@ const RegisterMotorbikeStep2 = (files) => {
           {/* Overtime limit section */}
           <div className="w-full sm:w-1/2 pl-3">
             <label className="block text-sm font-medium text-zinc-700 mb-2">
-              Overtime limit
+              Giới hạn trả xe muộn
             </label>
             <div className="flex items-center">
               <input
@@ -416,7 +389,7 @@ const RegisterMotorbikeStep2 = (files) => {
                 value={formData.overtimeLimit}
                 onChange={handleChange}
               />
-              <span className="text-sm text-zinc-700">hour</span>
+              <span className="text-sm text-zinc-700">giờ</span>
             </div>
             {overtimeLimitError && (
               <div className="text-red-500">{overtimeLimitError}</div>
@@ -425,17 +398,17 @@ const RegisterMotorbikeStep2 = (files) => {
         </div>
 
         <div className="flex justify-between mb-6">
-          <div className="w-full sm:w-1/2 pr-3 mb-6 sm:mb-0 flex justify-between items-center">
-            <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
-              Giao xe tận nơi
-            </h2>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                value={checkDelivery}
-                className="sr-only peer"
-                onClick={handleCheckDelivery}
-              />
+  <div className="w-full sm:w-1/2 pr-3 mb-6 sm:mb-0 flex items-center">
+    <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mr-2">
+      Giao xe tận nơi
+    </h2>
+    <label className="relative inline-flex items-center cursor-pointer">
+      <input
+        type="checkbox"
+        value={checkDelivery}
+        className="sr-only peer"
+        onClick={handleCheckDelivery}
+      />
               <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 dark:peer-focus:ring-green-800 rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-zinc-600 peer-checked:bg-green-600"></div>
             </label>
           </div>
@@ -464,7 +437,7 @@ const RegisterMotorbikeStep2 = (files) => {
 
           <div className="w-full md:w-1/2 pr-2">
             <label className="block text-sm font-medium text-zinc-700 mb-1">
-              Phí giao xe cho mỗi km
+              Phí giao xe cho mỗi km (ngoài bán kính freeship)
             </label>
             <div className="flex items-center">
               <input
@@ -505,4 +478,3 @@ const RegisterMotorbikeStep2 = (files) => {
 };
 
 export default RegisterMotorbikeStep2;
-

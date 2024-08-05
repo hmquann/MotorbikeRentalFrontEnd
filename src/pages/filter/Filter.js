@@ -333,7 +333,7 @@ const Filter = () => {
 
   
     <div className='bg-gray-200'>
-      <div className="relative ">
+      {/* <div className="relative ">
         <img
           src="https://imgcdnblog.carbay.com/wp-content/uploads/2019/12/16150859/Ducati-Streetfighter-v4s2.jpg"
           alt="Hero Image"
@@ -363,7 +363,7 @@ const Filter = () => {
 
     </div>
    
-</div>
+</div> */}
 
 <div className="flex justify-center items-center mt-4">
   <div style={{ width: '40%' }}>

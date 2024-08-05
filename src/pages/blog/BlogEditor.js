@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-import axios from "axios";
 import UploadAdapter from "./UploadAdapter";
 import styled from "styled-components";
 import apiClient from "../../axiosConfig";
-
 
 const BlogEditorWrapper = styled.div`
   max-width: 768px;
@@ -46,14 +44,49 @@ const SaveButton = styled.button`
   }
 `;
 
+const ErrorText = styled.p`
+  color: red;
+  margin: 8px 0;
+`;
+
 const BlogEditor = ({ onSave }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [titleError, setTitleError] = useState("");
+  const [contentError, setContentError] = useState("");
+
   const userDataString = localStorage.getItem("user");
   const userData = JSON.parse(userDataString);
   const userId = userData.userId;
 
+  const validateForm = () => {
+    let hasError = false;
+
+    // Reset errors
+    setTitleError("");
+    setContentError("");
+
+    // Validate title
+    if (!title.trim()) {
+      setTitleError("Bạn phải nhập đầy đủ các thông tin.");
+      hasError = true;
+    }
+
+    // Validate content
+    if (!/<img[^>]*src=[^>]+>/i.test(content)) {
+      setContentError("Phần nội dung Blog phải có ít nhất 1 ảnh.");
+      hasError = true;
+    }
+
+    return !hasError; // Return true if no errors
+  };
+
   const handleSave = async () => {
+    // Validate form
+    if (!validateForm()) {
+      return; // If there are validation errors, do not proceed
+    }
+
     const blogData = { title, content, userId };
 
     try {
@@ -68,6 +101,21 @@ const BlogEditor = ({ onSave }) => {
       setContent("");
     } catch (error) {
       console.error("Error saving blog:", error);
+    }
+  };
+
+  const handleTitleChange = (e) => {
+    setTitle(e.target.value);
+    if (e.target.value.trim()) {
+      setTitleError("");
+    }
+  };
+
+  const handleContentChange = (event, editor) => {
+    const newContent = editor.getData();
+    setContent(newContent);
+    if (/<img[^>]*src=[^>]+>/i.test(newContent)) {
+      setContentError("");
     }
   };
 
@@ -86,21 +134,20 @@ const BlogEditor = ({ onSave }) => {
       <TitleInput
         type="text"
         value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="Title"
+        onChange={handleTitleChange}
+        placeholder="Tiêu đề"
       />
+      {titleError && <ErrorText>{titleError}</ErrorText>}
       <EditorWrapper>
         <CKEditor
           editor={ClassicEditor}
           config={editorConfiguration}
           data={content}
-          onChange={(event, editor) => {
-            const data = editor.getData();
-            setContent(data);
-          }}
+          onChange={handleContentChange}
         />
       </EditorWrapper>
-      <SaveButton onClick={handleSave}>Save Blog</SaveButton>
+      {contentError && <ErrorText>{contentError}</ErrorText>}
+      <SaveButton onClick={handleSave}>Lưu Blogs</SaveButton>
     </BlogEditorWrapper>
   );
 };

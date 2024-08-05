@@ -49,14 +49,14 @@ const BlogList = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto p-4">
+    <div className="max-w-5xl mx-auto p-4 font-manrope">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Blogs</h1>
         <button
           className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700 transition duration-300"
           onClick={() => setShowCreateBlog(true)}
         >
-          + Create Blog
+          + Tạo Blog
         </button>
       </div>
       {blogs.map((blog) => (
@@ -69,7 +69,7 @@ const BlogList = () => {
               className="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-700 transition duration-300"
               onClick={() => setShowCreateBlog(false)}
             >
-              Close
+              Đóng
             </button>
             <BlogEditor onSave={handleSave} />
           </div>

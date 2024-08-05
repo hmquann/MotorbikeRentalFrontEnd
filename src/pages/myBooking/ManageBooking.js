@@ -1,5 +1,14 @@
 import { faCalendarDays, faMapPin } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  doc,
+  setDoc,
+  collection,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
+import { db } from "../../firebase";
 import axios from "axios";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
@@ -8,6 +17,7 @@ import PopUpConfirm from "./PopUpConfirm";
 import { useNavigate } from "react-router-dom";
 import PopUpSuccess from "./PopUpSuccess";
 import apiClient from "../../axiosConfig";
+import { CircularProgress } from "@mui/material";
 
 const statusTranslations = {
   PENDING: "Chờ duyệt",
@@ -59,11 +69,12 @@ const statusStyles = {
 
 export default function Widget() {
   const booking = JSON.parse(localStorage.getItem("booking"));
-  const userDataString = localStorage.getItem("user");
-  const userData = JSON.parse(userDataString);
   const [motorbikeName, setMotorbikeName] = useState();
   const [lessorName, setLessorName] = useState();
   const [urlImage, setUrlImage] = useState();
+  const [motorbikePlate, setMotorbikePlate] = useState();
+  const [motorbikeDeliveryFee, setMotorbikeDeliveryFee] = useState();
+  const [motorbikeOvertimeFee, setMotorbikeOvertimeFee] = useState();
   const [lessorId, setLessorId] = useState();
   const [renterName, setRenterName] = useState();
   const [pricePerDay, setPricePerDay] = useState();
@@ -71,6 +82,15 @@ export default function Widget() {
   const [popupContent, setPopupContent] = useState("");
   const [action, setAction] = useState("");
   const [showPopupSuccess, setShowPopupSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const userDataString = localStorage.getItem("user");
+  const userData = JSON.parse(userDataString);
+  const userId = userData ? userData.userId : null;
+  const userName = userData
+    ? userData.firstName + " " + userData.lastName
+    : null;
+
   const navigate = useNavigate();
   useEffect(() => {
     const fetchMotorbike = async () => {
@@ -82,15 +102,17 @@ export default function Widget() {
         setMotorbikeName(
           `${response.data.model.modelName} ${response.data.yearOfManufacture}`
         );
+        setMotorbikeDeliveryFee(`${response.data.deliveryFee}`);
+        setMotorbikeOvertimeFee(`${response.data.overtimeFee}`);
+        console.log(motorbikeOvertimeFee);
+        setMotorbikePlate(`${response.data.motorbikePlate}`);
         setLessorName(
           `${response.data.user.firstName} ${response.data.user.lastName}`
         );
         setUrlImage(response.data.motorbikeImages[0].url);
         setLessorId(response.data.user.userId);
 
-        const response2 = await apiClient.get(
-          `/api/user/${booking.renterId}`
-        );
+        const response2 = await apiClient.get(`/api/user/${booking.renterId}`);
         console.log(response2.data);
         setRenterName(response2.data.firstName + " " + response2.data.lastName);
       } catch (error) {
@@ -118,6 +140,14 @@ export default function Widget() {
   };
 
   const handleConfirm = async () => {
+    setShowPopup(false);
+    setLoading(true);
+    const formattedStartDate = dayjs(booking.startDate).format(
+      "HH:mm DD/MM/YYYY"
+    );
+    const formattedEndDate = dayjs(booking.endDate).format("HH:mm DD/MM/YYYY");
+    setLoading(true);
+    const now = new Date();
     try {
       let status;
       if (action === "accept") {
@@ -131,261 +161,370 @@ export default function Widget() {
       }
       const url = `/api/booking/changeStatus/${booking.bookingId}/${status}`;
       await apiClient.put(url);
-      setShowPopup(false);
-      setShowPopupSuccess(true); // Show success popup
-      setTimeout(() => {
-        setShowPopupSuccess(false); // Hide success popup after 3 seconds
-        navigate("/menu/myBooking"); // Navigate to myBooking page
-      }, 3000);
+
+      if (status === "REJECTED") {
+        await setDoc(doc(collection(db, "notifications")), {
+          userId: userId,
+          message: JSON.stringify({
+            title: '<strong style="color: red">Từ chối cho thuê</strong>',
+            content: `Bạn đã từ chối việc đặt xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong>.`,
+          }),
+          timestamp: now,
+          seen: false,
+        });
+        await setDoc(doc(collection(db, "notifications")), {
+          userId: booking.renterId,
+          message: JSON.stringify({
+            title: '<strong style="color: red">Từ chối cho thuê</strong>',
+            content: `Chủ xe <strong>${userName}</strong> đã từ chối việc đặt xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong>.`,
+          }),
+          timestamp: now,
+          seen: false,
+        });
+      } else if (status === "PENDING_DEPOSIT") {
+        await setDoc(doc(collection(db, "notifications")), {
+          userId: userId,
+          message: JSON.stringify({
+            title: '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
+            content: `Bạn đã duyệt đơn thuê xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong>, thời gian thuê xe từ <strong>${formattedStartDate}</strong> đến <strong>${formattedEndDate}</strong>`,
+          }),
+          timestamp: now,
+          seen: false,
+        });
+        await setDoc(doc(collection(db, "notifications")), {
+          userId: booking.renterId,
+          message: JSON.stringify({
+            title: '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
+            content: `Chủ xe ${userName} đã duyệt đơn thuê xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong>, thời gian thuê xe từ <strong>${formattedStartDate}</strong> đến <strong>${formattedEndDate}</strong>. Bạn hãy đặt cọc chuyến xe này để hoàn tất thủ tục đặt xe. `,
+          }),
+          timestamp: now,
+          seen: false,
+        });
+      } else if (status === "RENTING") {
+        await setDoc(doc(collection(db, "notifications")), {
+          userId: userId,
+          message: JSON.stringify({
+            title: '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
+            content: `Xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong> đã được giao thành công.`,
+          }),
+          timestamp: now,
+          seen: false,
+        });
+        await setDoc(doc(collection(db, "notifications")), {
+          userId: booking.renterId,
+          message: JSON.stringify({
+            title: '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
+            content: `Xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong> đã được giao thành công. Chúc bạn có một chuyến đi vui vẻ.`,
+          }),
+          timestamp: now,
+          seen: false,
+        });
+      } else if (status === "DONE") {
+        await setDoc(doc(collection(db, "notifications")), {
+          userId: userId,
+          message: JSON.stringify({
+            title: '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
+            content: `Chuyến đi với xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong> đã hoàn thành.`,
+          }),
+          timestamp: now,
+          seen: false,
+        });
+        await setDoc(doc(collection(db, "notifications")), {
+          userId: booking.renterId,
+          message: JSON.stringify({
+            title: '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
+            content: `Chuyến đi với xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong> đã hoàn thành. Bạn có thể đánh giá chuyến ở phần lịch sử chuyến.`,
+          }),
+          timestamp: now,
+          seen: false,
+        });
+      }
+      // setShowPopup(false);
+      // setShowPopupSuccess(true); // Show success popup
+      // setTimeout(() => {
+      //   setShowPopupSuccess(false); // Hide success popup after 3 seconds
+      //   navigate("/menu/myBooking"); // Navigate to myBooking page
+      // }, 3000);
     } catch (error) {
       console.error("Error:", error);
+    } finally {
+      setLoading(false);
+      setShowPopupSuccess(true);
     }
   };
 
+  const handlePopUpSuccess = () => {
+    setShowPopupSuccess(false);
+    navigate("/menu/myBooking");
+  };
+
   return (
-    <div className="p-12 bg-gray font-manrope">
-      <div
-        className={`${statusStyle.bg} ${statusStyle.text} p-4 rounded-lg flex items-center mb-6`}
-      >
-        <FontAwesomeIcon icon={statusStyles.icon} className="mr-2" />
-        <span>{statusTranslations[booking.status]}</span>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="col-span-2 bg-white p-6 rounded-lg shadow-lg">
-          <div className="flex items-center mb-6">
-            <img
-              className="object-cover rounded-lg md:mr-4 mb-4 md:mb-0"
-              style={{ height: "200px", width: "350px" }}
-              src={urlImage}
-              alt="Motorbike"
-            />
-            <div>
-              <h2 className="text-2xl font-bold">{motorbikeName}</h2>
-              <a href="#" className="text-blue-500 underline">
-                Xem lộ trình
-              </a>
-              <p className="text-gray-600">{booking.receiveLocation}</p>
-            </div>
+    <div className="relative">
+      {loading && (
+        <>
+          <div className="absolute inset-0 bg-white bg-opacity-75 z-10"></div>
+          <div
+            className="absolute inset-0 flex justify-center"
+            style={{ top: "30%" }}
+          >
+            <CircularProgress size={80} color="inherit" />
           </div>
-          <div className="mb-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <h4 className="text-gray-500">
-                  {" "}
-                  <FontAwesomeIcon
-                    icon={faCalendarDays}
-                    size="lg"
-                    color="gray"
-                  />{" "}
-                  Bắt đầu thuê xe
-                </h4>
-                <p className="text-gray-700">
-                  {dayjs(booking.startDate).format("HH:mm - DD/MM/YYYY")}
-                </p>
-              </div>
-              <div>
-                <h4 className="text-gray-500">
-                  {" "}
-                  <FontAwesomeIcon
-                    icon={faCalendarDays}
-                    size="lg"
-                    color="gray"
-                  />{" "}
-                  Kết thúc thuê xe
-                </h4>
-                <p className="text-gray-700">
-                  {dayjs(booking.endDate).format("HH:mm - DD/MM/YYYY")}
-                </p>
-              </div>
-            </div>
-          </div>
-          <RentalDocument></RentalDocument>
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold">Tài sản thế chấp</h3>
-            <p className="text-gray-700">
-              15 triệu (tiền mặt/chuyển khoản cho chủ xe khi nhận xe) hoặc Xe
-              máy (kèm cà vẹt gốc) giá trị 15 triệu
-            </p>
-          </div>
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold">Điều khoản</h3>
-            <ul className="list-disc list-inside text-gray-700">
-              <li>Quy định khác:</li>
-              <li>Không sử dụng xe vào mục đích phi pháp, trái pháp luật.</li>
-              <li>
-                Không sử dụng xe thuê vào mục đích phi pháp, trái pháp luật.
-              </li>
-              <li>Không sử dụng xe thuê để cầm cố, thế chấp.</li>
-              <li>Không chở hàng cấm, hàng hóa có mùi trong xe.</li>
-              <li>Không chở hàng quá cước hoặc quá tải.</li>
-              <li>Không hút thuốc trong xe.</li>
-              <li>
-                Không chở hàng cấm, hàng hóa có mùi trong xe, khách hàng vi phạm
-                sẽ bị phạt vệ sinh xe sạch sẽ hoặc gửi phụ thu phí vệ sinh xe.
-              </li>
-              <li>
-                Trân trọng cảm ơn, chúc quý khách hàng có những chuyến đi tuyệt
-                vời!
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="text-lg font-bold">Chính sách huỷ chuyến</h3>
-            <table className="w-full border border-muted-foreground text-sm">
-              <thead>
-                <tr>
-                  <th className="border border-muted-foreground p-2">
-                    Thời Gian Hủy Chuyến
-                  </th>
-                  <th className="border border-muted-foreground p-2">
-                    Khách Thuê Hủy Chuyến
-                  </th>
-                  <th className="border border-muted-foreground p-2">
-                    Chủ Xe Hủy Chuyến
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="border border-muted-foreground p-2">
-                    Trong Vòng 1h Từ Lúc Đặt Cọc
-                  </td>
-                  <td className="border border-muted-foreground p-2 text-green-600">
-                    Hoàn tiền cọc 100%
-                  </td>
-                  <td className="border border-muted-foreground p-2 text-green-600">
-                    Hoàn tiền cọc 100%
-                  </td>
-                </tr>
-                <tr>
-                  <td className="border border-muted-foreground p-2">
-                    Trước Chuyến 7 Ngày
-                  </td>
-                  <td className="border border-muted-foreground p-2 text-yellow-600">
-                    Hoàn tiền cọc 70%
-                  </td>
-                  <td className="border border-muted-foreground p-2 text-yellow-600">
-                    Hoàn tiền cọc 70%
-                  </td>
-                </tr>
-                <tr>
-                  <td className="border border-muted-foreground p-2">
-                    Trong 7 Ngày / Trước Chuyến
-                  </td>
-                  <td className="border border-muted-foreground p-2 text-red-600">
-                    Không hoàn tiền
-                  </td>
-                  <td className="border border-muted-foreground p-2 text-red-600">
-                    Phạt 50%
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+        </>
+      )}
+      <div className="p-12 bg-gray font-manrope">
+        <div
+          className={`${statusStyle.bg} ${statusStyle.text} p-4 rounded-lg flex items-center mb-6`}
+        >
+          <FontAwesomeIcon icon={statusStyles.icon} className="mr-2" />
+          <span>{statusTranslations[booking.status]}</span>
         </div>
-        <div className="col-span-1">
-          <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="col-span-2 bg-white p-6 rounded-lg shadow-lg">
             <div className="flex items-center mb-6">
               <img
-               src="https://n1-cstg.mioto.vn/m/avatars/avatar-0.png"
-                alt="User avatar"
-                className="w-14 h-14 rounded-full mr-4 mb-3"
+                className="object-cover rounded-lg md:mr-4 mb-4 md:mb-0"
+                style={{ height: "200px", width: "350px" }}
+                src={urlImage}
+                alt="Motorbike"
               />
               <div>
-                <h4 className="font-semibold">{renterName}</h4>
-                <p className="text-gray-500">Khách thuê</p>
+                <h2 className="text-2xl font-bold">{motorbikeName}</h2>
+                <a href="#" className="text-blue-500 underline">
+                  Xem lộ trình
+                </a>
+                <p className="text-gray-600">{booking.receiveLocation}</p>
               </div>
             </div>
             <div className="mb-6">
-              <h4 className="text-gray-500">
-                <FontAwesomeIcon icon={faMapPin} /> Địa điểm giao nhận xe
-              </h4>
-              <p className="text-gray-700">{booking.receiveLocation}</p>
-              <a href="#" className="text-blue-500 underline">
-                Xem bản đồ
-              </a>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h4 className="text-gray-500">
+                    {" "}
+                    <FontAwesomeIcon
+                      icon={faCalendarDays}
+                      size="lg"
+                      color="gray"
+                    />{" "}
+                    Bắt đầu thuê xe
+                  </h4>
+                  <p className="text-gray-700">
+                    {dayjs(booking.startDate).format("HH:mm - DD/MM/YYYY")}
+                  </p>
+                </div>
+                <div>
+                  <h4 className="text-gray-500">
+                    {" "}
+                    <FontAwesomeIcon
+                      icon={faCalendarDays}
+                      size="lg"
+                      color="gray"
+                    />{" "}
+                    Kết thúc thuê xe
+                  </h4>
+                  <p className="text-gray-700">
+                    {dayjs(booking.endDate).format("HH:mm - DD/MM/YYYY")}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <RentalDocument></RentalDocument>
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold">Tài sản thế chấp</h3>
+              <p className="text-gray-700">
+                15 triệu (tiền mặt/chuyển khoản cho chủ xe khi nhận xe) hoặc Xe
+                máy (kèm cà vẹt gốc) giá trị 15 triệu
+              </p>
             </div>
             <div className="mb-6">
-              <h4 className="text-gray-500">
-                Tổng tiền: {booking.totalPrice.toLocaleString("vi-VN")}vnd
-              </h4>
+              <h3 className="text-lg font-semibold">Điều khoản</h3>
+              <ul className="list-disc list-inside text-gray-700">
+                <li>Quy định khác:</li>
+                <li>Không sử dụng xe vào mục đích phi pháp, trái pháp luật.</li>
+                <li>
+                  Không sử dụng xe thuê vào mục đích phi pháp, trái pháp luật.
+                </li>
+                <li>Không sử dụng xe thuê để cầm cố, thế chấp.</li>
+                <li>Không chở hàng cấm, hàng hóa có mùi trong xe.</li>
+                <li>Không chở hàng quá cước hoặc quá tải.</li>
+                <li>Không hút thuốc trong xe.</li>
+                <li>
+                  Không chở hàng cấm, hàng hóa có mùi trong xe, khách hàng vi
+                  phạm sẽ bị phạt vệ sinh xe sạch sẽ hoặc gửi phụ thu phí vệ
+                  sinh xe.
+                </li>
+                <li>
+                  Trân trọng cảm ơn, chúc quý khách hàng có những chuyến đi
+                  tuyệt vời!
+                </li>
+              </ul>
             </div>
-            <div className="flex p-1 mt-6 justify-center">
-              {booking.status === "PENDING" && (
-                <>
-                  <button
-                    className="bg-red-500 text-white py-2 px-4 rounded mb-2 mr-4 w-full text-center transition hover:scale-105"
-                    onClick={() => handleAction("reject")}
-                  >
-                    Từ chối
-                  </button>
+            <div>
+              <h3 className="text-lg font-bold">Chính sách huỷ chuyến</h3>
+              <table className="w-full border border-muted-foreground text-sm">
+                <thead>
+                  <tr>
+                    <th className="border border-muted-foreground p-2">
+                      Thời Gian Hủy Chuyến
+                    </th>
+                    <th className="border border-muted-foreground p-2">
+                      Khách Thuê Hủy Chuyến
+                    </th>
+                    <th className="border border-muted-foreground p-2">
+                      Chủ Xe Hủy Chuyến
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="border border-muted-foreground p-2">
+                      Trong Vòng 1h Từ Lúc Đặt Cọc
+                    </td>
+                    <td className="border border-muted-foreground p-2 text-green-600">
+                      Hoàn tiền cọc 100%
+                    </td>
+                    <td className="border border-muted-foreground p-2 text-green-600">
+                      Hoàn tiền cọc 100%
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="border border-muted-foreground p-2">
+                      Trước Chuyến 7 Ngày
+                    </td>
+                    <td className="border border-muted-foreground p-2 text-yellow-600">
+                      Hoàn tiền cọc 70%
+                    </td>
+                    <td className="border border-muted-foreground p-2 text-yellow-600">
+                      Hoàn tiền cọc 70%
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="border border-muted-foreground p-2">
+                      Trong 7 Ngày / Trước Chuyến
+                    </td>
+                    <td className="border border-muted-foreground p-2 text-red-600">
+                      Không hoàn tiền
+                    </td>
+                    <td className="border border-muted-foreground p-2 text-red-600">
+                      Phạt 50%
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div className="col-span-1">
+            <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
+              <div className="flex items-center mb-6">
+                <img
+                  src="https://n1-cstg.mioto.vn/m/avatars/avatar-0.png"
+                  alt="User avatar"
+                  className="w-14 h-14 rounded-full mr-4 mb-3"
+                />
+                <div>
+                  <h4 className="font-semibold">{renterName}</h4>
+                  <p className="text-gray-500">Khách thuê</p>
+                </div>
+              </div>
+              <div className="mb-6">
+                <h4 className="text-gray-500">
+                  <FontAwesomeIcon icon={faMapPin} /> Địa điểm giao nhận xe
+                </h4>
+                <p className="text-gray-700">{booking.receiveLocation}</p>
+                <a href="#" className="text-blue-500 underline">
+                  Xem bản đồ
+                </a>
+              </div>
+              <div className="mb-6">
+                <h4 className="text-gray-500">
+                  Tổng tiền: {booking.totalPrice.toLocaleString("vi-VN")}vnd
+                </h4>
+              </div>
+              <div className="flex p-1 mt-6 justify-center">
+                {booking.status === "PENDING" && (
+                  <>
+                    <button
+                      className="bg-red-500 text-white py-2 px-4 rounded mb-2 mr-4 w-full text-center transition hover:scale-105"
+                      onClick={() => handleAction("reject")}
+                    >
+                      Từ chối
+                    </button>
+                    <button
+                      className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:scale-105"
+                      onClick={() => handleAction("accept")}
+                    >
+                      Chấp nhận
+                    </button>
+                  </>
+                )}
+                {booking.status === "PENDING_DEPOSIT" && (
                   <button
                     className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:scale-105"
-                    onClick={() => handleAction("accept")}
-                  >
-                    Chấp nhận
-                  </button>
-                </>
-              )}
-              {booking.status === "PENDING_DEPOSIT" && (
-                <button
-                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:scale-105"
-                  onClick={() => handleAction("reject")}
-                >
-                  Hủy chuyến
-                </button>
-              )}
-              {booking.status === "DEPOSIT_MADE" && (
-                <>
-                  <button
-                    className="bg-red-500 text-white py-2 px-4 rounded mb-2 mr-4 w-full text-center transition hover:scale-105"
                     onClick={() => handleAction("reject")}
                   >
                     Hủy chuyến
                   </button>
+                )}
+                {booking.status === "DEPOSIT_MADE" && (
+                  <>
+                    <button
+                      className="bg-red-500 text-white py-2 px-4 rounded mb-2 mr-4 w-full text-center transition hover:scale-105"
+                      onClick={() => handleAction("reject")}
+                    >
+                      Hủy chuyến
+                    </button>
+                    <button
+                      className="bg-blue-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:scale-105"
+                      onClick={() => handleAction("deliver")}
+                    >
+                      Giao xe
+                    </button>
+                  </>
+                )}
+                {booking.status === "RENTING" && (
                   <button
-                    className="bg-blue-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:scale-105"
-                    onClick={() => handleAction("deliver")}
+                    className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:scale-105"
+                    onClick={() => handleAction("complete")}
                   >
-                    Giao xe
+                    Hoàn thành
                   </button>
-                </>
+                )}
+              </div>
+
+              {showPopup && (
+                <PopUpConfirm
+                  show={showPopup}
+                  message={popupContent}
+                  onConfirm={handleConfirm}
+                  onCancel={() => setShowPopup(false)}
+                />
               )}
-              {booking.status === "RENTING" && (
-                <button
-                  className="bg-green-500 text-white py-2 px-4 rounded mb-2 w-full text-center transition hover:scale-105"
-                  onClick={() => handleAction("complete")}
-                >
-                  Hoàn thành
-                </button>
+              {showPopupSuccess && (
+                <PopUpSuccess
+                  show={showPopupSuccess}
+                  onHide={handlePopUpSuccess}
+                  message="Bạn đã cập nhật thành công trạng thái chuyến !"
+                />
               )}
             </div>
-
-            {showPopup && (
-              <PopUpConfirm
-                show={showPopup}
-                message={popupContent}
-                onConfirm={handleConfirm}
-                onCancel={() => setShowPopup(false)}
-              />
-            )}
-            {showPopupSuccess && (
-              <PopUpSuccess
-               show={showPopupSuccess}
-               onHide={() => setShowPopupSuccess(false)}
-               message="Bạn đã cập nhật thành công trạng thái chuyến !"
-               />
-            )}
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow-lg">
-            <h4 className="text-lg font-semibold mb-4">
-              Phụ phí có thể phát sinh
-            </h4>
-            <ul className="list-none text-gray-700">
-              <li>Phụ phí giao nhận xe tận nơi: 5 000đ/km</li>
-              <li>Phụ phí giao nhận xe tại sân bay: 70 000đ</li>
-              <li>Phụ phí xe bẩn: 100 000đ</li>
-            </ul>
+            <div className="bg-white p-6 rounded-lg shadow-lg">
+              <h4 className="text-lg font-semibold mb-4">
+                Phụ phí có thể phát sinh
+              </h4>
+              <ul className="list-none text-gray-700">
+                <li>
+                  Phụ phí giao nhận xe tận nơi:{" "}
+                  <strong>
+                    {motorbikeDeliveryFee}vnd/km
+                  </strong>{" "}
+                </li>
+                <li>
+                  Phụ phí quá giờ:{" "}
+                  <strong>
+                    {motorbikeOvertimeFee}vnd/km
+                  </strong>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>

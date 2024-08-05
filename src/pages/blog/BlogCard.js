@@ -106,14 +106,14 @@ const BlogCard = ({ blog, onUpdate }) => {
             onClick={openEditBlog}
           >
             <FontAwesomeIcon icon={faEdit} />
-            &nbsp;Edit
+            &nbsp;Chỉnh sửa
           </button>
           <button
             className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-700 transition duration-300"
             onClick={() => setShowDeletePopup(true)}
           >
             <FontAwesomeIcon icon={faTrash} />
-            &nbsp;Delete
+            &nbsp;Xóa
           </button>
         </div>
       </div>

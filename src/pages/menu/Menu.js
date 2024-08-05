@@ -18,6 +18,7 @@ import BlogEditor from "../blog/BlogEditor";
 import BlogList from "../blog/BlogList";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faList } from "@fortawesome/free-solid-svg-icons";
+import ChatWithFirebase from "../chatWithFirebase/ChatWithFirebase";
 
 const Menu = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -78,12 +79,11 @@ const Menu = () => {
     <div className="menu bg-zinc-100">
       {isAuthenticated && (
         <>
-      
           <div id="menu-left" className="menu-left bg-zinc-100 font-manrope" ref={menuLeftRef}>
             <h4 className="font-bold">Xin chào bạn !</h4>
-          <hr></hr>
+            <hr></hr>
             <ul>
-            <li>
+              <li>
                 <NavLink
                   to="/menu/profile"
                   onClick={handleLinkClick}
@@ -123,11 +123,10 @@ const Menu = () => {
               </li>
               <li>
                 <NavLink
-                  to="/menu/chatApp"
-                  onClick={handleLinkClick}
+                  to="/menu/chatting"
                   className={({ isActive }) => (isActive ? "active" : "")}
                 >
-                  Chatting
+                  Tin nhắn
                 </NavLink>
               </li>
               <hr></hr>
@@ -137,21 +136,20 @@ const Menu = () => {
                     type="button"
                     onClick={handleManageClick}
                     style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      width: '100%',
-                      padding: '8px 16px',
-                      textDecoration: 'none',
-                      color: 'inherit',
-                      marginBottom : '3px'
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      width: "100%",
+                      padding: "8px 16px",
+                      textDecoration: "none",
+                      color: "inherit",
+                      marginBottom: "3px",
                     }}
                     className={({ isActive }) => (isActive ? "active" : "")}
                   >
                     <span>Quản lý</span>
                     <FontAwesomeIcon icon={faList} />
                   </a>
-                
                     <ol className={`sub-menu ${isManageOpen ? 'open' : ''}`}>
                       {isAdmin && (
                         <>
@@ -239,7 +237,6 @@ const Menu = () => {
                         </>
                       )}
                     </ol>
-                  
                 </li>
               )}
               <hr></hr>
@@ -258,7 +255,7 @@ const Menu = () => {
             <Routes>
               <Route path="/profile" element={<Profile />} />
               <Route path="/myBooking" element={<MyBooking />} />
-              <Route path="/chatApp" element={<ChatApp />} />
+              <Route path="/chatting" element={<ChatWithFirebase />} />
               <Route path="/wallet" element={<UserWallet />} />
               {isAdmin && (
                 <>
