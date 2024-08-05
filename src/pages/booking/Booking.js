@@ -764,7 +764,7 @@ const Booking = () => {
               </div>
               <RentalDocument />
               <hr className="my-3 border-gray-800"></hr>
-              <div className="p-4 bg-white dark:bg-zinc-800  flex items-center space-x-4">
+              <div className="p-4 bg-white dark:bg-zinc-800  flex items-center space-x-4 cursor-pointer" onClick={() => handleClick(receiveData.user.id)}>
                 <div className="flex flex-col items-center mb-4">
                   <h2 className="text-sm font-semibold mb-2">
                     Chủ xe
