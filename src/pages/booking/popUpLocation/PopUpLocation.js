@@ -17,6 +17,7 @@ const PopUpLocation = ({
   onSelectLocation,
   onChangeLocation,
   receiveData,
+  shipFee,
 }) => {
   const [selectedOption, setSelectedOption] = useState("pickup-location");
   const [customLocation, setCustomLocation] = useState(null); // Updated to hold coordinates
@@ -30,10 +31,9 @@ const PopUpLocation = ({
   const [openMapboxSearch, setOpenMapBoxSearch] = useState(false);
   const [error, setError] = useState(null);
   const [formError, setFormError] = useState("");
-
+  const[deliveryFee,setDeliveryFee]=useState(0);
   // State for distance and delivery fee
   const [distance, setDistance] = useState(0);
-  const [deliveryFee, setDeliveryFee] = useState(0);
 
   const handleSelectLocation = (location) => {
     console.log("Selected Location:", location);
@@ -56,7 +56,7 @@ const PopUpLocation = ({
     const endCoord = `${addressTwo.longitude},${addressTwo.latitude}`;
     const apiKey =
       "pk.eyJ1Ijoibmd1eWVua2llbjAyIiwiYSI6ImNseDNpem83bjByM3cyaXF4NTZqOWFhZWIifQ.pVT0I74tSdI290kImTlphQ";
-    const apiUrl = `https://api.mapbox.com/directions/v5/mapbox/driving/${startCoord};${endCoord}?access_token=${apiKey}`;
+    const apiUrl = `https://api.mapbox.com/directions/v5/mapbox/driving/${startCoord};${endCoord}?approaches=unrestricted;curb&access_token=${apiKey}`;
 
     try {
       const response = await axios.get(apiUrl);
@@ -67,7 +67,6 @@ const PopUpLocation = ({
         response.data.routes.length > 0
       ) {
         const distance = response.data.routes[0].distance / 1000; // Convert from meters to kilometers
-        console.log(`Distance is: ${distance} km`);
         setDistance(distance.toFixed(1));
         return distance;
       } else {
@@ -101,7 +100,7 @@ const PopUpLocation = ({
         } // Use customLocation directly
       );
       if (calculatedDistance > receiveData.freeShipLimit) {
-        setDeliveryFee(calculatedDistance * receiveData.deliveryFee);
+        setDeliveryFee(Math.ceil(calculatedDistance * receiveData.deliveryFee/1000)*1000);
       } else {
         setDeliveryFee(0);
       }
@@ -127,14 +126,15 @@ const PopUpLocation = ({
     let location;
 
     if (selectedOption === "pickup-location") {
-      location = selectedLocation; // Use onSelectLocation directly
+      location = selectedLocation; 
     } else if (selectedOption === "map-location") {
-      location = customLocation.place_name;
+      location = customLocation;
     }
 
     // Call the onChangeLocation callback to send location data
     console.log(location);
     onChangeLocation(location);
+    shipFee(deliveryFee)
     onClose(); // Close the popup after selection
   };
 
@@ -152,7 +152,7 @@ const PopUpLocation = ({
   };
 
   return (
-    <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-50">
+    <div className="fixed top-0 z-50 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-50">
       <div className="popup-location-form">
         <form
           onSubmit={handleSubmitForm}
@@ -191,7 +191,7 @@ const PopUpLocation = ({
                       Giao nhận tại vị trí xe
                     </p>
                     <p className={sharedClasses.textZincLight}>
-                      {onSelectLocation}
+                      {onSelectLocation.address}
                     </p>
                   </div>
                 </label>
@@ -233,8 +233,9 @@ const PopUpLocation = ({
             <div>
               <p>Khoảng cách giao nhận xe: {distance} km</p>
               <p>Miễn phí giao nhận xe trong: {receiveData.freeShipLimit} km</p>
+              <p>Phí giao xe 2 chiều: {receiveData.deliveryFee.toLocaleString("vi-VN")} đ/km</p>
               <p>
-                Phí giao nhận xe 2 chiều: {deliveryFee.toLocaleString("vi-VN")}{" "}
+                Phí giao nhận xe 2 chiều: {deliveryFee.toLocaleString("vi-VN")} {" "}
                 đ
               </p>
             </div>

@@ -22,7 +22,7 @@ const avatarClasses = "w-10 h-10 rounded-full border-2 border-yellow-400";
 const MotorbikeList = (listMotor) => {
   const navigate = useNavigate();
   console.log(listMotor);
-  const [motorbikeList, setMotorbikeList] = useState(listMotor.listMotor);
+  const [motorbikeList, setMotorbikeList] = useState(listMotor);
   const [selectedMotorbike, setSelectedMotorbike] = useState(null);
   useEffect(() => {
     if (listMotor.listMotor) {
@@ -60,11 +60,12 @@ const MotorbikeList = (listMotor) => {
     <div>
       <div className="p-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {motorbikeList.length === 0 ? (
+          {Array.isArray(motorbikeList) && motorbikeList.length === 0 ? (
             <div className="col-span-full text-center text-zinc-500 dark:text-zinc-400">
               Không tìm thấy xe phù hợp.
             </div>
           ) : (
+            Array.isArray(motorbikeList) &&
             motorbikeList.map((motorbike) => (
               <div
                 key={motorbike.id}
@@ -74,7 +75,11 @@ const MotorbikeList = (listMotor) => {
                 <div className="relative">
                   <img
                     className="w-full h-64 object-cover rounded-t-lg"
-                    src={motorbike.motorbikeImages[0].url}
+                    src={
+                      motorbike.motorbikeImages
+                        ? motorbike.motorbikeImages[0].url
+                        : ""
+                    }
                     alt="Motorbike"
                   />
                   <div className="absolute top-2 left-2 space-y-1">

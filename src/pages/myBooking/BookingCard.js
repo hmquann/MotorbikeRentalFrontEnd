@@ -296,10 +296,10 @@ const BookingCard = ({ booking }) => {
           const subtractMoneyUrl = `/api/payment/subtract`;
           const addMoneyUrl = `/api/payment/add`;
           await apiClient.post(subtractMoneyUrl, null, {
-            params: { id: renterId, amount: amount },
+            params: { id: renterId, amount: amount, motorbikeName : motorbikeName, motorbikePlate : motorbikePlate },
           });
           await apiClient.post(addMoneyUrl, null, {
-            params: { id: adminDataId, amount: amount },
+            params: { id: adminDataId, amount: amount, motorbikeName : motorbikeName, motorbikePlate : motorbikePlate },
           });
           break;
         default:
