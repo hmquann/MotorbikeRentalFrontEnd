@@ -88,11 +88,11 @@ const PopUpLocation = ({
 
   const updateCustomLocation = async () => {
     if (selectedOption === "map-location" && customLocation) {
-      console.log(motorbikeCoords)
+      console.log(motorbikeCoords);
       console.log({
         longitude: customLocation.long,
         latitude: customLocation.lat,
-      })
+      });
       const calculatedDistance = await checkDistance(
         motorbikeCoords,
         {
@@ -147,6 +147,10 @@ const PopUpLocation = ({
     }
   };
 
+  const handleChangeLocation = () => {
+    setSelectedOption("map-location");
+  };
+
   return (
     <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-50">
       <div className="popup-location-form">
@@ -191,30 +195,33 @@ const PopUpLocation = ({
                     </p>
                   </div>
                 </label>
-                <label className="flex items-center p-4 border rounded-lg cursor-pointer mb-2">
+                <label
+                  className="flex items-center p-4 border rounded-lg cursor-pointer mb-2"
+                  onClick={handleChangeLocation}
+                >
                   <input
                     type="radio"
                     name="map-location"
                     value="map-location"
                     className={`form-radio ${sharedClasses.black}`}
-                    checked={selectedOption === "map-location"}
                     onChange={() => handleOptionChange("map-location")}
                   />
                   <div className="ml-3 w-full">
-                    <button 
+                    <button
                       type="button"
                       onClick={() => setOpenMapBoxSearch(true)}
                       className="text-zinc-500"
-                    > <p
-                    className={sharedClasses.textZinc}
-                    style={{ fontWeight: "bold" }}
-                  >
-                     Chọn địa điểm trên bản đồ
-                  </p>
-                  <p className={sharedClasses.textZincLight}>
-                  {customLocation?(customLocation.place_name):""}
-                    </p>
-                    
+                    >
+                      {" "}
+                      <p
+                        className={sharedClasses.textZinc}
+                        style={{ fontWeight: "bold" }}
+                      >
+                        Chọn địa điểm trên bản đồ
+                      </p>
+                      <p className={sharedClasses.textZincLight}>
+                        {customLocation ? customLocation.place_name : ""}
+                      </p>
                     </button>
                   </div>
                 </label>

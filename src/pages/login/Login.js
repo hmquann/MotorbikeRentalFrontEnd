@@ -61,6 +61,9 @@ const Login = ({
         lastName: data.lastName,
         phone: data.phone,
         totalTrip: data.totalTripCount,
+        emailNoti: data.emailNoti,
+        systemNoti: data.systemNoti,
+        minimizeNoti: data.minimizeNoti,
       };
       localStorage.setItem("user", JSON.stringify(userInfor));
       localStorage.setItem("token", data.token);

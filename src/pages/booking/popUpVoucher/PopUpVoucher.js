@@ -42,8 +42,7 @@ const PopUpVoucher = ({ onCloseVoucher, discounts, discountValue }) => {
           placeholder="Nhập mã khuyến mãi"
           className="border border-zinc-300 dark:border-zinc-600 rounded-md p-2 w-full mb-4"
         />
-        {discounts
-          .filter((discount) => calculateDaysLeft(discount.expirationDate) > 0)
+        {discounts ? discounts.filter((discount) => calculateDaysLeft(discount.expirationDate) > 0)
           .map((discount) => (
             <div key={discount.id} className="mb-1">
               <div className="flex justify-between p-2">
@@ -73,7 +72,8 @@ const PopUpVoucher = ({ onCloseVoucher, discounts, discountValue }) => {
                 </div>
               </div>
             </div>
-          ))}
+          )) : "Bạn không"}
+        
       </div>
     </div>
   );

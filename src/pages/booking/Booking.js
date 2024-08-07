@@ -239,16 +239,20 @@ const Booking = () => {
   console.log(dateRange[1]?.format("DD/MM/YYYY"));
   console.log(receiveTime?.format("HH:mm"));
   console.log(returnTime?.format("HH:mm"));
+  const [startDateTime, setStartDateTime] = useState();
+  const [endDateTime, setEndDateTime] = useState();
 
   useEffect(() => {
     if (dateRange[0] && dateRange[1] && receiveTime && returnTime) {
-      const startDateTime = dayjs(dateRange[0])
+      const time1 = dayjs(dateRange[0])
         .set("hour", receiveTime.hour())
         .set("minute", receiveTime.minute());
-      const endDateTime = dayjs(dateRange[1])
+      setStartDateTime(time1);
+      const time2 = dayjs(dateRange[1])
         .set("hour", returnTime.hour())
         .set("minute", returnTime.minute());
-      const duration = endDateTime.diff(startDateTime, "minute");
+      setEndDateTime(time2);
+      const duration = time2.diff(time1, "minute");
 
       // Tính số ngày thuê
       const days = Math.ceil(duration / (24 * 60));
@@ -530,6 +534,7 @@ const Booking = () => {
     const roomId = getRoomId(userEmail, receiveData.user.email);
     try {
       setLoading(true);
+      setShowConfirmPopup(false);
       e.preventDefault();
       if (discount) {
         const deleteDiscount = apiClient.delete(
@@ -783,8 +788,11 @@ const Booking = () => {
               </div>
               <RentalDocument />
               <hr className="my-3 border-gray-800"></hr>
-              <div className="p-4 bg-white dark:bg-zinc-800  flex items-center space-x-4 cursor-pointer" onClick={() => handleClick(receiveData.user.id)}>
-                <div className="flex flex-col items-center mb-4">
+              <div className="p-4 bg-white dark:bg-zinc-800  flex items-center space-x-4">
+                <div
+                  className="flex flex-col items-center mb-4  cursor-pointer"
+                  onClick={() => handleClick(receiveData.user.id)}
+                >
                   <h2 className="text-sm font-semibold mb-2">Chủ xe</h2>
                   <img
                     src="https://n1-cstg.mioto.vn/m/avatars/avatar-2.png"
@@ -794,7 +802,7 @@ const Booking = () => {
                 </div>
                 <div className="flex-1">
                   <div
-                    className="flex items-center justify-between"
+                    className="flex items-center justify-between rounded-lg"
                     onClick={handleChatting}
                   >
                     <h2
@@ -808,6 +816,7 @@ const Booking = () => {
                         style={{
                           border: "1px solid #ee4d2d", // Màu viền
                           padding: "2px 5px", // Khoảng cách giữa nội dung và viền
+                          borderRadius: "10px",
                           display: "inline-flex", // Để icon và text nằm trên cùng một dòng
                           alignItems: "center", // Căn giữa icon và text theo chiều dọc
                           cursor: "pointer", // Thay đổi con trỏ chuột khi hover
@@ -820,7 +829,7 @@ const Booking = () => {
                           color="#ee4d2d"
                           style={{ marginRight: "5px", fontSize: "0.875rem" }}
                         />
-                        Trò chuyện...
+                        Liên hệ
                       </span>
                     </h2>
                   </div>
@@ -860,6 +869,7 @@ const Booking = () => {
                     onDateRangeChange={handleDateRangeChange}
                     onReceiveTimeChange={handleReceiveTimeChange}
                     onReturnTimeChange={handleReturnTimeChange}
+                    motorbikeId={motorbikeId}
                   ></DateTimeRange>
                 </div>
 
@@ -960,10 +970,8 @@ const Booking = () => {
                 <PopUpConfirmBooking
                   motorbikeDetails={receiveData}
                   bookingDetails={{
-                    startDate: dayjs(dateRange[0]).format(
-                      "YYYY-MM-DDTHH:mm:ss"
-                    ),
-                    endDate: dayjs(dateRange[1]).format("YYYY-MM-DDTHH:mm:ss"),
+                    startDate: startDateTime,
+                    endDate: endDateTime,
                     receiveLocation: gettedLocation,
                     totalPrice: totalPrice,
                   }}

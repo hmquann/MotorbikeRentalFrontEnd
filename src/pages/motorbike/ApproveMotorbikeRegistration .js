@@ -1,4 +1,13 @@
 import React, { useState, useEffect } from "react";
+import {
+  doc,
+  setDoc,
+  collection,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
+import { db } from "../../firebase";
 import axios from "axios";
 import Dropdown from "./Dropdown";
 import useDebounce from "../../hooks/useDebounce";
@@ -48,6 +57,8 @@ const ApproveMotorbikeRegistration = () => {
   const debouncedSearchTerm = useDebounce(searchTerm, 1000);
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
+  const [lessorName, setLessorName] = useState();
+  const [lessorId, setLessorId] = useState();
 
   useEffect(() => {
     const role = JSON.parse(localStorage.getItem("roles"));
@@ -95,9 +106,7 @@ const ApproveMotorbikeRegistration = () => {
 
   const fetchDetailMotorbike = async (motorbikeId) => {
     try {
-      const response = await apiClient.get(
-        `/api/motorbike/${motorbikeId}`
-      );
+      const response = await apiClient.get(`/api/motorbike/${motorbikeId}`);
       console.log(response.data);
       setSelectedMotorbike(response.data);
     } catch (error) {
@@ -118,22 +127,19 @@ const ApproveMotorbikeRegistration = () => {
   const searchMotorbike = async (searchTerm, userId, roles, page, size) => {
     try {
       setIsLoading(true);
-      const response = await apiClient.get(
-        `/api/motorbike/search`,
-        {
-          params: {
-            searchTerm,
-            status: statusFilter,
-            userId: userId,
-            role: roles.join(","),
-            page,
-            size,
-          },
-          paramsSerializer: (params) => {
-            return qs.stringify(params, { arrayFormat: "repeat" });
-          },
-        }
-      );
+      const response = await apiClient.get(`/api/motorbike/search`, {
+        params: {
+          searchTerm,
+          status: statusFilter,
+          userId: userId,
+          role: roles.join(","),
+          page,
+          size,
+        },
+        paramsSerializer: (params) => {
+          return qs.stringify(params, { arrayFormat: "repeat" });
+        },
+      });
 
       if (response.data) {
         const totalElements = response.data.totalElements;
@@ -218,10 +224,15 @@ const ApproveMotorbikeRegistration = () => {
     }
   };
 
-  const handleAction = (motorbike, action) => {
+  const handleAction = async (motorbike, action) => {
     setSelectedMotorbike(motorbike);
     setActionType(action);
     setIsModalOpen(true);
+    const response = await apiClient.get(`/api/motorbike/${motorbike.id}`);
+    setLessorName(
+      `${response.data.user.firstName} ${response.data.user.lastName}`
+    );
+    setLessorId(response.data.user.id);
   };
   const actionTypeMap = {
     approve: "Xác nhận",
@@ -230,7 +241,7 @@ const ApproveMotorbikeRegistration = () => {
     deactivate: "Hủy kích hoạt",
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     const url =
       actionType === "approve"
         ? `/api/motorbike/approve/${selectedMotorbike.id}`
@@ -240,7 +251,7 @@ const ApproveMotorbikeRegistration = () => {
         ? `/api/motorbike/toggleStatus/${selectedMotorbike.id}`
         : `/api/motorbike/toggleStatus/${selectedMotorbike.id}`;
 
-    apiClient
+    await apiClient
       .put(url)
       .then((response) => {
         if (response.data) {
@@ -260,6 +271,55 @@ const ApproveMotorbikeRegistration = () => {
       .catch((error) =>
         console.error(`Error ${actionType}ing motorbike:`, error)
       );
+
+    const now = new Date();
+    const admin = await apiClient.get("api/user/getAdmin");
+    const adminId = admin.data.id;
+    const adminSystemNoti = admin.data.systemNoti;
+    const lessorId = selectedMotorbike.user.id;
+    const lessorSystemNoti = selectedMotorbike.user.systemNoti;
+
+    // Send notification to admin if required
+    if (
+      adminSystemNoti &&
+      (actionType === "approve" || actionType === "reject")
+    ) {
+      await setDoc(doc(collection(db, "notifications")), {
+        userId: adminId,
+        message: JSON.stringify({
+          title: '<strong style="color: rgb(90 92 95)">Kiểm duyệt xe</strong>',
+          content:
+            actionType === "approve"
+              ? `Bạn đã <strong style="color: rgb(34 197 94)">phê duyệt xe</strong> <strong>${selectedMotorbike.model.modelName} ${selectedMotorbike.yearOfManufacture}</strong>, biển số <strong>${selectedMotorbike.motorbikePlate}</strong>.`
+              : actionType === "reject"
+              ? `Bạn đã <strong style="color: rgb(197 34 34)">từ chối phê duyệt xe</strong> <strong>${selectedMotorbike.model.modelName} ${selectedMotorbike.yearOfManufacture}</strong>, biển số <strong>${selectedMotorbike.motorbikePlate}</strong>.`
+              : "",
+        }),
+        timestamp: now,
+        seen: false,
+      });
+    }
+
+    // Send notification to lessor if required
+    if (
+      lessorSystemNoti &&
+      (actionType === "approve" || actionType === "reject")
+    ) {
+      await setDoc(doc(collection(db, "notifications")), {
+        userId: lessorId,
+        message: JSON.stringify({
+          title: '<strong style="color: rgb(90 92 95)">Kiểm duyệt xe</strong>',
+          content:
+            actionType === "approve"
+              ? `Xe <strong>${selectedMotorbike.model.modelName} ${selectedMotorbike.yearOfManufacture}</strong>, biển số <strong>${selectedMotorbike.motorbikePlate}</strong> của bạn đã được <strong style="color: rgb(34 197 94)">phê duyệt</strong>.`
+              : actionType === "reject"
+              ? `Xe <strong>${selectedMotorbike.model.modelName} ${selectedMotorbike.yearOfManufacture}</strong>, biển số <strong>${selectedMotorbike.motorbikePlate}</strong> của bạn bị <strong style="color: rgb(197 34 34)">từ chối phê duyệt</strong>.`
+              : "",
+        }),
+        timestamp: now,
+        seen: false,
+      });
+    }
   };
 
   const handleCancel = () => {
@@ -367,168 +427,168 @@ const ApproveMotorbikeRegistration = () => {
       </div>
       {isAdmin || isLessor ? (
         <div className="overflow-x-auto">
-        <table className="min-w-full table-fixed divide-y divide-gray-400  ">
-          <thead className="bg-gray-50 ">
-            <tr>
-              {isAdmin && (
-                <th className="px-6 py-3 text-left text-xm font-bold text-gray-500  uppercase tracking-wider">
-                  ID
-                </th>
-              )}
-              {isAdmin && (
-                <th className="px-6 py-3 text-left text-xm font-bold text-gray-500  uppercase tracking-wider">
-                  Người dùng
-                </th>
-              )}
-              <th className="px-6 py-3 text-left text-xm font-bold text-gray-500  uppercase tracking-wider">
-                Mẫu xe
-              </th>
-              <th className="px-6 py-3 text-left text-xm font-bold text-gray-500  uppercase tracking-wider">
-                Biển xe
-              </th>
-              <th className="px-6 py-3 text-left text-xm font-bold text-gray-500  uppercase tracking-wider">
-                Trạng thái
-              </th>
-              <th className="px-6 py-3 text-left text-xm font-bold text-gray-500  uppercase tracking-wider">
-                Hành động
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white dark:bg-black divide-y divide-gray-400 ">
-            {isLoading ? (
+          <table className="min-w-full table-fixed divide-y divide-gray-400  ">
+            <thead className="bg-gray-50 ">
               <tr>
-                <td colSpan="6" className="p-4">
-                  <div className="flex justify-center items-center">
-                  <Box sx={{ display: 'flex' }}>
-      <CircularProgress />
-    </Box>
-                  </div>
-                </td>
+                {isAdmin && (
+                  <th className="px-6 py-3 text-left text-xm font-bold text-gray-500  uppercase tracking-wider">
+                    ID
+                  </th>
+                )}
+                {isAdmin && (
+                  <th className="px-6 py-3 text-left text-xm font-bold text-gray-500  uppercase tracking-wider">
+                    Người dùng
+                  </th>
+                )}
+                <th className="px-6 py-3 text-left text-xm font-bold text-gray-500  uppercase tracking-wider">
+                  Mẫu xe
+                </th>
+                <th className="px-6 py-3 text-left text-xm font-bold text-gray-500  uppercase tracking-wider">
+                  Biển xe
+                </th>
+                <th className="px-6 py-3 text-left text-xm font-bold text-gray-500  uppercase tracking-wider">
+                  Trạng thái
+                </th>
+                <th className="px-6 py-3 text-left text-xm font-bold text-gray-500  uppercase tracking-wider">
+                  Hành động
+                </th>
               </tr>
-            ) : filteredMotorbikes.length === 0 ? (
-              <tr>
-                <td colSpan="6" className="p-4 text-center text-amber-700">
-                  Không thấy xe nào
-                </td>
-              </tr>
-            ) : (
-              <>
-                {filteredMotorbikes.map((motorbike) => (
-                  <tr
-                    key={motorbike.id}
-                    className="border-b transition duration-300 ease-in-out hover:bg-slate-200 "
-                  >
-                    {isAdmin && (
-                      <td className="px-6 py-4 whitespace-nowrap font-bold text-sky-900 ">
-                        {motorbike.id}
-                      </td>
-                    )}
-                    {isAdmin && (
+            </thead>
+            <tbody className="bg-white dark:bg-black divide-y divide-gray-400 ">
+              {isLoading ? (
+                <tr>
+                  <td colSpan="6" className="p-4">
+                    <div className="flex justify-center items-center">
+                      <Box sx={{ display: "flex" }}>
+                        <CircularProgress />
+                      </Box>
+                    </div>
+                  </td>
+                </tr>
+              ) : filteredMotorbikes.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="p-4 text-center text-amber-700">
+                    Không thấy xe nào
+                  </td>
+                </tr>
+              ) : (
+                <>
+                  {filteredMotorbikes.map((motorbike) => (
+                    <tr
+                      key={motorbike.id}
+                      className="border-b transition duration-300 ease-in-out hover:bg-slate-200 "
+                    >
+                      {isAdmin && (
+                        <td className="px-6 py-4 whitespace-nowrap font-bold text-sky-900 ">
+                          {motorbike.id}
+                        </td>
+                      )}
+                      {isAdmin && (
+                        <td className={tableCellClasses}>
+                          {motorbike.user.firstName +
+                            " " +
+                            motorbike.user.lastName}
+                        </td>
+                      )}
                       <td className={tableCellClasses}>
-                        {motorbike.user.firstName +
-                          " " +
-                          motorbike.user.lastName}
+                        {motorbike.model.modelName}
                       </td>
-                    )}
-                    <td className={tableCellClasses}>
-                      {motorbike.model.modelName}
-                    </td>
-                    <td className={tableCellClasses}>
-                      {motorbike.motorbikePlate}
-                    </td>
-                    <td className={tableCellClasses}>
-                      <span
-                        className={`px-2 inline-flex text-sm leading-7 font-semibold rounded-full ${
-                          motorbike.motorbikeStatus === "ACTIVE"
-                            ? "bg-green-100 text-green-800"
+                      <td className={tableCellClasses}>
+                        {motorbike.motorbikePlate}
+                      </td>
+                      <td className={tableCellClasses}>
+                        <span
+                          className={`px-2 inline-flex text-sm leading-7 font-semibold rounded-full ${
+                            motorbike.motorbikeStatus === "ACTIVE"
+                              ? "bg-green-100 text-green-800"
+                              : motorbike.motorbikeStatus === "PENDING"
+                              ? "bg-orange-100 text-orange-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {motorbike.motorbikeStatus === "ACTIVE"
+                            ? "Hoạt động"
                             : motorbike.motorbikeStatus === "PENDING"
-                            ? "bg-orange-100 text-orange-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {motorbike.motorbikeStatus === "ACTIVE"
-                          ? "Hoạt động"
-                          : motorbike.motorbikeStatus === "PENDING"
-                          ? "Đang chờ duyệt"
-                          : "Không hoạt động"}
-                      </span>
-                    </td>
-                    <td className={tableCellClasses}>
-                      {isAdmin && motorbike.motorbikeStatus === "PENDING" ? (
-                        <>
-                          <button
-                            className={`hover:bg-green-600 bg-green-500 text-white mr-2 ${buttonClasses}`}
-                            onClick={() => handleAction(motorbike, "approve")}
-                          >
-                            <FontAwesomeIcon icon={faCheck} />
-                          </button>
-                          <button
-                            className={`hover:bg-red-600 bg-red-500 text-white mr-2 ${buttonClasses}`}
-                            onClick={() => handleAction(motorbike, "reject")}
-                          >
-                            <FontAwesomeIcon icon={faTimesCircle} />
-                          </button>
+                            ? "Đang chờ duyệt"
+                            : "Không hoạt động"}
+                        </span>
+                      </td>
+                      <td className={tableCellClasses}>
+                        {isAdmin && motorbike.motorbikeStatus === "PENDING" ? (
+                          <>
+                            <button
+                              className={`hover:bg-green-600 bg-green-500 text-white mr-2 ${buttonClasses}`}
+                              onClick={() => handleAction(motorbike, "approve")}
+                            >
+                              <FontAwesomeIcon icon={faCheck} />
+                            </button>
+                            <button
+                              className={`hover:bg-red-600 bg-red-500 text-white mr-2 ${buttonClasses}`}
+                              onClick={() => handleAction(motorbike, "reject")}
+                            >
+                              <FontAwesomeIcon icon={faTimesCircle} />
+                            </button>
+                            <button
+                              className={`hover:bg-blue-600 bg-blue-500 text-white ${buttonClasses}`}
+                              onClick={() => handleViewDetail(motorbike.id)}
+                            >
+                              <FontAwesomeIcon icon={faInfoCircle} />
+                            </button>
+                          </>
+                        ) : isLessor &&
+                          (motorbike.motorbikeStatus === "ACTIVE" ||
+                            motorbike.motorbikeStatus === "DEACTIVE") ? (
+                          motorbike.motorbikeStatus === "ACTIVE" ? (
+                            <>
+                              <button
+                                className={`hover:bg-red-600 bg-red-500 text-white  ${buttonClasses}`}
+                                onClick={() =>
+                                  handleActionWithCheck(motorbike, "deactivate")
+                                }
+                              >
+                                {/* <ImSwitch /> */}
+                                <FontAwesomeIcon icon={faToggleOn} />
+                              </button>
+                              <button
+                                className={`hover:bg-blue-600 bg-blue-500 text-white ml-2 ${buttonClasses}`}
+                                onClick={() => handleViewDetail(motorbike.id)}
+                              >
+                                <FontAwesomeIcon icon={faInfoCircle} />
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <button
+                                className={`hover:bg-green-600 bg-green-500 text-white ${buttonClasses}`}
+                                onClick={() =>
+                                  handleAction(motorbike, "activate")
+                                }
+                              >
+                                <FontAwesomeIcon icon={faToggleOff} />
+                              </button>
+                              <button
+                                className={`hover:bg-blue-600 bg-blue-500 text-white ml-2 ${buttonClasses}`}
+                                onClick={() => handleViewDetail(motorbike.id)}
+                              >
+                                <FontAwesomeIcon icon={faInfoCircle} />
+                              </button>
+                            </>
+                          )
+                        ) : (
                           <button
                             className={`hover:bg-blue-600 bg-blue-500 text-white ${buttonClasses}`}
                             onClick={() => handleViewDetail(motorbike.id)}
                           >
                             <FontAwesomeIcon icon={faInfoCircle} />
                           </button>
-                        </>
-                      ) : isLessor &&
-                        (motorbike.motorbikeStatus === "ACTIVE" ||
-                          motorbike.motorbikeStatus === "DEACTIVE") ? (
-                        motorbike.motorbikeStatus === "ACTIVE" ? (
-                          <>
-                            <button
-                              className={`hover:bg-red-600 bg-red-500 text-white  ${buttonClasses}`}
-                              onClick={() =>
-                                handleActionWithCheck(motorbike, "deactivate")
-                              }
-                            >
-                              {/* <ImSwitch /> */}
-                              <FontAwesomeIcon icon={faToggleOn} />
-                            </button>
-                            <button
-                              className={`hover:bg-blue-600 bg-blue-500 text-white ml-2 ${buttonClasses}`}
-                              onClick={() => handleViewDetail(motorbike.id)}
-                            >
-                              <FontAwesomeIcon icon={faInfoCircle} />
-                            </button>
-                          </>
-                        ) : (
-                          <>
-                            <button
-                              className={`hover:bg-green-600 bg-green-500 text-white ${buttonClasses}`}
-                              onClick={() =>
-                                handleAction(motorbike, "activate")
-                              }
-                            >
-                              <FontAwesomeIcon icon={faToggleOff} />
-                            </button>
-                            <button
-                              className={`hover:bg-blue-600 bg-blue-500 text-white ml-2 ${buttonClasses}`}
-                              onClick={() => handleViewDetail(motorbike.id)}
-                            >
-                              <FontAwesomeIcon icon={faInfoCircle} />
-                            </button>
-                          </>
-                        )
-                      ) : (
-                        <button
-                          className={`hover:bg-blue-600 bg-blue-500 text-white ${buttonClasses}`}
-                          onClick={() => handleViewDetail(motorbike.id)}
-                        >
-                          <FontAwesomeIcon icon={faInfoCircle} />
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </>
-            )}
-          </tbody>
-        </table>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </>
+              )}
+            </tbody>
+          </table>
         </div>
       ) : (
         <p className="text-red-500">Bạn không có quyền truy cập trang này.</p>
@@ -572,7 +632,11 @@ const ApproveMotorbikeRegistration = () => {
           </p>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" className="transition hover:scale-105" onClick={handleCloseModal}>
+          <Button
+            variant="secondary"
+            className="transition hover:scale-105"
+            onClick={handleCloseModal}
+          >
             Đóng
           </Button>
         </Modal.Footer>
@@ -593,10 +657,18 @@ const ApproveMotorbikeRegistration = () => {
             </p>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="success" className="transition hover:scale-105" onClick={handleConfirm}>
+            <Button
+              variant="success"
+              className="transition hover:scale-105"
+              onClick={handleConfirm}
+            >
               Có
             </Button>
-            <Button variant="secondary" className="transition hover:scale-105" onClick={handleCancel}>
+            <Button
+              variant="secondary"
+              className="transition hover:scale-105"
+              onClick={handleCancel}
+            >
               Hủy
             </Button>
           </Modal.Footer>

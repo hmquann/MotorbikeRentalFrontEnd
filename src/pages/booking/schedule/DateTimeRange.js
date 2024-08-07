@@ -5,11 +5,13 @@ import { AdapterDayjs } from "@mui/x-date-pickers-pro/AdapterDayjs";
 import { DateRangePicker, TimePicker } from "@mui/x-date-pickers-pro";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
+import apiClient from "../../../axiosConfig";
 
 const DateTimeRange = ({
   onDateRangeChange,
   onReceiveTimeChange,
   onReturnTimeChange,
+  motorbikeId,
 }) => {
   const [dateTimeReceive, setDateTimeReceive] = useState({
     date: "",
@@ -23,7 +25,22 @@ const DateTimeRange = ({
 
   const [dateRange, setDateRange] = useState([dayjs(), dayjs().add(1, "day")]);
   const [minDate, setMinDate] = useState(dayjs().add(1, "day"));
+  const [disabledDates, setDisabledDates] = useState([]);
+
   useEffect(() => {
+    const fetchDisabledDates = async () => {
+      try {
+        const response = await apiClient.get(
+          `/api/booking/dates/motorbike/${motorbikeId}`
+        );
+        const bookedDates = response.data.map((date) => dayjs(date));
+        setDisabledDates(bookedDates);
+      } catch (error) {
+        console.error("Error fetching disabled dates", error);
+      }
+    };
+
+    fetchDisabledDates();
     const now = new Date();
     const tomorrow = new Date();
     tomorrow.setDate(now.getDate() + 1); // Thêm 1 ngày vào thời gian hiện tại
@@ -60,6 +77,13 @@ const DateTimeRange = ({
   const handleReturnTimeChange = (newTime) => {
     setDateTimeReturn((prev) => ({ ...prev, time: newTime }));
     onReturnTimeChange(newTime);
+    console.log(newTime);
+  };
+
+  const disableWeekends = (date) => {
+    return disabledDates.some((disabledDate) =>
+      date.isSame(disabledDate, "day")
+    );
   };
 
   return (
@@ -70,6 +94,7 @@ const DateTimeRange = ({
           onChange={handleDateRangeChange}
           localeText={{ start: "Ngày nhận", end: "Ngày trả" }}
           minDate={minDate}
+          shouldDisableDate={disableWeekends} // Vô hiệu hóa cuối tuần
         />
         <div style={{ display: "flex", gap: "16px" }}>
           <TimePicker

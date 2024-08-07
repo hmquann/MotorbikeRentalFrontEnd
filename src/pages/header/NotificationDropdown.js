@@ -87,6 +87,10 @@ const NotificationDropdown = () => {
     return () => unsubscribe(); // Cleanup subscription on unmount
   }, [userId]);
 
+  // useEffect(() => {
+  //   window.location.reload();
+  // }, notificationCount);
+
   const handleClick = async (event) => {
     setAnchorEl(event.currentTarget);
 
