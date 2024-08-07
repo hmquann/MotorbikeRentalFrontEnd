@@ -146,13 +146,6 @@ function SetPriceRangeModal({ minValueProp, maxValueProp, modelTypeProp, onUpdat
   );
 }
 
-const extractSecondAndThirdLastElements = (str) => {
-  const parts = str.split(',');
-  if (parts.length < 3) return ''; // Nếu chuỗi không có đủ phần tử, trả về chuỗi rỗng
-  const secondLastElement = parts[parts.length - 3].trim();
-  const thirdLastElement = parts[parts.length - 2].trim();
-  return `${secondLastElement}, ${thirdLastElement}`;
-};
 const Filter = () => {
   const navigate = useNavigate();
   const[addressPopUp,setAddressPopUp]=useState(false);
@@ -165,12 +158,13 @@ const Filter = () => {
   const[schedulePopUp,setSchedulePopUp]=useState(false);
   const [showBrandPopup, setShowBrandPopup] = useState(false);
   const [showModelPopup, setShowModelPopup] = useState(false);
-
+  
   const[loading,setLoading]=useState(false);
   const [error, setError] = useState(null);
   const [modalShow, setModalShow] = useState(false);
   const location=useLocation();
   const filterAddressAndTime=location.state.filterList;
+  const[address,setAddress]=useState(filterAddressAndTime.address)
   const [listMotor,setListMotor]=useState(location.state.listMotor);
   const handleUpdateValues = (newValues) => {
     setFilterList({...filterList,minPrice:newValues[0]})
@@ -178,13 +172,16 @@ const Filter = () => {
     console.log(newValues)
     console.log(filterList)
   };
+  const [page,setPage]=useState(0)
+  const pageSize=24;
   const handleUpdateModelType = (newModelType) => {
     setFilterList({...filterList,modelType:newModelType});
   };
   const [filterList,setFilterList]=useState({
     startDate:filterAddressAndTime.startDate,
     endDate:filterAddressAndTime.endDate,
-    address:filterAddressAndTime.address,
+    longitude:filterAddressAndTime.longitude,
+    latitude:filterAddressAndTime.latitude,
     brandId:"",
     modelType:"",
     isDelivery:"",
@@ -287,7 +284,7 @@ const Filter = () => {
     }
     setLoading(true);
     try {
-      const response = await apiClient.post('/api/motorbike/filter', newFilterList, {
+      const response = await apiClient.post(`/api/motorbike/filter/${page}/${pageSize}`, newFilterList, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -300,6 +297,32 @@ const Filter = () => {
       setLoading(false);
     }
   };
+  useEffect(() => {
+    const fetchGeocodeData = async () => {
+      try {
+        const response = await axios.get(
+          `https://api.mapbox.com/search/geocode/v6/forward?q=${encodeURIComponent(address)}&access_token=pk.eyJ1Ijoibmd1eWVua2llbjAyIiwiYSI6ImNseDNpem83bjByM3cyaXF4NTZqOWFhZWIifQ.pVT0I74tSdI290kImTlphQ`
+        );
+  
+        if (response.status === 200 && response.data) {
+          const coordinates = response.data.features[0].geometry.coordinates;
+          setFilterList(prevState => ({
+            ...prevState,
+            longitude: coordinates[0],
+            latitude: coordinates[1]
+          }));
+        } else {
+          console.error('Error: Invalid response status or data.');
+        }
+      } catch (error) {
+        console.error("Error making Axios request:", error);
+      }
+    };
+  
+    if (address) {
+      fetchGeocodeData();
+    }
+  }, [address]);
   useEffect(() => {
     handleSearchMotor(filterList);
   }, [filterList]);
@@ -326,7 +349,7 @@ const Filter = () => {
   };
   const handleSelectLocation = (location) => {
     setSelectedLocation(location);
-    setFilterList({...filterList,address:extractSecondAndThirdLastElements(location.place_name)});
+    setAddress(location.place_name);
     setOpenMapBoxSearch(false);
   };
   return (
@@ -374,7 +397,7 @@ const Filter = () => {
           <circle cx="12" cy="11" r="3" />  
           <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 0 1 -2.827 0l-4.244-4.243a8 8 0 1 1 11.314 0z" />
         </svg>
-        <span>{filterList.address}</span>
+        <span>{address}</span>
       </div>
       <div className='flex items-center space-x-1' onClick={handleOpenSchedulePopup}>
         <svg className="h-4 w-4 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"> 
