@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import Button from "react-bootstrap/Button";
-import Modal from "react-bootstrap/Modal";
 import { format } from "date-fns";
 
-const TransactionListModal = ({ transactions, onClose }) => {
+const TransactionList = ({ transactions }) => {
+  const [showTransactions, setShowTransactions] = useState(false);
   const [page, setPage] = useState(0);
   const pageSize = 5;
   const handlePageChange = (newPage) => {
@@ -29,13 +28,8 @@ const TransactionListModal = ({ transactions, onClose }) => {
   };
 
   return (
-    <Modal show={true} onHide={onClose}>
-      <Modal.Header closeButton>
-        <Modal.Title>Lịch sử giao dịch</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <div className="overflow-x-auto font-manrope w-full">
-          <table className="min-w-full border-collapse border border-gray-300 table-fixed">
+        <div className="overflow-x-auto font-manrope mt-4">
+          <table className=" border-collapse border border-gray-300 table-fixed w-full">
             <thead>
               <tr className="bg-gray-100">
                 <th className="border border-gray-300 p-2 w-3/12">Số tiền</th>
@@ -46,6 +40,7 @@ const TransactionListModal = ({ transactions, onClose }) => {
                 <th className="border border-gray-300 p-3 w-3/12">
                   Trạng thái
                 </th>
+                <th className="border border-gray-300 p-3 w-3/12">Mô tả</th>
               </tr>
             </thead>
             <tbody>
@@ -85,6 +80,9 @@ const TransactionListModal = ({ transactions, onClose }) => {
                     >
                       {typeMap[transaction.status]}
                     </td>
+                    <td className={`border border-gray-300 p-2`}>
+                      {transaction.description}
+                    </td>
                   </tr>
                 );
               })}
@@ -92,34 +90,24 @@ const TransactionListModal = ({ transactions, onClose }) => {
           </table>
           {transactions.length > pageSize && (
             <div className="flex justify-end mt-4">
-              <Button
-                variant="secondary"
+              <button
                 onClick={() => handlePageChange(page - 1)}
                 disabled={page === 0}
-                className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+                className="bg-zinc-500 hover:bg-zinc-600 text-white py-2 px-4 rounded"
               >
                 Trước
-              </Button>
-              <Button
-                variant="primary"
+              </button>
+              <button
                 onClick={() => handlePageChange(page + 1)}
                 disabled={endIndex >= transactions.length}
                 className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded ml-2"
               >
                 Tiếp
-              </Button>
+              </button>
             </div>
           )}
         </div>
-      </Modal.Body>
-      {/* <Modal.Footer>
-
-        <Button variant="secondary" onClick={onClose}>
-          Close
-        </Button>
-      </Modal.Footer> */}
-    </Modal>
   );
 };
 
-export default TransactionListModal;
+export default TransactionList;

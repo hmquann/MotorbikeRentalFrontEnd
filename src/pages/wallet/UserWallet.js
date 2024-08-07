@@ -7,6 +7,7 @@ import TransactionListModal from "./TransactionModal";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import apiClient from "../../axiosConfig";
+import TransactionList from "./TransactionModal";
 
 const UserWallet = () => {
   const [balance, setBalance] = useState(0);
@@ -21,7 +22,7 @@ const UserWallet = () => {
   const [pageSize, setPageSize] = useState(5);
   const [hasSearched, setHasSearched] = useState(false);
   const [selectedTransactions, setSelectedTransactions] = useState([]);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [showTransactions, setShowTransactions] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -162,6 +163,10 @@ const UserWallet = () => {
   };
 
   const handleSearch = () => {
+    if (showTransactions) {
+      setShowTransactions(false);
+      setSelectedTransactions([]);
+    } else {
     const fromDateObj = new Date(fromDate);
     const toDateObj = new Date(toDate);
     toDateObj.setHours(23, 59, 59, 999);
@@ -172,19 +177,18 @@ const UserWallet = () => {
     });
     if (filtered.length === 0) {
       setError("Không tìm thấy giao dịch nào");
-      setModalOpen(false);
     } else {
+      setShowTransactions(true)
       setFilteredTransactions(filtered);
       setPage(0);
       setHasSearched(true);
-      setModalOpen(true);
       setSelectedTransactions(filtered);
       setError("");
     }
+  }
   };
 
   const handleModalClose = () => {
-    setModalOpen(false);
     setFilteredTransactions([]);
     setHasSearched(false);
   };
@@ -240,14 +244,11 @@ const UserWallet = () => {
           className={`bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded`}
           onClick={handleSearch}
         >
-          Tìm
+         {showTransactions ? "Ẩn giao dịch" : "Tìm"}
         </button>
       </div>
-      {modalOpen && (
-        <TransactionListModal
-          transactions={selectedTransactions}
-          onClose={handleModalClose}
-        />
+      {showTransactions && (
+        <TransactionList transactions={selectedTransactions} />
       )}
       <Modal
         show={showWithdrawModal}

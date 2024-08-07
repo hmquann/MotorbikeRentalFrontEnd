@@ -148,7 +148,7 @@ const PopUpLocation = ({
   };
 
   return (
-    <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-50">
+    <div className="fixed top-0 z-50 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-50">
       <div className="popup-location-form">
         <form
           onSubmit={handleSubmitForm}
