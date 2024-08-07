@@ -12,7 +12,6 @@ import {
   faCalendarDays,
 } from "@fortawesome/free-solid-svg-icons";
 import apiClient from "../../axiosConfig";
-
 const formatDateTime = (dateTimeString) => {
   const date = new Date(dateTimeString);
   const day = String(date.getDate()).padStart(2, "0");
@@ -20,18 +19,8 @@ const formatDateTime = (dateTimeString) => {
   const year = date.getFullYear();
   const hours = String(date.getHours()).padStart(2, "0");
   const minutes = String(date.getMinutes()).padStart(2, "0");
-
   return `${hours}:${minutes}, ${day}/${month}/${year}`;
 };
-
-const extractSecondAndThirdLastElements = (str) => {
-  const parts = str.split(",");
-  if (parts.length < 3) return ""; // Nếu chuỗi không có đủ phần tử, trả về chuỗi rỗng
-  const secondLastElement = parts[parts.length - 3].trim();
-  const thirdLastElement = parts[parts.length - 2].trim();
-  return `${secondLastElement}, ${thirdLastElement}`;
-};
-
 const SearchMotorbike = () => {
   const navigate = useNavigate();
   const[searchError,setSearchError]=useState("");
@@ -44,6 +33,8 @@ const SearchMotorbike = () => {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [page,setPage]=useState(0)
+  const pageSize=24;
   useEffect(() => {
     const getCurrentTime = () => {
       const now = new Date();
@@ -68,33 +59,64 @@ const SearchMotorbike = () => {
     setRentalEndTime(data.endDateTime);
   };
   const handleSearchMotor = async () => {
-    if(!rentalStartTime||!rentalEndTime||!rentalAddress){
-      setSearchError("Vui lòng điền đầy đủ thông tin thuê")
-    }
-    else{
-      setSearchError("")
-    const filterList = {
-      startDate: dayjs(rentalStartTime).format("YYYY-MM-DDTHH:mm:ss"),
-      endDate: dayjs(rentalEndTime).format("YYYY-MM-DDTHH:mm:ss"),
-      address: rentalAddress,
-    };
-    setLoading(true);
-    try {
-      const response = await apiClient.post('/api/motorbike/filter', filterList, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      console.log('Data sent successfully:', response.data);
-      const listMotor = response.data;
-      navigate("/filter", { state: { filterList, listMotor } });
-    } catch (error) {
-      handleRequestError(error);
-    } finally {
-      setLoading(false);
+    if (!rentalStartTime || !rentalEndTime || !rentalAddress) {
+      setSearchError("Vui lòng điền đầy đủ thông tin thuê");
+    } else {
+      setSearchError("");
+      let long;
+      let lat;
+  
+      try {
+        const response = await axios.get(
+          `https://api.mapbox.com/search/geocode/v6/forward?q=${encodeURIComponent(rentalAddress)}&access_token=pk.eyJ1Ijoibmd1eWVua2llbjAyIiwiYSI6ImNseDNpem83bjByM3cyaXF4NTZqOWFhZWIifQ.pVT0I74tSdI290kImTlphQ`
+        );
+        if (response.status === 200 && response.data) {
+          const coordinates = response.data.features[0].geometry.coordinates;
+          long = coordinates[0];
+          lat = coordinates[1];
+        } else {
+          console.error('Error: Invalid response status or data.');
+        }
+      } catch (error) {
+        console.error("Error making Axios request:", error);
+      }
+  
+      if (long && lat) {
+        console.log("longitude"+long+"latitude"+lat)
+        const filterList = {
+          startDate: dayjs(rentalStartTime).format("YYYY-MM-DDTHH:mm:ss"),
+          endDate: dayjs(rentalEndTime).format("YYYY-MM-DDTHH:mm:ss"),
+          longitude: long,
+          latitude: lat,
+          address: rentalAddress,
+        };
+        const filter = {
+          startDate: dayjs(rentalStartTime).format("YYYY-MM-DDTHH:mm:ss"),
+          endDate: dayjs(rentalEndTime).format("YYYY-MM-DDTHH:mm:ss"),
+          longitude: long,
+          latitude: lat,
+        };
+  
+        setLoading(true);
+        try {
+          const response = await apiClient.post(`/api/motorbike/filter/${page}/${pageSize}`, filter, {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+          console.log('Data sent successfully:', response.data);
+          const listMotor = response.data;
+          navigate("/filter", { state: { filterList, listMotor } });
+        } catch (error) {
+          handleRequestError(error);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setSearchError("Không thể lấy tọa độ từ địa chỉ.");
+      }
     }
   };
-}
 
   const handleRequestError = (error) => {
     if (error.response) {
@@ -126,7 +148,7 @@ const SearchMotorbike = () => {
 
   const handleSelectLocation = (location) => {
     setSelectedLocation(location);
-    setRentalAddress(extractSecondAndThirdLastElements(location.place_name));
+    setRentalAddress(location.place_name);
     setOpenMapBoxSearch(false);
   };
 

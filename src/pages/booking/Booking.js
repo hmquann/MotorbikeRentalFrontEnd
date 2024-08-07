@@ -174,10 +174,11 @@ const Booking = () => {
     setRedirectUrl(currentPath);
     setShowLoginModal(true);
   };
-
+console.log(receiveData)
   const [showPopUpPricePerDay, setShowPopUpPricePerDay] = useState(false);
-  const motorbikeAddress = receiveData.motorbikeAddress;
-  const [gettedLocation, setGettedLocation] = useState(motorbikeAddress);
+  const motorbikeAddress ={address:receiveData.motorbikeAddress,longitude:receiveData.longitude,latitude:receiveData.latitude};
+
+  const [gettedLocation, setGettedLocation] = useState(motorbikeAddress.address);
 
   const handleClosePopup = () => {
     setShowPopUp(false);
@@ -253,116 +254,13 @@ const Booking = () => {
   ]);
 
   const handleChangeLocation = (location) => {
+    console.log(location)
     setGettedLocation(location);
-    setAddressData((prevAddressData) =>
-      prevAddressData.map((item) =>
-        item.id === 2 ? { ...item, address: location } : item
-      )
-    );
   };
   console.log(gettedLocation);
 
   const [distance, setDistance] = useState(0);
   const [newAddressData, setNewAddressData] = useState([]);
-
-  useEffect(() => {
-    const fetchGeocodeData = async () => {
-      try {
-        const promises = addressData.map(async (addressItem) => {
-          try {
-            const response = await axios.get(
-              `https://api.mapbox.com/search/geocode/v6/forward?q=${encodeURIComponent(
-                addressItem.address
-              )}&access_token=pk.eyJ1Ijoibmd1eWVua2llbjAyIiwiYSI6ImNseDNpem83bjByM3cyaXF4NTZqOWFhZWIifQ.pVT0I74tSdI290kImTlphQ`
-            );
-
-            if (response.status === 200 && response.data) {
-              const coordinates =
-                response.data.features[0].geometry.coordinates;
-
-              return {
-                ...addressItem,
-                longitude: coordinates[0],
-                latitude: coordinates[1],
-              };
-            } else {
-              console.error("Error: Invalid response status or data.");
-              return null;
-            }
-          } catch (error) {
-            console.error("Error making Axios request:", error);
-            return null;
-          }
-        });
-
-        const results = await Promise.all(promises);
-        const validResults = results.filter((address) => address !== null);
-
-        setNewAddressData(validResults); // Cập nhật `newAddressData`
-        console.log(validResults);
-      } catch (error) {
-        console.error("Error fetching geocode data:", error);
-      }
-    };
-
-    fetchGeocodeData();
-  }, [addressData]);
-  const checkDistance = (addressOne, addressTwo) => {
-    if (!addressOne || !addressTwo) {
-      console.error("Invalid addresses provided.");
-      return;
-    }
-
-    if (
-      addressOne.longitude === undefined ||
-      addressOne.latitude === undefined ||
-      addressTwo.longitude === undefined ||
-      addressTwo.latitude === undefined
-    ) {
-      console.error("Address coordinates are missing.");
-      return;
-    }
-
-    const apiKey =
-      "pk.eyJ1Ijoibmd1eWVua2llbjAyIiwiYSI6ImNseDNpem83bjByM3cyaXF4NTZqOWFhZWIifQ.pVT0I74tSdI290kImTlphQ";
-    const startCoord = `${addressOne.longitude},${addressOne.latitude}`;
-    const endCoord = `${addressTwo.longitude},${addressTwo.latitude}`;
-    const apiUrl = `https://api.mapbox.com/directions/v5/mapbox/driving/${startCoord};${endCoord}?approaches=unrestricted;curb&access_token=${apiKey}`;
-
-    axios
-      .get(apiUrl)
-      .then((response) => {
-        if (
-          response.status === 200 &&
-          response.data &&
-          response.data.routes &&
-          response.data.routes.length > 0
-        ) {
-          const distance = response.data.routes[0].distance / 1000; // Đổi đơn vị từ mét sang km
-          console.log(`Distance is: ${distance} km`);
-          setDistance(distance.toFixed(1));
-        } else {
-          console.error("Error: Invalid response or no routes found.");
-        }
-      })
-      .catch((error) => {
-        console.error("Error making Axios request:", error);
-      });
-  };
-  useEffect(() => {
-    if (newAddressData.length >= 2) {
-      checkDistance(newAddressData[0], newAddressData[1]);
-    }
-  }, [newAddressData]);
-  console.log(distance);
-  useEffect(() => {
-    if (distance > receiveData.freeShipLimit) {
-      setDeliveryFee(distance * receiveData.deliveryFee);
-    } else {
-      setDeliveryFee(0);
-    }
-  }, [distance]);
-
   const [showPopUpVoucher, setShowPopUpVoucher] = useState(false);
   const [discounts, setDiscounts] = useState([]);
   useEffect(() => {
@@ -531,7 +429,9 @@ const Booking = () => {
           endDate: dayjs(dateRange[1]).format("YYYY-MM-DDTHH:mm:ss"),
           bookingTime: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
           totalPrice: totalPrice,
-          receiveLocation: gettedLocation,
+          receiveLocation: gettedLocation.address,
+          longitude:gettedLocation.longitude,
+          latitude:gettedLocation.latitude,
         })
         .then(async () => {
           setShowPopupSuccess(true); // Hiển thị popup khi thành công
@@ -945,6 +845,7 @@ const Booking = () => {
                   onClose={() => setShowPopUp(false)}
                   onSelectLocation={motorbikeAddress}
                   onChangeLocation={handleChangeLocation}
+                  shipFee={(deliFee)=>setDeliveryFee(deliFee)}
                   receiveData={receiveData}
                 />
               )}
