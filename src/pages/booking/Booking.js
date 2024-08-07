@@ -623,7 +623,7 @@ const Booking = () => {
     navigate(`/userCard/${userId}`);
   };
   return (
-    <div className="relative">
+    <div className="relative w-full my-auto font-manrope">
       <div>
         {loading && (
           <>
@@ -637,9 +637,8 @@ const Booking = () => {
           </>
         )}
       </div>
-      <div>
         <div class="cover-car">
-          <div class="m-container p-9 ">
+          <div class="m-container ">
             <div class="cover-car-container">
               <div class="main-img">
                 <div class="cover-car-item">
@@ -677,52 +676,187 @@ const Booking = () => {
           </div>
         </div>
 
-        <div className={`${sharedClasses.p4} ${sharedClasses.maxW7xl} mx-auto`}>
-          <div className="flex justify-between">
+        <div className="relative ">
+        <div className="m-container flex flex-col md:flex-row gap-4">
             {/* Left Column - 60% width */}
             <div
-              className={`${sharedClasses.w2_3} ${sharedClasses.p4} ${sharedClasses.rounded}`}
+              
             >
               {/* Header Section */}
+              <div className="">
               <div
-                className={`flex flex-col md:flex-row justify-between items-start md:items-center ${sharedClasses.mb4}`}
+                className="content-detail"
               >
+                <div className="mb-9">
                 <div>
-                  <h1 className={`text-2xl ${sharedClasses.fontBold}`}>
+                <h1 className="font-bold text-2xl md:text-4xl">
                     {receiveData.model.modelName +
                       " " +
                       receiveData.yearOfManufacture}
                   </h1>
                   <div
-                    className={`flex ${sharedClasses.itemsCenter} ${sharedClasses.textSm} ${sharedClasses.textZinc500} ${sharedClasses.mb2}`}
-                  >
-                    {/* <span className="mr-2">{receiveData.tripCount}</span> */}
+                   className="flex items-center flex-wrap"
+                  > 
+                  <FontAwesomeIcon icon={faMotorcycle} />
+                    <span className="ml-2">{receiveData.tripCount} chuyến</span>
+                    <span class="px-1 py-0">•</span>
                     <span>{receiveData.motorbikeAddress}</span>
                   </div>
                   <div
                     className={`flex ${sharedClasses.spaceX2} ${sharedClasses.mt2}`}
                   >
+                      <span
+                      className={`${sharedClasses.bgGreen100} rounded-xl mr-2 ${sharedClasses.px2} ${sharedClasses.py1}`}
+                    >
+                      {receiveData.model.modelType}
+                    </span>
                     <span
-                      className={`${sharedClasses.bgBlue100} ${sharedClasses.textBlue800} ${sharedClasses.px2} ${sharedClasses.py1} ${sharedClasses.rounded}`}
+                      className={`${sharedClasses.bgBlue100} rounded-xl  ${sharedClasses.px2} ${sharedClasses.py1} `}
                     >
                       {receiveData.delivery ? "Giao xe tận nơi" : ""}
                     </span>
                   </div>
                 </div>
+                </div>
                 <div
                   className={`flex ${sharedClasses.spaceX2} ${sharedClasses.mt4} md:${sharedClasses.mt0}`}
                 ></div>
               </div>
+              <div
+              className="flex flex-col float-right md:flex-row gap-6 mb-20 w-2/6"
+            >
+              <form onSubmit={handleFormSubmit}>
+                {/* Rental Section */}
+                <div className="relative py-4 px-6 rounded-lg bg-sky-50">
+                <div className="mb-4">
+                  <h2 className={`text-4xl font-extrabold mb-4`}>
+                    {receiveData.price / 1000}K/ngày
+                  </h2>
+                </div>
 
+                <div className="relative flex mb-3">
+                  <DateTimeRange
+                    onDateRangeChange={handleDateRangeChange}
+                    onReceiveTimeChange={handleReceiveTimeChange}
+                    onReturnTimeChange={handleReturnTimeChange}
+                  ></DateTimeRange>
+                </div>
+
+                <div className="relative flex flex-col gap-2 p-3 border border-gray-100 bg-white rounded-lg mb-3 ">
+                  <label className="block text-sm font-medium text-zinc-700">
+                    Địa điểm giao nhận xe
+                  </label>
+                  <div className="pr-8">
+                    
+                    <input
+                      type="text"
+                      className={`w-full overflow-hidden text-ellipsis whitespace-nowrap font-bold cursor-pointer`}
+                      value={gettedLocation}
+                      readOnly
+                      onClick={() => setShowPopUp(true)}
+                    />
+                  </div>
+                </div>
+                <div className="w-full border-b border-b-zinc-300"></div>                
+                <div className="flex flex-col gap-2 pt-4">
+                <div
+                  className="flex justify-between"
+                >
+                  <span>
+                    Đơn giá{" "}
+                    <span style={{ cursor: "pointer" }}>
+                      <FontAwesomeIcon
+                        onClick={handlePricePerDay}
+                        icon={faCircleQuestion}
+                      ></FontAwesomeIcon>
+                    </span>{" "}
+                  </span>
+                  <span className="font-semibold">
+                    {receiveData.price.toLocaleString("vi-VN")}đ/ ngày
+                  </span>
+                </div>
+                <div
+                     className="flex justify-between"
+                >
+                  <span>Phí giao nhận xe</span>
+                  <span className="font-semibold">
+                    {deliveryFee.toLocaleString("vi-VN")}đ
+                  </span>
+                </div>
+                <div
+                      className="flex justify-between"
+                >
+                  <span>Tổng cộng</span>
+                  <span className="font-semibold">
+                    {receiveData.price.toLocaleString("vi-VN")}đ x {rentalDays}{" "}
+                    ngày
+                  </span>
+                </div>
+                <div className="w-full border-b border-b-zinc-300"></div>
+                {discount ? (
+                  <div
+                    className="flex justify-between pl-0 gap-2"
+                  >
+                    <span>
+                      Mã{" "}
+                      <span className="font-semibold text-green-300">
+                        {discount.name}
+                      </span>
+                      &nbsp;
+                      <FontAwesomeIcon
+                        className="text-red-600 cursor-pointer"
+                        icon={faCircleXmark}
+                        onClick={handleCancelDiscount}
+                      ></FontAwesomeIcon>
+                    </span>
+                    <span className="font-semibold">
+                      {formatDiscountMoney(discount.discountMoney)}
+                    </span>
+                  </div>
+                ) : (
+                  <div
+                    className="flex justify-between pl-0 gap-2"
+                    style={{ cursor: "pointer" }}
+                    onClick={handleVoucher}
+                  >
+                    <span>Mã khuyến mãi</span>
+                    <span>
+                      <FontAwesomeIcon icon={faArrowRight} />
+                    </span>
+                  </div>
+                )}
+                  <div className="w-full border-b border-b-zinc-300"></div>
+                <div
+                  className="flex justify-between items-center py-2"
+                >
+                  <span className="text-base font-extrabold">Thành tiền</span>
+                  <span className="text-base font-extrabold">{totalPrice.toLocaleString("vi-VN")}đ</span>
+                </div>
+                </div>
+                <button
+                  type="submit"
+                  className="py-4 px-6 relative justify-center inline-flex items-center font-bold rounded-lg w-100 bg-green-500 hover:bg-green-600 text-white"
+                >
+                  CHỌN THUÊ
+                </button>
+                </div>
+              </form>
+              </div>
+
+                <div className="content-detail">
+                <div className="w-full border-b border-b-zinc-400"></div>
               {/* Features Section */}
               <div
-                className={`${sharedClasses.grid} ${sharedClasses.gridCols2} ${sharedClasses.gap4} ${sharedClasses.mb4}`}
+                className="flex flex-col my-6"
               >
+                <h6 className="mb-6 font-semibold text-xl">Đặc điểm</h6>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <FeatureItem
                   icon={faGasPump}
                   altText="fuel"
                   title="Nhiên liệu"
                   description=""
+                  class="flex items-center"
                 />
                 <FeatureItem
                   icon={faMotorcycle}
@@ -736,17 +870,19 @@ const Booking = () => {
                   title="Nhiên liệu tiêu hao"
                   description={receiveData.model.fuelConsumption}
                 />
+                </div>
               </div>
+              <div className="w-full border-b border-b-zinc-400"></div>
 
               {/* Description Section */}
-              <div className={`${sharedClasses.mb4}`}>
+              <div className="flex flex-col my-6">
                 <h2
-                  className={`text-xl ${sharedClasses.fontSemibold} ${sharedClasses.mb2}`}
+                 className="text-xl font-semibold mb-6"
                 >
                   Mô tả
                 </h2>
                 <p
-                  className={`${sharedClasses.textZinc700} ${sharedClasses.mb4}`}
+                  className="max-h-32"
                 >
                   Trang bị camera hành trình trước sau
                   <br />
@@ -755,6 +891,7 @@ const Booking = () => {
                   Chủ xe thân thiện hỗ trợ nhiệt tình
                 </p>
               </div>
+              <div className="w-full border-b border-b-zinc-400 mb-6"></div>
               {/* <RentalDocument /> */}
               {/* Other amenities section */}
               <div
@@ -797,122 +934,13 @@ const Booking = () => {
               </div>
               {motorbikeId && <FeedbackList motorbikeId={motorbikeId} />}
             </div>
+            </div>
+            </div>
+            </div>
+               </div>
 
             {/* Right Column - 40% width */}
-            <div
-              className={`${sharedClasses.w1_3} bg-blue-100 ${sharedClasses.p4} ${sharedClasses.rounded}`}
-            >
-              <form onSubmit={handleFormSubmit}>
-                {/* Rental Section */}
-                <div className="text-center">
-                  <h6 className="text-gray-500">Giá thuê</h6>
-                  <h2 className={`text-xl font-semibold mb-4`}>
-                    {receiveData.price / 1000}K/ngày
-                  </h2>
-                </div>
-
-                <div className="mb-3">
-                  <DateTimeRange
-                    onDateRangeChange={handleDateRangeChange}
-                    onReceiveTimeChange={handleReceiveTimeChange}
-                    onReturnTimeChange={handleReturnTimeChange}
-                  ></DateTimeRange>
-                </div>
-
-                <div className="mb-3">
-                  <label className="block text-lg text-zinc-700 mb-1">
-                    Địa điểm giao nhận xe
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      className={`w-full px-3 py-2 border border-zinc-300 rounded shadow-sm focus:outline-none focus:border-zinc-500 overflow-hidden text-ellipsis whitespace-nowrap font-bold`}
-                      value={gettedLocation}
-                      readOnly
-                      onClick={() => setShowPopUp(true)}
-                    />
-                  </div>
-                </div>
-
-                <div
-                  className={`flex justify-between text-lg ${sharedClasses.mb2}`}
-                >
-                  <span>
-                    Đơn giá{" "}
-                    <span style={{ cursor: "pointer" }}>
-                      <FontAwesomeIcon
-                        onClick={handlePricePerDay}
-                        icon={faCircleQuestion}
-                      ></FontAwesomeIcon>
-                    </span>{" "}
-                  </span>
-                  <span className="font-semibold">
-                    {receiveData.price.toLocaleString("vi-VN")}đ/ ngày
-                  </span>
-                </div>
-                <div
-                  className={`flex justify-between text-lg ${sharedClasses.mb2}`}
-                >
-                  <span>Tổng cộng</span>
-                  <span className="font-semibold">
-                    {receiveData.price.toLocaleString("vi-VN")}đ x {rentalDays}{" "}
-                    ngày
-                  </span>
-                </div>
-                <div
-                  className={`flex justify-between text-lg ${sharedClasses.mb2}`}
-                >
-                  <span>Phí giao nhận xe</span>
-                  <span className="font-semibold">
-                    {deliveryFee.toLocaleString("vi-VN")}đ
-                  </span>
-                </div>
-                {discount ? (
-                  <div
-                    className={`flex justify-between text-lg ${sharedClasses.mb2}`}
-                  >
-                    <span>
-                      Mã{" "}
-                      <span className="font-semibold text-green-300">
-                        {discount.name}
-                      </span>
-                      &nbsp;
-                      <FontAwesomeIcon
-                        className="text-red-600 cursor-pointer"
-                        icon={faCircleXmark}
-                        onClick={handleCancelDiscount}
-                      ></FontAwesomeIcon>
-                    </span>
-                    <span className="font-semibold">
-                      {formatDiscountMoney(discount.discountMoney)}
-                    </span>
-                  </div>
-                ) : (
-                  <div
-                    className={`flex justify-between text-lg ${sharedClasses.mb4} hover:${sharedClasses.cursorPointer}`}
-                    style={{ cursor: "pointer" }}
-                    onClick={handleVoucher}
-                  >
-                    <span>Mã khuyến mãi</span>
-                    <span>
-                      <FontAwesomeIcon icon={faArrowRight} />
-                    </span>
-                  </div>
-                )}
-
-                <div
-                  className={`flex justify-between text-lg ${sharedClasses.mb1}`}
-                >
-                  <span>Thành tiền</span>
-                  <span>{totalPrice.toLocaleString("vi-VN")}đ</span>
-                </div>
-                <button
-                  type="submit"
-                  className={`text-lg ${sharedClasses.mt4} ${sharedClasses.wFull} ${sharedClasses.bgGreen500} ${sharedClasses.textWhite} ${sharedClasses.py2} ${sharedClasses.rounded}`}
-                >
-                  CHỌN THUÊ
-                </button>
-              </form>
+          
               {showConfirmPopup && (
                 <PopUpConfirmBooking
                   motorbikeDetails={receiveData}
@@ -970,10 +998,9 @@ const Booking = () => {
                   onClose={handleClosePopUpPricePerDay}
                 ></PopUpPricePerDay>
               )}
-            </div>
-          </div>
-        </div>
-      </div>
+         
+  
+     
     </div>
   );
 };

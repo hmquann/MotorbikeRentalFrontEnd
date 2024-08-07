@@ -273,10 +273,10 @@ const BookingCard = ({ booking }) => {
           const renterId = userData.userId; // Replace with actual user ID if different
           const amount = (booking.totalPrice * 30) / 100; // Replace with actual amount to be subtracted
           await apiClient.post(subtractMoneyUrl, null, {
-            params: { id: renterId, amount: amount },
+            params: { id: renterId, amount: amount, motorbikeName : motorbikeName, motorbikePlate : motorbikePlate },
           });
           await apiClient.post(addMoneyUrl, null, {
-            params: { id: lessorId, amount: amount },
+            params: { id: lessorId, amount: amount, motorbikeName : motorbikeName, motorbikePlate : motorbikePlate },
           });
           break;
         default:

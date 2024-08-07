@@ -2,6 +2,15 @@
     position: relative;
     padding-bottom: 32px
     }
+    .m-container{
+        max-width: 1280px;
+        margin: 0 auto;
+        position: relative;
+    }
+    .content-detail{
+        width: calc(67% - 16px);
+        float: left;
+    }
     
     .cover-car-container {
     display: flex;
