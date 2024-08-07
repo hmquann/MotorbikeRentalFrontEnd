@@ -5,7 +5,9 @@ import UpdatePassword from "./UpdatePassword";
 import ChangeEmail from "./ChangeEmail";
 import License from "../license/License";
 import axios from "axios";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { faBell } from "@fortawesome/free-regular-svg-icons";
+import NotificationSettings from "./NotificationSettings";
 
 const cardClasses =
   "bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-md max-w-4xl mx-auto border border-zinc-300 dark:border-zinc-700 mt-8";
@@ -31,6 +33,8 @@ const sharedClasses = {
 };
 
 const Profile = () => {
+  const navigate = useNavigate();
+
   const getFirstLetter = (name) => {
     return name.charAt(0).toUpperCase();
   };
@@ -38,6 +42,7 @@ const Profile = () => {
 
   const [showPopUpPassword, setShowPopUpPassword] = useState(false);
   const [showPopUpEmail, setShowPopUpEmail] = useState(false);
+  const [showPopUpNotifications, setShowPopUpNotifications] = useState(false);
 
   const location = useLocation();
   const firstLetter = getFirstLetter(user.lastName);
@@ -51,6 +56,13 @@ const Profile = () => {
     }
   }, [location]);
 
+  const handleChangeNotification = () => {
+    setShowPopUpNotifications(false);
+    localStorage.clear();
+    navigate("/homepage", { replace: true });
+    console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaa");
+  };
+
   return (
     <div className="font-manrope">
       <div className={cardClasses}>
@@ -58,6 +70,14 @@ const Profile = () => {
           <h2 className={`text-xl font-semibold ${textClasses}`}>
             Thông tin cá nhân
           </h2>
+          <div className="flex items-center space-x-2">
+            <button
+              className="bg-zinc-200 bg-zinc-100 hover:bg-zinc-300 text-zinc-900 dark:text-white px-4 py-2 rounded-lg"
+              onClick={() => setShowPopUpNotifications(true)}
+            >
+              <FontAwesomeIcon icon={faBell}></FontAwesomeIcon> Thiết lập
+            </button>
+          </div>
         </div>
         <div className="flex mt-4 items-center">
           <div className="flex-shrink-0">
@@ -110,9 +130,6 @@ const Profile = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <div className={textClasses}>Số điện thoại</div>
-              <span className="ml-2 bg-red-100 dark:bg-green-700 text-green-800 dark:text-green-300 text-xs px-2 py-1 rounded-full">
-                Chưa xác thực
-              </span>
             </div>
             <div className="flex items-center">
               <div className="font-bold">{user.phone}</div>
@@ -141,8 +158,14 @@ const Profile = () => {
       <div id="license">
         <License />
       </div>
+      {showPopUpNotifications && (
+        <NotificationSettings
+          show={showPopUpNotifications}
+          handleClose={() => setShowPopUpNotifications(false)}
+          onSuccess={() => handleChangeNotification()}
+        />
+      )}
     </div>
-    
   );
 };
 

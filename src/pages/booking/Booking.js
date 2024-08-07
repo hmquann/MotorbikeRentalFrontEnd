@@ -240,16 +240,20 @@ console.log(receiveData)
   console.log(dateRange[1]?.format("DD/MM/YYYY"));
   console.log(receiveTime?.format("HH:mm"));
   console.log(returnTime?.format("HH:mm"));
+  const [startDateTime, setStartDateTime] = useState();
+  const [endDateTime, setEndDateTime] = useState();
 
   useEffect(() => {
     if (dateRange[0] && dateRange[1] && receiveTime && returnTime) {
-      const startDateTime = dayjs(dateRange[0])
+      const time1 = dayjs(dateRange[0])
         .set("hour", receiveTime.hour())
         .set("minute", receiveTime.minute());
-      const endDateTime = dayjs(dateRange[1])
+      setStartDateTime(time1);
+      const time2 = dayjs(dateRange[1])
         .set("hour", returnTime.hour())
         .set("minute", returnTime.minute());
-      const duration = endDateTime.diff(startDateTime, "minute");
+      setEndDateTime(time2);
+      const duration = time2.diff(time1, "minute");
 
       // Tính số ngày thuê
       const days = Math.ceil(duration / (24 * 60));
@@ -428,6 +432,7 @@ console.log(receiveData)
     const roomId = getRoomId(userEmail, receiveData.user.email);
     try {
       setLoading(true);
+      setShowConfirmPopup(false);
       e.preventDefault();
       if (discount) {
         const deleteDiscount = apiClient.delete(
@@ -658,6 +663,7 @@ console.log(receiveData)
                     onDateRangeChange={handleDateRangeChange}
                     onReceiveTimeChange={handleReceiveTimeChange}
                     onReturnTimeChange={handleReturnTimeChange}
+                    motorbikeId={motorbikeId}
                   ></DateTimeRange>
                 </div>
 
@@ -864,10 +870,8 @@ console.log(receiveData)
                 <PopUpConfirmBooking
                   motorbikeDetails={receiveData}
                   bookingDetails={{
-                    startDate: dayjs(dateRange[0]).format(
-                      "YYYY-MM-DDTHH:mm:ss"
-                    ),
-                    endDate: dayjs(dateRange[1]).format("YYYY-MM-DDTHH:mm:ss"),
+                    startDate: startDateTime,
+                    endDate: endDateTime,
                     receiveLocation: gettedLocation,
                     totalPrice: totalPrice,
                   }}

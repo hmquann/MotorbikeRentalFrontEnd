@@ -30,6 +30,7 @@ const Privacy = () => {
         <PrivacyList />
         <div className="flex-1 md:ml-8 mt-8 md:mt-0">
           <Routes>
+            <Route path="/" element={<GeneralPolicy />} />
             <Route path="general" element={<GeneralPolicy />} />
             <Route path="regulations" element={<Regulations />} />
             <Route path="privacy" element={<PrivacyPolicy />} />
