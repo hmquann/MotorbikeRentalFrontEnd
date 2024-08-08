@@ -281,8 +281,9 @@ const Booking = () => {
   ]);
 
   const handleChangeLocation = (location) => {
-    console.log(location);
-    setGettedLocation(location);
+
+    console.log(location)
+    setGettedLocation(location.place_name);
   };
   console.log(gettedLocation);
 

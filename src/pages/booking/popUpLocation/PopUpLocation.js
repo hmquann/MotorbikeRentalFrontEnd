@@ -46,7 +46,7 @@ const PopUpLocation = ({
   };
 
   const checkDistance = async (addressOne, addressTwo) => {
-    console.log(customLocation);
+
     if (!addressOne || !addressTwo) {
       console.error("Invalid addresses provided.");
       return;
@@ -54,9 +54,7 @@ const PopUpLocation = ({
 
     const startCoord = `${addressOne.longitude},${addressOne.latitude}`;
     const endCoord = `${addressTwo.longitude},${addressTwo.latitude}`;
-    const apiKey =
-      "pk.eyJ1Ijoibmd1eWVua2llbjAyIiwiYSI6ImNseDNpem83bjByM3cyaXF4NTZqOWFhZWIifQ.pVT0I74tSdI290kImTlphQ";
-    const apiUrl = `https://api.mapbox.com/directions/v5/mapbox/driving/${startCoord};${endCoord}?approaches=unrestricted;curb&access_token=${apiKey}`;
+    const apiUrl = `https://api.mapbox.com/directions/v5/mapbox/driving/${startCoord};${endCoord}?approaches=unrestricted;curb&access_token=pk.eyJ1Ijoibmd1eWVua2llbjAyIiwiYSI6ImNseDNpem83bjByM3cyaXF4NTZqOWFhZWIifQ.pVT0I74tSdI290kImTlphQ`;
 
     try {
       const response = await axios.get(apiUrl);
