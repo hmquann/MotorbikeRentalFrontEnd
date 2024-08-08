@@ -35,6 +35,8 @@ const BookingCard = ({ booking }) => {
   const [lessorId, setLessorId] = useState();
   const [renterName, setRenterName] = useState();
   const [renterIdNoti, setRenterIdNoti] = useState();
+  const [renter, setRenter] = useState();
+  const [lessor, setLessor] = useState();
   const [renterSystemNoti, setRenterSystemNoti] = useState();
   const [renterEmailNoti, setRenterEmailNoti] = useState();
   const [renterMinimizeNoti, setRenterMinimizeNoti] = useState();
@@ -112,6 +114,7 @@ const BookingCard = ({ booking }) => {
         setLessorName(
           `${response.data.user.firstName} ${response.data.user.lastName}`
         );
+        setLessor(response.data.user);
         setMotorbikePlate(`${response.data.motorbikePlate}`);
         setLessorId(response.data.user.id);
         setUrlImage(response.data.motorbikeImages[0].url);
@@ -125,7 +128,8 @@ const BookingCard = ({ booking }) => {
         console.log(response2);
         setRenterIdNoti(booking.renterId);
         setRenterName(`${response2.data.firstName} ${response2.data.lastName}`);
-        setRenterSystemNoti(response2.systemNoti);
+        setRenterSystemNoti(response2.data.systemNoti);
+        setRenter(response2.data);
         console.log(response2);
       } catch (error) {
         console.error("Error:", error);
@@ -206,36 +210,88 @@ const BookingCard = ({ booking }) => {
               seen: false,
             });
           }
-          await setDoc(doc(collection(db, "notifications")), {
-            userId: renterIdNoti,
-            message: JSON.stringify({
-              title: '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
-              content: `Chủ xe ${lessorName} đã duyệt đơn thuê xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong>, thời gian thuê xe từ <strong>${formattedStartDate}</strong> đến <strong>${formattedEndDate}</strong>. Bạn hãy đặt cọc chuyến xe này để hoàn tất thủ tục đặt xe. `,
-            }),
-            timestamp: now,
-            seen: false,
-          });
-
+          if (renter.systemNoti) {
+            await setDoc(doc(collection(db, "notifications")), {
+              userId: renterIdNoti,
+              message: JSON.stringify({
+                title:
+                  '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
+                content: `Chủ xe ${lessorName} đã duyệt đơn thuê xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong>, thời gian thuê xe từ <strong>${formattedStartDate}</strong> đến <strong>${formattedEndDate}</strong>. Bạn hãy đặt cọc chuyến xe này để hoàn tất thủ tục đặt xe. `,
+              }),
+              timestamp: now,
+              seen: false,
+            });
+          }
+          if (emailNoti) {
+            const response3 = apiClient.post(
+              "/api/booking/sendEmailApproveBookingForLessor",
+              {
+                lessorName: userName,
+                lessorEmail: userEmail,
+                renterName: renterName,
+                motorbikeName:
+                  motorbike.model.modelName + " " + motorbike.yearOfManufacture,
+                motorbikePlate: motorbike.motorbikePlate,
+                bookingTime: dayjs(booking.bookingTime).format(
+                  "YYYY-MM-DDTHH:mm:ss"
+                ),
+                startDate: dayjs(booking.startDate).format(
+                  "YYYY-MM-DDTHH:mm:ss"
+                ),
+                endDate: dayjs(booking.endDate).format("YYYY-MM-DDTHH:mm:ss"),
+                totalPrice: booking.totalPrice,
+                receiveLocation: booking.receiveLocation,
+              }
+            );
+          }
+          if (renter.emailNoti) {
+            const response5 = apiClient.post(
+              "/api/booking/sendEmailApproveBooking",
+              {
+                renterName: renterName,
+                renterEmail: renter.email,
+                motorbikeName:
+                  motorbike.model.modelName + " " + motorbike.yearOfManufacture,
+                motorbikePlate: motorbike.motorbikePlate,
+                bookingTime: dayjs(booking.bookingTime).format(
+                  "YYYY-MM-DDTHH:mm:ss"
+                ),
+                startDate: dayjs(booking.startDate).format(
+                  "YYYY-MM-DDTHH:mm:ss"
+                ),
+                endDate: dayjs(booking.endDate).format("YYYY-MM-DDTHH:mm:ss"),
+                totalPrice: booking.totalPrice,
+                receiveLocation: booking.receiveLocation,
+              }
+            );
+          }
           break;
         case "RENTING":
-          await setDoc(doc(collection(db, "notifications")), {
-            userId: userId,
-            message: JSON.stringify({
-              title: '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
-              content: `Xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong> đã được giao thành công.`,
-            }),
-            timestamp: now,
-            seen: false,
-          });
-          await setDoc(doc(collection(db, "notifications")), {
-            userId: renterIdNoti,
-            message: JSON.stringify({
-              title: '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
-              content: `Xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong> đã được giao thành công. Chúc bạn có một chuyến đi vui vẻ.`,
-            }),
-            timestamp: now,
-            seen: false,
-          });
+          if (systemNoti) {
+            await setDoc(doc(collection(db, "notifications")), {
+              userId: userId,
+              message: JSON.stringify({
+                title:
+                  '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
+                content: `Xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong> đã được giao thành công.`,
+              }),
+              timestamp: now,
+              seen: false,
+            });
+          }
+          if (renter.systemNoti) {
+            await setDoc(doc(collection(db, "notifications")), {
+              userId: renterIdNoti,
+              message: JSON.stringify({
+                title:
+                  '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
+                content: `Xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong> đã được giao thành công. Chúc bạn có một chuyến đi vui vẻ.`,
+              }),
+              timestamp: now,
+              seen: false,
+            });
+          }
+
           break;
         case "DONE":
           const admin = await apiClient.get("api/user/getAdmin");
@@ -249,24 +305,70 @@ const BookingCard = ({ booking }) => {
           await apiClient.post(subtractMoneyUrlDone, null, {
             params: { id: adminId, amount: amountDone },
           });
-          await setDoc(doc(collection(db, "notifications")), {
-            userId: userId,
-            message: JSON.stringify({
-              title: '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
-              content: `Chuyến đi với xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong> đã hoàn thành.`,
-            }),
-            timestamp: now,
-            seen: false,
-          });
-          await setDoc(doc(collection(db, "notifications")), {
-            userId: renterIdNoti,
-            message: JSON.stringify({
-              title: '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
-              content: `Chuyến đi với xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong> đã hoàn thành.`,
-            }),
-            timestamp: now,
-            seen: false,
-          });
+          if (systemNoti) {
+            await setDoc(doc(collection(db, "notifications")), {
+              userId: userId,
+              message: JSON.stringify({
+                title:
+                  '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
+                content: `Chuyến đi với xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong> đã hoàn thành.`,
+              }),
+              timestamp: now,
+              seen: false,
+            });
+          }
+          if (renter.systemNoti) {
+            await setDoc(doc(collection(db, "notifications")), {
+              userId: renterIdNoti,
+              message: JSON.stringify({
+                title:
+                  '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
+                content: `Chuyến đi với xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong> đã hoàn thành.`,
+              }),
+              timestamp: now,
+              seen: false,
+            });
+          }
+          if (emailNoti) {
+            const response3 = apiClient.post(
+              "/api/booking/sendEmailDoneBookingForLessor",
+              {
+                lessorName: userName,
+                lessorEmail: userEmail,
+                renterName: renterName,
+                motorbikeName:
+                  motorbike.model.modelName + " " + motorbike.yearOfManufacture,
+                motorbikePlate: motorbike.motorbikePlate,
+                bookingTime: dayjs(booking.bookingTime).format(
+                  "YYYY-MM-DDTHH:mm:ss"
+                ),
+                startDate: dayjs(booking.startDate).format("YYYY-MM-DDTHH:mm:ss"),
+                endDate: dayjs(booking.endDate).format("YYYY-MM-DDTHH:mm:ss"),
+                totalPrice: booking.totalPrice,
+                receiveLocation: booking.receiveLocation,
+              }
+            );
+          }
+          if (renter.emailNoti) {
+            const response5 = apiClient.post(
+              "/api/booking/sendEmailDoneBooking",
+              {
+                renterName: renterName,
+                renterEmail: renter.email,
+                motorbikeName:
+                  motorbike.model.modelName + " " + motorbike.yearOfManufacture,
+                motorbikePlate: motorbike.motorbikePlate,
+                bookingTime: dayjs(booking.bookingTime).format(
+                  "YYYY-MM-DDTHH:mm:ss"
+                ),
+                startDate: dayjs(booking.startDate).format("YYYY-MM-DDTHH:mm:ss"),
+                endDate: dayjs(booking.endDate).format("YYYY-MM-DDTHH:mm:ss"),
+                totalPrice: booking.totalPrice,
+                receiveLocation: booking.receiveLocation,
+              }
+            );
+          }
+
           break;
         case "DEPOSIT_MADE":
           console.log(renterName);
@@ -296,10 +398,20 @@ const BookingCard = ({ booking }) => {
           const subtractMoneyUrl = `/api/payment/subtract`;
           const addMoneyUrl = `/api/payment/add`;
           await apiClient.post(subtractMoneyUrl, null, {
-            params: { id: renterId, amount: amount, motorbikeName : motorbikeName, motorbikePlate : motorbikePlate },
+            params: {
+              id: renterId,
+              amount: amount,
+              motorbikeName: motorbikeName,
+              motorbikePlate: motorbikePlate,
+            },
           });
           await apiClient.post(addMoneyUrl, null, {
-            params: { id: adminDataId, amount: amount, motorbikeName : motorbikeName, motorbikePlate : motorbikePlate },
+            params: {
+              id: adminDataId,
+              amount: amount,
+              motorbikeName: motorbikeName,
+              motorbikePlate: motorbikePlate,
+            },
           });
           break;
         default:

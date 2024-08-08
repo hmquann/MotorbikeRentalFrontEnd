@@ -149,6 +149,9 @@ const Booking = () => {
     ? userData.firstName + " " + userData.lastName
     : null;
   const userEmail = userData ? userData.email : null;
+  const emailNoti = userData ? userData.emailNoti : null;
+  const systemNoti = userData ? userData.systemNoti : null;
+  const minimizeNoti = userData ? userData.minimizeNoti : null;
 
   console.log(userId);
 
@@ -175,11 +178,17 @@ const Booking = () => {
     setRedirectUrl(currentPath);
     setShowLoginModal(true);
   };
-console.log(receiveData)
+  console.log(receiveData);
   const [showPopUpPricePerDay, setShowPopUpPricePerDay] = useState(false);
-  const motorbikeAddress ={address:receiveData.motorbikeAddress,longitude:receiveData.longitude,latitude:receiveData.latitude};
+  const motorbikeAddress = {
+    address: receiveData.motorbikeAddress,
+    longitude: receiveData.longitude,
+    latitude: receiveData.latitude,
+  };
 
-  const [gettedLocation, setGettedLocation] = useState(motorbikeAddress.address);
+  const [gettedLocation, setGettedLocation] = useState(
+    motorbikeAddress.address
+  );
 
   const handleClosePopup = () => {
     setShowPopUp(false);
@@ -272,7 +281,7 @@ console.log(receiveData)
   ]);
 
   const handleChangeLocation = (location) => {
-    console.log(location)
+    console.log(location);
     setGettedLocation(location);
   };
   console.log(gettedLocation);
@@ -444,61 +453,86 @@ console.log(receiveData)
         .post("/api/booking/create", {
           renterId: userId,
           motorbikeId: receiveData.id,
-          startDate: dayjs(dateRange[0]).format("YYYY-MM-DDTHH:mm:ss"),
-          endDate: dayjs(dateRange[1]).format("YYYY-MM-DDTHH:mm:ss"),
+          startDate: dayjs(startDateTime).format("YYYY-MM-DDTHH:mm:ss"),
+          endDate: dayjs(endDateTime).format("YYYY-MM-DDTHH:mm:ss"),
           bookingTime: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
           totalPrice: totalPrice,
           receiveLocation: gettedLocation.address,
-          longitude:gettedLocation.longitude,
-          latitude:gettedLocation.latitude,
+          longitude: gettedLocation.longitude,
+          latitude: gettedLocation.latitude,
         })
         .then(async () => {
           setShowPopupSuccess(true); // Hiển thị popup khi thành công
-          const response3 = apiClient.post(
-            "/api/booking/sendEmailSuccessBooking",
-            {
-              renterName: userName,
-              renterEmail: userEmail,
-              motorbikeName:
-                receiveData.model.modelName +
-                " " +
-                receiveData.yearOfManufacture,
-              motorbikePlate: receiveData.motorbikePlate,
-              bookingTime: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
-              startDate: dayjs(dateRange[0]).format("YYYY-MM-DDTHH:mm:ss"),
-              endDate: dayjs(dateRange[1]).format("YYYY-MM-DDTHH:mm:ss"),
-              totalPrice: totalPrice,
-              receiveLocation: gettedLocation,
-            }
-          );
-
+          if (emailNoti) {
+            const response3 = apiClient.post(
+              "/api/booking/sendEmailSuccessBooking",
+              {
+                renterName: userName,
+                renterEmail: userEmail,
+                motorbikeName:
+                  receiveData.model.modelName +
+                  " " +
+                  receiveData.yearOfManufacture,
+                motorbikePlate: receiveData.motorbikePlate,
+                bookingTime: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
+                startDate: dayjs(startDateTime).format("YYYY-MM-DDTHH:mm:ss"),
+                endDate: dayjs(endDateTime).format("YYYY-MM-DDTHH:mm:ss"),
+                totalPrice: totalPrice,
+                receiveLocation: gettedLocation,
+              }
+            );
+          }
+          if (receiveData.user.emailNoti) {
+            const response5 = apiClient.post(
+              "/api/booking/sendEmailSuccessBookingForLessor",
+              {
+                lessorName:
+                  receiveData.user.firstName + " " + receiveData.user.lastName,
+                lessorEmail: receiveData.user.email,
+                renterName: userName,
+                motorbikeName:
+                  receiveData.model.modelName +
+                  " " +
+                  receiveData.yearOfManufacture,
+                motorbikePlate: receiveData.motorbikePlate,
+                bookingTime: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
+                startDate: dayjs(startDateTime).format("YYYY-MM-DDTHH:mm:ss"),
+                endDate: dayjs(endDateTime).format("YYYY-MM-DDTHH:mm:ss"),
+                totalPrice: totalPrice,
+                receiveLocation: gettedLocation,
+              }
+            );
+          }
           const response4 = apiClient.post("/api/chatting/create", {
             emailUser1: receiveData.user.email,
             emailUser2: userEmail,
           });
 
           const now = new Date();
-
-          await setDoc(doc(collection(db, "notifications")), {
-            userId: userId,
-            message: JSON.stringify({
-              title: '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
-              content: `Yêu cầu đặt xe <strong>${receiveData.motorbikePlate}</strong> của bạn đã được gửi.`,
-            }),
-            timestamp: now,
-            seen: false,
-          });
-
-          await setDoc(doc(collection(db, "notifications")), {
-            userId: receiveData.userId,
-            message: JSON.stringify({
-              title: '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
-              content: ` <strong>${userName}</strong> đã đặt xe <strong>${receiveData.motorbikePlate}</strong> của bạn.`,
-            }),
-            timestamp: now,
-            seen: false,
-          });
-
+          if (systemNoti) {
+            await setDoc(doc(collection(db, "notifications")), {
+              userId: userId,
+              message: JSON.stringify({
+                title:
+                  '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
+                content: `Yêu cầu đặt xe <strong>${receiveData.motorbikePlate}</strong> của bạn đã được gửi.`,
+              }),
+              timestamp: now,
+              seen: false,
+            });
+          }
+          if (receiveData.systemNoti) {
+            await setDoc(doc(collection(db, "notifications")), {
+              userId: receiveData.userId,
+              message: JSON.stringify({
+                title:
+                  '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
+                content: ` <strong>${userName}</strong> đã đặt xe <strong>${receiveData.motorbikePlate}</strong> của bạn.`,
+              }),
+              timestamp: now,
+              seen: false,
+            });
+          }
           await addDoc(collection(db, `rooms/${roomId}/messages`), {
             createdAt: new Date(),
             content:
@@ -561,276 +595,256 @@ console.log(receiveData)
           </>
         )}
       </div>
-        <div class="cover-car">
-          <div class="m-container ">
-            <div class="cover-car-container">
-              <div class="main-img">
-                <div class="cover-car-item">
-                  <img
-                    loading="lazy"
-                    alt={receiveData.model.modelName}
-                    src={receiveData.motorbikeImages[0].url}
-                  />
-                </div>
+      <div class="cover-car">
+        <div class="m-container ">
+          <div class="cover-car-container">
+            <div class="main-img">
+              <div class="cover-car-item">
+                <img
+                  loading="lazy"
+                  alt={receiveData.model.modelName}
+                  src={receiveData.motorbikeImages[0].url}
+                />
               </div>
-              <div class="sub-img ">
-                <div class="cover-car-item">
-                  <img
-                    loading="lazy"
-                    src={receiveData.motorbikeImages[1].url}
-                    alt={receiveData.model.modelName}
-                  />
-                </div>
-                <div class="cover-car-item">
-                  <img
-                    loading="lazy"
-                    src={receiveData.motorbikeImages[2].url}
-                    alt={receiveData.model.modelName}
-                  />
-                </div>
-                <div class="cover-car-item">
-                  <img
-                    loading="lazy"
-                    src={receiveData.motorbikeImages[3].url}
-                    alt={receiveData.model.modelName}
-                  />
-                </div>
+            </div>
+            <div class="sub-img ">
+              <div class="cover-car-item">
+                <img
+                  loading="lazy"
+                  src={receiveData.motorbikeImages[1].url}
+                  alt={receiveData.model.modelName}
+                />
+              </div>
+              <div class="cover-car-item">
+                <img
+                  loading="lazy"
+                  src={receiveData.motorbikeImages[2].url}
+                  alt={receiveData.model.modelName}
+                />
+              </div>
+              <div class="cover-car-item">
+                <img
+                  loading="lazy"
+                  src={receiveData.motorbikeImages[3].url}
+                  alt={receiveData.model.modelName}
+                />
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="relative ">
+      <div className="relative ">
         <div className="m-container flex flex-col md:flex-row gap-4">
-            {/* Left Column - 60% width */}
-            <div
-              
-            >
-              {/* Header Section */}
-              <div className="">
-              <div
-                className="content-detail"
-              >
+          {/* Left Column - 60% width */}
+          <div>
+            {/* Header Section */}
+            <div className="">
+              <div className="content-detail">
                 <div className="mb-9">
-                <div>
-                <h1 className="font-bold text-2xl md:text-4xl">
-                    {receiveData.model.modelName +
-                      " " +
-                      receiveData.yearOfManufacture}
-                  </h1>
-                  <div
-                   className="flex items-center flex-wrap"
-                  > 
-                  <FontAwesomeIcon icon={faMotorcycle} />
-                    <span className="ml-2">{receiveData.tripCount} chuyến</span>
-                    <span class="px-1 py-0">•</span>
-                    <span>{receiveData.motorbikeAddress}</span>
-                  </div>
-                  <div
-                    className={`flex ${sharedClasses.spaceX2} ${sharedClasses.mt2}`}
-                  >
+                  <div>
+                    <h1 className="font-bold text-2xl md:text-4xl">
+                      {receiveData.model.modelName +
+                        " " +
+                        receiveData.yearOfManufacture}
+                    </h1>
+                    <div className="flex items-center flex-wrap">
+                      <FontAwesomeIcon icon={faMotorcycle} />
+                      <span className="ml-2">
+                        {receiveData.tripCount} chuyến
+                      </span>
+                      <span class="px-1 py-0">•</span>
+                      <span>{receiveData.motorbikeAddress}</span>
+                    </div>
+                    <div
+                      className={`flex ${sharedClasses.spaceX2} ${sharedClasses.mt2}`}
+                    >
                       <span
-                      className={`${sharedClasses.bgGreen100} rounded-xl mr-2 ${sharedClasses.px2} ${sharedClasses.py1}`}
-                    >
-                      {receiveData.model.modelType}
-                    </span>
-                    <span
-                      className={`${sharedClasses.bgBlue100} rounded-xl  ${sharedClasses.px2} ${sharedClasses.py1} `}
-                    >
-                      {receiveData.delivery ? "Giao xe tận nơi" : ""}
-                    </span>
+                        className={`${sharedClasses.bgGreen100} rounded-xl mr-2 ${sharedClasses.px2} ${sharedClasses.py1}`}
+                      >
+                        {receiveData.model.modelType}
+                      </span>
+                      <span
+                        className={`${sharedClasses.bgBlue100} rounded-xl  ${sharedClasses.px2} ${sharedClasses.py1} `}
+                      >
+                        {receiveData.delivery ? "Giao xe tận nơi" : ""}
+                      </span>
+                    </div>
                   </div>
-                </div>
                 </div>
                 <div
                   className={`flex ${sharedClasses.spaceX2} ${sharedClasses.mt4} md:${sharedClasses.mt0}`}
                 ></div>
               </div>
-              <div
-              className="flex flex-col float-right md:flex-row gap-6 mb-20 w-2/6"
-            >
-              <form onSubmit={handleFormSubmit}>
-                {/* Rental Section */}
-                <div className="relative py-4 px-6 rounded-lg bg-sky-50">
-                <div className="mb-4">
-                  <h2 className={`text-4xl font-extrabold mb-4`}>
-                    {receiveData.price / 1000}K/ngày
-                  </h2>
-                </div>
+              <div className="flex flex-col float-right md:flex-row gap-6 mb-20 w-2/6">
+                <form onSubmit={handleFormSubmit}>
+                  {/* Rental Section */}
+                  <div className="relative py-4 px-6 rounded-lg bg-sky-50">
+                    <div className="mb-4">
+                      <h2 className={`text-4xl font-extrabold mb-4`}>
+                        {receiveData.price / 1000}K/ngày
+                      </h2>
+                    </div>
 
-                <div className="relative flex mb-3">
-                  <DateTimeRange
-                    onDateRangeChange={handleDateRangeChange}
-                    onReceiveTimeChange={handleReceiveTimeChange}
-                    onReturnTimeChange={handleReturnTimeChange}
-                    motorbikeId={motorbikeId}
-                  ></DateTimeRange>
-                </div>
+                    <div className="relative flex mb-3">
+                      <DateTimeRange
+                        onDateRangeChange={handleDateRangeChange}
+                        onReceiveTimeChange={handleReceiveTimeChange}
+                        onReturnTimeChange={handleReturnTimeChange}
+                        motorbikeId={motorbikeId}
+                      ></DateTimeRange>
+                    </div>
 
-                <div className="relative flex flex-col gap-2 p-3 border border-gray-100 bg-white rounded-lg mb-3 ">
-                  <label className="block text-sm font-medium text-zinc-700">
-                    Địa điểm giao nhận xe
-                  </label>
-                  <div className="pr-8">
-                    
-                    <input
-                      type="text"
-                      className={`w-full overflow-hidden text-ellipsis whitespace-nowrap font-bold cursor-pointer`}
-                      value={gettedLocation}
-                      readOnly
-                      onClick={() => setShowPopUp(true)}
+                    <div className="relative flex flex-col gap-2 p-3 border border-gray-100 bg-white rounded-lg mb-3 ">
+                      <label className="block text-sm font-medium text-zinc-700">
+                        Địa điểm giao nhận xe
+                      </label>
+                      <div className="pr-8">
+                        <input
+                          type="text"
+                          className={`w-full overflow-hidden text-ellipsis whitespace-nowrap font-bold cursor-pointer`}
+                          value={gettedLocation}
+                          readOnly
+                          onClick={() => setShowPopUp(true)}
+                        />
+                      </div>
+                    </div>
+                    <div className="w-full border-b border-b-zinc-300"></div>
+                    <div className="flex flex-col gap-2 pt-4">
+                      <div className="flex justify-between">
+                        <span>
+                          Đơn giá{" "}
+                          <span style={{ cursor: "pointer" }}>
+                            <FontAwesomeIcon
+                              onClick={handlePricePerDay}
+                              icon={faCircleQuestion}
+                            ></FontAwesomeIcon>
+                          </span>{" "}
+                        </span>
+                        <span className="font-semibold">
+                          {receiveData.price.toLocaleString("vi-VN")}đ/ ngày
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Phí giao nhận xe</span>
+                        <span className="font-semibold">
+                          {deliveryFee.toLocaleString("vi-VN")}đ
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Tổng cộng</span>
+                        <span className="font-semibold">
+                          {receiveData.price.toLocaleString("vi-VN")}đ x{" "}
+                          {rentalDays} ngày
+                        </span>
+                      </div>
+                      <div className="w-full border-b border-b-zinc-300"></div>
+                      {discount ? (
+                        <div className="flex justify-between pl-0 gap-2">
+                          <span>
+                            Mã{" "}
+                            <span className="font-semibold text-green-300">
+                              {discount.name}
+                            </span>
+                            &nbsp;
+                            <FontAwesomeIcon
+                              className="text-red-600 cursor-pointer"
+                              icon={faCircleXmark}
+                              onClick={handleCancelDiscount}
+                            ></FontAwesomeIcon>
+                          </span>
+                          <span className="font-semibold">
+                            {formatDiscountMoney(discount.discountMoney)}
+                          </span>
+                        </div>
+                      ) : (
+                        <div
+                          className="flex justify-between pl-0 gap-2"
+                          style={{ cursor: "pointer" }}
+                          onClick={handleVoucher}
+                        >
+                          <span>Mã khuyến mãi</span>
+                          <span>
+                            <FontAwesomeIcon icon={faArrowRight} />
+                          </span>
+                        </div>
+                      )}
+                      <div className="w-full border-b border-b-zinc-300"></div>
+                      <div className="flex justify-between items-center py-2">
+                        <span className="text-base font-extrabold">
+                          Thành tiền
+                        </span>
+                        <span className="text-base font-extrabold">
+                          {totalPrice.toLocaleString("vi-VN")}đ
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      type="submit"
+                      className="py-4 px-6 relative justify-center inline-flex items-center font-bold rounded-lg w-100 bg-green-500 hover:bg-green-600 text-white"
+                    >
+                      CHỌN THUÊ
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <div className="content-detail">
+                <div className="w-full border-b border-b-zinc-400"></div>
+                {/* Features Section */}
+                <div className="flex flex-col my-6">
+                  <h6 className="mb-6 font-semibold text-xl">Đặc điểm</h6>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <FeatureItem
+                      icon={faGasPump}
+                      altText="fuel"
+                      title="Nhiên liệu"
+                      description=""
+                      class="flex items-center"
+                    />
+                    <FeatureItem
+                      icon={faMotorcycle}
+                      altText="modelType"
+                      title="Loại xe"
+                      description={receiveData.model.modelType}
+                    />
+                    <FeatureItem
+                      icon={faOilCan}
+                      altText="consumption"
+                      title="Nhiên liệu tiêu hao"
+                      description={receiveData.model.fuelConsumption}
                     />
                   </div>
                 </div>
-                <div className="w-full border-b border-b-zinc-300"></div>                
-                <div className="flex flex-col gap-2 pt-4">
-                <div
-                  className="flex justify-between"
-                >
-                  <span>
-                    Đơn giá{" "}
-                    <span style={{ cursor: "pointer" }}>
-                      <FontAwesomeIcon
-                        onClick={handlePricePerDay}
-                        icon={faCircleQuestion}
-                      ></FontAwesomeIcon>
-                    </span>{" "}
-                  </span>
-                  <span className="font-semibold">
-                    {receiveData.price.toLocaleString("vi-VN")}đ/ ngày
-                  </span>
-                </div>
-                <div
-                     className="flex justify-between"
-                >
-                  <span>Phí giao nhận xe</span>
-                  <span className="font-semibold">
-                    {deliveryFee.toLocaleString("vi-VN")}đ
-                  </span>
-                </div>
-                <div
-                      className="flex justify-between"
-                >
-                  <span>Tổng cộng</span>
-                  <span className="font-semibold">
-                    {receiveData.price.toLocaleString("vi-VN")}đ x {rentalDays}{" "}
-                    ngày
-                  </span>
-                </div>
-                <div className="w-full border-b border-b-zinc-300"></div>
-                {discount ? (
-                  <div
-                    className="flex justify-between pl-0 gap-2"
-                  >
-                    <span>
-                      Mã{" "}
-                      <span className="font-semibold text-green-300">
-                        {discount.name}
-                      </span>
-                      &nbsp;
-                      <FontAwesomeIcon
-                        className="text-red-600 cursor-pointer"
-                        icon={faCircleXmark}
-                        onClick={handleCancelDiscount}
-                      ></FontAwesomeIcon>
-                    </span>
-                    <span className="font-semibold">
-                      {formatDiscountMoney(discount.discountMoney)}
-                    </span>
-                  </div>
-                ) : (
-                  <div
-                    className="flex justify-between pl-0 gap-2"
-                    style={{ cursor: "pointer" }}
-                    onClick={handleVoucher}
-                  >
-                    <span>Mã khuyến mãi</span>
-                    <span>
-                      <FontAwesomeIcon icon={faArrowRight} />
-                    </span>
-                  </div>
-                )}
-                  <div className="w-full border-b border-b-zinc-300"></div>
-                <div
-                  className="flex justify-between items-center py-2"
-                >
-                  <span className="text-base font-extrabold">Thành tiền</span>
-                  <span className="text-base font-extrabold">{totalPrice.toLocaleString("vi-VN")}đ</span>
-                </div>
-                </div>
-                <button
-                  type="submit"
-                  className="py-4 px-6 relative justify-center inline-flex items-center font-bold rounded-lg w-100 bg-green-500 hover:bg-green-600 text-white"
-                >
-                  CHỌN THUÊ
-                </button>
-                </div>
-              </form>
-              </div>
-
-                <div className="content-detail">
                 <div className="w-full border-b border-b-zinc-400"></div>
-              {/* Features Section */}
-              <div
-                className="flex flex-col my-6"
-              >
-                <h6 className="mb-6 font-semibold text-xl">Đặc điểm</h6>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <FeatureItem
-                  icon={faGasPump}
-                  altText="fuel"
-                  title="Nhiên liệu"
-                  description=""
-                  class="flex items-center"
-                />
-                <FeatureItem
-                  icon={faMotorcycle}
-                  altText="modelType"
-                  title="Loại xe"
-                  description={receiveData.model.modelType}
-                />
-                <FeatureItem
-                  icon={faOilCan}
-                  altText="consumption"
-                  title="Nhiên liệu tiêu hao"
-                  description={receiveData.model.fuelConsumption}
-                />
-                </div>
-              </div>
-              <div className="w-full border-b border-b-zinc-400"></div>
 
-              {/* Description Section */}
-              <div className="flex flex-col my-6">
-                <h2
-                 className="text-xl font-semibold mb-6"
+                {/* Description Section */}
+                <div className="flex flex-col my-6">
+                  <h2 className="text-xl font-semibold mb-6">Mô tả</h2>
+                  <p className="max-h-32">
+                    Trang bị camera hành trình trước sau
+                    <br />
+                    Có bảo hiểm đầy đủ
+                    <br />
+                    Chủ xe thân thiện hỗ trợ nhiệt tình
+                  </p>
+                </div>
+                <div className="w-full border-b border-b-zinc-400 mb-6"></div>
+                {/* <RentalDocument /> */}
+                {/* Other amenities section */}
+                <div
+                  className={`${sharedClasses.grid} ${sharedClasses.gridCols4} ${sharedClasses.gap4}`}
                 >
-                  Mô tả
-                </h2>
-                <p
-                  className="max-h-32"
+                  {/* Other amenities go here */}
+                </div>
+                <RentalDocument />
+                <hr className="my-3 border-gray-800"></hr>
+                <div className="p-4 bg-white dark:bg-zinc-800  flex items-center space-x-4">
+                <div
+                  className="flex flex-col items-center mb-4  cursor-pointer"
+                  onClick={() => handleClick(receiveData.user.id)}
                 >
-                  Trang bị camera hành trình trước sau
-                  <br />
-                  Có bảo hiểm đầy đủ
-                  <br />
-                  Chủ xe thân thiện hỗ trợ nhiệt tình
-                </p>
-              </div>
-              <div className="w-full border-b border-b-zinc-400 mb-6"></div>
-              {/* <RentalDocument /> */}
-              {/* Other amenities section */}
-              <div
-                className={`${sharedClasses.grid} ${sharedClasses.gridCols4} ${sharedClasses.gap4}`}
-              >
-                {/* Other amenities go here */}
-              </div>
-              <RentalDocument />
-              <hr className="my-3 border-gray-800"></hr>
-              <div className="p-4 bg-white dark:bg-zinc-800  flex items-center space-x-4 cursor-pointer" onClick={() => handleClick(receiveData.user.id)}>
-                <div className="flex flex-col items-center mb-4">
-                  <h2 className="text-sm font-semibold mb-2">
-                    Chủ xe
-                  </h2>
+                  <h2 className="text-sm font-semibold mb-2">Chủ xe</h2>
                   <img
                     src="https://n1-cstg.mioto.vn/m/avatars/avatar-2.png"
                     alt="User profile picture"
@@ -838,93 +852,118 @@ console.log(receiveData)
                   />
                 </div>
                 <div className="flex-1">
-                  <h2
-                    className={`text-lg font-semibold ${sharedClasses.textZincDark}`}
+                  <div
+                    className="flex items-center justify-between rounded-lg"
+                    onClick={handleChatting}
                   >
-                    {receiveData.user.firstName +
-                      " " +
-                      receiveData.user.lastName}
-                  </h2>
+                    <h2
+                      className={`text-lg font-semibold ${sharedClasses.textZincDark}`}
+                    >
+                      {receiveData.user.firstName +
+                        " " +
+                        receiveData.user.lastName}
+                      &nbsp;&nbsp;&nbsp;
+                      <span
+                        style={{
+                          border: "1px solid #ee4d2d", // Màu viền
+                          padding: "2px 5px", // Khoảng cách giữa nội dung và viền
+                          borderRadius: "10px",
+                          display: "inline-flex", // Để icon và text nằm trên cùng một dòng
+                          alignItems: "center", // Căn giữa icon và text theo chiều dọc
+                          cursor: "pointer", // Thay đổi con trỏ chuột khi hover
+                          color: "#ee4d2d",
+                          fontSize: "0.875rem",
+                        }}
+                      >
+                        <FontAwesomeIcon
+                          icon={faMessage}
+                          color="#ee4d2d"
+                          style={{ marginRight: "5px", fontSize: "0.875rem" }}
+                        />
+                        Liên hệ
+                      </span>
+                    </h2>
+                  </div>
                   <div
                     className={`${sharedClasses.flexItemsCenter} space-x-2 ${sharedClasses.textZincLight}`}
                   >
                     <span className={sharedClasses.flexItemsCenter}>
                       <FaMotorcycle className="w-6 h-6" />
-                    <span className="ml-2">
-                      {receiveData.user.totalTripCount>0?receiveData.user.totalTripCount:"Chưa có"} chuyến
+                      <span className="ml-2">
+                        {receiveData.user.totalTripCount > 0
+                          ? receiveData.user.totalTripCount
+                          : "Chưa có"}{" "}
+                        chuyến
+                      </span>
                     </span>
-                  </span>  
                   </div>
                 </div>
               </div>
-              {motorbikeId && <FeedbackList motorbikeId={motorbikeId} />}
+                {motorbikeId && <FeedbackList motorbikeId={motorbikeId} />}
+              </div>
             </div>
-            </div>
-            </div>
-            </div>
-               </div>
+          </div>
+        </div>
+      </div>
 
-            {/* Right Column - 40% width */}
-          
-              {showConfirmPopup && (
-                <PopUpConfirmBooking
-                  motorbikeDetails={receiveData}
-                  bookingDetails={{
-                    startDate: startDateTime,
-                    endDate: endDateTime,
-                    receiveLocation: gettedLocation,
-                    totalPrice: totalPrice,
-                  }}
-                  onConfirm={handleConfirmBooking}
-                  onCancel={handleCancelBooking}
-                />
-              )}
-              {showPopUpLicense && (
-                <PopUpLicense
-                  onClose={() => setShowPopUpLicense(false)}
-                  messageLicense={messageLicense}
-                  buttonLicense={buttonLicense}
-                  buttonBackHomePage="Chọn xe khác"
-                />
-              )}
-              {showPopupSuccess && (
-                <PopupSuccess
-                  show={showPopupSuccess}
-                  onHide={handleShowPopupSuccess}
-                  message="Yêu cầu đặt xe của bạn đã được gửi đi !"
-                />
-              )}
-              {showPopUp && (
-                <PopUpLocation
-                  onClose={() => setShowPopUp(false)}
-                  onSelectLocation={motorbikeAddress}
-                  onChangeLocation={handleChangeLocation}
-                  shipFee={(deliFee)=>setDeliveryFee(deliFee)}
-                  receiveData={receiveData}
-                />
-              )}
-              {showPopUpVoucher && (
-                <PopUpVoucher
-                  onCloseVoucher={handleCloseVoucher}
-                  discounts={discounts}
-                  discountValue={handleDiscountValue}
-                ></PopUpVoucher>
-              )}
-              {showLoginModal && (
-                <Login
-                  show={showLoginModal}
-                  handleClose={() => setShowLoginModal(false)}
-                  onLoginSuccess={handleLoginSuccess}
-                />
-              )}
-              {showPopUpPricePerDay && (
-                <PopUpPricePerDay
-                  onClose={handleClosePopUpPricePerDay}
-                ></PopUpPricePerDay>
-              )}
-         
-  
-     
+      {/* Right Column - 40% width */}
+
+      {showConfirmPopup && (
+        <PopUpConfirmBooking
+          motorbikeDetails={receiveData}
+          bookingDetails={{
+            startDate: startDateTime,
+            endDate: endDateTime,
+            receiveLocation: gettedLocation,
+            totalPrice: totalPrice,
+          }}
+          onConfirm={handleConfirmBooking}
+          onCancel={handleCancelBooking}
+        />
+      )}
+      {showPopUpLicense && (
+        <PopUpLicense
+          onClose={() => setShowPopUpLicense(false)}
+          messageLicense={messageLicense}
+          buttonLicense={buttonLicense}
+          buttonBackHomePage="Chọn xe khác"
+        />
+      )}
+      {showPopupSuccess && (
+        <PopupSuccess
+          show={showPopupSuccess}
+          onHide={handleShowPopupSuccess}
+          message="Yêu cầu đặt xe của bạn đã được gửi đi !"
+        />
+      )}
+      {showPopUp && (
+        <PopUpLocation
+          onClose={() => setShowPopUp(false)}
+          onSelectLocation={motorbikeAddress}
+          onChangeLocation={handleChangeLocation}
+          shipFee={(deliFee) => setDeliveryFee(deliFee)}
+          receiveData={receiveData}
+        />
+      )}
+      {showPopUpVoucher && (
+        <PopUpVoucher
+          onCloseVoucher={handleCloseVoucher}
+          discounts={discounts}
+          discountValue={handleDiscountValue}
+        ></PopUpVoucher>
+      )}
+      {showLoginModal && (
+        <Login
+          show={showLoginModal}
+          handleClose={() => setShowLoginModal(false)}
+          onLoginSuccess={handleLoginSuccess}
+        />
+      )}
+      {showPopUpPricePerDay && (
+        <PopUpPricePerDay
+          onClose={handleClosePopUpPricePerDay}
+        ></PopUpPricePerDay>
+      )}
     </div>
   );
 };

@@ -133,9 +133,6 @@ const Profile = () => {
             </div>
             <div className="flex items-center">
               <div className="font-bold">{user.phone}</div>
-              <button className={`ml-2 ${buttonClasses}`}>
-                <FontAwesomeIcon icon={faPenToSquare} />
-              </button>
             </div>
           </div>
           <div className="flex justify-center mt-4">
