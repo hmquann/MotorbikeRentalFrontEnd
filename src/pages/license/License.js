@@ -1,4 +1,14 @@
 import React, { useState, useEffect } from "react";
+import {
+  collection,
+  onSnapshot,
+  doc,
+  updateDoc,
+  query,
+  where,
+  setDoc,
+} from "firebase/firestore";
+import { db } from "../../firebase";
 import axios from "axios";
 import apiClient from "../../axiosConfig";
 import { CircularProgress } from "@mui/material";
@@ -59,7 +69,21 @@ const License = () => {
   const [birthDateError, setBirthOfDateError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPopupSuccess, setShowPopupSuccess] = useState(false);
+
   const[sizeNotification,setSizeNotification]=useState("Dung lượng ảnh tải lên dưới 2 MB");
+
+
+  const userDataString = localStorage.getItem("user");
+  const userData = JSON.parse(userDataString);
+  const userId = userData ? userData.userId : null;
+  const userName = userData
+    ? userData.firstName + " " + userData.lastName
+    : null;
+  const userEmail = userData ? userData.email : null;
+  const emailNoti = userData ? userData.emailNoti : null;
+  const systemNoti = userData ? userData.systemNoti : null;
+  const minimizeNoti = userData ? userData.minimizeNoti : null;
+
   useEffect(() => {
     apiClient
       .get(`/api/license/getLicenseByUserId/${user.userId}`)
@@ -84,6 +108,10 @@ const License = () => {
     }
     else {
     setLoading(true);
+    const now = new Date();
+    const admin = await apiClient.get("api/user/getAdmin");
+    const adminId = admin.data.id;
+    const adminSystemNoti = admin.data.systemNoti;
     await new Promise((resolve) => setTimeout(resolve, 1500));
     try {
       const formData = new FormData();
@@ -133,7 +161,34 @@ const License = () => {
             setChangeLicense(false);
           });
       }
-     catch (error) {
+
+      if (adminSystemNoti) {
+        await setDoc(doc(collection(db, "notifications")), {
+          userId: adminId,
+          message: JSON.stringify({
+            title:
+              '<strong style="color: rgb(90 92 95)">Kiểm duyệt GPLX</strong>',
+            content: `Người dùng <strong>${userName}</strong>  đã gửi yêu cầu phê duyệt GPLX.`,
+          }),
+          timestamp: now,
+          seen: false,
+        });
+      }
+
+      // Send notification to lessor if required
+      if (systemNoti) {
+        await setDoc(doc(collection(db, "notifications")), {
+          userId: userId,
+          message: JSON.stringify({
+            title:
+              '<strong style="color: rgb(90 92 95)">Kiểm duyệt GPLX</strong>',
+            content: `Bạn đã gửi yêu cầu phê duyệt <strong>GPLX</strong> thành công.`,
+          }),
+          timestamp: now,
+          seen: false,
+        });
+      }
+    } catch (error) {
       console.log(error);
     } finally {
       setLoading(false);

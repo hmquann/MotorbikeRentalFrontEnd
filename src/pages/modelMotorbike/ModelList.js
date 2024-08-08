@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import AddModel from "./AddModel";
 import ViewModel from "./ViewModel";
-import { MdOutlineAddCircleOutline, MdSearch } from "react-icons/md";
+import { MdOutlineAddCircleOutline } from "react-icons/md";
 import { IoEyeOutline } from "react-icons/io5";
 import useDebounce from "../../hooks/useDebounce";
 import apiClient from "../../axiosConfig";
@@ -161,7 +160,7 @@ const ModelList = () => {
         <h2 className="text-4xl font-bold">Quản lý mẫu xe</h2>
         <div>
           <button
-            className={`${buttonClasses}hover:from-zinc-700 hover:bg-blue-700 bg-blue-600 text-white rounded-full `}
+            className={`${buttonClasses}hover:from-zinc-700 hover:bg-blue-700 bg-blue-600 text-white rounded-lg `}
             onClick={() => setShowModal(true)}
           >
            <MdOutlineAddCircleOutline />

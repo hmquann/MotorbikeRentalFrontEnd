@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import {
+  collection,
+  onSnapshot,
+  doc,
+  updateDoc,
+  query,
+  where,
+  setDoc,
+} from "firebase/firestore";
+import { db } from "../../firebase";
 import ModalImage from "react-modal-image";
 import apiClient from "../../axiosConfig";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -28,6 +38,7 @@ const ApproveLicense = () => {
   const [pageSize, setPageSize] = useState(5);
   const [totalPages, setTotalPages] = useState(0);
   const [actionType, setActionType] = useState("");
+  const [user, setUser] = useState();
   const isAdmin = JSON.parse(localStorage.getItem("roles")).includes("ADMIN");
   const fetchLicenses = async () => {
     try {
@@ -97,10 +108,14 @@ const ApproveLicense = () => {
     }
     return pages;
   };
-  const handleAction = (license, action) => {
+  const handleAction = async (license, action) => {
+    console.log(license);
     setSelectedLicense(license);
     setActionType(action);
     setIsModalOpen(true);
+    const respone = await apiClient.get(`/api/user/${license.userId}`);
+    setUser(respone.data);
+    console.log(respone.data);
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -131,6 +146,61 @@ const ApproveLicense = () => {
       setLicenses(updatedLicenses);
 
       setIsModalOpen(false);
+
+      const now = new Date();
+      const admin = await apiClient.get("api/user/getAdmin");
+      const adminId = admin.data.id;
+      const adminSystemNoti = admin.data.systemNoti;
+      const licenseHolderId = user.id; // Giả sử bạn có userId của người sở hữu giấy phép từ selectedLicense
+      const licenseHolderSystemNoti = user.systemNoti;
+
+      // Send notification to admin if required
+      if (
+        adminSystemNoti &&
+        (actionType === "approve" || actionType === "rejected")
+      ) {
+        await setDoc(doc(collection(db, "notifications")), {
+          userId: adminId,
+          message: JSON.stringify({
+            title:
+              '<strong style="color: rgb(90 92 95)">Kiểm duyệt GPLX</strong>',
+            content:
+              actionType === "approve"
+                ? `Bạn đã <strong style="color: rgb(34 197 94)">phê duyệt</strong> GPLX của người dùng <strong>${
+                    user.firstName + " " + user.lastName
+                  }</strong>.`
+                : actionType === "rejected"
+                ? `Bạn đã <strong style="color: rgb(197 34 34)">từ chối phê duyệt</strong> GPLX của người dùng <strong>${
+                    user.firstName + " " + user.lastName
+                  }</strong>.`
+                : "",
+          }),
+          timestamp: now,
+          seen: false,
+        });
+      }
+
+      // Send notification to license holder if required
+      if (
+        licenseHolderSystemNoti &&
+        (actionType === "approve" || actionType === "rejected")
+      ) {
+        await setDoc(doc(collection(db, "notifications")), {
+          userId: licenseHolderId,
+          message: JSON.stringify({
+            title:
+              '<strong style="color: rgb(90 92 95)">Kiểm duyệt GPLX</strong>',
+            content:
+              actionType === "approve"
+                ? `<strong>GPLX</strong> của bạn đã được <strong style="color: rgb(34 197 94)">phê duyệt</strong>.`
+                : actionType === "rejected"
+                ? `<strong>GPLX</strong> của bạn bị <strong style="color: rgb(197 34 34)">từ chối phê duyệt</strong>.`
+                : "",
+          }),
+          timestamp: now,
+          seen: false,
+        });
+      }
     } catch (error) {
       // Xử lý lỗi
       console.error("Error:", error);

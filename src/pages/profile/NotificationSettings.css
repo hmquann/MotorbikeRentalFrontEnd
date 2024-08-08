@@ -1,0 +1,21 @@
+/* NotificationSettings.css */
+.custom-switch .form-check-input {
+    width: 60px; /* Width of the switch */
+    height: 34px; /* Height of the switch */
+    background-color: rgb(34, 197, 94); /* Background color when active */
+    border-radius: 34px; /* Rounded corners */
+    border: 2px solid rgb(34, 197, 94); /* Border color */
+  }
+  
+  .custom-switch .form-check-input:checked {
+    background-color: rgb(34, 197, 94); /* Background color when checked */
+  }
+  
+  .custom-switch .form-check-input:focus {
+    box-shadow: 0 0 0 0.2rem rgba(34, 197, 94, 0.25); /* Focus effect */
+  }
+  
+  .custom-switch .form-check-label {
+    font-size: 1rem; /* Adjust label font size if needed */
+  }
+  
