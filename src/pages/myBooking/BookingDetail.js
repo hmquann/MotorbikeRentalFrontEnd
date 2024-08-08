@@ -80,13 +80,15 @@ export default function Widget() {
   const [motorbikeOvertimeFee, setMotorbikeOvertimeFee] = useState();
   const [urlImage, setUrlImage] = useState();
   const [lessorId, setLessorId] = useState();
+  const [motorbike, setMotorbike] = useState();
   const [pricePerDay, setPricePerDay] = useState();
   const [showPopup, setShowPopup] = useState(false);
   const [popupContent, setPopupContent] = useState("");
   const [action, setAction] = useState("");
+  const [lessor, setLessor] = useState("");
   const [showPopupSuccess, setShowPopupSuccess] = useState(false);
   const [showPopUpReason, setShowPopUpReason] = useState(false);
-  const [selectedReason, setSelectedReason] = useState('');
+  const [selectedReason, setSelectedReason] = useState("");
   const [reason, setReason] = useState("");
   const [loading, setLoading] = useState(false);
   const userDataString = localStorage.getItem("user");
@@ -95,6 +97,10 @@ export default function Widget() {
   const userName = userData
     ? userData.firstName + " " + userData.lastName
     : null;
+  const userEmail = userData ? userData.email : null;
+  const emailNoti = userData ? userData.emailNoti : null;
+  const systemNoti = userData ? userData.systemNoti : null;
+  const minimizeNoti = userData ? userData.minimizeNoti : null;
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [feedbackSent, setFeedbackSent] = useState(false);
   const navigate = useNavigate();
@@ -115,6 +121,7 @@ export default function Widget() {
           `/api/motorbike/${booking.motorbikeId}`
         );
         console.log(response.data);
+        setMotorbike(response.data);
         setMotorbikeName(
           `${response.data.model.modelName} ${response.data.yearOfManufacture}`
         );
@@ -122,6 +129,7 @@ export default function Widget() {
         setLessorName(
           `${response.data.user.firstName} ${response.data.user.lastName}`
         );
+        setLessor(response.data.user);
         setMotorbikeDeliveryFee(`${response.data.deliveryFee}`);
         setMotorbikeOvertimeFee(`${response.data.overtimeFee}`);
         setUrlImage(response.data.motorbikeImages[0].url);
@@ -142,7 +150,8 @@ export default function Widget() {
 
   const handleAction = (actionType) => {
     if (actionType === "canceled") {
-      setShowPopUpReason(true); // Hiển thị popup lý do hủy
+      setShowPopUpReason(true);
+      console.log(booking.status);
     } else {
       setPopupContent(
         actionType === "accept"
@@ -167,9 +176,89 @@ export default function Widget() {
     setShowFeedbackModal(false);
   };
 
-  const handleSendReason = (reason) => {
-    setSelectedReason(reason); 
-    setShowPopup(true);
+  const handleSendReason = async (reason) => {
+    setShowPopUpReason(false);
+    setSelectedReason(reason);
+    const now = new Date();
+    setLoading(true);
+    try {
+      if (emailNoti) {
+        const response3 = apiClient.post(
+          "/api/booking/sendEmailCancelBooking",
+          {
+            renterName: userName,
+            renterEmail: userEmail,
+            motorbikeName:
+              motorbike.model.modelName + " " + motorbike.yearOfManufacture,
+            motorbikePlate: motorbike.motorbikePlate,
+            bookingTime: dayjs(booking.bookingTime).format(
+              "YYYY-MM-DDTHH:mm:ss"
+            ),
+            startDate: dayjs(booking.startDate).format("YYYY-MM-DDTHH:mm:ss"),
+            endDate: dayjs(booking.endDate).format("YYYY-MM-DDTHH:mm:ss"),
+            totalPrice: booking.totalPrice,
+            receiveLocation: booking.receiveLocation,
+            reason: reason,
+          }
+        );
+      }
+      if (lessor.emailNoti) {
+        const response5 = apiClient.post(
+          "/api/booking/sendEmailCancelBookingForLessor",
+          {
+            lessorName: lessor.firstName + " " + lessor.lastName,
+            lessorEmail: lessor.email,
+            renterName: userName,
+            motorbikeName:
+              motorbike.model.modelName + " " + motorbike.yearOfManufacture,
+            motorbikePlate: motorbike.motorbikePlate,
+            bookingTime: dayjs(booking.bookingTime).format(
+              "YYYY-MM-DDTHH:mm:ss"
+            ),
+            startDate: dayjs(booking.startDate).format("YYYY-MM-DDTHH:mm:ss"),
+            endDate: dayjs(booking.endDate).format("YYYY-MM-DDTHH:mm:ss"),
+            totalPrice: booking.totalPrice,
+            receiveLocation: booking.receiveLocation,
+            reason: reason,
+          }
+        );
+      }
+      if (systemNoti) {
+        await setDoc(doc(collection(db, "notifications")), {
+          userId: userId,
+          message: JSON.stringify({
+            title: '<strong style="color: rgb(197 34 34)">Hủy thuê xe</strong>',
+            content: `Bạn đã hủy thuê xe <strong>${motorbike.model.modelName} ${motorbike.yearOfManufacture}</strong>, biển số <strong>${motorbike.motorbikePlate}</strong> với lí do <strong>${reason}</strong>.`,
+          }),
+          timestamp: now,
+          seen: false,
+        });
+      }
+      if (lessor.systemNoti) {
+        await setDoc(doc(collection(db, "notifications")), {
+          userId: lessor.id,
+          message: JSON.stringify({
+            title: '<strong style="color: rgb(197 34 34)">Hủy thuê xe</strong>',
+            content: `<strong>${userName}</strong> đã hủy thuê xe <strong>${motorbike.model.modelName} ${motorbike.yearOfManufacture}</strong>, biển số <strong>${motorbike.motorbikePlate}</strong> của bạn với lí do <strong>${reason}</strong>.`,
+          }),
+          timestamp: now,
+          seen: false,
+        });
+      }
+      let status = "CANCELED";
+      const url = `/api/booking/changeStatus/${booking.bookingId}/${status}`;
+      await apiClient.put(url);
+
+      if(booking.status === "DEPOSIT_MADE"){
+        
+      }
+
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+      setShowPopupSuccess(true);
+    }
   };
 
   const handleConfirm = async () => {
@@ -187,8 +276,7 @@ export default function Widget() {
       }
       const url = `/api/booking/changeStatus/${booking.bookingId}/${status}`;
       await apiClient.put(url);
-      if (status === "CANCELED") {
-        setShowPopUpReason(true);
+      if (status === "CANCELED" && booking.status === "DEPOSIT_PENDING") {
         // await setDoc(doc(collection(db, "notifications")), {
         //   userId: userId,
         //   message: JSON.stringify({
@@ -208,29 +296,71 @@ export default function Widget() {
         //   seen: false,
         // });
       } else if (status === "DEPOSIT_MADE") {
-        await setDoc(doc(collection(db, "notifications")), {
-          userId: userId,
-          message: JSON.stringify({
-            title: '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
-            content: `Bạn đã thanh toán tiền cọc cho xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong>. Hãy theo dõi lịch của chuyến để nhận xe đúng hẹn.`,
-          }),
-          timestamp: now,
-          seen: false,
-        });
-        await setDoc(doc(collection(db, "notifications")), {
-          userId: lessorId,
-          message: JSON.stringify({
-            title: '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
-            content: `Khách thuê <strong>${renterName}</strong> đã thanh toán tiền cọc cho xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong>. Hãy theo dõi lịch của chuyến để giao xe đúng hẹn.`,
-          }),
-          timestamp: now,
-          seen: false,
-        });
-
+        if (systemNoti) {
+          await setDoc(doc(collection(db, "notifications")), {
+            userId: userId,
+            message: JSON.stringify({
+              title: '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
+              content: `Bạn đã thanh toán tiền cọc cho xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong>. Hãy theo dõi lịch của chuyến để nhận xe đúng hẹn.`,
+            }),
+            timestamp: now,
+            seen: false,
+          });
+        }
+        if (lessor.systemNoti) {
+          await setDoc(doc(collection(db, "notifications")), {
+            userId: lessorId,
+            message: JSON.stringify({
+              title: '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
+              content: `Khách thuê <strong>${renterName}</strong> đã thanh toán tiền cọc cho xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong>. Hãy theo dõi lịch của chuyến để giao xe đúng hẹn.`,
+            }),
+            timestamp: now,
+            seen: false,
+          });
+        }
+        if (emailNoti) {
+          const response3 = apiClient.post(
+            "/api/booking/sendEmailDepositMadeBooking",
+            {
+              renterName: userName,
+              renterEmail: userEmail,
+              motorbikeName:
+                motorbike.model.modelName + " " + motorbike.yearOfManufacture,
+              motorbikePlate: motorbike.motorbikePlate,
+              bookingTime: dayjs(booking.bookingTime).format(
+                "YYYY-MM-DDTHH:mm:ss"
+              ),
+              startDate: dayjs(booking.startDate).format("YYYY-MM-DDTHH:mm:ss"),
+              endDate: dayjs(booking.endDate).format("YYYY-MM-DDTHH:mm:ss"),
+              totalPrice: booking.totalPrice,
+              receiveLocation: booking.receiveLocation,
+            }
+          );
+        }
+        if (lessor.emailNoti) {
+          const response5 = apiClient.post(
+            "/api/booking/sendEmailDepositMadeBookingForLessor",
+            {
+              lessorName: lessor.firstName + " " + lessor.lastName,
+              lessorEmail: lessor.email,
+              renterName: userName,
+              motorbikeName:
+                motorbike.model.modelName + " " + motorbike.yearOfManufacture,
+              motorbikePlate: motorbike.motorbikePlate,
+              bookingTime: dayjs(booking.bookingTime).format(
+                "YYYY-MM-DDTHH:mm:ss"
+              ),
+              startDate: dayjs(booking.startDate).format("YYYY-MM-DDTHH:mm:ss"),
+              endDate: dayjs(booking.endDate).format("YYYY-MM-DDTHH:mm:ss"),
+              totalPrice: booking.totalPrice,
+              receiveLocation: booking.receiveLocation,
+            }
+          );
+        }
         const adminData = await apiClient.get("api/user/getAdmin");
         const adminDataId = adminData.data.id;
-        const renterId = userData.userId; 
-        const amount = (booking.totalPrice * 30) / 100; 
+        const renterId = userData.userId;
+        const amount = (booking.totalPrice * 30) / 100;
         const subtractMoneyUrl = `/api/payment/subtract`;
         const addMoneyUrl = `/api/payment/add`;
         await apiClient.post(subtractMoneyUrl, null, {
@@ -251,25 +381,29 @@ export default function Widget() {
         await apiClient.post(subtractMoneyUrlDone, null, {
           params: { id: adminId, amount: amountDone },
         });
-
-        await setDoc(doc(collection(db, "notifications")), {
-          userId: userId,
-          message: JSON.stringify({
-            title: '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
-            content: `Chuyến đi với xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong> đã hoàn thành.`,
-          }),
-          timestamp: now,
-          seen: false,
-        });
-        await setDoc(doc(collection(db, "notifications")), {
-          userId: booking.renterId,
-          message: JSON.stringify({
-            title: '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
-            content: `Chuyến đi với xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong> đã hoàn thành.`,
-          }),
-          timestamp: now,
-          seen: false,
-        });
+        if(systemNoti){
+          await setDoc(doc(collection(db, "notifications")), {
+            userId: userId,
+            message: JSON.stringify({
+              title: '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
+              content: `Chuyến đi với xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong> đã hoàn thành.`,
+            }),
+            timestamp: now,
+            seen: false,
+          });
+        }
+        if(lessor.systemNoti){
+          await setDoc(doc(collection(db, "notifications")), {
+            userId: booking.renterId,
+            message: JSON.stringify({
+              title: '<strong style="color: rgb(34 197 94)">Thông báo</strong>',
+              content: `Chuyến đi với xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong> đã hoàn thành.`,
+            }),
+            timestamp: now,
+            seen: false,
+          });    
+        }
+        
       }
       // setShowPopup(false);
       // setShowPopupSuccess(true); // Show success popup
@@ -284,7 +418,6 @@ export default function Widget() {
       setShowPopupSuccess(true);
     }
   };
-
 
   const handlePopUpSuccess = () => {
     setShowPopupSuccess(false);
@@ -316,7 +449,7 @@ export default function Widget() {
           <div className="col-span-2 bg-white p-6 rounded-lg shadow-lg">
             <div className="flex items-center mb-6">
               <img
-                src="https://n1-cstg.mioto.vn/m/avatars/avatar-0.png"
+                src={urlImage}
                 alt="User avatar"
                 className="w-14 h-14 rounded-full mr-4 mb-3"
               />
