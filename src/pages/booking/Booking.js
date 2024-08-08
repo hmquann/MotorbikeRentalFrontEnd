@@ -797,25 +797,6 @@ console.log(receiveData)
                 />
                 </div>
               </div>
-              <div className="w-full border-b border-b-zinc-400"></div>
-
-              {/* Description Section */}
-              <div className="flex flex-col my-6">
-                <h2
-                 className="text-xl font-semibold mb-6"
-                >
-                  Mô tả
-                </h2>
-                <p
-                  className="max-h-32"
-                >
-                  Trang bị camera hành trình trước sau
-                  <br />
-                  Có bảo hiểm đầy đủ
-                  <br />
-                  Chủ xe thân thiện hỗ trợ nhiệt tình
-                </p>
-              </div>
               <div className="w-full border-b border-b-zinc-400 mb-6"></div>
               {/* <RentalDocument /> */}
               {/* Other amenities section */}

@@ -271,6 +271,7 @@ const BookingCard = ({ booking }) => {
         case "DEPOSIT_MADE":
           console.log(renterName);
           console.log(lessorId);
+          
           await setDoc(doc(collection(db, "notifications")), {
             userId: userId,
             message: JSON.stringify({
@@ -296,11 +297,17 @@ const BookingCard = ({ booking }) => {
           const subtractMoneyUrl = `/api/payment/subtract`;
           const addMoneyUrl = `/api/payment/add`;
           await apiClient.post(subtractMoneyUrl, null, {
-            params: { id: renterId, amount: amount, motorbikeName : motorbikeName, motorbikePlate : motorbikePlate },
-          });
-          await apiClient.post(addMoneyUrl, null, {
-            params: { id: adminDataId, amount: amount, motorbikeName : motorbikeName, motorbikePlate : motorbikePlate },
-          });
+            params: {
+                senderId: renterId,
+                receiverId: adminDataId,
+                amount: amount,
+                motorbikeName: motorbikeName,
+                motorbikePlate: motorbikePlate,
+            },
+        });
+          // await apiClient.post(addMoneyUrl, null, {
+          //   params: { id: lessorId, amount: amount, motorbikeName : motorbikeName, motorbikePlate : motorbikePlate },
+          // });
           break;
         default:
           return;
