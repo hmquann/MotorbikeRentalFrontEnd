@@ -122,7 +122,7 @@ const MotorbikeList = ({ listMotor, showDistance, searchLongitude, searchLatitud
                     <div className='flex flex-col w-full gap-4 rounded-xl'>
                       <img
                         className="w-full h-48 object-cover rounded-xl"
-                        src={motorbike.motorbikeImages[0].url || '/default-image.jpg'}
+                        src={motorbike.motorbikeImages[0]?.url || '/default-image.jpg'}
                         alt={motorbike.name}
                       />
                       <div className="">
