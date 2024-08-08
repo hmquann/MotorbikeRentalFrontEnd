@@ -299,11 +299,14 @@ const BookingCard = ({ booking }) => {
           const subtractMoneyUrlDone = `/api/payment/subtract`;
           const addMoneyUrlDone = `/api/payment/add`;
           const amountDone = (booking.totalPrice * 30) / 200;
-          await apiClient.post(addMoneyUrlDone, null, {
-            params: { id: userId, amount: amountDone },
-          });
           await apiClient.post(subtractMoneyUrlDone, null, {
-            params: { id: adminId, amount: amountDone },
+            params: {
+              senderId: adminId,
+              receiverId: userId,
+              amount: amountDone,
+              motorbikeName: motorbikeName,
+              motorbikePlate: motorbikePlate,
+            },
           });
           if (systemNoti) {
             await setDoc(doc(collection(db, "notifications")), {
@@ -342,7 +345,9 @@ const BookingCard = ({ booking }) => {
                 bookingTime: dayjs(booking.bookingTime).format(
                   "YYYY-MM-DDTHH:mm:ss"
                 ),
-                startDate: dayjs(booking.startDate).format("YYYY-MM-DDTHH:mm:ss"),
+                startDate: dayjs(booking.startDate).format(
+                  "YYYY-MM-DDTHH:mm:ss"
+                ),
                 endDate: dayjs(booking.endDate).format("YYYY-MM-DDTHH:mm:ss"),
                 totalPrice: booking.totalPrice,
                 receiveLocation: booking.receiveLocation,
@@ -361,7 +366,9 @@ const BookingCard = ({ booking }) => {
                 bookingTime: dayjs(booking.bookingTime).format(
                   "YYYY-MM-DDTHH:mm:ss"
                 ),
-                startDate: dayjs(booking.startDate).format("YYYY-MM-DDTHH:mm:ss"),
+                startDate: dayjs(booking.startDate).format(
+                  "YYYY-MM-DDTHH:mm:ss"
+                ),
                 endDate: dayjs(booking.endDate).format("YYYY-MM-DDTHH:mm:ss"),
                 totalPrice: booking.totalPrice,
                 receiveLocation: booking.receiveLocation,
@@ -373,7 +380,7 @@ const BookingCard = ({ booking }) => {
         case "DEPOSIT_MADE":
           console.log(renterName);
           console.log(lessorId);
-          
+
           await setDoc(doc(collection(db, "notifications")), {
             userId: userId,
             message: JSON.stringify({
@@ -400,13 +407,13 @@ const BookingCard = ({ booking }) => {
           const addMoneyUrl = `/api/payment/add`;
           await apiClient.post(subtractMoneyUrl, null, {
             params: {
-                senderId: renterId,
-                receiverId: adminDataId,
-                amount: amount,
-                motorbikeName: motorbikeName,
-                motorbikePlate: motorbikePlate,
+              senderId: renterId,
+              receiverId: adminDataId,
+              amount: amount,
+              motorbikeName: motorbikeName,
+              motorbikePlate: motorbikePlate,
             },
-        });
+          });
           // await apiClient.post(addMoneyUrl, null, {
           //   params: { id: lessorId, amount: amount, motorbikeName : motorbikeName, motorbikePlate : motorbikePlate },
           // });

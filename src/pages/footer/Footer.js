@@ -25,10 +25,10 @@ const Footer = () => {
                 Tổng đài hỗ trợ: 7AM - 10PM
               </p>
               <p className="text-lg text-black dark:text-white">
-                contact@mioto.vn
+                contact@mimotor.vn
               </p>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Gửi mail cho Mioto
+                Gửi mail cho MiMotor
               </p>
             </div>
           </div>
