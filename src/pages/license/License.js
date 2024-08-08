@@ -160,7 +160,6 @@ const License = () => {
 
             setChangeLicense(false);
           });
-      }
 
       if (adminSystemNoti) {
         await setDoc(doc(collection(db, "notifications")), {
