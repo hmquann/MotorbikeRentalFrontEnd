@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import PopUpSuccess from "./PopUpSuccess";
 import apiClient from "../../axiosConfig";
 import { CircularProgress } from "@mui/material";
+import PopUpReasonManage from "./PopUpReasonManage";
 
 const statusTranslations = {
   PENDING: "Chờ duyệt",
@@ -75,6 +76,7 @@ export default function Widget() {
   const [motorbikePlate, setMotorbikePlate] = useState();
   const [motorbikeDeliveryFee, setMotorbikeDeliveryFee] = useState();
   const [motorbikeOvertimeFee, setMotorbikeOvertimeFee] = useState();
+  const [showPopUpReason, setShowPopUpReason] = useState(false);
   const [lessorId, setLessorId] = useState();
   const [renterName, setRenterName] = useState();
   const [pricePerDay, setPricePerDay] = useState();
@@ -126,17 +128,21 @@ export default function Widget() {
   const statusStyle = statusStyles[booking.status];
 
   const handleAction = (actionType) => {
-    setPopupContent(
-      actionType === "accept"
-        ? "Bạn có chắc chắn muốn duyệt chuyến này?"
-        : actionType === "reject"
-        ? "Bạn có chắc chắn muốn từ chối chuyến này?"
-        : actionType === "deliver"
-        ? "Bạn có chắc chắn muốn giao xe cho chuyến này?"
-        : "Bạn có chắc chắn muốn hoàn thành chuyến này?"
-    );
-    setAction(actionType);
-    setShowPopup(true);
+    if (actionType === "reject") {
+      setShowPopUpReason(true);
+    } else {
+      setPopupContent(
+        actionType === "accept"
+          ? "Bạn có chắc chắn muốn duyệt chuyến này?"
+          : actionType === "reject"
+          ? "Bạn có chắc chắn muốn từ chối chuyến này?"
+          : actionType === "deliver"
+          ? "Bạn có chắc chắn muốn giao xe cho chuyến này?"
+          : "Bạn có chắc chắn muốn hoàn thành chuyến này?"
+      );
+      setAction(actionType);
+      setShowPopup(true);
+    }
   };
 
   const handleConfirm = async () => {
@@ -163,24 +169,25 @@ export default function Widget() {
       await apiClient.put(url);
 
       if (status === "REJECTED") {
-        await setDoc(doc(collection(db, "notifications")), {
-          userId: userId,
-          message: JSON.stringify({
-            title: '<strong style="color: red">Từ chối cho thuê</strong>',
-            content: `Bạn đã từ chối việc đặt xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong>.`,
-          }),
-          timestamp: now,
-          seen: false,
-        });
-        await setDoc(doc(collection(db, "notifications")), {
-          userId: booking.renterId,
-          message: JSON.stringify({
-            title: '<strong style="color: red">Từ chối cho thuê</strong>',
-            content: `Chủ xe <strong>${userName}</strong> đã từ chối việc đặt xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong>.`,
-          }),
-          timestamp: now,
-          seen: false,
-        });
+        setShowPopUpReason(true);
+        // await setDoc(doc(collection(db, "notifications")), {
+        //   userId: userId,
+        //   message: JSON.stringify({
+        //     title: '<strong style="color: red">Từ chối cho thuê</strong>',
+        //     content: `Bạn đã từ chối việc đặt xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong>.`,
+        //   }),
+        //   timestamp: now,
+        //   seen: false,
+        // });
+        // await setDoc(doc(collection(db, "notifications")), {
+        //   userId: booking.renterId,
+        //   message: JSON.stringify({
+        //     title: '<strong style="color: red">Từ chối cho thuê</strong>',
+        //     content: `Chủ xe <strong>${userName}</strong> đã từ chối việc đặt xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong>.`,
+        //   }),
+        //   timestamp: now,
+        //   seen: false,
+        // });
       } else if (status === "PENDING_DEPOSIT") {
         await setDoc(doc(collection(db, "notifications")), {
           userId: userId,
@@ -383,29 +390,29 @@ export default function Widget() {
                       Hoàn tiền cọc 100%
                     </td>
                     <td className="border border-muted-foreground p-2 text-green-600">
-                      Hoàn tiền cọc 100%
+                      Không mất phí
                     </td>
                   </tr>
                   <tr>
                     <td className="border border-muted-foreground p-2">
-                      Trước Chuyến 7 Ngày
+                      Trước Chuyến Đi 2 Ngày
                     </td>
                     <td className="border border-muted-foreground p-2 text-yellow-600">
                       Hoàn tiền cọc 70%
                     </td>
                     <td className="border border-muted-foreground p-2 text-yellow-600">
-                      Hoàn tiền cọc 70%
+                      Đền tiền 30%
                     </td>
                   </tr>
                   <tr>
                     <td className="border border-muted-foreground p-2">
-                      Trong 7 Ngày / Trước Chuyến
+                      Trong Vòng 2 Ngày Trước Chuyến Đi
                     </td>
                     <td className="border border-muted-foreground p-2 text-red-600">
                       Không hoàn tiền
                     </td>
                     <td className="border border-muted-foreground p-2 text-red-600">
-                      Phạt 50%
+                      Đền tiền 100%
                     </td>
                   </tr>
                 </tbody>
@@ -505,6 +512,11 @@ export default function Widget() {
                   message="Bạn đã cập nhật thành công trạng thái chuyến !"
                 />
               )}
+              <PopUpReasonManage
+                show={showPopUpReason}
+                onHide={() => setShowPopUpReason(false)}
+                onSend={() => setShowPopup(true)}
+              />
             </div>
             <div className="bg-white p-6 rounded-lg shadow-lg">
               <h4 className="text-lg font-semibold mb-4">
@@ -513,15 +525,10 @@ export default function Widget() {
               <ul className="list-none text-gray-700">
                 <li>
                   Phụ phí giao nhận xe tận nơi:{" "}
-                  <strong>
-                    {motorbikeDeliveryFee}vnd/km
-                  </strong>{" "}
+                  <strong>{motorbikeDeliveryFee}vnd/km</strong>{" "}
                 </li>
                 <li>
-                  Phụ phí quá giờ:{" "}
-                  <strong>
-                    {motorbikeOvertimeFee}vnd/km
-                  </strong>
+                  Phụ phí quá giờ: <strong>{motorbikeOvertimeFee}vnd/km</strong>
                 </li>
               </ul>
             </div>
