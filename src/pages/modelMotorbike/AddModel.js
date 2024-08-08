@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { Form, FloatingLabel } from "react-bootstrap";
 import apiClient from "../../axiosConfig";
 
-const inputClasses = "mt-1 block w-full p-2 border border-zinc-300 rounded-md dark:text-green-800 font-medium";
-const labelClasses = "block text-md font-bold text-slate-500 dark:text-neutral-300";
+
 
 const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
   const [formData, setFormData] = useState({
@@ -73,7 +70,8 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
     'XeSo': 'Xe Số',
     'XeTayGa': 'Xe Tay Ga',
     'XeConTay': 'Xe Côn Tay',
-    'XeDien': 'Xe Điện'
+    'XeDien': 'Xe Điện',
+    'XeGanMay' : 'Xe Gắn Máy'
   };
 
   const handleChange = (e) => {

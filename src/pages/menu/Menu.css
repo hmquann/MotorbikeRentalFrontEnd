@@ -5,15 +5,16 @@
   gap: 20px;
   padding: 20px; 
   box-sizing: border-box; 
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 
 /* Menu Left */
 .menu-left {
   width: 300px; 
   padding: 20px;
+  position: -webkit-sticky;
   position: sticky; 
-  top : 0;
+  top : 0;  
   height: 100%;
   flex-shrink: 0; 
  

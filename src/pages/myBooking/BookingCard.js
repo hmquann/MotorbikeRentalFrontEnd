@@ -249,6 +249,7 @@ const BookingCard = ({ booking }) => {
         case "DEPOSIT_MADE":
           console.log(renterName);
           console.log(lessorId);
+          
           await setDoc(doc(collection(db, "notifications")), {
             userId: userId,
             message: JSON.stringify({
@@ -273,11 +274,17 @@ const BookingCard = ({ booking }) => {
           const renterId = userData.userId; // Replace with actual user ID if different
           const amount = (booking.totalPrice * 30) / 100; // Replace with actual amount to be subtracted
           await apiClient.post(subtractMoneyUrl, null, {
-            params: { id: renterId, amount: amount, motorbikeName : motorbikeName, motorbikePlate : motorbikePlate },
-          });
-          await apiClient.post(addMoneyUrl, null, {
-            params: { id: lessorId, amount: amount, motorbikeName : motorbikeName, motorbikePlate : motorbikePlate },
-          });
+            params: {
+                senderId: renterId,
+                receiverId: lessorId,
+                amount: amount,
+                motorbikeName: motorbikeName,
+                motorbikePlate: motorbikePlate,
+            },
+        });
+          // await apiClient.post(addMoneyUrl, null, {
+          //   params: { id: lessorId, amount: amount, motorbikeName : motorbikeName, motorbikePlate : motorbikePlate },
+          // });
           break;
         default:
           return;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useRef } from "react";
+import React, { useState, useEffect} from "react";
 import { NavLink, Route, Routes, useNavigate, useLocation } from "react-router-dom";
 import "./Menu.css";
 import Profile from "../profile/Profile";
@@ -27,8 +27,6 @@ const Menu = () => {
   const [isManageOpen, setIsManageOpen] = useState(false); // State for managing dropdown
   const navigate = useNavigate();
   const location = useLocation();
-  const menuLeftRef = useRef(null);
-  const menuRightRef = useRef(null); 
 
   useEffect(() => {
     const roles = localStorage.getItem("roles");
@@ -69,17 +67,13 @@ const Menu = () => {
   
     window.scrollTo({ top: 0, behavior: 'smooth' });
   
-  
-    // if (menuRightRef.current) {
-    //   menuRightRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    // }
   };
 
   return (
     <div className="menu bg-zinc-100">
       {isAuthenticated && (
         <>
-          <div id="menu-left" className="menu-left bg-zinc-100 font-manrope" ref={menuLeftRef}>
+          <div id="menu-left" className="menu-left bg-zinc-100 font-manrope">
             <h4 className="font-bold">Xin chào bạn !</h4>
             <hr></hr>
             <ul>
@@ -129,8 +123,10 @@ const Menu = () => {
                   Trò chuyện
                 </NavLink>
               </li>
-              <hr></hr>
               {(isAdmin || isLessor) && (
+                <>
+              <hr></hr>
+
                 <li>
                   <a
                     type="button"
@@ -238,6 +234,7 @@ const Menu = () => {
                       )}
                     </ol>
                 </li>
+                </>
               )}
               <hr></hr>
               <li>
@@ -251,7 +248,7 @@ const Menu = () => {
               </li>
             </ul>
           </div>
-          <div className="menu-right" ref={menuRightRef}>
+          <div className="menu-right">
             <Routes>
               <Route path="/profile" element={<Profile />} />
               <Route path="/myBooking" element={<MyBooking />} />
