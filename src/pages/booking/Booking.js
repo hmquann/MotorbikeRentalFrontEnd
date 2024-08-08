@@ -269,7 +269,7 @@ console.log(receiveData)
 
   const handleChangeLocation = (location) => {
     console.log(location)
-    setGettedLocation(location);
+    setGettedLocation(location.place_name);
   };
   console.log(gettedLocation);
 

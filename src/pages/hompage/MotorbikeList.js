@@ -19,23 +19,61 @@ const badgeClasses =
 const buttonClasses = "bg-white bg-opacity-50 p-1 rounded-full";
 const avatarClasses = "w-10 h-10 rounded-full border-2 border-yellow-400";
 
-const MotorbikeList = (listMotor) => {
+const MotorbikeList = ({ listMotor, showDistance, searchLongitude, searchLatitude }) => {
+  console.log(listMotor)
   const navigate = useNavigate();
-  console.log(listMotor);
-  const [motorbikeList, setMotorbikeList] = useState(listMotor);
+  const [motorbikeList, setMotorbikeList] = useState([]);
+  const [locaList, setLocaList] = useState([]);
   const [selectedMotorbike, setSelectedMotorbike] = useState(null);
-  useEffect(() => {
-    if (listMotor.listMotor) {
-      setMotorbikeList(listMotor.listMotor);
-    }
-  }, [listMotor.listMotor]);
-  function formatNumber(numberString) {
-    // Convert the string to a number, in case it isn't already
-    const number = parseInt(numberString, 10);
+  const [distanceList, setDistanceList] = useState([]);
+  const accessToken = "pk.eyJ1Ijoibmd1eWVua2llbjAyIiwiYSI6ImNseDNpem83bjByM3cyaXF4NTZqOWFhZWIifQ.pVT0I74tSdI290kImTlphQ";
 
-    // Convert the number back to a string and use regex to format it with dots
+  useEffect(() => {
+    if (listMotor) {
+      const updatedMotorbikeList = listMotor;
+      setMotorbikeList(updatedMotorbikeList);
+
+      if (Array.isArray(updatedMotorbikeList) && updatedMotorbikeList.length !== 0) {
+        const newLocaList = updatedMotorbikeList.map(motor => [motor.longitude, motor.latitude]);
+        setLocaList(newLocaList);
+      }
+    }
+  }, [listMotor]);
+
+  useEffect(() => {
+    if (locaList.length > 0) {
+      fetchDistances();
+    }
+  }, [locaList]);
+
+  const fetchDistances = async () => {
+    const origin = [searchLongitude, searchLatitude];
+    console.log( origin);
+    console.log( locaList);
+
+    const coordinates = [origin, ...locaList];
+    const coordinatesString = coordinates.map(coord => coord.join(',')).join(';');
+    console.log(coordinatesString)
+    try {
+      const response = await axios.get(`https://api.mapbox.com/directions-matrix/v1/mapbox/driving/${coordinatesString}?access_token=${accessToken}`);
+      
+      if (response.status === 200) {
+        console.log('API Response:', response.data);
+        setDistanceList(response.data.distances);
+        console.log('Khoảng cách:', response.data.distances);
+      } else {
+        console.error('Lỗi: Trạng thái hoặc dữ liệu phản hồi không hợp lệ.');
+      }
+    } catch (error) {
+      console.error('Lỗi khi thực hiện yêu cầu Axios:', error);
+    }
+  };
+
+  const formatNumber = (numberString) => {
+    const number = parseInt(numberString, 10);
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  }
+  };
+
   const getAddress = (inputString) => {
     if (typeof inputString !== "string" || inputString.trim() === "") {
       return "";
@@ -55,7 +93,6 @@ const MotorbikeList = (listMotor) => {
       console.error("Error fetching motorbike details:", error);
     }
   };
-
   return (
     <div>
       <div className="p-8">
@@ -77,8 +114,8 @@ const MotorbikeList = (listMotor) => {
                     className="w-full h-64 object-cover rounded-t-lg"
                     src={
                       motorbike.motorbikeImages
-                        ? motorbike.motorbikeImages[0].url
-                        : ""
+                        ? motorbike.motorbikeImages[0]?.url
+                        : "https://kenhmuabanxehoi.net/uploads/truong-the-vinh_1680594107/halinh2.jpg"
                     }
                     alt="Motorbike"
                   />

@@ -54,10 +54,12 @@ const License = () => {
   const [previewImage, setPreviewImage] = useState();
   const [license, setLicense] = useState();
   const [error, setError] = useState("");
+  const[sizeImageError,setSizeImageError]=useState("");
   const [licenseNumberError, setLicenseNumberError] = useState("");
   const [birthDateError, setBirthOfDateError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPopupSuccess, setShowPopupSuccess] = useState(false);
+  const[sizeNotification,setSizeNotification]=useState("Dung lượng ảnh tải lên dưới 2 MB");
   useEffect(() => {
     apiClient
       .get(`/api/license/getLicenseByUserId/${user.userId}`)
@@ -65,12 +67,22 @@ const License = () => {
       .catch((error) => console.error("Error fetching motorbikes:", error));
   }, []);
   const [formLicenseData, setFormLicenseData] = useState({
-    licenseNumber: "",
-    birthOfDate: "",
-    licenseImageFile: "",
-    licenseType: "",
+    licenseNumber: license?license.licenseNumber:"",
+    birthOfDate: license?license.birthOfDate:"",
+    licenseImageFile: license?license.licenseImageFile:"",
+    licenseType: license?license.licenseType:"",
   });
   const handleSubmit = async () => {
+    if (
+      licenseNumberError ||
+      birthDateError ||
+      !formLicenseData.licenseType ||
+      !formLicenseData.birthOfDate ||
+      !formLicenseData.licenseNumber
+    ) {
+      setError("Hãy kiểm tra thông tin bạn nhập vào");
+    }
+    else {
     setLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 1500));
     try {
@@ -78,18 +90,9 @@ const License = () => {
       formData.append("licenseNumber", formLicenseData.licenseNumber);
       formData.append("birthOfDate", formLicenseData.birthOfDate);
       formData.append("licenseImageFile", formLicenseData.licenseImageFile);
-      formData.append("licenseType", formLicenseData.licenseType);
-      if (
-        licenseNumberError ||
-        birthDateError ||
-        !formLicenseData.licenseType ||
-        !formLicenseData.birthOfDate ||
-        !formLicenseData.licenseNumber
-      ) {
-        setError("Hãy kiểm tra thông tin bạn nhập vào");
-      } else {
+      formData.append("licenseType", formLicenseData.licenseType); 
         apiClient
-          .post("/api/license/uploadLicense", formData, {
+          .post(license?"/api/license/updateLicense":"/api/license/uploadLicense", formData, {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
@@ -130,13 +133,14 @@ const License = () => {
             setChangeLicense(false);
           });
       }
-    } catch (error) {
+     catch (error) {
       console.log(error);
     } finally {
       setLoading(false);
       setShowPopupSuccess(true);
     }
   };
+}
 
   const handlePopUpSuccess = () => {
     setShowPopupSuccess(false);
@@ -147,6 +151,14 @@ const License = () => {
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
+      const fileSizeMB = file.size / 1024 / 1024;
+
+      if (fileSizeMB > 2) {
+        setSizeImageError('Tệp quá lớn. Kích thước tối đa là 2MB.');
+      } 
+      else{
+        setSizeImageError('');
+        setSizeNotification('')
       reader.onloadend = () => {
         setFormLicenseData((prevState) => ({
           ...prevState,
@@ -156,6 +168,7 @@ const License = () => {
       };
       reader.readAsDataURL(file);
     }
+  }
   };
 
   const handleChangeLicense = () => {
@@ -257,6 +270,7 @@ const License = () => {
                     onChange={handleFileChange}
                     className={sharedClasses.inputFile}
                   />
+
                   {previewImage && (
                     <img
                       src={previewImage}
@@ -269,6 +283,8 @@ const License = () => {
                       className={sharedClasses.imagePreview}
                     />
                   )}
+                  {changeLicense?sizeImageError?"":<p style={{ color: 'red' }}>{sizeNotification}</p>:""}
+                  {sizeImageError && <p style={{ color: 'red' }}>{sizeImageError}</p>}
                 </>
               ) : (
                 <img
@@ -298,7 +314,7 @@ const License = () => {
                       className={sharedClasses.content}
                       name="licenseNumber"
                       value={formLicenseData.licenseNumber}
-                      // placeholder={license ? license.licenseNumber : "Chưa có"}
+                      placeholder={license ? license.licenseNumber : "Chưa có"}
                       onChange={handleChangeValue}
                     />
                   )}
@@ -358,7 +374,7 @@ const License = () => {
                 <div>
                   <label className={sharedClasses.label}>Họ và tên</label>
                   <div className={sharedClasses.content}>
-                    {license ? fullName : "Chưa có"}
+                    {fullName}
                   </div>
                 </div>
               </div>
@@ -377,7 +393,7 @@ const License = () => {
                       onClick={handleSubmit}
                       className=" py-3 px-5 mr-3 text-sm w-full tracking-wide rounded-lg text-white bg-green-500 hover:bg-green-600 transition hover:scale-110"
                     >
-                      Đăng ký
+                     {license?"Chỉnh sửa":"Đăng ký"} 
                     </button>
                     <button
                       onClick={() => {
@@ -398,7 +414,7 @@ const License = () => {
               show={showPopupSuccess}
               onHide={handlePopUpSuccess}
               message="Bạn đã cập nhật thành công GPLX.
-              Vui lòng đợi hệ thống duyệt hoặc liên hệ 1900-1009 nếu cần gấp!"
+              Vui lòng đợi hệ thống duyệt hoặc liên hệ hotline: 1900-1009 !"
             />
           )}
         </div>

@@ -188,8 +188,9 @@ const Filter = () => {
   const [modalShow, setModalShow] = useState(false);
   const location = useLocation();
   const filterAddressAndTime = location.state.filterList;
+  const listMotorbike=location.state.listMotor;
   const [address, setAddress] = useState(filterAddressAndTime.address);
-  const [listMotor, setListMotor] = useState(location.state.listMotor);
+  const [listMotor, setListMotor] = useState(listMotorbike.content);
   const handleUpdateValues = (newValues) => {
     setFilterList({ ...filterList, minPrice: newValues[0] });
     setFilterList({ ...filterList, maxPrice: newValues[1] });
@@ -213,6 +214,7 @@ const Filter = () => {
     maxPrice: 200000,
     isFiveStar: "",
   });
+  console.log(filterList.longitude,filterList.latitude)
   const handleOpenSchedulePopup = () => {
     setSchedulePopUp(true);
   };
@@ -561,7 +563,7 @@ const Filter = () => {
 
       <div className="flex justify-center">
         <div style={{ width: "95%" }}>
-          <MotorbikeList listMotor={listMotor} />
+          <MotorbikeList listMotor={listMotor} searchLongitude={filterList.longitude} searchLatitude={filterList.latitude} showDistance={true}/>
         </div>
       </div>
       {showBrandPopup && (
