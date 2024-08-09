@@ -18,7 +18,14 @@ const badgeClasses =
   "bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded";
 const buttonClasses = "bg-white bg-opacity-50 p-1 rounded-full";
 const avatarClasses = "w-10 h-10 rounded-full border-2 border-yellow-400";
-
+const fixedNumber=(number)=>{
+  return (number / 1000).toFixed(1);
+}
+const displayAddress=(str)=>{
+  const parts = str.split(",");
+  const result = parts.slice(-2).join(",");
+return result;
+}
 const MotorbikeList = ({ listMotor, showDistance, searchLongitude, searchLatitude }) => {
   console.log(listMotor)
   const navigate = useNavigate();
@@ -55,12 +62,12 @@ const MotorbikeList = ({ listMotor, showDistance, searchLongitude, searchLatitud
     const coordinatesString = coordinates.map(coord => coord.join(',')).join(';');
     console.log(coordinatesString)
     try {
-      const response = await axios.get(`https://api.mapbox.com/directions-matrix/v1/mapbox/driving/${coordinatesString}?access_token=${accessToken}`);
+      const response = await axios.get(`https://api.mapbox.com/directions-matrix/v1/mapbox/driving/${coordinatesString}?access_token=${accessToken}&annotations=distance`);
       
       if (response.status === 200) {
         console.log('API Response:', response.data);
-        setDistanceList(response.data.distances);
-        console.log('Khoảng cách:', response.data.distances);
+        setDistanceList(response.data.distances[0]);
+        console.log('Khoảng cách:', response.data.distances[0]);
       } else {
         console.error('Lỗi: Trạng thái hoặc dữ liệu phản hồi không hợp lệ.');
       }
@@ -111,7 +118,7 @@ const MotorbikeList = ({ listMotor, showDistance, searchLongitude, searchLatitud
             </div>
           ) : (
             Array.isArray(motorbikeList) &&
-            motorbikeList.map((motorbike) => (
+            motorbikeList.map((motorbike,index) => (
               <div className="relative flex items-center">
             <div className="grid gap-4 w-full h-full cursor-pointer overflow-hidden ">
                   <div 
@@ -135,10 +142,10 @@ const MotorbikeList = ({ listMotor, showDistance, searchLongitude, searchLatitud
                           </button>
                         </div>
                         <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{motorbike.model.modelName}</h3>
-                        <div className="text-gray-500">
+                        <div className="text-gray-500 text-xs">
                           <FontAwesomeIcon icon={faLocationDot} className='mr-2' />
-                          <span className="">{motorbike.motorbikeAddress}</span>
-                          <span className="float-right">km</span>
+                          <span className="">{motorbike.motorbikeAddress?displayAddress(motorbike.motorbikeAddress):" "}</span>
+                          <span className="float-right">~{fixedNumber(distanceList[index+1])} km</span>
                         </div>
                         <hr />
                         <div className='flex justify-between'>

@@ -39,8 +39,8 @@ const PopUpLocation = ({
     console.log("Selected Location:", location);
     setSelectedLocation(location);
     setCustomLocation({
-      long: location.long,
-      lat: location.lat,
+      longitude: location.long,
+      latitude: location.lat,
       place_name: location.place_name,
     });
   };
@@ -87,14 +87,14 @@ const PopUpLocation = ({
     if (selectedOption === "map-location" && customLocation) {
       console.log(motorbikeCoords);
       console.log({
-        longitude: customLocation.long,
-        latitude: customLocation.lat,
+        longitude: customLocation.longitude,
+        latitude: customLocation.latitude,
       });
       const calculatedDistance = await checkDistance(
         motorbikeCoords,
         {
-          longitude: customLocation.long,
-          latitude: customLocation.lat,
+          longitude: customLocation.longitude,
+          latitude: customLocation.latitude,
         } // Use customLocation directly
       );
       if (calculatedDistance > receiveData.freeShipLimit) {
@@ -189,7 +189,7 @@ const PopUpLocation = ({
                       Giao nhận tại vị trí xe
                     </p>
                     <p className={sharedClasses.textZincLight}>
-                      {onSelectLocation.address}
+                      {onSelectLocation.place_name}
                     </p>
                   </div>
                 </label>

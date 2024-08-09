@@ -313,22 +313,48 @@ const RegisterMotorbikeStep1 = () => {
   const handleReturnNavigate = () => {
     navigate("/homepage", { state: {} });
   };
-  const handleSunbmit = (e) => {
-    console.log(formData);
-    e.preventDefault();
-    setError(null);
-    if (!formData.motorbikePlate.trim()) {
-      setMotorbikePlateError("Hãy điền biển số xe");
-    } else if (!selectedModel) {
-      setMotorbikeModelError("Hãy chọn mẫu xe");
-    } else if (!formData.yearOfManufacture.trim()) {
-      setManufactureYearError("Hãy điền năm sản xuất");
-    } else {
-      setLoading(true);
-      console.log(modelName);
-      navigate("/registermotorbike/step2", { state: { formData, modelName } });
+
+
+
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError(null);
+
+  try {
+    const response = await apiClient.get(`/api/motorbike/checkExistPlate/${formData.motorbikePlate}`);
+    if(response.data){
+      setMotorbikePlateError("Biển số xe đã được đăng ký");
+      console.log(response.data.motorbikePlate)
+      return;
+    }else{
+      setMotorbikePlateError("");
+      console.log(response.data)
     }
-  };
+    } catch (error) {   
+    console.error('Error checking plate:', error);
+
+}
+
+  // Kiểm tra lỗi cơ bản
+  if (!formData.motorbikePlate.trim()) {
+      setMotorbikePlateError("Hãy điền biển số xe");
+  } 
+  if (!selectedModel) {
+      setMotorbikeModelError("Hãy chọn mẫu xe");
+  } 
+  if (!formData.yearOfManufacture.trim()) {
+      setManufactureYearError("Hãy điền năm sản xuất");
+  }
+
+  // Kiểm tra xem có lỗi nào không
+  if (motorbikePlateError || motorbikeModelError || motorbikeBrandError || manufactureYearError) {
+      setError("Thông tin xe không đầy đủ hoặc không hợp lệ");
+      return;
+  }
+  setLoading(true);
+  navigate("/registermotorbike/step2", { state: { formData, modelName } });
+};
   const CustomFormLabel = ({ children }) => {
     return (
       <Form.Label>
@@ -340,7 +366,7 @@ const RegisterMotorbikeStep1 = () => {
     setShowTooltip(true);
     setTimeout(() => {
       setShowTooltip(false);
-    }, 5000); // 5 seconds
+    }, 2000); // 5 seconds
   };
 
   return (
@@ -351,7 +377,7 @@ const RegisterMotorbikeStep1 = () => {
         Đăng ký xe
       </h1>
       <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-lg max-w-xl w-full mb-10">
-        <Form onSubmit={handleSunbmit}>
+        <Form onSubmit={handleSubmit}>
           {/* Biển số xe */}
           <Form.Group className="mb-4">
             <CustomFormLabel>Biển số xe</CustomFormLabel>
@@ -433,8 +459,9 @@ const RegisterMotorbikeStep1 = () => {
               onClick={handleIconClick}
             />
             {showTooltip && (
-              <div className={sharedClasses.tooltipText}>
-                Các tài sản thế chấp thường được sử dụng như:
+              <div className={`absolute bottom-28  z-50 bg-[#f5f5dc] border border-gray-300 p-2 rounded shadow text-xs`}>
+                Các tài sản thế chấp thường được
+                sử dụng như:CCCD/CMND,GPLX...
               </div>
             )}
             <Form.Control
@@ -462,7 +489,8 @@ const RegisterMotorbikeStep1 = () => {
             <button
               type="submit"
               className="w-6/12 py-2 text-base font-bold text-white  bg-green-500 rounded-lg hover:bg-green-600 transition hover:scale-105"
-              disabled={loading}
+              disabled={loading|| motorbikePlateError || motorbikeModelError || motorbikeBrandError || manufactureYearError}
+              
             >
               {loading ? "Tiếp tục..." : "Tiếp tục"}
             </button>
