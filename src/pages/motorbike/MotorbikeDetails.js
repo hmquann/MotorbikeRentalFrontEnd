@@ -183,7 +183,7 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
               id="delivery"
               name="delivery"
               placeholder="Enter delivery status"
-              value={updateForm.delivery ? "Yes" : "No"}
+              value={updateForm.delivery ? "Có" : "Không"}
               readOnly={!isUpdate}
               onChange={handleChange}
             />

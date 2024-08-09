@@ -181,13 +181,13 @@ const Booking = () => {
   console.log(receiveData);
   const [showPopUpPricePerDay, setShowPopUpPricePerDay] = useState(false);
   const motorbikeAddress = {
-    address: receiveData.motorbikeAddress,
+    place_name: receiveData.motorbikeAddress,
     longitude: receiveData.longitude,
     latitude: receiveData.latitude,
   };
 
   const [gettedLocation, setGettedLocation] = useState(
-    motorbikeAddress.address
+    motorbikeAddress
   );
 
   const handleClosePopup = () => {
@@ -283,12 +283,9 @@ const Booking = () => {
   const handleChangeLocation = (location) => {
 
     console.log(location)
-    setGettedLocation(location.place_name);
+    setGettedLocation(location);
   };
   console.log(gettedLocation);
-
-  const [distance, setDistance] = useState(0);
-  const [newAddressData, setNewAddressData] = useState([]);
   const [showPopUpVoucher, setShowPopUpVoucher] = useState(false);
   const [discounts, setDiscounts] = useState([]);
   useEffect(() => {
@@ -451,19 +448,20 @@ const Booking = () => {
       }
 
       const response2 = await apiClient
-        .post("/api/booking/create", {
+        .post("/api/booking/create", {        
           renterId: userId,
           motorbikeId: receiveData.id,
           startDate: dayjs(startDateTime).format("YYYY-MM-DDTHH:mm:ss"),
           endDate: dayjs(endDateTime).format("YYYY-MM-DDTHH:mm:ss"),
           bookingTime: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
           totalPrice: totalPrice,
-          receiveLocation: gettedLocation.address,
+          receiveLocation: gettedLocation.place_name,
           longitude: gettedLocation.longitude,
           latitude: gettedLocation.latitude,
         })
         .then(async () => {
-          setShowPopupSuccess(true); // Hiển thị popup khi thành công
+          setShowPopupSuccess(true);
+         // Hiển thị popup khi thành công
           if (emailNoti) {
             const response3 = apiClient.post(
               "/api/booking/sendEmailSuccessBooking",
@@ -479,7 +477,7 @@ const Booking = () => {
                 startDate: dayjs(startDateTime).format("YYYY-MM-DDTHH:mm:ss"),
                 endDate: dayjs(endDateTime).format("YYYY-MM-DDTHH:mm:ss"),
                 totalPrice: totalPrice,
-                receiveLocation: gettedLocation,
+                receiveLocation: gettedLocation.place_name,
               }
             );
           }
@@ -500,7 +498,7 @@ const Booking = () => {
                 startDate: dayjs(startDateTime).format("YYYY-MM-DDTHH:mm:ss"),
                 endDate: dayjs(endDateTime).format("YYYY-MM-DDTHH:mm:ss"),
                 totalPrice: totalPrice,
-                receiveLocation: gettedLocation,
+                receiveLocation: gettedLocation.place_name,
               }
             );
           }
@@ -704,7 +702,7 @@ const Booking = () => {
                         <input
                           type="text"
                           className={`w-full overflow-hidden text-ellipsis whitespace-nowrap font-bold cursor-pointer`}
-                          value={gettedLocation}
+                          value={gettedLocation.place_name}
                           readOnly
                           onClick={() => setShowPopUp(true)}
                         />
@@ -915,7 +913,7 @@ const Booking = () => {
           bookingDetails={{
             startDate: startDateTime,
             endDate: endDateTime,
-            receiveLocation: gettedLocation,
+            receiveLocation: gettedLocation.place_name,
             totalPrice: totalPrice,
           }}
           onConfirm={handleConfirmBooking}
