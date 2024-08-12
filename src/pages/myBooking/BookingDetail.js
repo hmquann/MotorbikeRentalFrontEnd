@@ -25,6 +25,8 @@ import { styled } from "@mui/system";
 import FeedbackModal from "../booking/FeedbackModal";
 import PopUpReason from "./PopUpReason";
 import FeedbackList from "../booking/FeedbackList";
+import MapModal from "./MapModal";
+
 
 const statusTranslations = {
   PENDING: "Chờ duyệt",
@@ -132,10 +134,12 @@ export default function Widget() {
   const booking = JSON.parse(localStorage.getItem("booking"));
   const [motorbikeName, setMotorbikeName] = useState();
   const [motorbikePlate, setMotorbikePlate] = useState();
+  const [motorbikeLocation, setMotorbikeLocation] = useState();
   const [lessorName, setLessorName] = useState();
   const [renterName, setRenterName] = useState();
   const [motorbikeDeliveryFee, setMotorbikeDeliveryFee] = useState();
   const [motorbikeOvertimeFee, setMotorbikeOvertimeFee] = useState();
+  const [motorbikeOvertimeLimit, setMotorbikeOvertimeLimit] = useState();
   const [urlImage, setUrlImage] = useState();
   const [lessorId, setLessorId] = useState();
   const [motorbike, setMotorbike] = useState();
@@ -161,6 +165,7 @@ export default function Widget() {
   const minimizeNoti = userData ? userData.minimizeNoti : null;
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [feedbackSent, setFeedbackSent] = useState(false);
+  const [viewMap, setViewMap] = useState(false);
   const navigate = useNavigate();
 
   const CustomLinearProgress = styled(LinearProgress)(
@@ -188,7 +193,12 @@ export default function Widget() {
           `${response.data.user.firstName} ${response.data.user.lastName}`
         );
         setLessor(response.data.user);
+        setMotorbikeLocation({
+          longitude: response.data.longitude,
+          latitude: response.data.latitude,
+        });
         setMotorbikeDeliveryFee(`${response.data.deliveryFee}`);
+        setMotorbikeOvertimeLimit(`${response.data.overtimeLimit}`);
         setMotorbikeOvertimeFee(`${response.data.overtimeFee}`);
         setUrlImage(response.data.motorbikeImages[0].url);
         setLessorId(response.data.user.id);
@@ -508,7 +518,13 @@ export default function Widget() {
     setShowPopupSuccess(false);
     navigate("/menu/myBooking");
   };
-
+  const handleViewMap = (e) => {
+    e.preventDefault();
+    setViewMap(true);
+  };
+  const handleCloseModal = () => {
+    setViewMap(false);
+  };
   return (
     <div className="relative">
       {loading && (
@@ -540,7 +556,7 @@ export default function Widget() {
               />
               <div>
                 <h2 className="text-2xl font-bold">{motorbikeName}</h2>
-                <a href="#" className="text-blue-500 underline">
+                <a href="#" className="text-blue-500 " onClick={handleViewMap}>
                   Xem lộ trình
                 </a>
                 <p className="text-gray-600">{booking.receiveLocation}</p>
@@ -554,7 +570,7 @@ export default function Widget() {
                     <FontAwesomeIcon
                       icon={faCalendarDays}
                       size="lg"
-                      color="gray"
+                      color="green"
                     />{" "}
                     Bắt đầu thuê xe
                   </h4>
@@ -568,7 +584,7 @@ export default function Widget() {
                     <FontAwesomeIcon
                       icon={faCalendarDays}
                       size="lg"
-                      color="gray"
+                      color="green"
                     />{" "}
                     Kết thúc thuê xe
                   </h4>
@@ -853,6 +869,14 @@ export default function Widget() {
                 bookingId={booking.bookingId}
                 onFeedbackSubmitted={() => setFeedbackSent(true)}
               />
+              {viewMap && (
+                <MapModal
+                  isOpen={viewMap}
+                  onClose={handleCloseModal}
+                  startLocation={[motorbikeLocation.longitude,motorbikeLocation.latitude]}
+                  endLocation={[booking.longitude,booking.latitude]}
+                />
+              )}
             </div>
             <div className="bg-white p-6 rounded-lg shadow-lg">
               <h4 className="text-lg font-semibold mb-4">
@@ -861,10 +885,15 @@ export default function Widget() {
               <ul className="list-none text-gray-700">
                 <li>
                   Phụ phí giao nhận xe tận nơi:{" "}
-                  <strong>{motorbikeDeliveryFee}đ/km</strong>{" "}
+                  <strong>{motorbikeDeliveryFee} đ/km</strong>{" "}
                 </li>
                 <li>
-                  Phụ phí quá giờ: <strong>{motorbikeOvertimeFee}đ/km</strong>
+                  Phụ phí quá giờ: <strong>{motorbikeOvertimeFee} đ/giờ</strong>
+                </li>
+                <li>
+                  Giới hạn quá giờ:{" "}
+                  <strong>{motorbikeOvertimeLimit} giờ</strong>(sẽ tính thêm 1
+                  ngày thuê mới nếu quá giới hạn này)
                 </li>
               </ul>
             </div>
