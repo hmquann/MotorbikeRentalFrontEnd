@@ -27,6 +27,8 @@ import { useNavigate } from "react-router-dom";
 import FeedbackModal from "../booking/FeedbackModal";
 import apiClient from "../../axiosConfig";
 import { CircularProgress, LinearProgress } from "@mui/material";
+import DepositCountdown from "./DepositCountdown";
+import PopupWallet from "./PopUpWallet";
 
 const BookingCard = ({ booking }) => {
   const [motorbikeName, setMotorbikeName] = useState();
@@ -44,9 +46,13 @@ const BookingCard = ({ booking }) => {
   const [messageConfirm, setMessageConfirm] = useState();
   const [showPopUp, setShowPopUp] = useState(false);
   const [showPopupSuccess, setShowPopupSuccess] = useState(false);
+  const [showPopupWallet, setShowPopupWallet] = useState(false);
+  const [balance, setBalance] = useState(0);
+  const [backWallet, setBackWallet] = useState(false);
   const [action, setAction] = useState("");
   const navigate = useNavigate();
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState(null);
   const [feedbackSent, setFeedbackSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const userDataString = localStorage.getItem("user");
@@ -149,6 +155,141 @@ const BookingCard = ({ booking }) => {
     window.open("/manageBooking", "_blank");
   };
 
+  const handleOneHourLeft = async () => {
+    console.log(booking.depositNoti);
+    if (booking.depositNoti) {
+      const now = new Date();
+      const formattedStartDate = dayjs(booking.startDate).format(
+        "HH:mm DD/MM/YYYY"
+      );
+      const formattedEndDate = dayjs(booking.endDate).format(
+        "HH:mm DD/MM/YYYY"
+      );
+      // Đổi noti
+      const changeNoti = await apiClient.post(
+        `/api/booking/changeDepositNotification/${booking.bookingId}`
+      );
+      // mail
+      if (renter.emailNoti) {
+        const response5 = await apiClient.post(
+          "/api/booking/sendEmailDepositNotification",
+          {
+            renterName: renterName,
+            renterEmail: renter.email,
+            motorbikeName:
+              motorbike.model.modelName + " " + motorbike.yearOfManufacture,
+            motorbikePlate: motorbike.motorbikePlate,
+            bookingTime: dayjs(booking.bookingTime).format(
+              "YYYY-MM-DDTHH:mm:ss"
+            ),
+            startDate: dayjs(booking.startDate).format("YYYY-MM-DDTHH:mm:ss"),
+            endDate: dayjs(booking.endDate).format("YYYY-MM-DDTHH:mm:ss"),
+            totalPrice: booking.totalPrice,
+            receiveLocation: booking.receiveLocation,
+          }
+        );
+      }
+      // system
+      if (renter.systemNoti) {
+        await setDoc(doc(collection(db, "notifications")), {
+          userId: renterIdNoti,
+          message: JSON.stringify({
+            title:
+              '<strong style="color: rgb(249 115 22">Nhắc nhở đặt cọc</strong>',
+            content: `Đơn thuê xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong>, thời gian thuê xe từ <strong>${formattedStartDate}</strong> đến <strong>${formattedEndDate}</strong> của bạn sắp hết hạn đặt cọc. Bạn vui lòng thanh toán tiền cọc để hoàn tất thủ tục.`,
+          }),
+          timestamp: now,
+          seen: false,
+        });
+      }
+    }
+  };
+
+  const handleTimeExpired = async () => {
+    console.log(booking.depositCanceled);
+    if (booking.depositCanceled) {
+      const now = new Date();
+      const formattedStartDate = dayjs(booking.startDate).format(
+        "HH:mm DD/MM/YYYY"
+      );
+      const formattedEndDate = dayjs(booking.endDate).format(
+        "HH:mm DD/MM/YYYY"
+      );
+      //setcanceled
+      const changeCanceled = await apiClient.post(
+        `/api/booking/changeDepositCanceled/${booking.bookingId}`
+      );
+      //setStatus
+      const newStatus = "CANCELED";
+      const url = `/api/booking/changeStatus/${booking.bookingId}/${newStatus}`;
+      await apiClient.put(url);
+
+      if (renter.emailNoti) {
+        const response3 = apiClient.post(
+          "/api/booking/sendEmailCancelBooking",
+          {
+            renterName: userName,
+            renterEmail: userEmail,
+            motorbikeName:
+              motorbike.model.modelName + " " + motorbike.yearOfManufacture,
+            motorbikePlate: motorbike.motorbikePlate,
+            bookingTime: dayjs(booking.bookingTime).format(
+              "YYYY-MM-DDTHH:mm:ss"
+            ),
+            startDate: dayjs(booking.startDate).format("YYYY-MM-DDTHH:mm:ss"),
+            endDate: dayjs(booking.endDate).format("YYYY-MM-DDTHH:mm:ss"),
+            totalPrice: booking.totalPrice,
+            receiveLocation: booking.receiveLocation,
+            reason: "Hết hạn đặt cọc chuyến",
+          }
+        );
+      }
+      if (lessor.emailNoti) {
+        const response5 = apiClient.post(
+          "/api/booking/sendEmailCancelBookingForLessor",
+          {
+            lessorName: lessor.firstName + " " + lessor.lastName,
+            lessorEmail: lessor.email,
+            renterName: userName,
+            motorbikeName:
+              motorbike.model.modelName + " " + motorbike.yearOfManufacture,
+            motorbikePlate: motorbike.motorbikePlate,
+            bookingTime: dayjs(booking.bookingTime).format(
+              "YYYY-MM-DDTHH:mm:ss"
+            ),
+            startDate: dayjs(booking.startDate).format("YYYY-MM-DDTHH:mm:ss"),
+            endDate: dayjs(booking.endDate).format("YYYY-MM-DDTHH:mm:ss"),
+            totalPrice: booking.totalPrice,
+            receiveLocation: booking.receiveLocation,
+            reason: "Hết hạn đặt cọc chuyến",
+          }
+        );
+      }
+      if (renter.systemNoti) {
+        await setDoc(doc(collection(db, "notifications")), {
+          userId: userId,
+          message: JSON.stringify({
+            title: '<strong style="color: rgb(197 34 34)">Hủy thuê xe</strong>',
+            content: `Bạn đã hủy thuê xe <strong>${motorbike.model.modelName} ${motorbike.yearOfManufacture}</strong>, biển số <strong>${motorbike.motorbikePlate}</strong> với lí do <strong>Hết hạn đặt cọc chuyến</strong>.`,
+          }),
+          timestamp: now,
+          seen: false,
+        });
+      }
+      if (lessor.systemNoti) {
+        await setDoc(doc(collection(db, "notifications")), {
+          userId: lessor.id,
+          message: JSON.stringify({
+            title: '<strong style="color: rgb(197 34 34)">Hủy thuê xe</strong>',
+            content: `<strong>${userName}</strong> đã hủy thuê xe <strong>${motorbike.model.modelName} ${motorbike.yearOfManufacture}</strong>, biển số <strong>${motorbike.motorbikePlate}</strong> của bạn với lí do <strong>Hết hạn đặt cọc chuyến</strong>.`,
+          }),
+          timestamp: now,
+          seen: false,
+        });
+      }
+    }
+  };
+
   const handleAction = async (actionType) => {
     console.log(lessorId);
     console.log(lessorName);
@@ -183,6 +324,17 @@ const BookingCard = ({ booking }) => {
     }
     setShowPopUp(true);
   };
+  const checkWallet = () => {
+    const depositMoney = (booking.totalPrice * 30) / 100;
+    if (balance < depositMoney) {
+      setShowPopupWallet(true);
+      setBackWallet(true);
+      console.log(balance);
+      console.log(depositMoney);
+    } else {
+      setShowPopupWallet(false);
+    }
+  };
 
   const handleConfirm = async () => {
     setShowPopUp(false);
@@ -191,13 +343,43 @@ const BookingCard = ({ booking }) => {
     );
     const formattedEndDate = dayjs(booking.endDate).format("HH:mm DD/MM/YYYY");
     setLoading(true);
+
+    const userId = JSON.parse(localStorage.getItem("user")).userId;
+    const token = localStorage.getItem("token");
+
+    try {
+      const response = await apiClient.get(`/api/user/${userId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.status === 200) {
+        const user = response.data;
+        setBalance(user.balance);
+      } else {
+        console.error("Failed to fetch user balance");
+      }
+    } catch (error) {
+      console.error("Error fetching user balance:", error);
+    }
+
     try {
       const url = `/api/booking/changeStatus/${booking.bookingId}/${action}`;
-      await apiClient.put(url);
+      if (action !== "DEPOSIT_MADE") {
+        await apiClient.put(url);
+      }
       const now = new Date();
 
       switch (action) {
         case "PENDING_DEPOSIT":
+          const saveDepositRespone = await apiClient.post(
+            "/api/booking/saveDepositTime",
+            {
+              bookingId: booking.bookingId,
+              depositTime: dayjs(now).format("YYYY-MM-DDTHH:mm:ss"),
+            }
+          );
           if (systemNoti) {
             await setDoc(doc(collection(db, "notifications")), {
               userId: userId,
@@ -299,11 +481,14 @@ const BookingCard = ({ booking }) => {
           const subtractMoneyUrlDone = `/api/payment/subtract`;
           const addMoneyUrlDone = `/api/payment/add`;
           const amountDone = (booking.totalPrice * 30) / 200;
-          await apiClient.post(addMoneyUrlDone, null, {
-            params: { id: userId, amount: amountDone },
-          });
           await apiClient.post(subtractMoneyUrlDone, null, {
-            params: { id: adminId, amount: amountDone },
+            params: {
+              senderId: adminId,
+              receiverId: userId,
+              amount: amountDone,
+              motorbikeName: motorbikeName,
+              motorbikePlate: motorbikePlate,
+            },
           });
           if (systemNoti) {
             await setDoc(doc(collection(db, "notifications")), {
@@ -342,7 +527,9 @@ const BookingCard = ({ booking }) => {
                 bookingTime: dayjs(booking.bookingTime).format(
                   "YYYY-MM-DDTHH:mm:ss"
                 ),
-                startDate: dayjs(booking.startDate).format("YYYY-MM-DDTHH:mm:ss"),
+                startDate: dayjs(booking.startDate).format(
+                  "YYYY-MM-DDTHH:mm:ss"
+                ),
                 endDate: dayjs(booking.endDate).format("YYYY-MM-DDTHH:mm:ss"),
                 totalPrice: booking.totalPrice,
                 receiveLocation: booking.receiveLocation,
@@ -361,7 +548,9 @@ const BookingCard = ({ booking }) => {
                 bookingTime: dayjs(booking.bookingTime).format(
                   "YYYY-MM-DDTHH:mm:ss"
                 ),
-                startDate: dayjs(booking.startDate).format("YYYY-MM-DDTHH:mm:ss"),
+                startDate: dayjs(booking.startDate).format(
+                  "YYYY-MM-DDTHH:mm:ss"
+                ),
                 endDate: dayjs(booking.endDate).format("YYYY-MM-DDTHH:mm:ss"),
                 totalPrice: booking.totalPrice,
                 receiveLocation: booking.receiveLocation,
@@ -371,9 +560,21 @@ const BookingCard = ({ booking }) => {
 
           break;
         case "DEPOSIT_MADE":
+          if (showPopupWallet) {
+            console.log(showPopupWallet);
+            return;
+          }
+          await apiClient.put(url);
+          const changeNoti = await apiClient.post(
+            `/api/booking/changeDepositNotification/${booking.bookingId}`
+          );
+          const changeCanceled = await apiClient.post(
+            `/api/booking/changeDepositCanceled/${booking.bookingId}`
+          );
+
           console.log(renterName);
           console.log(lessorId);
-          
+
           await setDoc(doc(collection(db, "notifications")), {
             userId: userId,
             message: JSON.stringify({
@@ -392,6 +593,51 @@ const BookingCard = ({ booking }) => {
             timestamp: now,
             seen: false,
           });
+
+          if (emailNoti) {
+            const response3 = apiClient.post(
+              "/api/booking/sendEmailDepositMadeBooking",
+              {
+                renterName: userName,
+                renterEmail: userEmail,
+                motorbikeName:
+                  motorbike.model.modelName + " " + motorbike.yearOfManufacture,
+                motorbikePlate: motorbike.motorbikePlate,
+                bookingTime: dayjs(booking.bookingTime).format(
+                  "YYYY-MM-DDTHH:mm:ss"
+                ),
+                startDate: dayjs(booking.startDate).format(
+                  "YYYY-MM-DDTHH:mm:ss"
+                ),
+                endDate: dayjs(booking.endDate).format("YYYY-MM-DDTHH:mm:ss"),
+                totalPrice: booking.totalPrice,
+                receiveLocation: booking.receiveLocation,
+              }
+            );
+          }
+          if (lessor.emailNoti) {
+            const response5 = apiClient.post(
+              "/api/booking/sendEmailDepositMadeBookingForLessor",
+              {
+                lessorName: lessor.firstName + " " + lessor.lastName,
+                lessorEmail: lessor.email,
+                renterName: userName,
+                motorbikeName:
+                  motorbike.model.modelName + " " + motorbike.yearOfManufacture,
+                motorbikePlate: motorbike.motorbikePlate,
+                bookingTime: dayjs(booking.bookingTime).format(
+                  "YYYY-MM-DDTHH:mm:ss"
+                ),
+                startDate: dayjs(booking.startDate).format(
+                  "YYYY-MM-DDTHH:mm:ss"
+                ),
+                endDate: dayjs(booking.endDate).format("YYYY-MM-DDTHH:mm:ss"),
+                totalPrice: booking.totalPrice,
+                receiveLocation: booking.receiveLocation,
+              }
+            );
+          }
+
           const adminData = await apiClient.get("api/user/getAdmin");
           const adminDataId = adminData.data.id;
           const renterId = userData.userId; // Replace with actual user ID if different
@@ -400,13 +646,13 @@ const BookingCard = ({ booking }) => {
           const addMoneyUrl = `/api/payment/add`;
           await apiClient.post(subtractMoneyUrl, null, {
             params: {
-                senderId: renterId,
-                receiverId: adminDataId,
-                amount: amount,
-                motorbikeName: motorbikeName,
-                motorbikePlate: motorbikePlate,
+              senderId: renterId,
+              receiverId: adminDataId,
+              amount: amount,
+              motorbikeName: motorbikeName,
+              motorbikePlate: motorbikePlate,
             },
-        });
+          });
           // await apiClient.post(addMoneyUrl, null, {
           //   params: { id: lessorId, amount: amount, motorbikeName : motorbikeName, motorbikePlate : motorbikePlate },
           // });
@@ -424,14 +670,27 @@ const BookingCard = ({ booking }) => {
     } catch (error) {
       console.error("Error:", error);
     } finally {
+      console.log(showPopupWallet);
       setLoading(false);
-      setShowPopupSuccess(true);
+      if (!showPopupWallet) {
+        setShowPopupSuccess(true);
+      }
     }
   };
+
+  useEffect(() => {
+    if (backWallet) {
+      handleConfirm();
+    }
+  }, [showPopupWallet, backWallet]);
 
   const handlePopUpSuccess = () => {
     setShowPopupSuccess(false);
     window.location.reload();
+  };
+  const handlePopUpWallet = () => {
+    setShowPopupWallet(false);
+    navigate("/menu/wallet");
   };
 
   const { text, icon, color } = statusDetails[booking.status] || {};
@@ -494,6 +753,15 @@ const BookingCard = ({ booking }) => {
                 <div className="font-bold text-lg">
                   Tổng chi phí: {booking.totalPrice.toLocaleString("vi-VN")} vnd
                 </div>
+                {booking.depositTime && (
+                  <DepositCountdown
+                    depositTime={booking.depositTime}
+                    onOneHourLeft={handleOneHourLeft}
+                    onTimeExpired={handleTimeExpired}
+                    depositNoti={booking.depositNoti}
+                    depositCanceled={booking.depositCanceled}
+                  ></DepositCountdown>
+                )}
               </div>
             </div>
           </div>
@@ -570,7 +838,7 @@ const BookingCard = ({ booking }) => {
           <PopUpConfirm
             show={showPopUp}
             message={messageConfirm}
-            onConfirm={handleConfirm}
+            onConfirm={checkWallet}
             onCancel={() => setShowPopUp(false)}
           />
         )}
@@ -579,6 +847,13 @@ const BookingCard = ({ booking }) => {
             show={showPopupSuccess}
             onHide={handlePopUpSuccess}
             message="Bạn đã cập nhật thành công trạng thái chuyến !"
+          />
+        )}
+        {showPopupWallet && (
+          <PopupWallet
+            show={showPopupWallet}
+            onHide={handlePopUpWallet}
+            message="Số dư ví của bạn chưa đủ. Bạn vui lòng nạp thêm để thanh toán tiền cọc!"
           />
         )}
       </div>

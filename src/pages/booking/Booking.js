@@ -41,6 +41,7 @@ import PopUpPricePerDay from "./popUpPricePerDay/PopUpPricePerDay";
 import apiClient from "../../axiosConfig";
 import { useNotification } from "../../NotificationContext";
 import { CircularProgress } from "@mui/material";
+import PopUpCheckOverlap from "./popUpCheckOverlap/PopUpCheckOverlap";
 const sharedClasses = {
   rounded: "rounded",
   flex: "flex",
@@ -159,6 +160,7 @@ const Booking = () => {
   const [showPopUp, setShowPopUp] = useState(false);
   const navigate = useNavigate();
   const [showPopUpLicense, setShowPopUpLicense] = useState(false);
+  const [showPopUpCheckOverlap, setShowPopUpCheckOverlap] = useState(false);
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [schedulePopUp, setSchedulePopUp] = useState(false);
   const [pickupDate, setPickupDate] = useState("");
@@ -172,6 +174,7 @@ const Booking = () => {
   const [showPopupSuccess, setShowPopupSuccess] = useState(false);
   const { incrementNotificationCount } = useNotification();
   const [loading, setLoading] = useState();
+  const [errorTime, setErrorTime] = useState();
 
   const handleOpenLoginModal = () => {
     const currentPath = window.location.pathname;
@@ -281,7 +284,6 @@ const Booking = () => {
   ]);
 
   const handleChangeLocation = (location) => {
-
     console.log(location)
     setGettedLocation(location);
   };
@@ -303,6 +305,12 @@ const Booking = () => {
 
     fetchDiscounts();
   }, []);
+
+  // useEffect(() =>{
+  //   const dateByMotorbike = apiClient.get(
+  //     `api/booking/dates/motorbike/${motorbikeId}`
+  //   );
+  // },[])
 
   const handleVoucher = () => {
     setShowPopUpVoucher(true);
@@ -349,6 +357,19 @@ const Booking = () => {
   const [messageLicense, setMessageLicense] = useState("");
   const [buttonLicense, setButtonLicense] = useState("");
   const [buttonBackHomePage, setButtonBackHomePage] = useState("Chọn xe khác");
+
+  useEffect(() => {
+    if (endDateTime && startDateTime) {
+      if (endDateTime.diff(startDateTime, "hour") < 2) {
+        setErrorTime(
+          "*Thời gian trả xe phải lớn hơn thời gian nhận xe tối thiểu 2 tiếng"
+        );
+      } else {
+        setErrorTime();
+      }
+    }
+  }, [startDateTime, endDateTime]);
+
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     if (!userId) {
@@ -435,8 +456,25 @@ const Booking = () => {
     return [user1, user2].sort().join("_");
   };
 
+  const isDateOverlap = (startDateTime, endDateTime, dateByMotorbike) => {
+    const start = new Date(startDateTime);
+    const end = new Date(endDateTime);
+
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      const dateStr = d.toISOString().split("T")[0];
+      if (dateByMotorbike.includes(dateStr)) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
   const handleConfirmBooking = async (e) => {
     const roomId = getRoomId(userEmail, receiveData.user.email);
+    const dateByMotorbike = await apiClient.get(
+      `api/booking/dates/motorbike/${motorbikeId}`
+    );
     try {
       setLoading(true);
       setShowConfirmPopup(false);
@@ -445,6 +483,20 @@ const Booking = () => {
         const deleteDiscount = apiClient.delete(
           `/api/discounts/deleteDiscountByIdAndUserId/${userId}/${discount.id}`
         );
+      }
+
+      const isOverlap = isDateOverlap(
+        startDateTime,
+        endDateTime,
+        dateByMotorbike.data
+      );
+      if (isOverlap) {
+        setShowPopUpCheckOverlap(true);
+        setMessageLicense(
+          "Xe này vừa có lịch bận. Vui lòng thay đổi lịch hoặc chọn xe khác"
+        );
+        setButtonLicense("Đã hiểu");
+        return;
       }
 
       const response2 = await apiClient
@@ -693,7 +745,11 @@ const Booking = () => {
                         motorbikeId={motorbikeId}
                       ></DateTimeRange>
                     </div>
-
+                    {errorTime && (
+                      <i className="text-red-500 text-xs relative flex mb-3">
+                        {errorTime}
+                      </i>
+                    )}
                     <div className="relative flex flex-col gap-2 p-3 border border-gray-100 bg-white rounded-lg mb-3 ">
                       <label className="block text-sm font-medium text-zinc-700">
                         Địa điểm giao nhận xe
@@ -778,12 +834,29 @@ const Booking = () => {
                         </span>
                       </div>
                     </div>
-                    <button
-                      type="submit"
-                      className="py-4 px-6 relative justify-center inline-flex items-center font-bold rounded-lg w-100 bg-green-500 hover:bg-green-600 text-white"
-                    >
-                      CHỌN THUÊ
-                    </button>
+                    {errorTime || receiveData.userId === userId ? (
+                      <>
+                        <button
+                          type="submit"
+                          className="py-4 px-6 relative justify-center inline-flex items-center font-bold rounded-lg w-100 bg-green-500 hover:bg-green-600 text-white disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-50"
+                          disabled
+                        >
+                          CHỌN THUÊ
+                        </button>
+                        {receiveData.userId === userId && (
+                          <i className="text-red-500 text-center  text-sm relative flex mb-3 mt-2">
+                            Bạn không thể đặt xe của chính bạn. Vui lòng chọn xe khác.
+                          </i>
+                        )}
+                      </>
+                    ) : (
+                      <button
+                        type="submit"
+                        className="py-4 px-6 relative justify-center inline-flex items-center font-bold rounded-lg w-100 bg-green-500 hover:bg-green-600 text-white"
+                      >
+                        CHỌN THUÊ
+                      </button>
+                    )}
                   </div>
                 </form>
               </div>
@@ -839,65 +912,65 @@ const Booking = () => {
                 <RentalDocument />
                 <hr className="my-3 border-gray-800"></hr>
                 <div className="p-4 bg-white dark:bg-zinc-800  flex items-center space-x-4">
-                <div
-                  className="flex flex-col items-center mb-4  cursor-pointer"
-                  onClick={() => handleClick(receiveData.user.id)}
-                >
-                  <h2 className="text-sm font-semibold mb-2">Chủ xe</h2>
-                  <img
-                    src="https://n1-cstg.mioto.vn/m/avatars/avatar-2.png"
-                    alt="User profile picture"
-                    className="w-16 h-16 rounded-full"
-                  />
-                </div>
-                <div className="flex-1">
                   <div
-                    className="flex items-center justify-between rounded-lg"
-                    onClick={handleChatting}
+                    className="flex flex-col items-center mb-4  cursor-pointer"
+                    onClick={() => handleClick(receiveData.user.id)}
                   >
-                    <h2
-                      className={`text-lg font-semibold ${sharedClasses.textZincDark}`}
+                    <h2 className="text-sm font-semibold mb-2">Chủ xe</h2>
+                    <img
+                      src="https://n1-cstg.mioto.vn/m/avatars/avatar-2.png"
+                      alt="User profile picture"
+                      className="w-16 h-16 rounded-full"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <div
+                      className="flex items-center justify-between rounded-lg"
+                      onClick={handleChatting}
                     >
-                      {receiveData.user.firstName +
-                        " " +
-                        receiveData.user.lastName}
-                      &nbsp;&nbsp;&nbsp;
-                      <span
-                        style={{
-                          border: "1px solid #ee4d2d", // Màu viền
-                          padding: "2px 5px", // Khoảng cách giữa nội dung và viền
-                          borderRadius: "10px",
-                          display: "inline-flex", // Để icon và text nằm trên cùng một dòng
-                          alignItems: "center", // Căn giữa icon và text theo chiều dọc
-                          cursor: "pointer", // Thay đổi con trỏ chuột khi hover
-                          color: "#ee4d2d",
-                          fontSize: "0.875rem",
-                        }}
+                      <h2
+                        className={`text-lg font-semibold ${sharedClasses.textZincDark}`}
                       >
-                        <FontAwesomeIcon
-                          icon={faMessage}
-                          color="#ee4d2d"
-                          style={{ marginRight: "5px", fontSize: "0.875rem" }}
-                        />
-                        Liên hệ
+                        {receiveData.user.firstName +
+                          " " +
+                          receiveData.user.lastName}
+                        &nbsp;&nbsp;&nbsp;
+                        <span
+                          style={{
+                            border: "1px solid #ee4d2d", // Màu viền
+                            padding: "2px 5px", // Khoảng cách giữa nội dung và viền
+                            borderRadius: "10px",
+                            display: "inline-flex", // Để icon và text nằm trên cùng một dòng
+                            alignItems: "center", // Căn giữa icon và text theo chiều dọc
+                            cursor: "pointer", // Thay đổi con trỏ chuột khi hover
+                            color: "#ee4d2d",
+                            fontSize: "0.875rem",
+                          }}
+                        >
+                          <FontAwesomeIcon
+                            icon={faMessage}
+                            color="#ee4d2d"
+                            style={{ marginRight: "5px", fontSize: "0.875rem" }}
+                          />
+                          Liên hệ
+                        </span>
+                      </h2>
+                    </div>
+                    <div
+                      className={`${sharedClasses.flexItemsCenter} space-x-2 ${sharedClasses.textZincLight}`}
+                    >
+                      <span className={sharedClasses.flexItemsCenter}>
+                        <FaMotorcycle className="w-6 h-6" />
+                        <span className="ml-2">
+                          {receiveData.user.totalTripCount > 0
+                            ? receiveData.user.totalTripCount
+                            : "Chưa có"}{" "}
+                          chuyến
+                        </span>
                       </span>
-                    </h2>
-                  </div>
-                  <div
-                    className={`${sharedClasses.flexItemsCenter} space-x-2 ${sharedClasses.textZincLight}`}
-                  >
-                    <span className={sharedClasses.flexItemsCenter}>
-                      <FaMotorcycle className="w-6 h-6" />
-                      <span className="ml-2">
-                        {receiveData.user.totalTripCount > 0
-                          ? receiveData.user.totalTripCount
-                          : "Chưa có"}{" "}
-                        chuyến
-                      </span>
-                    </span>
+                    </div>
                   </div>
                 </div>
-              </div>
                 {motorbikeId && <FeedbackList motorbikeId={motorbikeId} />}
               </div>
             </div>
@@ -923,6 +996,14 @@ const Booking = () => {
       {showPopUpLicense && (
         <PopUpLicense
           onClose={() => setShowPopUpLicense(false)}
+          messageLicense={messageLicense}
+          buttonLicense={buttonLicense}
+          buttonBackHomePage="Chọn xe khác"
+        />
+      )}
+      {showPopUpCheckOverlap && (
+        <PopUpCheckOverlap
+          onClose={() => setShowPopUpCheckOverlap(false)}
           messageLicense={messageLicense}
           buttonLicense={buttonLicense}
           buttonBackHomePage="Chọn xe khác"
