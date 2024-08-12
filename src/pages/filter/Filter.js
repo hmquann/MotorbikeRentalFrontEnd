@@ -187,9 +187,9 @@ const Filter = () => {
   const [error, setError] = useState(null);
   const [modalShow, setModalShow] = useState(false);
   const location = useLocation();
-  const filterAddressAndTime = location.state.filterList;
+  const filterAddressAndTime = location.state?.filterList || [];
   const [address, setAddress] = useState(filterAddressAndTime.address);
-  const [listMotor, setListMotor] = useState(location.state.listMotor);
+  const [listMotor, setListMotor] = useState(location.state?.listMotor || []);
   const handleUpdateValues = (newValues) => {
     setFilterList({ ...filterList, minPrice: newValues[0] });
     setFilterList({ ...filterList, maxPrice: newValues[1] });
@@ -213,6 +213,7 @@ const Filter = () => {
     maxPrice: 200000,
     isFiveStar: "",
   });
+  console.log(filterList.longitude,filterList.latitude)
   const handleOpenSchedulePopup = () => {
     setSchedulePopUp(true);
   };
@@ -686,8 +687,15 @@ const Filter = () => {
                   </svg>
                 </div>
                 <span>
-                  {format(filterList.startDate, "HH:mm, dd/MM/yyyy")} -{" "}
-                  {format(filterList.endDate, "HH:mm, dd/MM/yyyy")}
+                  {filterList.startDate && filterList.endDate
+                    ? `${format(
+                        new Date(filterList.startDate),
+                        "HH:mm, dd/MM/yyyy"
+                      )} - ${format(
+                        new Date(filterList.endDate),
+                        "HH:mm, dd/MM/yyyy"
+                      )}`
+                    : "Thời gian không hợp lệ"}
                 </span>
               </div>
             </div>
@@ -734,7 +742,7 @@ const Filter = () => {
 
       <div className="flex justify-center">
         <div style={{ width: "95%" }}>
-          <MotorbikeList listMotor={listMotor} />
+          <MotorbikeList listMotor={listMotor} searchLongitude={filterList.longitude} searchLatitude={filterList.latitude} showDistance={true}/>
         </div>
       </div>
       {showBrandPopup && (

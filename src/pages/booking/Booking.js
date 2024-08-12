@@ -41,6 +41,7 @@ import PopUpPricePerDay from "./popUpPricePerDay/PopUpPricePerDay";
 import apiClient from "../../axiosConfig";
 import { useNotification } from "../../NotificationContext";
 import { CircularProgress } from "@mui/material";
+import PopUpCheckOverlap from "./popUpCheckOverlap/PopUpCheckOverlap";
 const sharedClasses = {
   rounded: "rounded",
   flex: "flex",
@@ -111,23 +112,36 @@ const formatVehicleType = (description) => {
       return description;
   }
 };
-const FeatureItem = ({ icon, altText, title, description }) => (
+const FeatureItem = ({ icon, altText, title, description, modelType, fuelConsumption }) => (
   <div className="flex items-center">
-    <FontAwesomeIcon icon={icon} className="text-green-600 text-xl mr-2" />
+    <FontAwesomeIcon icon={icon} alt={altText} className="text-green-600 text-lg mr-5" />
     <div>
-      <p className="text-zinc-500 font-bold">{title}</p>
-      <p className="text-lg">
-        {title === "Nhiên liệu"
-          ? description === "GASOLINE"
-            ? "Xăng"
-            : "Điện"
-          : ""}
-        {title === "Loại xe" ? formatVehicleType(description) : description}
-        {title === "Nhiên liệu tiêu hao" ? " lít/100km" : ""}
+      <span className="text-zinc-500 font-thin">
+        {title === "Nhiên liệu tiêu hao" && modelType === "XeDien"
+          ? "Quãng đường đi được"
+          : title}
+      </span>
+      <p className="text-xl mb-0">
+        {title === "Nhiên liệu" && (
+          <>
+            {description === "GASOLINE" ? "Xăng" : "Điện"}
+          </>
+        )}
+
+        {title === "Loại xe" && formatVehicleType(description)}
+
+        {title === "Nhiên liệu tiêu hao" && (
+          <>
+            {modelType === "XeDien"
+              ? `${fuelConsumption} km`
+              : `${fuelConsumption} lít/ 100km`}
+          </>
+        )}
       </p>
     </div>
   </div>
 );
+
 const Booking = () => {
   const getAddress = (inputString) => {
     if (typeof inputString !== "string" || inputString.trim() === "") {
@@ -159,6 +173,7 @@ const Booking = () => {
   const [showPopUp, setShowPopUp] = useState(false);
   const navigate = useNavigate();
   const [showPopUpLicense, setShowPopUpLicense] = useState(false);
+  const [showPopUpCheckOverlap, setShowPopUpCheckOverlap] = useState(false);
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [schedulePopUp, setSchedulePopUp] = useState(false);
   const [pickupDate, setPickupDate] = useState("");
@@ -172,6 +187,7 @@ const Booking = () => {
   const [showPopupSuccess, setShowPopupSuccess] = useState(false);
   const { incrementNotificationCount } = useNotification();
   const [loading, setLoading] = useState();
+  const [errorTime, setErrorTime] = useState();
 
   const handleOpenLoginModal = () => {
     const currentPath = window.location.pathname;
@@ -181,13 +197,13 @@ const Booking = () => {
   console.log(receiveData);
   const [showPopUpPricePerDay, setShowPopUpPricePerDay] = useState(false);
   const motorbikeAddress = {
-    address: receiveData.motorbikeAddress,
+    place_name: receiveData.motorbikeAddress,
     longitude: receiveData.longitude,
     latitude: receiveData.latitude,
   };
 
   const [gettedLocation, setGettedLocation] = useState(
-    motorbikeAddress.address
+    motorbikeAddress
   );
 
   const handleClosePopup = () => {
@@ -281,13 +297,10 @@ const Booking = () => {
   ]);
 
   const handleChangeLocation = (location) => {
-    console.log(location);
+    console.log(location)
     setGettedLocation(location);
   };
   console.log(gettedLocation);
-
-  const [distance, setDistance] = useState(0);
-  const [newAddressData, setNewAddressData] = useState([]);
   const [showPopUpVoucher, setShowPopUpVoucher] = useState(false);
   const [discounts, setDiscounts] = useState([]);
   useEffect(() => {
@@ -305,6 +318,12 @@ const Booking = () => {
 
     fetchDiscounts();
   }, []);
+
+  // useEffect(() =>{
+  //   const dateByMotorbike = apiClient.get(
+  //     `api/booking/dates/motorbike/${motorbikeId}`
+  //   );
+  // },[])
 
   const handleVoucher = () => {
     setShowPopUpVoucher(true);
@@ -351,6 +370,19 @@ const Booking = () => {
   const [messageLicense, setMessageLicense] = useState("");
   const [buttonLicense, setButtonLicense] = useState("");
   const [buttonBackHomePage, setButtonBackHomePage] = useState("Chọn xe khác");
+
+  useEffect(() => {
+    if (endDateTime && startDateTime) {
+      if (endDateTime.diff(startDateTime, "hour") < 2) {
+        setErrorTime(
+          "*Thời gian trả xe phải lớn hơn thời gian nhận xe tối thiểu 2 tiếng"
+        );
+      } else {
+        setErrorTime();
+      }
+    }
+  }, [startDateTime, endDateTime]);
+
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     if (!userId) {
@@ -437,8 +469,25 @@ const Booking = () => {
     return [user1, user2].sort().join("_");
   };
 
+  const isDateOverlap = (startDateTime, endDateTime, dateByMotorbike) => {
+    const start = new Date(startDateTime);
+    const end = new Date(endDateTime);
+
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      const dateStr = d.toISOString().split("T")[0];
+      if (dateByMotorbike.includes(dateStr)) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
   const handleConfirmBooking = async (e) => {
     const roomId = getRoomId(userEmail, receiveData.user.email);
+    const dateByMotorbike = await apiClient.get(
+      `api/booking/dates/motorbike/${motorbikeId}`
+    );
     try {
       setLoading(true);
       setShowConfirmPopup(false);
@@ -449,20 +498,35 @@ const Booking = () => {
         );
       }
 
+      const isOverlap = isDateOverlap(
+        startDateTime,
+        endDateTime,
+        dateByMotorbike.data
+      );
+      if (isOverlap) {
+        setShowPopUpCheckOverlap(true);
+        setMessageLicense(
+          "Xe này vừa có lịch bận. Vui lòng thay đổi lịch hoặc chọn xe khác"
+        );
+        setButtonLicense("Đã hiểu");
+        return;
+      }
+
       const response2 = await apiClient
-        .post("/api/booking/create", {
+        .post("/api/booking/create", {        
           renterId: userId,
           motorbikeId: receiveData.id,
           startDate: dayjs(startDateTime).format("YYYY-MM-DDTHH:mm:ss"),
           endDate: dayjs(endDateTime).format("YYYY-MM-DDTHH:mm:ss"),
           bookingTime: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
           totalPrice: totalPrice,
-          receiveLocation: gettedLocation.address,
+          receiveLocation: gettedLocation.place_name,
           longitude: gettedLocation.longitude,
           latitude: gettedLocation.latitude,
         })
         .then(async () => {
-          setShowPopupSuccess(true); // Hiển thị popup khi thành công
+          setShowPopupSuccess(true);
+         // Hiển thị popup khi thành công
           if (emailNoti) {
             const response3 = apiClient.post(
               "/api/booking/sendEmailSuccessBooking",
@@ -478,7 +542,7 @@ const Booking = () => {
                 startDate: dayjs(startDateTime).format("YYYY-MM-DDTHH:mm:ss"),
                 endDate: dayjs(endDateTime).format("YYYY-MM-DDTHH:mm:ss"),
                 totalPrice: totalPrice,
-                receiveLocation: gettedLocation,
+                receiveLocation: gettedLocation.place_name,
               }
             );
           }
@@ -499,7 +563,7 @@ const Booking = () => {
                 startDate: dayjs(startDateTime).format("YYYY-MM-DDTHH:mm:ss"),
                 endDate: dayjs(endDateTime).format("YYYY-MM-DDTHH:mm:ss"),
                 totalPrice: totalPrice,
-                receiveLocation: gettedLocation,
+                receiveLocation: gettedLocation.place_name,
               }
             );
           }
@@ -662,13 +726,15 @@ const Booking = () => {
                       <span
                         className={`${sharedClasses.bgGreen100} rounded-xl mr-2 ${sharedClasses.px2} ${sharedClasses.py1}`}
                       >
-                        {receiveData.model.modelType}
+                        {formatVehicleType(receiveData.model.modelType)}
                       </span>
+                      {receiveData.delivery && (
                       <span
                         className={`${sharedClasses.bgBlue100} rounded-xl  ${sharedClasses.px2} ${sharedClasses.py1} `}
                       >
                         {receiveData.delivery ? "Giao xe tận nơi" : ""}
                       </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -694,7 +760,11 @@ const Booking = () => {
                         motorbikeId={motorbikeId}
                       ></DateTimeRange>
                     </div>
-
+                    {errorTime && (
+                      <i className="text-red-500 text-xs relative flex mb-3">
+                        {errorTime}
+                      </i>
+                    )}
                     <div className="relative flex flex-col gap-2 p-3 border border-gray-100 bg-white rounded-lg mb-3 ">
                       <label className="block text-sm font-medium text-zinc-700">
                         Địa điểm giao nhận xe
@@ -703,7 +773,7 @@ const Booking = () => {
                         <input
                           type="text"
                           className={`w-full overflow-hidden text-ellipsis whitespace-nowrap font-bold cursor-pointer`}
-                          value={gettedLocation}
+                          value={gettedLocation.place_name}
                           readOnly
                           onClick={() => setShowPopUp(true)}
                         />
@@ -779,12 +849,29 @@ const Booking = () => {
                         </span>
                       </div>
                     </div>
-                    <button
-                      type="submit"
-                      className="py-4 px-6 relative justify-center inline-flex items-center font-bold rounded-lg w-100 bg-green-500 hover:bg-green-600 text-white"
-                    >
-                      CHỌN THUÊ
-                    </button>
+                    {errorTime || receiveData.userId === userId ? (
+                      <>
+                        <button
+                          type="submit"
+                          className="py-4 px-6 relative justify-center inline-flex items-center font-bold rounded-lg w-100 bg-green-500 hover:bg-green-600 text-white disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-50"
+                          disabled
+                        >
+                          CHỌN THUÊ
+                        </button>
+                        {receiveData.userId === userId && (
+                          <i className="text-red-500 text-center  text-sm relative flex mb-3 mt-2">
+                            Bạn không thể đặt xe của chính bạn. Vui lòng chọn xe khác.
+                          </i>
+                        )}
+                      </>
+                    ) : (
+                      <button
+                        type="submit"
+                        className="py-4 px-6 relative justify-center inline-flex items-center font-bold rounded-lg w-100 bg-green-500 hover:bg-green-600 text-white"
+                      >
+                        CHỌN THUÊ
+                      </button>
+                    )}
                   </div>
                 </form>
               </div>
@@ -794,12 +881,12 @@ const Booking = () => {
                 {/* Features Section */}
                 <div className="flex flex-col my-6">
                   <h6 className="mb-6 font-semibold text-xl">Đặc điểm</h6>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-bold">
                     <FeatureItem
                       icon={faGasPump}
                       altText="fuel"
                       title="Nhiên liệu"
-                      description=""
+                      description={receiveData.model.fuelType}
                       class="flex items-center"
                     />
                     <FeatureItem
@@ -812,7 +899,9 @@ const Booking = () => {
                       icon={faOilCan}
                       altText="consumption"
                       title="Nhiên liệu tiêu hao"
-                      description={receiveData.model.fuelConsumption}
+                      modelType={receiveData.model.modelType}
+                      description={receiveData.model.fuelType}
+                      fuelConsumption={receiveData.model.fuelConsumption}
                     />
                   </div>
                 </div>
@@ -888,65 +977,65 @@ const Booking = () => {
 
                 <hr className="my-3 border-gray-800"></hr>
                 <div className="p-4 bg-white dark:bg-zinc-800  flex items-center space-x-4">
-                <div
-                  className="flex flex-col items-center mb-4  cursor-pointer"
-                  onClick={() => handleClick(receiveData.user.id)}
-                >
-                  <h2 className="text-sm font-semibold mb-2">Chủ xe</h2>
-                  <img
-                    src="https://n1-cstg.mioto.vn/m/avatars/avatar-2.png"
-                    alt="User profile picture"
-                    className="w-16 h-16 rounded-full"
-                  />
-                </div>
-                <div className="flex-1">
                   <div
-                    className="flex items-center justify-between rounded-lg"
-                    onClick={handleChatting}
+                    className="flex flex-col items-center mb-4  cursor-pointer"
+                    onClick={() => handleClick(receiveData.user.id)}
                   >
-                    <h2
-                      className={`text-lg font-semibold ${sharedClasses.textZincDark}`}
+                    <h2 className="text-sm font-semibold mb-2">Chủ xe</h2>
+                    <img
+                      src="https://n1-cstg.mioto.vn/m/avatars/avatar-2.png"
+                      alt="User profile picture"
+                      className="w-16 h-16 rounded-full"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <div
+                      className="flex items-center justify-between rounded-lg"
+                      onClick={handleChatting}
                     >
-                      {receiveData.user.firstName +
-                        " " +
-                        receiveData.user.lastName}
-                      &nbsp;&nbsp;&nbsp;
-                      <span
-                        style={{
-                          border: "1px solid #ee4d2d", // Màu viền
-                          padding: "2px 5px", // Khoảng cách giữa nội dung và viền
-                          borderRadius: "10px",
-                          display: "inline-flex", // Để icon và text nằm trên cùng một dòng
-                          alignItems: "center", // Căn giữa icon và text theo chiều dọc
-                          cursor: "pointer", // Thay đổi con trỏ chuột khi hover
-                          color: "#ee4d2d",
-                          fontSize: "0.875rem",
-                        }}
+                      <h2
+                        className={`text-lg font-semibold ${sharedClasses.textZincDark}`}
                       >
-                        <FontAwesomeIcon
-                          icon={faMessage}
-                          color="#ee4d2d"
-                          style={{ marginRight: "5px", fontSize: "0.875rem" }}
-                        />
-                        Liên hệ
+                        {receiveData.user.firstName +
+                          " " +
+                          receiveData.user.lastName}
+                        &nbsp;&nbsp;&nbsp;
+                        <span
+                          style={{
+                            border: "1px solid #ee4d2d", // Màu viền
+                            padding: "2px 5px", // Khoảng cách giữa nội dung và viền
+                            borderRadius: "10px",
+                            display: "inline-flex", // Để icon và text nằm trên cùng một dòng
+                            alignItems: "center", // Căn giữa icon và text theo chiều dọc
+                            cursor: "pointer", // Thay đổi con trỏ chuột khi hover
+                            color: "#ee4d2d",
+                            fontSize: "0.875rem",
+                          }}
+                        >
+                          <FontAwesomeIcon
+                            icon={faMessage}
+                            color="#ee4d2d"
+                            style={{ marginRight: "5px", fontSize: "0.875rem" }}
+                          />
+                          Liên hệ
+                        </span>
+                      </h2>
+                    </div>
+                    <div
+                      className={`${sharedClasses.flexItemsCenter} space-x-2 ${sharedClasses.textZincLight}`}
+                    >
+                      <span className={sharedClasses.flexItemsCenter}>
+                        <FaMotorcycle className="w-6 h-6" />
+                        <span className="ml-2">
+                          {receiveData.user.totalTripCount > 0
+                            ? receiveData.user.totalTripCount
+                            : "Chưa có"}{" "}
+                          chuyến
+                        </span>
                       </span>
-                    </h2>
-                  </div>
-                  <div
-                    className={`${sharedClasses.flexItemsCenter} space-x-2 ${sharedClasses.textZincLight}`}
-                  >
-                    <span className={sharedClasses.flexItemsCenter}>
-                      <FaMotorcycle className="w-6 h-6" />
-                      <span className="ml-2">
-                        {receiveData.user.totalTripCount > 0
-                          ? receiveData.user.totalTripCount
-                          : "Chưa có"}{" "}
-                        chuyến
-                      </span>
-                    </span>
+                    </div>
                   </div>
                 </div>
-              </div>
                 {motorbikeId && <FeedbackList motorbikeId={motorbikeId} />}
               </div>
             </div>
@@ -962,7 +1051,7 @@ const Booking = () => {
           bookingDetails={{
             startDate: startDateTime,
             endDate: endDateTime,
-            receiveLocation: gettedLocation,
+            receiveLocation: gettedLocation.place_name,
             totalPrice: totalPrice,
           }}
           onConfirm={handleConfirmBooking}
@@ -972,6 +1061,14 @@ const Booking = () => {
       {showPopUpLicense && (
         <PopUpLicense
           onClose={() => setShowPopUpLicense(false)}
+          messageLicense={messageLicense}
+          buttonLicense={buttonLicense}
+          buttonBackHomePage="Chọn xe khác"
+        />
+      )}
+      {showPopUpCheckOverlap && (
+        <PopUpCheckOverlap
+          onClose={() => setShowPopUpCheckOverlap(false)}
           messageLicense={messageLicense}
           buttonLicense={buttonLicense}
           buttonBackHomePage="Chọn xe khác"

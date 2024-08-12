@@ -131,7 +131,7 @@ const BlogCard = ({ blog, onUpdate }) => {
               className="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-700 transition duration-300"
               onClick={() => setShowUpdatePopup(false)}
             >
-              Close
+              Đóng
             </button>
             <BlogUpdating
               blog={blog}

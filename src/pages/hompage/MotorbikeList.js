@@ -11,6 +11,7 @@ import {
   faStar,
   faSuitcase,
 } from "@fortawesome/free-solid-svg-icons";
+import { Pagination } from "@mui/material";
 // Define CSS classes
 const cardClasses =
   "max-w-lg mx-auto bg-white dark:bg-zinc-800 rounded-xl shadow-md overflow-hidden";
@@ -18,24 +19,71 @@ const badgeClasses =
   "bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded";
 const buttonClasses = "bg-white bg-opacity-50 p-1 rounded-full";
 const avatarClasses = "w-10 h-10 rounded-full border-2 border-yellow-400";
-
-const MotorbikeList = (listMotor) => {
+const fixedNumber=(number)=>{
+  return (number / 1000).toFixed(1);
+}
+const displayAddress=(str)=>{
+  const parts = str.split(",");
+  const result = parts.slice(-2).join(",");
+return result;
+}
+const MotorbikeList = ({ listMotor, showDistance, searchLongitude, searchLatitude }) => {
+  console.log(listMotor)
   const navigate = useNavigate();
-  console.log(listMotor);
-  const [motorbikeList, setMotorbikeList] = useState(listMotor);
+  const [motorbikeList, setMotorbikeList] = useState([]);
+  const [locaList, setLocaList] = useState([]);
   const [selectedMotorbike, setSelectedMotorbike] = useState(null);
-  useEffect(() => {
-    if (listMotor.listMotor) {
-      setMotorbikeList(listMotor.listMotor);
-    }
-  }, [listMotor.listMotor]);
-  function formatNumber(numberString) {
-    // Convert the string to a number, in case it isn't already
-    const number = parseInt(numberString, 10);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 2;
+  const [distanceList, setDistanceList] = useState([]);
+  const accessToken = "pk.eyJ1Ijoibmd1eWVua2llbjAyIiwiYSI6ImNseDNpem83bjByM3cyaXF4NTZqOWFhZWIifQ.pVT0I74tSdI290kImTlphQ";
 
-    // Convert the number back to a string and use regex to format it with dots
+  useEffect(() => {
+    if (listMotor) {
+      const updatedMotorbikeList = listMotor;
+      setMotorbikeList(updatedMotorbikeList);
+
+      if (Array.isArray(updatedMotorbikeList) && updatedMotorbikeList.length !== 0) {
+        const newLocaList = updatedMotorbikeList.map(motor => [motor.longitude, motor.latitude]);
+        setLocaList(newLocaList);
+      }
+    }
+  }, [listMotor]);
+
+  useEffect(() => {
+    if (locaList.length > 0) {
+      fetchDistances();
+    }
+  }, [locaList]);
+
+  const fetchDistances = async () => {
+    const origin = [searchLongitude, searchLatitude];
+    console.log( origin);
+    console.log( locaList);
+
+    const coordinates = [origin, ...locaList];
+    const coordinatesString = coordinates.map(coord => coord.join(',')).join(';');
+    console.log(coordinatesString)
+    try {
+      const response = await axios.get(`https://api.mapbox.com/directions-matrix/v1/mapbox/driving/${coordinatesString}?access_token=${accessToken}&annotations=distance`);
+      
+      if (response.status === 200) {
+        console.log('API Response:', response.data);
+        setDistanceList(response.data.distances[0]);
+        console.log('Khoảng cách:', response.data.distances[0]);
+      } else {
+        console.error('Lỗi: Trạng thái hoặc dữ liệu phản hồi không hợp lệ.');
+      }
+    } catch (error) {
+      console.error('Lỗi khi thực hiện yêu cầu Axios:', error);
+    }
+  };
+
+  const formatNumber = (numberString) => {
+    const number = parseInt(numberString, 10);
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  }
+  };
+
   const getAddress = (inputString) => {
     if (typeof inputString !== "string" || inputString.trim() === "") {
       return "";
@@ -63,6 +111,22 @@ const MotorbikeList = (listMotor) => {
     'XeDien': 'Xe Điện',
     'XeGanMay' : 'Xe Gắn Máy'
   };
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  let motorbikeArray = [];
+  if (Array.isArray(motorbikeList)) {
+      motorbikeArray = motorbikeList;
+  } else if (motorbikeList && Array.isArray(motorbikeList.items)) {
+      motorbikeArray = motorbikeList.items;
+  } else {
+      console.error("motorbikeList không phải là một mảng hoặc không chứa mảng items");
+  }
+  const currentMotorbikes = motorbikeArray.slice(indexOfFirstItem, indexOfLastItem);
+
   return (
     <div>
       <div className="p-8">
@@ -73,7 +137,7 @@ const MotorbikeList = (listMotor) => {
             </div>
           ) : (
             Array.isArray(motorbikeList) &&
-            motorbikeList.map((motorbike) => (
+            currentMotorbikes.map((motorbike,,index) => (
               <div className="relative flex items-center">
             <div className="grid gap-4 w-full h-full cursor-pointer overflow-hidden ">
                   <div 
@@ -84,7 +148,7 @@ const MotorbikeList = (listMotor) => {
                     <div className='flex flex-col w-full gap-4 rounded-xl'>
                       <img
                         className="w-full h-48 object-cover rounded-xl"
-                        src={motorbike.motorbikeImages[0].url || '/default-image.jpg'}
+                        src={motorbike.motorbikeImages[0]?.url || '/default-image.jpg'}
                         alt={motorbike.name}
                       />
                       <div className="">
@@ -97,10 +161,10 @@ const MotorbikeList = (listMotor) => {
                           </button>
                         </div>
                         <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{motorbike.model.modelName}</h3>
-                        <div className="text-gray-500">
+                        <div className="text-gray-500 text-xs">
                           <FontAwesomeIcon icon={faLocationDot} className='mr-2' />
-                          <span className="">{motorbike.motorbikeAddress}</span>
-                          <span className="float-right">km</span>
+                          <span className="">{motorbike.motorbikeAddress?displayAddress(motorbike.motorbikeAddress):" "}</span>
+                          <span className="float-right">~{fixedNumber(distanceList[index+1])} km</span>
                         </div>
                         <hr />
                         <div className='flex justify-between'>
@@ -160,6 +224,14 @@ const MotorbikeList = (listMotor) => {
             ))
           )}
         </div>
+      </div>
+      <div className="flex justify-center mt-4">
+        <Pagination
+          count={Math.ceil(motorbikeList.length / itemsPerPage)}
+          page={currentPage}
+          onChange={handlePageChange}
+          color="primary"
+        />
       </div>
     </div>
   );

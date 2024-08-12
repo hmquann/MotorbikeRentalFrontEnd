@@ -51,7 +51,8 @@ const Header = () => {
     setShowLogoutModal(false);
   };
 
-  const handleLoginOpen = () => {
+  const handleLoginOpen = (e) => {
+    e.preventDefault();
     const currentPath = window.location.pathname;
     setRedirectPath(currentPath);
     setShowLoginModal(true);
@@ -224,7 +225,7 @@ const Header = () => {
                     border: "1px solid black",
                   }}
                   className="hover:bg-zinc-200"
-                  onClick={handleLoginOpen}
+                  onClick={(e) =>handleLoginOpen(e)}
                 >
                   Đăng nhập
                 </Nav.Link>
