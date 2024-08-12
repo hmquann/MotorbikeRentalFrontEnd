@@ -11,6 +11,7 @@ import {
   faStar,
   faSuitcase,
 } from "@fortawesome/free-solid-svg-icons";
+import { Pagination } from "@mui/material";
 // Define CSS classes
 const cardClasses =
   "max-w-lg mx-auto bg-white dark:bg-zinc-800 rounded-xl shadow-md overflow-hidden";
@@ -24,6 +25,8 @@ const MotorbikeList = (listMotor) => {
   console.log(listMotor);
   const [motorbikeList, setMotorbikeList] = useState(listMotor);
   const [selectedMotorbike, setSelectedMotorbike] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 2;
   useEffect(() => {
     if (listMotor.listMotor) {
       setMotorbikeList(listMotor.listMotor);
@@ -63,6 +66,22 @@ const MotorbikeList = (listMotor) => {
     'XeDien': 'Xe Điện',
     'XeGanMay' : 'Xe Gắn Máy'
   };
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  let motorbikeArray = [];
+  if (Array.isArray(motorbikeList)) {
+      motorbikeArray = motorbikeList;
+  } else if (motorbikeList && Array.isArray(motorbikeList.items)) {
+      motorbikeArray = motorbikeList.items;
+  } else {
+      console.error("motorbikeList không phải là một mảng hoặc không chứa mảng items");
+  }
+  const currentMotorbikes = motorbikeArray.slice(indexOfFirstItem, indexOfLastItem);
+
   return (
     <div>
       <div className="p-8">
@@ -73,7 +92,7 @@ const MotorbikeList = (listMotor) => {
             </div>
           ) : (
             Array.isArray(motorbikeList) &&
-            motorbikeList.map((motorbike) => (
+            currentMotorbikes.map((motorbike) => (
               <div className="relative flex items-center">
             <div className="grid gap-4 w-full h-full cursor-pointer overflow-hidden ">
                   <div 
@@ -160,6 +179,14 @@ const MotorbikeList = (listMotor) => {
             ))
           )}
         </div>
+      </div>
+      <div className="flex justify-center mt-4">
+        <Pagination
+          count={Math.ceil(motorbikeList.length / itemsPerPage)}
+          page={currentPage}
+          onChange={handlePageChange}
+          color="primary"
+        />
       </div>
     </div>
   );

@@ -111,23 +111,36 @@ const formatVehicleType = (description) => {
       return description;
   }
 };
-const FeatureItem = ({ icon, altText, title, description }) => (
+const FeatureItem = ({ icon, altText, title, description, modelType, fuelConsumption }) => (
   <div className="flex items-center">
-    <FontAwesomeIcon icon={icon} className="text-green-600 text-xl mr-2" />
+    <FontAwesomeIcon icon={icon} alt={altText} className="text-green-600 text-lg mr-5" />
     <div>
-      <p className="text-zinc-500 font-bold">{title}</p>
-      <p className="text-lg">
-        {title === "Nhiên liệu"
-          ? description === "GASOLINE"
-            ? "Xăng"
-            : "Điện"
-          : ""}
-        {title === "Loại xe" ? formatVehicleType(description) : description}
-        {title === "Nhiên liệu tiêu hao" ? " lít/100km" : ""}
+      <span className="text-zinc-500 font-thin">
+        {title === "Nhiên liệu tiêu hao" && modelType === "XeDien"
+          ? "Quãng đường đi được"
+          : title}
+      </span>
+      <p className="text-xl mb-0">
+        {title === "Nhiên liệu" && (
+          <>
+            {description === "GASOLINE" ? "Xăng" : "Điện"}
+          </>
+        )}
+
+        {title === "Loại xe" && formatVehicleType(description)}
+
+        {title === "Nhiên liệu tiêu hao" && (
+          <>
+            {modelType === "XeDien"
+              ? `${fuelConsumption} km`
+              : `${fuelConsumption} lít/ 100km`}
+          </>
+        )}
       </p>
     </div>
   </div>
 );
+
 const Booking = () => {
   const getAddress = (inputString) => {
     if (typeof inputString !== "string" || inputString.trim() === "") {
@@ -662,13 +675,15 @@ const Booking = () => {
                       <span
                         className={`${sharedClasses.bgGreen100} rounded-xl mr-2 ${sharedClasses.px2} ${sharedClasses.py1}`}
                       >
-                        {receiveData.model.modelType}
+                        {formatVehicleType(receiveData.model.modelType)}
                       </span>
+                      {receiveData.delivery && (
                       <span
                         className={`${sharedClasses.bgBlue100} rounded-xl  ${sharedClasses.px2} ${sharedClasses.py1} `}
                       >
                         {receiveData.delivery ? "Giao xe tận nơi" : ""}
                       </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -794,12 +809,12 @@ const Booking = () => {
                 {/* Features Section */}
                 <div className="flex flex-col my-6">
                   <h6 className="mb-6 font-semibold text-xl">Đặc điểm</h6>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-bold">
                     <FeatureItem
                       icon={faGasPump}
                       altText="fuel"
                       title="Nhiên liệu"
-                      description=""
+                      description={receiveData.model.fuelType}
                       class="flex items-center"
                     />
                     <FeatureItem
@@ -812,7 +827,9 @@ const Booking = () => {
                       icon={faOilCan}
                       altText="consumption"
                       title="Nhiên liệu tiêu hao"
-                      description={receiveData.model.fuelConsumption}
+                      modelType={receiveData.model.modelType}
+                      description={receiveData.model.fuelType}
+                      fuelConsumption={receiveData.model.fuelConsumption}
                     />
                   </div>
                 </div>

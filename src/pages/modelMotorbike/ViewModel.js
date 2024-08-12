@@ -21,6 +21,10 @@ const ViewModel = ({ showModal, setShowModal, modelId }) => {
       brandName:""
     },
   });
+  const cylinderLabel = modelData.modelType === 'XeDien' ? 'Công suất (kW)' : 'Dung tích xi lanh (CC)';
+  const fuelConsumptionLable = modelData.modelType !== 'XeDien' ? "Nhiên liệu tiêu hao (l /100km)" : 'Quãng đường đi được (km)';
+  
+
 
   useEffect(() => {
     if (modelId && showModal) {
@@ -45,6 +49,10 @@ const ViewModel = ({ showModal, setShowModal, modelId }) => {
     'XeDien': 'Xe Điện'
   };
 
+  const fuelTypeMap = {
+    'GASOLINE' : 'Xăng',
+    'ELECTRIC' : 'Điện'
+  };
   return (
     <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" className="font-manrope" >
       <Modal.Header closeButton>
@@ -64,7 +72,7 @@ const ViewModel = ({ showModal, setShowModal, modelId }) => {
               />
             </div>
             <div>
-              <label className={labelClasses}>Dung tích xi lanh</label>
+              <label className={labelClasses}>{cylinderLabel}</label>
               <Form.Control
                 type="text"
                 name="cylinderCapacity"
@@ -74,7 +82,7 @@ const ViewModel = ({ showModal, setShowModal, modelId }) => {
               />
             </div>
             <div>
-              <label className={labelClasses}>Nhiên liệu tiêu hao</label>
+              <label className={labelClasses}>{fuelConsumptionLable}</label>
               <Form.Control
                 type="text"
                 name="fuelConsumption"
@@ -91,7 +99,7 @@ const ViewModel = ({ showModal, setShowModal, modelId }) => {
               <Form.Control
                 type="text"
                 name="fuelType"
-                value={modelData.fuelType}
+                value={fuelTypeMap[modelData.fuelType]}
                 readOnly
                 className={inputClasses}
               />
