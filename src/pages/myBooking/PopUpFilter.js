@@ -136,7 +136,7 @@ const PopUpFilter = ({ onClose, onApply, activeTab, initialFilters }) => {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">Status</label>
+            <label className="block text-sm font-medium mb-2">Trạng thái</label>
             <select
               className="form-select w-full border border-border rounded-lg p-2"
               value={status}
@@ -158,7 +158,7 @@ const PopUpFilter = ({ onClose, onApply, activeTab, initialFilters }) => {
                 <div>
                   <DemoItem
                     label={
-                      <span style={{ fontWeight: "bold" }}>Ngày bắt đầu</span>
+                      <span style={{ fontFamily: "manrope" }}>Ngày bắt đầu</span>
                     }
                   >
                     <DesktopDatePicker
@@ -170,7 +170,7 @@ const PopUpFilter = ({ onClose, onApply, activeTab, initialFilters }) => {
                 <div>
                   <DemoItem
                     label={
-                      <span style={{ fontWeight: "bold" }}>Ngày kết thúc</span>
+                      <span style={{ fontFamily: "manrope" }}>Ngày kết thúc</span>
                     }
                   >
                     <DesktopDatePicker

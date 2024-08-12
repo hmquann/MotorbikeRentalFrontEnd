@@ -76,7 +76,7 @@ const UpdatePassword = ({ show, handleClose }) => {
       return;
     }
     if (!newPassword || newPassword.trim() === "") {
-      setError("Password should not be empty!");
+      setError("Vui lòng điền đầy đủ các trường!");
       return;
     }
     setLoading(true);
@@ -167,7 +167,13 @@ const UpdatePassword = ({ show, handleClose }) => {
             {loading ? "Đang xác nhận..." : "Đổi mật khẩu"}
           </button>
         </Form>
-        {showPopup && <PopupMessage show={showPopup} onHide={() => setShowPopup(false)} message="Bạn đã thay đổi mật khẩu thành công" />}
+        {showPopup && (
+          <PopupMessage
+            show={showPopup}
+            onHide={() => setShowPopup(false)}
+            message="Bạn đã thay đổi mật khẩu thành công"
+          />
+        )}
       </Modal.Body>
     </Modal>
   );

@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-import axios from "axios";
 import UploadAdapter from "./UploadAdapter";
 import styled from "styled-components";
 import apiClient from "../../axiosConfig";
-
 
 const BlogUpdatingWrapper = styled.div`
   max-width: 768px;
@@ -47,28 +45,49 @@ const SaveButton = styled.button`
   }
 `;
 
-const CloseButton = styled.button`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background-color: #e53e3e;
-  color: white;
-  padding: 5px 10px;
-  border-radius: 4px;
-  transition: background-color 0.3s;
-  &:hover {
-    background-color: #c53030;
-  }
+const ErrorText = styled.p`
+  color: red;
+  margin: 8px 0;
 `;
 
 const BlogUpdating = ({ blog, onUpdate, onClose, onSuccess }) => {
   const [title, setTitle] = useState(blog.title);
   const [content, setContent] = useState(blog.content);
+  const [titleError, setTitleError] = useState("");
+  const [contentError, setContentError] = useState("");
+
   const userDataString = localStorage.getItem("user");
   const userData = JSON.parse(userDataString);
   const userId = userData.userId;
 
+  const validateForm = () => {
+    let hasError = false;
+
+    // Reset errors
+    setTitleError("");
+    setContentError("");
+
+    // Validate title
+    if (!title.trim()) {
+      setTitleError("Bạn phải nhập đầy đủ các thông tin.");
+      hasError = true;
+    }
+
+    // Validate content
+    if (!/<img[^>]*src=[^>]+>/i.test(content)) {
+      setContentError("Phần nội dung Blog phải có ít nhất 1 ảnh.");
+      hasError = true;
+    }
+
+    return !hasError; // Return true if no errors
+  };
+
   const handleUpdate = async () => {
+    // Validate form
+    if (!validateForm()) {
+      return; // If there are validation errors, do not proceed
+    }
+
     const updatedBlogData = { title, content, userId };
 
     try {
@@ -102,9 +121,15 @@ const BlogUpdating = ({ blog, onUpdate, onClose, onSuccess }) => {
       <TitleInput
         type="text"
         value={title}
-        onChange={(e) => setTitle(e.target.value)}
+        onChange={(e) => {
+          setTitle(e.target.value);
+          if (e.target.value.trim()) {
+            setTitleError("");
+          }
+        }}
         placeholder="Title"
       />
+      {titleError && <ErrorText>{titleError}</ErrorText>}
       <EditorWrapper>
         <CKEditor
           editor={ClassicEditor}
@@ -113,10 +138,14 @@ const BlogUpdating = ({ blog, onUpdate, onClose, onSuccess }) => {
           onChange={(event, editor) => {
             const data = editor.getData();
             setContent(data);
+            if (/<img[^>]*src=[^>]+>/i.test(data)) {
+              setContentError("");
+            }
           }}
         />
       </EditorWrapper>
-      <SaveButton onClick={handleUpdate}>Update Blog</SaveButton>
+      {contentError && <ErrorText>{contentError}</ErrorText>}
+      <SaveButton onClick={handleUpdate}>Cập nhật</SaveButton>
     </BlogUpdatingWrapper>
   );
 };

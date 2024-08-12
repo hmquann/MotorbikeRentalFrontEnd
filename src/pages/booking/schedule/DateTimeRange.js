@@ -35,33 +35,56 @@ const DateTimeRange = ({
         );
         const bookedDates = response.data.map((date) => dayjs(date));
         setDisabledDates(bookedDates);
+        return bookedDates;
       } catch (error) {
         console.error("Error fetching disabled dates", error);
+        return [];
       }
     };
-
-    fetchDisabledDates();
-    const now = new Date();
-    const tomorrow = new Date();
-    tomorrow.setDate(now.getDate() + 1); // Thêm 1 ngày vào thời gian hiện tại
-    const receiveDate = tomorrow.toLocaleDateString("en-GB"); // Định dạng ngày dd/mm/yyyy
-    const receiveTime = dayjs(tomorrow); // Chuyển đổi thành đối tượng dayjs
-    setDateTimeReceive({ date: receiveDate, time: receiveTime });
-
-    const returnDate = new Date();
-    returnDate.setDate(now.getDate() + 2); // Thêm 2 ngày vào thời gian hiện tại
-    const returnTime = dayjs(returnDate); // Chuyển đổi thành đối tượng dayjs
-    setDateTimeReturn({
-      date: returnDate.toLocaleDateString("en-GB"),
-      time: returnTime,
-    });
-
-    onDateRangeChange([receiveTime, returnTime]);
-    onReceiveTimeChange(receiveTime);
-    onReturnTimeChange(returnTime);
-
-    setDateRange([receiveTime, returnTime]);
-    setMinDate(dayjs(tomorrow));
+  
+    const findNextAvailableDates = (disabledDates) => {
+      let startDate = dayjs();
+  
+      while (true) {
+        const isStartDateDisabled = disabledDates.some((disabledDate) =>
+          startDate.isSame(disabledDate, "day")
+        );
+        const nextDate = startDate.add(1, "day");
+        const isNextDateDisabled = disabledDates.some((disabledDate) =>
+          nextDate.isSame(disabledDate, "day")
+        );
+  
+        if (!isStartDateDisabled && !isNextDateDisabled) {
+          return [startDate, nextDate];
+        }
+  
+        startDate = startDate.add(1, "day");
+      }
+    };
+  
+    const initDates = async () => {
+      const bookedDates = await fetchDisabledDates();
+  
+      const [availableNow, availableTomorrow] = findNextAvailableDates(bookedDates);
+  
+      const receiveDate = availableNow.format("DD/MM/YYYY");
+      const receiveTime = availableNow;
+  
+      const returnDate = availableTomorrow.format("DD/MM/YYYY");
+      const returnTime = availableTomorrow;
+  
+      setDateTimeReceive({ date: receiveDate, time: receiveTime });
+      setDateTimeReturn({ date: returnDate, time: returnTime });
+  
+      onDateRangeChange([receiveTime, returnTime]);
+      onReceiveTimeChange(receiveTime);
+      onReturnTimeChange(returnTime);
+  
+      setDateRange([receiveTime, returnTime]);
+      setMinDate(availableNow);
+    };
+  
+    initDates();
   }, []);
 
   const handleDateRangeChange = (newValue) => {
