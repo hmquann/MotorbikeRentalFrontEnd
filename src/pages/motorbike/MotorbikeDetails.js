@@ -82,7 +82,8 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
     <Modal show={true} onHide={onClose} size="lg" className="font-manrope">
       <Modal.Header closeButton>
         <Modal.Title>Chi tiết mẫu xe</Modal.Title>
-        <svg onClick={() => setIsUpdate(!isUpdate)}
+        {isLessor && userId===motorbike.userId && ( 
+        <><svg onClick={() => setIsUpdate(!isUpdate)}
           className="h-10 w-10 text-blue-500"
           viewBox="0 0 24 24"
           strokeWidth="2"
@@ -102,6 +103,7 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
                 <line x1="16" y1="3" x2="16" y2="7" />  <line x1="8" y1="3" x2="8" y2="7" />  
               <line x1="4" y1="11" x2="20" y2="11" />  <rect x="8" y="15" width="2" height="2" /></svg>
               <ManageSchedulePopUp isOpen={schedulePopUp} onClose={() => setSchedulePopUp(false)} motorbikeId={motorbike.id} />
+              </>)}
       </Modal.Header>
       <Modal.Body>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
