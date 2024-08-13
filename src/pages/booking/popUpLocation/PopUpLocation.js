@@ -39,14 +39,14 @@ const PopUpLocation = ({
     console.log("Selected Location:", location);
     setSelectedLocation(location);
     setCustomLocation({
-      long: location.long,
-      lat: location.lat,
+      longitude: location.long,
+      latitude: location.lat,
       place_name: location.place_name,
     });
   };
 
   const checkDistance = async (addressOne, addressTwo) => {
-    console.log(customLocation);
+
     if (!addressOne || !addressTwo) {
       console.error("Invalid addresses provided.");
       return;
@@ -54,9 +54,7 @@ const PopUpLocation = ({
 
     const startCoord = `${addressOne.longitude},${addressOne.latitude}`;
     const endCoord = `${addressTwo.longitude},${addressTwo.latitude}`;
-    const apiKey =
-      "pk.eyJ1Ijoibmd1eWVua2llbjAyIiwiYSI6ImNseDNpem83bjByM3cyaXF4NTZqOWFhZWIifQ.pVT0I74tSdI290kImTlphQ";
-    const apiUrl = `https://api.mapbox.com/directions/v5/mapbox/driving/${startCoord};${endCoord}?approaches=unrestricted;curb&access_token=${apiKey}`;
+    const apiUrl = `https://api.mapbox.com/directions/v5/mapbox/driving/${startCoord};${endCoord}?approaches=unrestricted;curb&access_token=pk.eyJ1Ijoibmd1eWVua2llbjAyIiwiYSI6ImNseDNpem83bjByM3cyaXF4NTZqOWFhZWIifQ.pVT0I74tSdI290kImTlphQ`;
 
     try {
       const response = await axios.get(apiUrl);
@@ -89,14 +87,14 @@ const PopUpLocation = ({
     if (selectedOption === "map-location" && customLocation) {
       console.log(motorbikeCoords);
       console.log({
-        longitude: customLocation.long,
-        latitude: customLocation.lat,
+        longitude: customLocation.longitude,
+        latitude: customLocation.latitude,
       });
       const calculatedDistance = await checkDistance(
         motorbikeCoords,
         {
-          longitude: customLocation.long,
-          latitude: customLocation.lat,
+          longitude: customLocation.longitude,
+          latitude: customLocation.latitude,
         } // Use customLocation directly
       );
       if (calculatedDistance > receiveData.freeShipLimit) {
@@ -191,7 +189,7 @@ const PopUpLocation = ({
                       Giao nhận tại vị trí xe
                     </p>
                     <p className={sharedClasses.textZincLight}>
-                      {onSelectLocation.address}
+                      {onSelectLocation.place_name}
                     </p>
                   </div>
                 </label>

@@ -226,6 +226,27 @@ export default function Widget() {
       let status = "REJECTED";
       const url = `/api/booking/changeStatus/${booking.bookingId}/${status}`;
       await apiClient.put(url);
+      const changeNoti = await apiClient.post(
+        `/api/booking/changeDepositNotification/${booking.bookingId}`
+      );
+      const changeCanceled = await apiClient.post(
+        `/api/booking/changeDepositCanceled/${booking.bookingId}`
+      );
+
+      const admin = await apiClient.get("api/user/getAdmin");
+      const adminId = admin.data.id;
+      const refundMoneyUrl = `/api/payment/refund`;
+      const amountDone = (booking.totalPrice * 30) / 200;
+      await apiClient.post(refundMoneyUrl, null, {
+        params: {
+          senderId: adminId,
+          receiverId: userId,
+          amount: amountDone,
+          motorbikeName: motorbikeName,
+          motorbikePlate: motorbikePlate,
+        },
+      });
+
     } catch (error) {
       console.log(error);
     } finally {

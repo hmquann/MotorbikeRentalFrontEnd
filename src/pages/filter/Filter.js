@@ -213,6 +213,7 @@ const Filter = () => {
     maxPrice: 200000,
     isFiveStar: "",
   });
+  console.log(filterList.longitude,filterList.latitude)
   const handleOpenSchedulePopup = () => {
     setSchedulePopUp(true);
   };
@@ -741,7 +742,7 @@ const Filter = () => {
 
       <div className="flex justify-center">
         <div style={{ width: "95%" }}>
-          <MotorbikeList newFilterList={filterList} listMotor={listMotor} />
+          <MotorbikeList listMotor={listMotor} searchLongitude={filterList.longitude} searchLatitude={filterList.latitude} showDistance={true}/>
         </div>
       </div>
       {showBrandPopup && (
