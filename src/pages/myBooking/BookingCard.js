@@ -324,9 +324,14 @@ const BookingCard = ({ booking }) => {
     }
     setShowPopUp(true);
   };
-  const checkWallet = () => {
+  const checkWallet = async () => {
+    const userId = JSON.parse(localStorage.getItem("user")).userId;
+    const token = localStorage.getItem("token");
+
+    const response = await apiClient.get(`/api/user/${userId}`);
+    console.log(response);
     const depositMoney = (booking.totalPrice * 30) / 100;
-    if (balance < depositMoney) {
+    if (response.data.balance < depositMoney) {
       setShowPopupWallet(true);
       setBackWallet(true);
       console.log(balance);
@@ -343,26 +348,6 @@ const BookingCard = ({ booking }) => {
     );
     const formattedEndDate = dayjs(booking.endDate).format("HH:mm DD/MM/YYYY");
     setLoading(true);
-
-    const userId = JSON.parse(localStorage.getItem("user")).userId;
-    const token = localStorage.getItem("token");
-
-    try {
-      const response = await apiClient.get(`/api/user/${userId}`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (response.status === 200) {
-        const user = response.data;
-        setBalance(user.balance);
-      } else {
-        console.error("Failed to fetch user balance");
-      }
-    } catch (error) {
-      console.error("Error fetching user balance:", error);
-    }
 
     try {
       const url = `/api/booking/changeStatus/${booking.bookingId}/${action}`;

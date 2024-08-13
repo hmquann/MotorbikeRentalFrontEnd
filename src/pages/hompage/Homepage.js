@@ -74,7 +74,7 @@ const Homepage = () => {
       <MotorRentalAd />
       <Box mt={8} px={12} mb={10}>
         <Typography variant="h4" className="text-center font-manrope mb-4">
-          MIOTO Blog
+          MiMotor Blogs
         </Typography>
         <Swiper
           modules={[Navigation, Autoplay]}
