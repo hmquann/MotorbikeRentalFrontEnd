@@ -137,7 +137,7 @@ const MotorbikeList = ({ listMotor, showDistance, searchLongitude, searchLatitud
             </div>
           ) : (
             Array.isArray(motorbikeList) &&
-            currentMotorbikes.map((motorbike,,index) => (
+            currentMotorbikes.map((motorbike,index) => (
               <div className="relative flex items-center">
             <div className="grid gap-4 w-full h-full cursor-pointer overflow-hidden ">
                   <div 

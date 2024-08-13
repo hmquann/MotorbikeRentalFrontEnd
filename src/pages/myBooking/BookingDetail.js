@@ -552,7 +552,8 @@ export default function Widget() {
               <img
                 src={urlImage}
                 alt="User avatar"
-                className="w-14 h-14 rounded-full mr-4 mb-3"
+                className="object-cover rounded-lg md:mr-4 mb-4 md:mb-0"
+                style={{ height: "200px", width: "350px" }}
               />
               <div>
                 <h2 className="text-2xl font-bold">{motorbikeName}</h2>
@@ -626,23 +627,23 @@ export default function Widget() {
               </h6>
               <div className="flex flex-col border border-gray-300 rounded-lg overflow-hidden">
                 <div className="flex bg-gray-100 font-semibold border-b border-gray-300">
-                  <div className="w-1/4 p-2 text-left border-r border-gray-300">
+                  <div className="w-1/3 p-2 text-left border-r border-gray-300">
                     Thời điểm hủy chuyến
                   </div>
-                  <div className="w-1/4 p-2 text-center border-r border-gray-300">
+                  <div className="w-1/3 p-2 text-center border-r border-gray-300">
                     Khách thuê hủy chuyến
                   </div>
-                  <div className="w-1/4 p-2 text-center">Chủ xe hủy chuyến</div>
+                  <div className="w-1/3 p-2 text-center">Chủ xe hủy chuyến</div>
                 </div>
                 <div className="flex border-t border-gray-300">
-                  <div className="w-1/4 p-2 font-semibold text-left border-r border-gray-300">
+                  <div className="flex items-center w-1/3 p-2 font-semibold text-left border-r border-gray-300">
                     Trong vòng 1h sau giữ chỗ
                   </div>
-                  <div className="w-1/4 p-2 flex flex-col items-center border-r border-gray-300">
+                  <div className="w-1/3 p-2 flex flex-col justify-center items-center border-r border-gray-300">
                     <i className="fas fa-check text-green-600 text-2xl mb-1"></i>
                     <span>Hoàn tiền giữ chỗ 100%</span>
                   </div>
-                  <div className="w-1/4 p-2 flex flex-col items-center">
+                  <div className="w-1/3 p-2 flex flex-col items-center">
                     <i className="fas fa-check text-green-600 text-2xl mb-1"></i>
                     <span>Không tốn phí</span>
                     <span className="text-gray-600">
@@ -651,14 +652,14 @@ export default function Widget() {
                   </div>
                 </div>
                 <div className="flex border-t border-gray-300">
-                  <div className="w-1/4 p-2 font-semibold text-left border-r border-gray-300">
+                  <div className="flex items-center w-1/3 p-2 font-semibold text-left border-r border-gray-300">
                     Trước chuyến đi &gt;7 ngày
                   </div>
-                  <div className="w-1/4 p-2 flex flex-col items-center border-r border-gray-300">
+                  <div className="w-1/3 p-2 flex flex-col justify-center items-center border-r border-gray-300">
                     <i className="fas fa-check text-green-600 text-2xl mb-1"></i>
                     <span>Hoàn tiền giữ chỗ 70%</span>
                   </div>
-                  <div className="w-1/4 p-2 flex flex-col items-center">
+                  <div className="w-1/3 p-2 flex flex-col items-center">
                     <i className="fas fa-times text-red-600 text-2xl mb-1"></i>
                     <span>Đền tiền 30%</span>
                     <span className="text-gray-600">
@@ -667,14 +668,14 @@ export default function Widget() {
                   </div>
                 </div>
                 <div className="flex border-t border-gray-300">
-                  <div className="w-1/4 p-2 font-semibold text-left border-r border-gray-300">
+                  <div className="flex items-center w-1/3 p-2 font-semibold text-left border-r border-gray-300">
                     Trong vòng 7 ngày trước chuyến đi
                   </div>
-                  <div className="w-1/4 p-2 flex flex-col items-center border-r border-gray-300">
+                  <div className="w-1/3 p-2 flex justify-center items-center border-r border-gray-300">
                     <i className="fas fa-times text-red-600 text-2xl mb-1"></i>
                     <span>Không hoàn tiền giữ chỗ</span>
                   </div>
-                  <div className="w-1/4 p-2 flex flex-col items-center">
+                  <div className="w-1/3 p-2 flex flex-col items-center">
                     <i className="fas fa-times text-red-600 text-2xl mb-1"></i>
                     <span>Đền tiền 100%</span>
                     <span className="text-gray-600">
