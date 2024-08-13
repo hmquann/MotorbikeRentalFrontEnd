@@ -58,7 +58,7 @@ function SetPriceRangeModal({
 
   const getFillWidth = () => {
     const rangeWidth = values[1] - values[0];
-    const totalWidth = 200000; // max value of the range
+    const totalWidth = 400000; // max value of the range
     return (rangeWidth / totalWidth) * 100;
   };
 
@@ -76,26 +76,7 @@ function SetPriceRangeModal({
       </Modal.Header>
       <Modal.Body>
         <div className="p-4 space-y-4">
-          <div>
-            <label className={sharedClasses.label}>Sắp xếp</label>
-            <div className={sharedClasses.selectContainer}>
-              <select className={sharedClasses.input}>
-                <option>Đánh giá cao nhất</option>
-                <option>Giá thấp đến cao</option>
-                <option>Giá cao đến thấp</option>
-                <option>Được thuê nhiều nhất</option>
-              </select>
-              <div className={sharedClasses.selectIcon}>
-                <svg
-                  className="fill-current h-4 w-4"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                </svg>
-              </div>
-            </div>
-          </div>
+
           <div>
             <label className={sharedClasses.label}>Loại xe</label>
             <div className={sharedClasses.selectContainer}>
@@ -116,9 +97,9 @@ function SetPriceRangeModal({
           <div>
             <label className={sharedClasses.label}>Mức giá</label>
             <Range
-              step={10000}
+              step={20000}
               min={0}
-              max={200000}
+              max={400000}
               values={values}
               onChange={handleChange}
               renderTrack={({ props, children }) => (
@@ -130,7 +111,7 @@ function SetPriceRangeModal({
                   <div
                     className="absolute bg-primary h-2 rounded-lg"
                     style={{
-                      left: `${(values[0] / 200000) * 100}%`,
+                      left: `${(values[0] / 400000) * 100}%`,
                       width: `${getFillWidth()}%`,
                     }}
                   />
@@ -192,11 +173,14 @@ const Filter = () => {
   const [address, setAddress] = useState(filterAddressAndTime.address);
   const [listMotor, setListMotor] = useState(listMotorbike.content);
   const handleUpdateValues = (newValues) => {
-    setFilterList({ ...filterList, minPrice: newValues[0] });
-    setFilterList({ ...filterList, maxPrice: newValues[1] });
     console.log(newValues);
+    setFilterList((prevFilterList) => ({
+        ...prevFilterList,
+        minPrice: newValues[0],
+        maxPrice: newValues[1],
+    }));
     console.log(filterList);
-  };
+};
   const [page, setPage] = useState(0);
   const pageSize = 24;
   const handleUpdateModelType = (newModelType) => {
@@ -211,7 +195,7 @@ const Filter = () => {
     modelType: "",
     isDelivery: "",
     minPrice: 0,
-    maxPrice: 200000,
+    maxPrice: 400000,
     isFiveStar: "",
   });
   console.log(filterList.longitude,filterList.latitude)
