@@ -7,8 +7,8 @@ const titleClasses = "text-center text-md font-semibold text-zinc-900 dark:text-
 const textClasses = "text-center text-zinc-700 dark:text-zinc-300 mt-2";
 const inputClasses = "w-full p-2 border border-zinc-300 dark:border-zinc-700 rounded-md";
 const buttonContainerClasses = "flex mt-4 border border-zinc-300 dark:border-zinc-700 rounded-md";
-const buttonClasses = "w-1/2 p-2 border-r border-zinc-300 dark:border-zinc-700";
-const buttonLastClasses = "w-1/2 p-2";
+const buttonClasses = " p-2 border-r border-zinc-300 dark:border-zinc-700";
+const buttonLastClasses = "w-full p-2";
 
 const Withdraw = ({balance, onClose, onConfirm, setError }) => {
   const [amount, setAmount] = useState("");
@@ -60,7 +60,7 @@ const Withdraw = ({balance, onClose, onConfirm, setError }) => {
 
   return (
     <div className={containerClasses}>
-      <h2 className={titleClasses}>Rút tiền</h2>
+      {/* <h2 className={titleClasses}>Rút tiền</h2> */}
       <p className={textClasses}>
         Số dư của bạn là {balance.toLocaleString()} VND. Hãy nhập số tiền bạn muốn rút.
       </p>
@@ -75,11 +75,11 @@ const Withdraw = ({balance, onClose, onConfirm, setError }) => {
       </div>
       {localError && <div className="text-red-500 mt-2">{localError}</div>}
       <div className={buttonContainerClasses}>
-        <button 
+        {/* <button 
           className={`${buttonClasses} hover:bg-red-500 text-zinc-700 dark:text-zinc-300 transition hover:scale-105`} 
           onClick={onClose}>
           Hủy
-        </button>
+        </button> */}
         <button 
           className={`${buttonLastClasses} hover:bg-green-500 text-blue-600 dark:text-blue-400 transition hover:scale-105`} 
           onClick={handleConfirm}>
