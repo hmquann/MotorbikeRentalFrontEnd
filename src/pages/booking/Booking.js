@@ -935,122 +935,77 @@ const Booking = () => {
                   {/* Other amenities go here */}
                 </div>
                 <RentalDocument />
-                <div class="bg-white p-4 rounded-lg shadow-md">
-                  <h3 class="text-xl font-semibold mb-4">
-                    Chính sách huỷ chuyến
-                  </h3>
-                  <div class="grid grid-cols-3 gap-4 text-sm">
-                    <div class="font-bold text-center">
-                      Thời điểm hủy chuyến
-                    </div>
-                    <div class="font-bold text-center">
-                      Khách thuê hủy chuyến
-                    </div>
-                    <div class="font-bold text-center">Chủ xe hủy chuyến</div>
+                <div className="font-manrope">
+              <h6 className="text-2xl font-semibold mb-4">
+                Chính sách huỷ chuyến
+              </h6>
+              <div className="flex flex-col border border-gray-300 rounded-t-lg overflow-hidden">
+                <div className="flex font-semibold border-b border-gray-100">
+                  <div className="w-4/12 pl-6 items-center py-3 flex text-left border-r border-gray-300">
+                    Thời điểm hủy chuyến
+                  </div>
+                  <div className="w-4/12 p-2 flex items-center justify-center border-r border-gray-300">
+                    Khách thuê hủy chuyến
+                  </div>
+                  <div className="w-4/12 p-2 flex items-center justify-center">Chủ xe hủy chuyến</div>
+                </div>
+                <div className="flex border-t border-gray-300">
+                  <div className="flex items-center w-4/12 pl-6 font-semibold text-left border-r border-gray-300">
+                    Trong vòng 1h sau giữ chỗ
+                  </div>
+                  <div className="w-4/12 p-2 flex flex-col justify-center items-center border-r border-gray-300">
+                    <i className="fas fa-check text-green-600 text-2xl mb-1"></i>
+                    <svg class="w-6 h-6 mr-1" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.25 2C6.74 2 2.25 6.49 2.25 12C2.25 17.51 6.74 22 12.25 22C17.76 22 22.25 17.51 22.25 12C22.25 6.49 17.76 2 12.25 2ZM15.84 10.59L12.32 14.11C12.17 14.26 11.98 14.33 11.79 14.33C11.6 14.33 11.4 14.26 11.26 14.11L9.5 12.35C9.2 12.06 9.2 11.58 9.5 11.29C9.79 11 10.27 11 10.56 11.29L11.79 12.52L14.78 9.53C15.07 9.24 15.54 9.24 15.84 9.53C16.13 9.82 16.13 10.3 15.84 10.59Z" fill="#12B76A"/></svg>
 
-                    <div class="flex items-center justify-center">
-                      <span>Trong vòng 1h sau giữ chỗ</span>
-                    </div>
-                    <div class="flex items-center justify-center text-green-600">
-                      <svg
-                        class="w-6 h-6 mr-1"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M12.25 2C6.74 2 2.25 6.49 2.25 12C2.25 17.51 6.74 22 12.25 22C17.76 22 22.25 17.51 22.25 12C22.25 6.49 17.76 2 12.25 2ZM15.84 10.59L12.32 14.11C12.17 14.26 11.98 14.33 11.79 14.33C11.6 14.33 11.4 14.26 11.26 14.11L9.5 12.35C9.2 12.06 9.2 11.58 9.5 11.29C9.79 11 10.27 11 10.56 11.29L11.79 12.52L14.78 9.53C15.07 9.24 15.54 9.24 15.84 9.53C16.13 9.82 16.13 10.3 15.84 10.59Z"
-                          fill="#12B76A"
-                        />
-                      </svg>
-                      Hoàn tiền giữ chỗ 100%
-                    </div>
-                    <div class="flex items-center justify-center text-green-600">
-                      <svg
-                        class="w-6 h-6 mr-1"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M12.25 2C6.74 2 2.25 6.49 2.25 12C2.25 17.51 6.74 22 12.25 22C17.76 22 22.25 17.51 22.25 12C22.25 6.49 17.76 2 12.25 2ZM15.84 10.59L12.32 14.11C12.17 14.26 11.98 14.33 11.79 14.33C11.6 14.33 11.4 14.26 11.26 14.11L9.5 12.35C9.2 12.06 9.2 11.58 9.5 11.29C9.79 11 10.27 11 10.56 11.29L11.79 12.52L14.78 9.53C15.07 9.24 15.54 9.24 15.84 9.53C16.13 9.82 16.13 10.3 15.84 10.59Z"
-                          fill="#12B76A"
-                        />
-                      </svg>
-                      Không tốn phí{" "}
-                      <span class="text-gray-500">(Đánh giá hệ thống 3*)</span>
-                    </div>
-
-                    <div class="flex items-center justify-center">
-                      <span>Trước chuyến đi &gt;7 ngày</span>
-                    </div>
-                    <div class="flex items-center justify-center text-yellow-600">
-                      <svg
-                        class="w-6 h-6 mr-1"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M12.25 2C6.74 2 2.25 6.49 2.25 12C2.25 17.51 6.74 22 12.25 22C17.76 22 22.25 17.51 22.25 12C22.25 6.49 17.76 2 12.25 2ZM15.84 10.59L12.32 14.11C12.17 14.26 11.98 14.33 11.79 14.33C11.6 14.33 11.4 14.26 11.26 14.11L9.5 12.35C9.2 12.06 9.2 11.58 9.5 11.29C9.79 11 10.27 11 10.56 11.29L11.79 12.52L14.78 9.53C15.07 9.24 15.54 9.24 15.84 9.53C16.13 9.82 16.13 10.3 15.84 10.59Z"
-                          fill="#12B76A"
-                        />
-                      </svg>
-                      Hoàn tiền giữ chỗ 70%
-                    </div>
-                    <div class="flex items-center justify-center text-yellow-600">
-                      <svg
-                        class="w-6 h-6 mr-1"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M12.25 2C6.74 2 2.25 6.49 2.25 12C2.25 17.51 6.74 22 12.25 22C17.76 22 22.25 17.51 22.25 12C22.25 6.49 17.76 2 12.25 2ZM15.84 10.59L12.32 14.11C12.17 14.26 11.98 14.33 11.79 14.33C11.6 14.33 11.4 14.26 11.26 14.11L9.5 12.35C9.2 12.06 9.2 11.58 9.5 11.29C9.79 11 10.27 11 10.56 11.29L11.79 12.52L14.78 9.53C15.07 9.24 15.54 9.24 15.84 9.53C16.13 9.82 16.13 10.3 15.84 10.59Z"
-                          fill="#12B76A"
-                        />
-                      </svg>
-                      Đền tiền 30%{" "}
-                      <span class="text-gray-500">(Đánh giá hệ thống 3*)</span>
-                    </div>
-
-                    <div class="flex items-center justify-center">
-                      <span>Trong vòng 7 ngày trước chuyến đi</span>
-                    </div>
-                    <div class="flex items-center justify-center text-red-600">
-                      <svg
-                        class="w-6 h-6 mr-1"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M12.25 2C6.74 2 2.25 6.49 2.25 12C2.25 17.51 6.74 22 12.25 22C17.76 22 22.25 17.51 22.25 12C22.25 6.49 17.76 2 12.25 2ZM14.67 13.39C14.97 13.69 14.96 14.16 14.67 14.45C14.52 14.59 14.33 14.67 14.14 14.67C13.95 14.67 13.75 14.59 13.61 14.44L12.25 13.07L10.9 14.44C10.75 14.59 10.56 14.67 10.36 14.67C10.17 14.67 9.98 14.59 9.84 14.45C9.54 14.16 9.53999 13.69 9.82999 13.39L11.2 12L9.82999 10.61C9.53999 10.32 9.54 9.84 9.84 9.55C10.13 9.26 10.61 9.26 10.9 9.55L12.25 10.92L13.61 9.55C13.9 9.26 14.38 9.26 14.67 9.55C14.96 9.84 14.96 10.32 14.67 10.61L13.3 12L14.67 13.39Z"
-                          fill="#F04438"
-                        />
-                      </svg>
-                      Không hoàn tiền giữ chỗ
-                    </div>
-                    <div class="flex items-center justify-center text-red-600">
-                      <svg
-                        class="w-6 h-6 mr-1"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M12.25 2C6.74 2 2.25 6.49 2.25 12C2.25 17.51 6.74 22 12.25 22C17.76 22 22.25 17.51 22.25 12C22.25 6.49 17.76 2 12.25 2ZM14.67 13.39C14.97 13.69 14.96 14.16 14.67 14.45C14.52 14.59 14.33 14.67 14.14 14.67C13.95 14.67 13.75 14.59 13.61 14.44L12.25 13.07L10.9 14.44C10.75 14.59 10.56 14.67 10.36 14.67C10.17 14.67 9.98 14.59 9.84 14.45C9.54 14.16 9.53999 13.69 9.82999 13.39L11.2 12L9.82999 10.61C9.53999 10.32 9.54 9.84 9.84 9.55C10.13 9.26 10.61 9.26 10.9 9.55L12.25 10.92L13.61 9.55C13.9 9.26 14.38 9.26 14.67 9.55C14.96 9.84 14.96 10.32 14.67 10.61L13.3 12L14.67 13.39Z"
-                          fill="#F04438"
-                        />
-                      </svg>
-                      Đền tiền 100%{" "}
-                      <span class="text-gray-500">(Đánh giá hệ thống 1*)</span>
-                    </div>
+                    <span className="text-green-500">Hoàn tiền giữ chỗ 100%</span>
+                  </div>
+                  <div className="w-4/12 p-4 flex flex-col items-center">
+                    <i className="fas fa-check text-green-600 text-2xl mb-1"></i>
+                    <svg class="w-6 h-6 mr-1" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.25 2C6.74 2 2.25 6.49 2.25 12C2.25 17.51 6.74 22 12.25 22C17.76 22 22.25 17.51 22.25 12C22.25 6.49 17.76 2 12.25 2ZM15.84 10.59L12.32 14.11C12.17 14.26 11.98 14.33 11.79 14.33C11.6 14.33 11.4 14.26 11.26 14.11L9.5 12.35C9.2 12.06 9.2 11.58 9.5 11.29C9.79 11 10.27 11 10.56 11.29L11.79 12.52L14.78 9.53C15.07 9.24 15.54 9.24 15.84 9.53C16.13 9.82 16.13 10.3 15.84 10.59Z" fill="#12B76A"/></svg>
+                    <span className="text-green-500">Không tốn phí</span>
+                    {/* <span className="text-gray-600">
+                      (Đánh giá hệ thống 3*)
+                    </span> */}
                   </div>
                 </div>
+                <div className="flex border-t border-gray-300">
+                  <div className="flex items-center w-4/12 pl-6 font-semibold text-left border-r border-gray-300">
+                    Trước chuyến đi &gt;7 ngày
+                  </div>
+                  <div className="w-4/12 p-2 flex flex-col justify-center items-center border-r border-gray-300">
+                    <i className="fas fa-check text-green-600 text-2xl mb-1"></i>
+                    <svg class="w-6 h-6 mr-1" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.25 2C6.74 2 2.25 6.49 2.25 12C2.25 17.51 6.74 22 12.25 22C17.76 22 22.25 17.51 22.25 12C22.25 6.49 17.76 2 12.25 2ZM15.84 10.59L12.32 14.11C12.17 14.26 11.98 14.33 11.79 14.33C11.6 14.33 11.4 14.26 11.26 14.11L9.5 12.35C9.2 12.06 9.2 11.58 9.5 11.29C9.79 11 10.27 11 10.56 11.29L11.79 12.52L14.78 9.53C15.07 9.24 15.54 9.24 15.84 9.53C16.13 9.82 16.13 10.3 15.84 10.59Z" fill="#12B76A"/></svg>
+                    <span className="text-yellow-600">Hoàn tiền giữ chỗ 70%</span>
+                  </div>
+                  <div className="w-4/12 p-4 flex flex-col items-center">
+                    <i className="fas fa-times text-red-600 text-2xl mb-1"></i>
+                    <svg class="w-6 h-6 mr-1" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.25 2C6.74 2 2.25 6.49 2.25 12C2.25 17.51 6.74 22 12.25 22C17.76 22 22.25 17.51 22.25 12C22.25 6.49 17.76 2 12.25 2ZM15.84 10.59L12.32 14.11C12.17 14.26 11.98 14.33 11.79 14.33C11.6 14.33 11.4 14.26 11.26 14.11L9.5 12.35C9.2 12.06 9.2 11.58 9.5 11.29C9.79 11 10.27 11 10.56 11.29L11.79 12.52L14.78 9.53C15.07 9.24 15.54 9.24 15.84 9.53C16.13 9.82 16.13 10.3 15.84 10.59Z" fill="#12B76A"/></svg>
+                    <span className="text-yellow-600">Đền tiền 30%</span>
+                    {/* <span className="text-gray-600">
+                      (Đánh giá hệ thống 3*)
+                    </span> */}
+                  </div>
+                </div>
+                <div className="flex border-t border-gray-300">
+                  <div className="flex items-center w-4/12 pl-6 font-semibold text-left border-r border-gray-300">
+                    Trong vòng 7 ngày trước chuyến đi
+                  </div>
+                  <div className="w-4/12 p-2 flex flex-col justify-center items-center border-r border-gray-300">
+                    <i className="fas fa-times text-red-600 text-2xl mb-1"></i>
+                    <svg class="w-6 h-6 mr-1" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.25 2C6.74 2 2.25 6.49 2.25 12C2.25 17.51 6.74 22 12.25 22C17.76 22 22.25 17.51 22.25 12C22.25 6.49 17.76 2 12.25 2ZM14.67 13.39C14.97 13.69 14.96 14.16 14.67 14.45C14.52 14.59 14.33 14.67 14.14 14.67C13.95 14.67 13.75 14.59 13.61 14.44L12.25 13.07L10.9 14.44C10.75 14.59 10.56 14.67 10.36 14.67C10.17 14.67 9.98 14.59 9.84 14.45C9.54 14.16 9.53999 13.69 9.82999 13.39L11.2 12L9.82999 10.61C9.53999 10.32 9.54 9.84 9.84 9.55C10.13 9.26 10.61 9.26 10.9 9.55L12.25 10.92L13.61 9.55C13.9 9.26 14.38 9.26 14.67 9.55C14.96 9.84 14.96 10.32 14.67 10.61L13.3 12L14.67 13.39Z" fill="#F04438"/></svg>
+                    <span className="text-red-500">Không hoàn tiền giữ chỗ</span>
+                  </div>
+                  <div className="w-4/12 p-4 flex flex-col items-center">
+                    <i className="fas fa-times text-red-600 text-2xl mb-1"></i>
+                    <svg class="w-6 h-6 mr-1" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.25 2C6.74 2 2.25 6.49 2.25 12C2.25 17.51 6.74 22 12.25 22C17.76 22 22.25 17.51 22.25 12C22.25 6.49 17.76 2 12.25 2ZM14.67 13.39C14.97 13.69 14.96 14.16 14.67 14.45C14.52 14.59 14.33 14.67 14.14 14.67C13.95 14.67 13.75 14.59 13.61 14.44L12.25 13.07L10.9 14.44C10.75 14.59 10.56 14.67 10.36 14.67C10.17 14.67 9.98 14.59 9.84 14.45C9.54 14.16 9.53999 13.69 9.82999 13.39L11.2 12L9.82999 10.61C9.53999 10.32 9.54 9.84 9.84 9.55C10.13 9.26 10.61 9.26 10.9 9.55L12.25 10.92L13.61 9.55C13.9 9.26 14.38 9.26 14.67 9.55C14.96 9.84 14.96 10.32 14.67 10.61L13.3 12L14.67 13.39Z" fill="#F04438"/></svg>
+                    <span className="text-red-500">Đền tiền 100%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-                <hr className="my-3 border-gray-800"></hr>
-                <div className="p-4 bg-white dark:bg-zinc-800  flex items-center space-x-4">
+                {/* <hr className="my-3 border-gray-800"></hr> */}
+                <div className="p-4 bg-white dark:bg-zinc-800  flex items-center space-x-4 mt-5">
                   <div
                     className="flex flex-col items-center mb-4  cursor-pointer"
                     onClick={() => handleClick(receiveData.user.id)}
