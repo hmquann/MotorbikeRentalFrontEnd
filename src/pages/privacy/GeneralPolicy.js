@@ -369,98 +369,87 @@ const GeneralPolicy = () => {
               khách thuê đã đặt cọc thông qua Công ty Cổ phần MiMOTOR Asia.
             </span>
           </p>
-          <div align="left">
-            <table style={{ border: "none", borderCollapse: "collapse" }}>
-              <tbody>
-                <tr>
-                  <td>
-                    <p style={{ textAlign: "center" }}>
-                      <strong>
-                        <span style={{ fontSize: "11pt" }}>
-                          Thời điểm Huỷ Chuyến
-                        </span>
-                      </strong>
-                    </p>
-                  </td>
-                  <td>
-                    <p style={{ textAlign: "center" }}>
-                      <strong>
-                        <span style={{ fontSize: "11pt" }}>Phí huỷ chuyến</span>
-                      </strong>
-                    </p>
-                  </td>
-                  <td>
-                    <p style={{ textAlign: "center" }}>
-                      <strong>
-                        <span style={{ fontSize: "11pt" }}>
-                          Đánh giá hệ thống
-                        </span>
-                      </strong>
-                    </p>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <p>
-                      <span style={{ fontSize: "11pt" }}>
-                        Trong vòng một giờ sau khi đặt cọc
-                      </span>
-                    </p>
-                  </td>
-                  <td>
-                    <p>
-                      <span style={{ fontSize: "11pt" }}>0% Tiền cọc</span>
-                    </p>
-                  </td>
-                  <td>
-                    <p>
-                      <span style={{ fontSize: "11pt" }}>3★</span>
-                    </p>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <p>
-                      <span style={{ fontSize: "11pt" }}>
-                        &gt; 2 ngày trước khởi hành
-                      </span>
-                    </p>
-                  </td>
-                  <td>
-                    <p>
-                      <span style={{ fontSize: "11pt" }}>30% Tiền cọc</span>
-                    </p>
-                  </td>
-                  <td>
-                    <p>
-                      <span style={{ fontSize: "11pt" }}>3★</span>
-                    </p>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <p>
-                      <span style={{ fontSize: "11pt" }}>
-                        &lt;= 2 ngày trước chuyến đi
-                      </span>
-                    </p>
-                  </td>
-                  <td>
-                    <p>
-                      <span style={{ fontSize: "11pt" }}>100% Tiền cọc</span>
-                    </p>
-                  </td>
-                  <td>
-                    <p>
-                      <span style={{ fontSize: "11pt" }}>
-                        2★ (hoặc 1★ nếu &lt;8 tiếng)
-                      </span>
-                    </p>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <div style={{ textAlign: "center" }}>
+  <table style={{ border: "1px solid #ccc", borderCollapse: "collapse", width: "100%" }}>
+    <tbody>
+      <tr>
+        <td style={{ border: "1px solid #ccc", padding: "8px" }}>
+          <p style={{ textAlign: "center" }}>
+            <strong>
+              <span style={{ fontSize: "11pt" }}>Thời điểm Huỷ Chuyến</span>
+            </strong>
+          </p>
+        </td>
+        <td style={{ border: "1px solid #ccc", padding: "8px" }}>
+          <p style={{ textAlign: "center" }}>
+            <strong>
+              <span style={{ fontSize: "11pt" }}>Phí huỷ chuyến</span>
+            </strong>
+          </p>
+        </td>
+        <td style={{ border: "1px solid #ccc", padding: "8px" }}>
+          <p style={{ textAlign: "center" }}>
+            <strong>
+              <span style={{ fontSize: "11pt" }}>Đánh giá hệ thống</span>
+            </strong>
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td style={{ border: "1px solid #ccc", padding: "8px" }}>
+          <p style={{ textAlign: "center" }}>
+            <span style={{ fontSize: "11pt" }}>Trong vòng một giờ sau khi đặt cọc</span>
+          </p>
+        </td>
+        <td style={{ border: "1px solid #ccc", padding: "8px" }}>
+          <p style={{ textAlign: "center" }}>
+            <span style={{ fontSize: "11pt" }}>0% Tiền cọc</span>
+          </p>
+        </td>
+        <td style={{ border: "1px solid #ccc", padding: "8px" }}>
+          <p style={{ textAlign: "center" }}>
+            <span style={{ fontSize: "11pt" }}>3★</span>
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td style={{ border: "1px solid #ccc", padding: "8px" }}>
+          <p style={{ textAlign: "center" }}>
+            <span style={{ fontSize: "11pt" }}>&gt; 2 ngày trước khởi hành</span>
+          </p>
+        </td>
+        <td style={{ border: "1px solid #ccc", padding: "8px" }}>
+          <p style={{ textAlign: "center" }}>
+            <span style={{ fontSize: "11pt" }}>30% Tiền cọc</span>
+          </p>
+        </td>
+        <td style={{ border: "1px solid #ccc", padding: "8px" }}>
+          <p style={{ textAlign: "center" }}>
+            <span style={{ fontSize: "11pt" }}>3★</span>
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td style={{ border: "1px solid #ccc", padding: "8px" }}>
+          <p style={{ textAlign: "center" }}>
+            <span style={{ fontSize: "11pt" }}>&lt;= 2 ngày trước chuyến đi</span>
+          </p>
+        </td>
+        <td style={{ border: "1px solid #ccc", padding: "8px" }}>
+          <p style={{ textAlign: "center" }}>
+            <span style={{ fontSize: "11pt" }}>100% Tiền cọc</span>
+          </p>
+        </td>
+        <td style={{ border: "1px solid #ccc", padding: "8px" }}>
+          <p style={{ textAlign: "center" }}>
+            <span style={{ fontSize: "11pt" }}>2★ (hoặc 1★ nếu &lt;8 tiếng)</span>
+          </p>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
           <p>
             <span style={{ fontSize: "11pt" }}>
               Trường hợp phát sinh phí hủy chuyến, MiMOTOR sẽ trừ vào tài khoản

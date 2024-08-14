@@ -3,17 +3,15 @@ import Modal from 'react-bootstrap/Modal';
 import { Form, FloatingLabel } from "react-bootstrap";
 import apiClient from "../../axiosConfig";
 
-
-
-const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
+const EditModel = ({ showModal, setShowModal, onModelUpdated, modelData }) => {
   const [formData, setFormData] = useState({
-    modelName: "",
-    cylinderCapacity: "",
-    fuelType: "",
-    fuelConsumption: "",
-    modelType: "",
+    modelName: modelData?.modelName || "",
+    cylinderCapacity: modelData?.cylinderCapacity || "",
+    fuelType: modelData?.fuelType || "",
+    fuelConsumption: modelData?.fuelConsumption || "",
+    modelType: modelData?.modelType || "",
     brand: {
-      brandId: "",
+      brandId: modelData?.brand?.brandId || "",
     },
   });
   const [brands, setBrands] = useState([]);
@@ -21,15 +19,14 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
   const [modelTypes, setModelTypes] = useState([]);
   const [errors, setErrors] = useState({});
   const [errorsMess, setErrorsMess] = useState("");
+
   const [cylinderCapacityLabel, setCylinderCapacityLabel] = useState("Dung tích xi lanh (CC)");
   const [fuelConsumptionLabel, setFuelConsumptionLabel] = useState("Nhiên liệu tiêu hao (l/ 100km)");
 
   useEffect(() => {
     const fetchBrands = async () => {
       try {
-        const response = await apiClient.get(
-          "/api/brand/getAllBrand"
-        );
+        const response = await apiClient.get("/api/brand/getAllBrand");
         setBrands(response.data);
       } catch (error) {
         console.error("Error fetching brands", error);
@@ -42,9 +39,7 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
   useEffect(() => {
     const fetchFuelTypes = async () => {
       try {
-        const response = await apiClient.get(
-          "/api/model/fuelTypes"
-        );
+        const response = await apiClient.get("/api/model/fuelTypes");
         setFuelTypes(response.data);
       } catch (error) {
         console.error("Error fetching fuel types", error);
@@ -57,9 +52,7 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
   useEffect(() => {
     const fetchModelTypes = async () => {
       try {
-        const response = await apiClient.get(
-          "/api/model/modelTypes"
-        );
+        const response = await apiClient.get("/api/model/modelTypes");
         setModelTypes(response.data);
       } catch (error) {
         console.error("Error fetching model types", error);
@@ -68,6 +61,7 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
 
     fetchModelTypes();
   }, []);
+
   const modelTypeMap = {
     'XeSo': 'Xe Số',
     'XeTayGa': 'Xe Tay Ga',
@@ -75,7 +69,6 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
     'XeDien': 'Xe Điện',
     'XeGanMay' : 'Xe Gắn Máy'
   };
-
   const fuelTypeMap = {
     'GASOLINE' : 'Xăng',
     'ELECTRIC' : 'Điện'
@@ -140,23 +133,27 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
         [name]: value,
       });
     }
+
     if (name === "modelType") {
-      updateLabels(value);
-    }
+        updateLabels(value);
+      }
+    };
+  
+    const updateLabels = (modelType) => {
+      if (modelType === "XeDien") {
+        setCylinderCapacityLabel("Công suất (W)");
+        setFuelConsumptionLabel("Quãng đường đi được (km)");
+      } else {
+        setCylinderCapacityLabel("Dung tích xi lanh (CC)");
+        setFuelConsumptionLabel("Nhiên liệu tiêu hao (l/ 100km)");
+      }
   };
 
-  const updateLabels = (modelType) => {
-    if (modelType === "XeDien") {
-      setCylinderCapacityLabel("Công suất (W)");
-      setFuelConsumptionLabel("Quãng đường đi được (km)");
-    } else{
-      setCylinderCapacityLabel("Dung tích xi lanh (CC)");
-      setFuelConsumptionLabel("Nhiên liệu tiêu hao (l/ 100km)");
+  useEffect(() => {
+    if (modelData?.modelType) {
+      updateLabels(modelData.modelType);
     }
-  };
-
-
-
+  }, [modelData]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -169,7 +166,7 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
       return
     }
     apiClient
-      .post("/api/model/addModel", {
+      .put(`/api/model/update/${modelData.modelId}`, {
         modelName: formData.modelName,
         cylinderCapacity: formData.cylinderCapacity,
         fuelType: formData.fuelType,
@@ -192,20 +189,20 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
         });
         setErrors({});
         setShowModal(false);
-        onModelCreated();
+        onModelUpdated();
       })
       .catch((error) => {
-        if (error.response.status === 400) {
+        if (error.response.status === 500) {
           setErrorsMess("Mẫu xe này đã tồn tại");
         }
-        console.error("There was an error creating the model!", error);
+        console.error("There was an error updating the model!", error);
       });
   };
 
   return (
     <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" className="font-manrope">
       <Modal.Header closeButton>
-        <Modal.Title>Thêm mẫu xe</Modal.Title>
+        <Modal.Title>Chỉnh sửa mẫu xe</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <form className="space-y-4" onSubmit={handleSubmit}>
@@ -220,7 +217,7 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
                   onChange={handleChange}
                   isInvalid={!!errors.modelName}
                 />
-                <Form.Control.Feedback type="invalid">
+                  <Form.Control.Feedback type="invalid">
                    {errors.modelName}
             </Form.Control.Feedback>
               </FloatingLabel>
@@ -235,9 +232,9 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
                   onChange={handleChange}
                   isInvalid={!!errors.cylinderCapacity}
                 />
-                  <Form.Control.Feedback type="invalid">
+                 <Form.Control.Feedback type="invalid">
                    {errors.cylinderCapacity}
-                 </Form.Control.Feedback>
+            </Form.Control.Feedback>
               </FloatingLabel>
             </div>
             <div>
@@ -250,10 +247,10 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
                   onChange={handleChange}
                   isInvalid={!!errors.fuelConsumption}
                 />
-                  <Form.Control.Feedback type="invalid">
+                 <Form.Control.Feedback type="invalid">
                    {errors.fuelConsumption}
-                 </Form.Control.Feedback>
-              </FloatingLabel>         
+            </Form.Control.Feedback>
+              </FloatingLabel>
             </div>
           </div>
 
@@ -268,7 +265,7 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
                   <option value="">Chọn loại nhiên liệu</option>
                   {fuelTypes.map((type) => (
                     <option key={type} value={type}>
-                     {fuelTypeMap[type] || type}
+                      {fuelTypeMap[type] || type}
                     </option>
                   ))}
                 </Form.Select>
@@ -284,7 +281,7 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
                   <option value="">Chọn loại xe</option>
                   {modelTypes.map((type) => (
                     <option key={type} value={type}>
-                     {modelTypeMap[type] || type}
+                      {modelTypeMap[type] || type}
                     </option>
                   ))}
                 </Form.Select>
@@ -320,11 +317,11 @@ const AddModel = ({ showModal, setShowModal, onModelCreated }) => {
           Hủy
         </button>
         <button className="px-4 py-2 hover:bg-blue-700 bg-blue-600 text-white rounded-lg mr-2 transition hover:scale-105" onClick={handleSubmit}>
-          Lưu
+          Cập nhật
         </button>
       </Modal.Footer>
     </Modal>
   );
 };
 
-export default AddModel;
+export default EditModel;

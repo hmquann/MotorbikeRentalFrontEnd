@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react";
 import AddModel from "./AddModel";
 import ViewModel from "./ViewModel";
 import { MdOutlineAddCircleOutline } from "react-icons/md";
-import { IoEyeOutline } from "react-icons/io5";
+import { IoEyeOutline, IoPencilOutline } from "react-icons/io5";
 import useDebounce from "../../hooks/useDebounce";
 import apiClient from "../../axiosConfig";
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import EditModel from "./EditModel";
+import { FaRegEdit } from "react-icons/fa";
 
 const buttonClasses = "font-semibold px-4 py-2 rounded-lg";
 const tableCellClasses = " px-6 py-4 whitespace-nowrap text-md ";
@@ -24,6 +26,8 @@ const ModelList = () => {
   const [searchTerm, setSearchTerm] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [modelToEdit, setModelToEdit] = useState(null);
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
@@ -153,6 +157,10 @@ const ModelList = () => {
     setModelToView(model);
     setShowViewModal(true);
   };
+  const handleEdit = (model) => {
+    setModelToEdit(model);
+    setShowEditModal(true);
+  };
 
   return (
     <div className="max-w-5xl mx-auto p-4 bg-zinc-100 font-manrope">
@@ -227,10 +235,16 @@ const ModelList = () => {
                   <td className={tableCellClasses}>{model.brand?.brandName}</td>
                   <td className={tableCellClasses}>
                     <button
-                      className={`${actionButtonClasses} mr-2`}
+                      className={`${actionButtonClasses}`}
                       onClick={() => handleView(model)}
                     >
                     <IoEyeOutline />
+                    </button>
+                    <button
+                      className="text-blue-400 hover:bg-white rounded-lg px-2 py-2"
+                      onClick={() => handleEdit(model)}
+                    >
+                      <FaRegEdit />
                     </button>
                   </td>
                 </tr>
@@ -284,6 +298,14 @@ const ModelList = () => {
           showModal={showViewModal}
           setShowModal={setShowViewModal}
           modelId={modelToView.modelId} 
+        />
+      )}
+      {showEditModal && (
+        <EditModel
+          showModal={showEditModal}
+          setShowModal={setShowEditModal}
+          modelData={modelToEdit}
+          onModelUpdated={fetchModels} // Refresh models after edit
         />
       )}
     </div>

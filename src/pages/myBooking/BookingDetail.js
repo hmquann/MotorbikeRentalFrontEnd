@@ -9,6 +9,9 @@ import {
   query,
   where,
 } from "firebase/firestore";
+import { FaMotorcycle } from "react-icons/fa";
+import { faMessage } from "@fortawesome/free-regular-svg-icons";
+
 import { db } from "../../firebase";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
@@ -21,7 +24,9 @@ import { CircularProgress, LinearProgress } from "@mui/material";
 import { styled } from "@mui/system";
 import FeedbackModal from "../booking/FeedbackModal";
 import PopUpReason from "./PopUpReason";
+import FeedbackList from "../booking/FeedbackList";
 import MapModal from "./MapModal";
+
 
 const statusTranslations = {
   PENDING: "Chờ duyệt",
@@ -72,6 +77,60 @@ const statusStyles = {
 };
 
 export default function Widget() {
+  const sharedClasses = {
+    rounded: "rounded",
+    flex: "flex",
+    itemsCenter: "items-center",
+    textZinc500: "text-zinc-500",
+    bgBlue100: "bg-blue-100",
+    textBlue800: "text-blue-800",
+    px2: "px-2",
+    py1: "py-1",
+    bgYellow100: "bg-yellow-100",
+    textYellow800: "text-yellow-800",
+    bgGreen100: "bg-green-100",
+    textGreen800: "text-green-800",
+    textSm: "text-sm",
+    textLg: "text-lg",
+    spaceX2: "space-x-2",
+    mt2: "mt-2",
+    mt4: "mt-4",
+    mt1: "mt-1",
+    p2: "p-2",
+    roundedFull: "rounded-full",
+    bgZinc200: "bg-zinc-200",
+    p4: "p-4",
+    maxW7xl: "max-w-7xl",
+    wFull: "w-full",
+    w2_3: "w-3/4",
+    w1_3: "w-1/4",
+    gridCols2: "grid-cols-4",
+    gridCols4: "grid-cols-4",
+    grid: "grid",
+    gap4: "gap-4",
+    block: "block",
+    borderZinc300: "border-zinc-300",
+    shadowSm: "shadow-sm",
+    select: "select",
+    textXl: "text-xl",
+    fontBold: "font-bold",
+    fontSemibold: "font-semibold",
+    underline: "underline",
+    textZinc700: "text-zinc-700",
+    textGreen600: "text-green-600",
+    textWhite: "text-white",
+    py2: "py-2",
+    bgGreen500: "bg-green-500",
+    mb4: "mb-4",
+    mb2: "mb-2",
+    mb3: "mb-3",
+    textGreen700: "text-green-700",
+    textZinc300: "text-zinc-300",
+    cursorPointer: "cursor-pointer",
+    textZincLight: "text-zinc-600 dark:text-zinc-400",
+    textZincDark: "text-zinc-900 dark:text-zinc-100",
+    flexItemsCenter: "flex items-center",
+  };
   const booking = JSON.parse(localStorage.getItem("booking"));
   const [motorbikeName, setMotorbikeName] = useState();
   const [motorbikePlate, setMotorbikePlate] = useState();
@@ -176,6 +235,21 @@ export default function Widget() {
       setShowPopup(true); // Hiển thị popup xác nhận
     }
   };
+  const handleChatting = () => {
+    try {
+      const response4 = apiClient.post("/api/chatting/create", {
+        emailUser1: lessor.email,
+        emailUser2: userEmail,
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      navigate("/menu/chatting");
+    }
+  };
+  const handleClick = (userId) => {
+    navigate(`/userCard/${userId}`);
+  };
 
   const openFeedback = () => {
     setShowFeedbackModal(true);
@@ -257,6 +331,12 @@ export default function Widget() {
       let status = "CANCELED";
       const url = `/api/booking/changeStatus/${booking.bookingId}/${status}`;
       await apiClient.put(url);
+      const changeNoti = await apiClient.post(
+        `/api/booking/changeDepositNotification/${booking.bookingId}`
+      );
+      const changeCanceled = await apiClient.post(
+        `/api/booking/changeDepositCanceled/${booking.bookingId}`
+      );
 
       if (booking.status === "DEPOSIT_MADE") {
       }
@@ -303,6 +383,12 @@ export default function Widget() {
         //   seen: false,
         // });
       } else if (status === "DEPOSIT_MADE") {
+        const changeNoti = await apiClient.post(
+          `/api/booking/changeDepositNotification/${booking.bookingId}`
+        );
+        const changeCanceled = await apiClient.post(
+          `/api/booking/changeDepositCanceled/${booking.bookingId}`
+        );
         if (systemNoti) {
           await setDoc(doc(collection(db, "notifications")), {
             userId: userId,
@@ -365,17 +451,20 @@ export default function Widget() {
           );
         }
         const adminData = await apiClient.get("api/user/getAdmin");
-        const adminDataId = adminData.data.id;
-        const renterId = userData.userId;
-        const amount = (booking.totalPrice * 30) / 100;
-        const subtractMoneyUrl = `/api/payment/subtract`;
-        const addMoneyUrl = `/api/payment/add`;
-        await apiClient.post(subtractMoneyUrl, null, {
-          params: { id: renterId, amount: amount },
-        });
-        await apiClient.post(addMoneyUrl, null, {
-          params: { id: adminDataId, amount: amount },
-        });
+          const adminDataId = adminData.data.id;
+          const renterId = userData.userId; // Replace with actual user ID if different
+          const amount = (booking.totalPrice * 30) / 100; // Replace with actual amount to be subtracted
+          const subtractMoneyUrl = `/api/payment/subtract`;
+          const addMoneyUrl = `/api/payment/add`;
+          await apiClient.post(subtractMoneyUrl, null, {
+            params: {
+              senderId: renterId,
+              receiverId: adminDataId,
+              amount: amount,
+              motorbikeName: motorbikeName,
+              motorbikePlate: motorbikePlate,
+            },
+          });
       } else if (status === "DONE") {
         const admin = await apiClient.get("api/user/getAdmin");
         const adminId = admin.data.id;
@@ -458,7 +547,7 @@ export default function Widget() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="col-span-2 bg-white p-6 rounded-lg shadow-lg">
+          <div className="col-span-2 bg-white p-6 rounded-lg">
             <div className="flex items-center mb-6">
               <img
                 src={urlImage}
@@ -530,59 +619,131 @@ export default function Widget() {
                 </li>
               </ul>
             </div>
-            <div>
-              <h3 className="text-lg font-bold">Chính sách huỷ chuyến</h3>
-              <table className="w-full border border-muted-foreground text-sm">
-                <thead>
-                  <tr>
-                    <th className="border border-muted-foreground p-2">
-                      Thời Gian Hủy Chuyến
-                    </th>
-                    <th className="border border-muted-foreground p-2">
-                      Khách Thuê Hủy Chuyến
-                    </th>
-                    <th className="border border-muted-foreground p-2">
-                      Chủ Xe Hủy Chuyến
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className="border border-muted-foreground p-2">
-                      Trong Vòng 1h Từ Lúc Đặt Cọc
-                    </td>
-                    <td className="border border-muted-foreground p-2 text-green-600">
-                      Hoàn tiền cọc 100%
-                    </td>
-                    <td className="border border-muted-foreground p-2 text-green-600">
-                      Không mất phí
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="border border-muted-foreground p-2">
-                      Trước Chuyến Đi 2 Ngày
-                    </td>
-                    <td className="border border-muted-foreground p-2 text-yellow-600">
-                      Hoàn tiền cọc 70%
-                    </td>
-                    <td className="border border-muted-foreground p-2 text-yellow-600">
-                      Đền tiền 30%
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="border border-muted-foreground p-2">
-                      Trong Vòng 2 Ngày Trước Chuyến Đi
-                    </td>
-                    <td className="border border-muted-foreground p-2 text-red-600">
-                      Không hoàn tiền
-                    </td>
-                    <td className="border border-muted-foreground p-2 text-red-600">
-                      Đền tiền 100%
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+            <hr className="my-3 border-gray-800"></hr>
+            <div className="font-sans">
+              <h6 className="text-lg font-semibold mb-4">
+                Chính sách huỷ chuyến
+              </h6>
+              <div className="flex flex-col border border-gray-300 rounded-lg overflow-hidden">
+                <div className="flex bg-gray-100 font-semibold border-b border-gray-300">
+                  <div className="w-1/4 p-2 text-left border-r border-gray-300">
+                    Thời điểm hủy chuyến
+                  </div>
+                  <div className="w-1/4 p-2 text-center border-r border-gray-300">
+                    Khách thuê hủy chuyến
+                  </div>
+                  <div className="w-1/4 p-2 text-center">Chủ xe hủy chuyến</div>
+                </div>
+                <div className="flex border-t border-gray-300">
+                  <div className="w-1/4 p-2 font-semibold text-left border-r border-gray-300">
+                    Trong vòng 1h sau giữ chỗ
+                  </div>
+                  <div className="w-1/4 p-2 flex flex-col items-center border-r border-gray-300">
+                    <i className="fas fa-check text-green-600 text-2xl mb-1"></i>
+                    <span>Hoàn tiền giữ chỗ 100%</span>
+                  </div>
+                  <div className="w-1/4 p-2 flex flex-col items-center">
+                    <i className="fas fa-check text-green-600 text-2xl mb-1"></i>
+                    <span>Không tốn phí</span>
+                    <span className="text-gray-600">
+                      (Đánh giá hệ thống 3*)
+                    </span>
+                  </div>
+                </div>
+                <div className="flex border-t border-gray-300">
+                  <div className="w-1/4 p-2 font-semibold text-left border-r border-gray-300">
+                    Trước chuyến đi &gt;7 ngày
+                  </div>
+                  <div className="w-1/4 p-2 flex flex-col items-center border-r border-gray-300">
+                    <i className="fas fa-check text-green-600 text-2xl mb-1"></i>
+                    <span>Hoàn tiền giữ chỗ 70%</span>
+                  </div>
+                  <div className="w-1/4 p-2 flex flex-col items-center">
+                    <i className="fas fa-times text-red-600 text-2xl mb-1"></i>
+                    <span>Đền tiền 30%</span>
+                    <span className="text-gray-600">
+                      (Đánh giá hệ thống 3*)
+                    </span>
+                  </div>
+                </div>
+                <div className="flex border-t border-gray-300">
+                  <div className="w-1/4 p-2 font-semibold text-left border-r border-gray-300">
+                    Trong vòng 7 ngày trước chuyến đi
+                  </div>
+                  <div className="w-1/4 p-2 flex flex-col items-center border-r border-gray-300">
+                    <i className="fas fa-times text-red-600 text-2xl mb-1"></i>
+                    <span>Không hoàn tiền giữ chỗ</span>
+                  </div>
+                  <div className="w-1/4 p-2 flex flex-col items-center">
+                    <i className="fas fa-times text-red-600 text-2xl mb-1"></i>
+                    <span>Đền tiền 100%</span>
+                    <span className="text-gray-600">
+                      (Đánh giá hệ thống 1*)
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
+            <div className="p-4 bg-white dark:bg-zinc-800 flex items-center space-x-4">
+              <div
+                className="flex flex-col items-center cursor-pointer"
+                onClick={() => handleClick(lessorId)}
+              >
+                <h2 className="text-sm font-semibold mb-2">Chủ xe</h2>
+                <img
+                  src="https://n1-cstg.mioto.vn/m/avatars/avatar-2.png"
+                  alt="User profile picture"
+                  className="w-16 h-16 rounded-full"
+                />
+              </div>
+              <div className="flex-1">
+                <div
+                  className="flex items-center justify-between rounded-lg"
+                  onClick={handleChatting}
+                >
+                  <h2
+                    className={`text-lg font-semibold ${sharedClasses.textZincDark}`}
+                  >
+                    {lessor.firstName + " " + lessor.lastName}
+                    &nbsp;&nbsp;&nbsp;
+                    <span
+                      style={{
+                        border: "1px solid #ee4d2d",
+                        padding: "2px 5px",
+                        borderRadius: "10px",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        cursor: "pointer",
+                        color: "#ee4d2d",
+                        fontSize: "0.875rem",
+                      }}
+                    >
+                      <FontAwesomeIcon
+                        icon={faMessage}
+                        color="#ee4d2d"
+                        style={{ marginRight: "5px", fontSize: "0.875rem" }}
+                      />
+                      Liên hệ
+                    </span>
+                  </h2>
+                </div>
+                <div
+                  className={`${sharedClasses.flexItemsCenter} space-x-2 ${sharedClasses.textZincLight}`}
+                >
+                  <span className={sharedClasses.flexItemsCenter}>
+                    <FaMotorcycle className="w-6 h-6" />
+                    <span className="ml-2">
+                      {lessor.totalTripCount > 0
+                        ? lessor.totalTripCount
+                        : "Chưa có"}{" "}
+                      chuyến
+                    </span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <FeedbackList motorbikeId={booking.motorbikeId} />
           </div>
           <div className="col-span-1">
             <div className="bg-white p-6 rounded-lg shadow-lg mb-6">

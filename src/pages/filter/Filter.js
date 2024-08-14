@@ -168,10 +168,9 @@ const Filter = () => {
   const [error, setError] = useState(null);
   const [modalShow, setModalShow] = useState(false);
   const location = useLocation();
-  const filterAddressAndTime = location.state.filterList;
-  const listMotorbike=location.state.listMotor;
+  const filterAddressAndTime = location.state?.filterList || [];
   const [address, setAddress] = useState(filterAddressAndTime.address);
-  const [listMotor, setListMotor] = useState(listMotorbike.content);
+  const [listMotor, setListMotor] = useState(location.state?.listMotor || []);
   const handleUpdateValues = (newValues) => {
     console.log(newValues);
     setFilterList((prevFilterList) => ({
@@ -672,8 +671,15 @@ const Filter = () => {
                   </svg>
                 </div>
                 <span>
-                  {format(filterList.startDate, "HH:mm, dd/MM/yyyy")} -{" "}
-                  {format(filterList.endDate, "HH:mm, dd/MM/yyyy")}
+                  {filterList.startDate && filterList.endDate
+                    ? `${format(
+                        new Date(filterList.startDate),
+                        "HH:mm, dd/MM/yyyy"
+                      )} - ${format(
+                        new Date(filterList.endDate),
+                        "HH:mm, dd/MM/yyyy"
+                      )}`
+                    : "Thời gian không hợp lệ"}
                 </span>
               </div>
             </div>

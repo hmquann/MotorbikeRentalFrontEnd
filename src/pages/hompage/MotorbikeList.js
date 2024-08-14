@@ -11,6 +11,7 @@ import {
   faStar,
   faSuitcase,
 } from "@fortawesome/free-solid-svg-icons";
+import { Pagination } from "@mui/material";
 // Define CSS classes
 const cardClasses =
   "max-w-lg mx-auto bg-white dark:bg-zinc-800 rounded-xl shadow-md overflow-hidden";
@@ -32,6 +33,8 @@ const MotorbikeList = ({ listMotor, showDistance, searchLongitude, searchLatitud
   const [motorbikeList, setMotorbikeList] = useState([]);
   const [locaList, setLocaList] = useState([]);
   const [selectedMotorbike, setSelectedMotorbike] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 2;
   const [distanceList, setDistanceList] = useState([]);
   const accessToken = "pk.eyJ1Ijoibmd1eWVua2llbjAyIiwiYSI6ImNseDNpem83bjByM3cyaXF4NTZqOWFhZWIifQ.pVT0I74tSdI290kImTlphQ";
 
@@ -108,6 +111,22 @@ const MotorbikeList = ({ listMotor, showDistance, searchLongitude, searchLatitud
     'XeDien': 'Xe Điện',
     'XeGanMay' : 'Xe Gắn Máy'
   };
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  let motorbikeArray = [];
+  if (Array.isArray(motorbikeList)) {
+      motorbikeArray = motorbikeList;
+  } else if (motorbikeList && Array.isArray(motorbikeList.items)) {
+      motorbikeArray = motorbikeList.items;
+  } else {
+      console.error("motorbikeList không phải là một mảng hoặc không chứa mảng items");
+  }
+  const currentMotorbikes = motorbikeArray.slice(indexOfFirstItem, indexOfLastItem);
+
   return (
     <div>
       <div className="p-8">
@@ -118,7 +137,7 @@ const MotorbikeList = ({ listMotor, showDistance, searchLongitude, searchLatitud
             </div>
           ) : (
             Array.isArray(motorbikeList) &&
-            motorbikeList.map((motorbike,index) => (
+            currentMotorbikes.map((motorbike,index) => (
               <div className="relative flex items-center">
             <div className="grid gap-4 w-full h-full cursor-pointer overflow-hidden ">
                   <div 
@@ -205,6 +224,14 @@ const MotorbikeList = ({ listMotor, showDistance, searchLongitude, searchLatitud
             ))
           )}
         </div>
+      </div>
+      <div className="flex justify-center mt-4">
+        <Pagination
+          count={Math.ceil(motorbikeList.length / itemsPerPage)}
+          page={currentPage}
+          onChange={handlePageChange}
+          color="primary"
+        />
       </div>
     </div>
   );

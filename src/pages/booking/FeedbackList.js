@@ -1,21 +1,13 @@
   import React, { useState, useEffect } from 'react';
-  import axios from 'axios';
+
   import { FaEdit } from "react-icons/fa";
   import { MdDelete } from "react-icons/md";
-  import { FaStar } from "react-icons/fa";
-  import StarRatings from 'react-star-ratings';
   import { Rating } from '@mui/material';
 import apiClient from '../../axiosConfig';
 import { Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
-  const modalOverlayClasses =
-    "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 ";
-  const modalContentClasses = "bg-white p-4 rounded-lg shadow-lg max-w-md w-full";
-  const cancelButtonClasses =
-    "hover:bg-red-600 bg-red-500 text-white px-3 py-2 rounded-lg";
-  const yesButtonClasses =
-    "hover:bg-green-600 bg-green-500 text-white px-4 py-2 rounded-lg mr-2";
+
 
   const FeedbackList = ({ motorbikeId }) => {
     const [feedbacks, setFeedbacks] = useState([]);
@@ -151,7 +143,7 @@ import { useNavigate } from 'react-router-dom';
         </div>
         <div className="space-y-4">
           {feedbacks.map((feedback) => (
-            <div key={feedback.id} className="bg-card p-4 rounded-lg shadow-sm border border-border cursor-pointer" onClick={() => handleClick(feedback.renterId)}>
+            <div key={feedback.id} className="bg-card p-4 rounded-lg shadow-sm border border-border cursor-pointer" >
             {isEditing && editingFeedbackId === feedback.id ? (
                 <div>
                   <div className='flex justify-start items-center mb-3'>
@@ -179,7 +171,7 @@ import { useNavigate } from 'react-router-dom';
                 </div>
               ) : (
                 <div>
-                  <div className="flex justify-between items-start">
+                  <div className="flex justify-between items-start" onClick={() => handleClick(feedback.renterId)}>
                     <div className="flex items-start">
                       <img src="https://n1-cstg.mioto.vn/m/avatars/avatar-0.png" alt={`${feedback.renterName} Avatar`} className="w-16 h-16 rounded-full mr-4" />
                       <div>
