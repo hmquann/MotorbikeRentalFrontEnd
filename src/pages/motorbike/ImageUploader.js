@@ -6,17 +6,17 @@ function ImageUploader({ sendDataToParent }) {
  
     const handleImageChange = (event) => {
         const files = Array.from(event.target.files);
-        // if (files.length !== 4) {
-        //     setError('Please select exactly 4 images.');
-        //     setImages([]);  // Clear previous images if selection is invalid
-        //     sendDataToParent([]);  // Send empty array to parent if invalid
-        // } else {
+        if (files.length !== 4) {
+            setError('Vui lòng đăng tải đủ 4 ảnh các góc độ chiếc xe của bạn.');
+            setImages([]);  // Clear previous images if selection is invalid
+            sendDataToParent([]);  // Send empty array to parent if invalid
+        } else {
             setError('');
             const imageUrls = files.map((file) => URL.createObjectURL(file));
             setImages(imageUrls);
             sendDataToParent(files);  // Send the files to the parent component
         }
-    // };
+    };
 
     return (
         <div className="p-6 bg-white dark:bg-zinc-800 rounded-lg shadow-md">

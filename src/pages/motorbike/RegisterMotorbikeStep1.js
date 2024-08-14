@@ -235,7 +235,7 @@ const RegisterMotorbikeStep1 = () => {
       );
   }, []);
   const checkPlate = (plateNumber) => {
-    const regex = /^\d{2}-[A-Z0-9]{2}-\d{5}$/;
+    const regex = /^\d{2}-([A-Z]\d|[A-Z]{2})-\d{5}$/;
     return regex.test(plateNumber);
   };
   const checkManufactureYear = (manufacture) => {
@@ -290,7 +290,7 @@ const RegisterMotorbikeStep1 = () => {
       if (!value) {
         setMotorbikePlateError("Hãy điền biển số xe");
       } else if (checkPlate(value) == false) {
-        setMotorbikePlateError("Sai định dạng biển số xe. Ví dụ: 11-A1-11111");
+        setMotorbikePlateError("Sai định dạng biển số xe. Ví dụ: 11-A1-11111,12-AB-123456");
       } else {
         setMotorbikePlateError("");
       }
@@ -452,7 +452,7 @@ const handleSubmit = async (e) => {
 
           {/* Điều kiện ràng buộc */}
           <Form.Group className="mb-4">
-            <CustomFormLabel>Điều kiện ràng buộc thuê xe</CustomFormLabel>
+            <Form.Label>Điều kiện ràng buộc thuê xe</Form.Label>
             <FontAwesomeIcon
               icon={faCircleInfo}
               className={`ml-2 ${sharedClasses.cursorPointer} ${sharedClasses.textPrimary}`}

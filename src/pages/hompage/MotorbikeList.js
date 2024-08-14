@@ -213,7 +213,7 @@ const MotorbikeList = ({ listMotor, showDistance, searchLongitude, searchLatitud
                           </div>
                           <div className='flex'>
                             <div className="text-lg text-right font-semibold text-green-500 mb-2">{motorbike.price.toLocaleString()}</div>
-                            <span className='text-lg'>/ ngày</span>
+                            <span className='text-lg'>đ/ ngày</span>
                           </div>
                         </div>
                       </div>
