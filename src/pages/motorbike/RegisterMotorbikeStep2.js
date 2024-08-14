@@ -14,6 +14,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import ImageUploader from "./ImageUploader";
 import apiClient from "../../axiosConfig";
 import { CircularProgress } from "@mui/material";
+import Login from "../login/Login";
 const inputClasses =
   "w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500";
 const buttonClasses =
@@ -34,7 +35,7 @@ const RegisterMotorbikeStep2 = (files) => {
   const receiveData = location.state.formData;
   const modelName = location.state.modelName;
   console.log(modelName);
-  const [checkDelivery, setCheckDelivery] = useState(true);
+  const [checkDelivery, setCheckDelivery] = useState(false);
   const [spinner, setSpinner] = useState(false);
   const [formData, setFormData] = useState(receiveData);
   const [overtimeFeeError, setOvertimeFeeError] = useState();
@@ -43,6 +44,8 @@ const RegisterMotorbikeStep2 = (files) => {
   const [deliveryFeeError, setDeliveryFeeError] = useState();
   const [freeshipError, setFreeshipError] = useState();
   const [uploadedImages, setUploadedImages] = useState([]);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [redirectUrl, setRedirectUrl] = useState(null);
   console.log(receiveData);
   const userDataString = localStorage.getItem("user");
   const userData = JSON.parse(userDataString);
@@ -171,19 +174,19 @@ const RegisterMotorbikeStep2 = (files) => {
         setOvertimeLimitError("");
       }
     }
-    if (name === "freeshipDistance") {
-      if (!regexValueInput(value) && checkDelivery == true) {
+    if (name === "freeshipLimit" && checkDelivery === true) {
+      if (!regexValueInput(value) ) {
         setFreeshipError("Phải là 1 số");
-      } else if (value === "" && checkDelivery == true) {
+      } else if (value === "" ) {
         setFreeshipError("Không được bỏ trống");
       } else {
         setFreeshipError("");
       }
     }
-    if (name === "deliveryFeePerKilometer") {
-      if (!regexValueInput(value) && checkDelivery == true) {
+    if (name === "deliveryFee" && checkDelivery === true) {
+      if (!regexValueInput(value) ) {
         setDeliveryFeeError("Phải là 1 số");
-      } else if (value === "" && checkDelivery == true) {
+      } else if (value === "") {
         setDeliveryFeeError("Không được bỏ trống");
       } else {
         setDeliveryFeeError("");
@@ -200,22 +203,49 @@ const RegisterMotorbikeStep2 = (files) => {
   const handleReturnClick = () => {
     navigate("/registermotorbike", { state: { receiveData } });
   };
-  const handleSubmitClick = async () => {
+  const handleOpenLoginModal = () => {
+    const currentPath = window.location.pathname;
+    setRedirectUrl(currentPath);
+    setShowLoginModal(true);
+  };
+  const handleLoginSuccess = (userInfor) => {
+    localStorage.setItem("user", JSON.stringify(userInfor));
+    setShowLoginModal(false);
+  };
+
+  useEffect(() => {
+    if (userId) {
+      setShowLoginModal(false);
+      handleSubmitClick();
+
+    }
+  }, [userId]);
+  const handleSubmitClick = async (e) => {
+    e?.preventDefault();
+    if (!userId) {
+      handleOpenLoginModal();
+      setSpinner(false);
+      return;
+    }
     setSpinner(true);
 
     // Kiểm tra lỗi trước khi gửi dữ liệu
     if (
-      deliveryFeeError ||
+      priceError ||
       overtimeFeeError ||
-      overtimeLimitError ||
-      freeshipError
+      overtimeLimitError 
     ) {
       setError("Hoàn thành form đăng ký trước khi ấn 'Đăng ký'.");
       setSpinner(false);
       return; // Dừng hàm nếu có lỗi
     }
-
-    // Lấy tên tỉnh, huyện, và xã từ các giá trị đã chọn
+    if(formData.delivery==="true"){
+      if(deliveryFeeError||freeshipError){
+        setError("Hoàn thành form đăng ký trước khi ấn 'Đăng ký'.");
+        setSpinner(false);
+        return; 
+      }
+    }
     const province =
       provinces.find((d) => d.province_id === selectedProvince)
         ?.province_name || "";
@@ -558,7 +588,7 @@ const RegisterMotorbikeStep2 = (files) => {
               Quay lại
             </button>
             <button
-              onClick={handleSubmitClick}
+              onClick={(e) => handleSubmitClick(e)}
               className="w-6/12 py-2 text-base font-bold text-white  bg-green-500 rounded-lg hover:bg-green-600 transition hover:scale-105"
             >
               Đăng ký
@@ -566,6 +596,13 @@ const RegisterMotorbikeStep2 = (files) => {
           </div>
         </div>
       </div>
+      {showLoginModal && (
+        <Login
+          show={showLoginModal}
+          handleClose={() => setShowLoginModal(false)}
+          onLoginSuccess={handleLoginSuccess}
+        />
+      )}
     </div>
   );
 };

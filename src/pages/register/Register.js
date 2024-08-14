@@ -52,7 +52,7 @@ const Register = ({ show, handleClose, showLogin }) => {
     }
   }, [show]);
   const validateName = (name) => {
-    return /^[a-zA-Z]+$/.test(name);
+    return /^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂÂÊÔƯa-zA-Z]+$/.test(name);
   };
   const validatePhoneNumber = (phone) => {
     const phoneRegex = /^[0-9]{10}$/;

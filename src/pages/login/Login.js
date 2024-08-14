@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Modal } from "react-bootstrap";
-import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLock, faUser } from "@fortawesome/free-solid-svg-icons";
 import apiClient from "../../axiosConfig";
@@ -14,9 +13,6 @@ const Login = ({
   showForgotPassword,
 }) => {
   const apiLogin = "/api/auth/signin";
-  const containerClasses = "bg-gray-50 font-[sans-serif]";
-  const contentClasses =
-    "min-h-screen flex flex-col items-center justify-center py-6 px-4";
   const formClasses = "p-8 rounded bg-gray-50 font-manrope";
   const inputClasses =
     "w-full text-gray-800 font-semibold text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600";

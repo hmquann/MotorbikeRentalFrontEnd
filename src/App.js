@@ -9,8 +9,6 @@ import {
   useLocation,
 } from "react-router-dom";
 import NoMatch from "./pages/noMatch/NoMatch";
-import PostUser from "./pages/employee/PostUser";
-import UpdateUser from "./pages/employee/UpdateUser";
 import Login from "./pages/login/Login";
 import Forgotpassword from "./pages/forgotpassword/Forgotpassword";
 import Register from "./pages/register/Register";
@@ -72,8 +70,6 @@ function App() {
       <Header />
       <Routes>
         <Route path="/userCard/:userId" element={<UserCard />} />
-        <Route path="/employee" element={<PostUser />} />
-        <Route path="/employee/:id" element={<UpdateUser />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgotpassword" element={<Forgotpassword />} />
         <Route
