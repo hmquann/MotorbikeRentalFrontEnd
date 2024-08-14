@@ -1,5 +1,11 @@
-import React, { useState, useEffect} from "react";
-import { NavLink, Route, Routes, useNavigate, useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import {
+  NavLink,
+  Route,
+  Routes,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
 import "./Menu.css";
 import Profile from "../profile/Profile";
 import { Modal } from "react-bootstrap";
@@ -19,6 +25,8 @@ import BlogList from "../blog/BlogList";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faList } from "@fortawesome/free-solid-svg-icons";
 import ChatWithFirebase from "../chatWithFirebase/ChatWithFirebase";
+import DashboardForAdmin from "../dashboard/DashboardForAdmin";
+import DashboardForLessor from "../dashboard/DashboardForLessor";
 
 const Menu = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -40,7 +48,6 @@ const Menu = () => {
       navigate("/homepage");
     }
   }, [navigate]);
-
 
   const isAdmin = userRole && userRole.includes("ADMIN");
   const isLessor = userRole && userRole.includes("LESSOR");
@@ -64,9 +71,7 @@ const Menu = () => {
   };
 
   const handleLinkClick = () => {
-  
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -89,11 +94,22 @@ const Menu = () => {
               {isAdmin && (
                 <li>
                   <NavLink
-                    to="/menu/dashboard"
+                    to="/menu/dashboardForAdmin"
                     onClick={handleLinkClick}
                     className={({ isActive }) => (isActive ? "active" : "")}
                   >
-                    Dashboard
+                    Thống kê
+                  </NavLink>
+                </li>
+              )}
+              {isLessor && (
+                <li>
+                  <NavLink
+                    to="/menu/dashboardForLessor"
+                    onClick={handleLinkClick}
+                    className={({ isActive }) => (isActive ? "active" : "")}
+                  >
+                    Thống kê
                   </NavLink>
                 </li>
               )}
@@ -125,28 +141,28 @@ const Menu = () => {
               </li>
               {(isAdmin || isLessor) && (
                 <>
-              <hr></hr>
+                  <hr></hr>
 
-                <li>
-                  <a
-                    type="button"
-                    onClick={handleManageClick}
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      width: "100%",
-                      padding: "8px 16px",
-                      textDecoration: "none",
-                      color: "inherit",
-                      marginBottom: "3px",
-                    }}
-                    className={({ isActive }) => (isActive ? "active" : "")}
-                  >
-                    <span>Quản lý</span>
-                    <FontAwesomeIcon icon={faList} />
-                  </a>
-                    <ol className={`sub-menu ${isManageOpen ? 'open' : ''}`}>
+                  <li>
+                    <a
+                      type="button"
+                      onClick={handleManageClick}
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        width: "100%",
+                        padding: "8px 16px",
+                        textDecoration: "none",
+                        color: "inherit",
+                        marginBottom: "3px",
+                      }}
+                      className={({ isActive }) => (isActive ? "active" : "")}
+                    >
+                      <span>Quản lý</span>
+                      <FontAwesomeIcon icon={faList} />
+                    </a>
+                    <ol className={`sub-menu ${isManageOpen ? "open" : ""}`}>
                       {isAdmin && (
                         <>
                           <li>
@@ -233,16 +249,12 @@ const Menu = () => {
                         </>
                       )}
                     </ol>
-                </li>
+                  </li>
                 </>
               )}
               <hr></hr>
               <li>
-                <a
-                  type="button"
-                  onClick={handleLogout}
-                  className="log-out"
-                >
+                <a type="button" onClick={handleLogout} className="log-out">
                   Đăng xuất
                 </a>
               </li>
@@ -258,11 +270,20 @@ const Menu = () => {
                 <>
                   <Route path="/brand" element={<BrandList />} />
                   <Route path="/model" element={<ModelList />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route
+                    path="/dashboardForAdmin"
+                    element={<DashboardForAdmin />}
+                  />
                   <Route path="/approveLicense" element={<ApproveLicense />} />
                   <Route path="/userData" element={<UserData />} />
                   <Route path="/blogList" element={<BlogList />} />
                 </>
+              )}
+              {isLessor && (
+                <Route
+                  path="/dashboardForLessor"
+                  element={<DashboardForLessor />}
+                />
               )}
               {(isAdmin || isLessor) && (
                 <>
