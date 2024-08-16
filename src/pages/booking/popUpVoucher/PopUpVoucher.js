@@ -2,7 +2,7 @@ import { faExclamationCircle, faTag } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 
-const PopUpVoucher = ({ onCloseVoucher, discounts, discountValue }) => {
+const PopUpVoucher = ({ onCloseVoucher, discounts, discountValue, bookingAmount }) => {
   const [value, setValue] = useState();
   const calculateDaysLeft = (expirationDate) => {
     const today = new Date();
@@ -18,13 +18,21 @@ const PopUpVoucher = ({ onCloseVoucher, discounts, discountValue }) => {
     return discountMoney; // giữ nguyên nếu không phải là số
   };
 
-  const handleValue = (value) => {
-    discountValue(value);
+  const handleValue = (discount) => {
+    if (discount.type === "PERCENTAGE") {
+      const maxDiscountAmount = discount.maxDiscountAmount || Infinity;
+      const calculatedDiscount = Math.min((bookingAmount * discount.discountPercent) / 100, maxDiscountAmount);
+      discount.calculatedDiscount = calculatedDiscount;
+    } else if (discount.type === "FIXED_AMOUNT") {
+      discount.calculatedDiscount = discount.discountMoney;
+    }
+
+    discountValue(discount);
     onCloseVoucher();
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 font-manrope">
       <div className="bg-white dark:bg-card rounded-lg shadow-lg p-6 w-96">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold text-zinc-800 dark:text-white">
@@ -32,7 +40,7 @@ const PopUpVoucher = ({ onCloseVoucher, discounts, discountValue }) => {
           </h2>
           <button
             onClick={onCloseVoucher}
-            className="text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+            className="text-zinc-500 text-2xl hover:text-zinc-700 dark:hover:text-zinc-300"
           >
             &times;
           </button>
@@ -51,12 +59,20 @@ const PopUpVoucher = ({ onCloseVoucher, discounts, discountValue }) => {
                     {discount.name}
                   </span>
                   <br />
-                  <span className="text-zinc-800 dark:text-white text-xs">
-                    Giảm {formatDiscountMoney(discount.discountMoney)}
-                  </span>
+                  {discount.voucherType === "PERCENTAGE" ? (
+                        <span className="text-zinc-800 dark:text-white text-xs">
+                          Giảm {discount.discountPercent}% (tối đa{" "}
+                          {formatDiscountMoney(discount.maxDiscountMoney)})
+                        </span>
+                      ) : (
+                        <span className="text-zinc-800 dark:text-white text-xs">
+                          Giảm {formatDiscountMoney(discount.discountMoney)}
+                        </span>
+                      )}
                   <p className="text-orange-500 dark:text-zinc-500 text-sm ">
                     <FontAwesomeIcon
                       icon={faExclamationCircle}
+                      className="mr-1"
                     ></FontAwesomeIcon>{" "}
                     Hết hạn sau {calculateDaysLeft(discount.expirationDate)}{" "}
                     ngày
@@ -64,7 +80,7 @@ const PopUpVoucher = ({ onCloseVoucher, discounts, discountValue }) => {
                 </div>
                 <div>
                   <button
-                    className="bg-green-500 text-white rounded-md px-3 py-2"
+                    className="bg-green-500 hover:bg-green-600 text-white rounded-md px-3 py-2"
                     onClick={() => handleValue(discount)}
                   >
                     Áp dụng

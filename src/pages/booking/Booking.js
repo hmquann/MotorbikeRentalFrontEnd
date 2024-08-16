@@ -197,6 +197,8 @@ const Booking = () => {
   const { incrementNotificationCount } = useNotification();
   const [loading, setLoading] = useState();
   const [errorTime, setErrorTime] = useState();
+  const [calculatedDiscountAmount, setCalculatedDiscountAmount] = useState(0);
+
 
   const handleOpenLoginModal = () => {
     const currentPath = window.location.pathname;
@@ -361,22 +363,35 @@ const Booking = () => {
   };
 
   useEffect(() => {
-    setTotalPrice(rentalDays * receiveData.price + deliveryFee);
+    const basePrice = rentalDays * receiveData.price + deliveryFee;
+    let calculatedTotalPrice = basePrice;
+    let discountAmount = 0;
+  
     if (discount) {
-      if (typeof discount.discountMoney === "number") {
-        setTotalPrice(
-          rentalDays * receiveData.price + deliveryFee - discount.discountMoney
-        );
-        console.log(totalPrice, discount.discountMoney);
-      } else {
-        setTotalPrice(
-          ((rentalDays * receiveData.price + deliveryFee) *
-            (100 - discount.discountMoney)) /
-            100
-        );
+      if (discount.voucherType === "FIXED_MONEY" && typeof discount.discountMoney === "number") {
+        // Fixed amount discount
+        discountAmount = discount.discountMoney;
+        calculatedTotalPrice = basePrice - discountAmount;
+        if (calculatedTotalPrice < 0) {
+          calculatedTotalPrice = 0;
+        }
+      } else if (discount.voucherType === "PERCENTAGE" && typeof discount.discountPercent === "number") {
+        // Percentage discount
+        discountAmount = (basePrice * discount.discountPercent) / 100;
+        if (discount.maxDiscountMoney) {
+          // Apply the max discount money limit
+          discountAmount = Math.min(discountAmount, discount.maxDiscountMoney);
+        }
+        calculatedTotalPrice = basePrice - discountAmount;
+        if (calculatedTotalPrice < 0) {
+          calculatedTotalPrice = 0;
+        }
       }
     }
-  }, [rentalDays, deliveryFee, discount]);
+  
+    setTotalPrice(calculatedTotalPrice);
+    setCalculatedDiscountAmount(discountAmount);
+  }, [rentalDays, deliveryFee, discount, receiveData.price]);
 
   const [showPopupBooking, setShowPopupBooking] = useState(false);
 
@@ -842,7 +857,13 @@ const Booking = () => {
                             ></FontAwesomeIcon>
                           </span>
                           <span className="font-semibold">
-                            {formatDiscountMoney(discount.discountMoney)}
+      {discount.voucherType === "PERCENTAGE" && typeof discount.discountPercent === "number" ? (
+        <>
+          {formatDiscountMoney(calculatedDiscountAmount)}
+        </>
+      ) : (
+        formatDiscountMoney(discount.discountMoney)
+      )}
                           </span>
                         </div>
                       ) : (
@@ -929,10 +950,10 @@ const Booking = () => {
                 {/* Description Section */}
                 <div className="flex flex-col my-6">
                   <h2 className="text-xl font-semibold mb-6">Mô tả</h2>
-                  <p className="max-h-32">
-                    Trang bị camera hành trình trước sau
+                  <p className="max-h-32 font-thin text-zinc-500">
+                   Xe đi giữ gìn , bảo dưỡng thường xuyên
                     <br />
-                    Có bảo hiểm đầy đủ
+                    Xe chính chủ, có bảo hiểm đầy đủ
                     <br />
                     Chủ xe thân thiện hỗ trợ nhiệt tình
                   </p>
@@ -1135,6 +1156,7 @@ const Booking = () => {
           onCloseVoucher={handleCloseVoucher}
           discounts={discounts}
           discountValue={handleDiscountValue}
+          bookingAmount={rentalDays * receiveData.price + deliveryFee}
         ></PopUpVoucher>
       )}
       {showLoginModal && (
