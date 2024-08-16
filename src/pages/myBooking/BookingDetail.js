@@ -27,7 +27,6 @@ import PopUpReason from "./PopUpReason";
 import FeedbackList from "../booking/FeedbackList";
 import MapModal from "./MapModal";
 
-
 const statusTranslations = {
   PENDING: "Chờ duyệt",
   PENDING_DEPOSIT: "Chờ đặt cọc",
@@ -136,6 +135,7 @@ export default function Widget() {
   const [motorbikePlate, setMotorbikePlate] = useState();
   const [motorbikeLocation, setMotorbikeLocation] = useState();
   const [lessorName, setLessorName] = useState();
+  const [lessorPhone, setLessorPhone] = useState();
   const [renterName, setRenterName] = useState();
   const [motorbikeDeliveryFee, setMotorbikeDeliveryFee] = useState();
   const [motorbikeOvertimeFee, setMotorbikeOvertimeFee] = useState();
@@ -202,6 +202,7 @@ export default function Widget() {
         setMotorbikeOvertimeFee(`${response.data.overtimeFee}`);
         setUrlImage(response.data.motorbikeImages[0].url);
         setLessorId(response.data.user.id);
+        setLessorPhone(response.data.user.phone);
         console.log(lessorId);
         const response2 = await apiClient.get(`/api/user/${booking.renterId}`);
         console.log(response2.data.firstName + " " + response2.data.lastName);
@@ -259,7 +260,11 @@ export default function Widget() {
     setShowFeedbackModal(false);
   };
 
-  const handleSendReason = async (reason) => {
+  const handleSendReason = async (
+    reason,
+    isWithinOneHour,
+    isMoreThanTwoDays
+  ) => {
     setShowPopUpReason(false);
     setSelectedReason(reason);
     const now = new Date();
@@ -338,7 +343,36 @@ export default function Widget() {
         `/api/booking/changeDepositCanceled/${booking.bookingId}`
       );
 
+      const adminData = await apiClient.get("api/user/getAdmin");
+      const adminDataId = adminData.data.id;
+      const renterId = userData.userId; // Replace with actual user ID if different
+      const amount = (booking.totalPrice * 30) / 100; 
+      const amount70 = booking.totalPrice * 30 / 100 * 70 / 100;
+      const refundMoneyUrl = `/api/payment/refund`;
+      
       if (booking.status === "DEPOSIT_MADE") {
+        if (isWithinOneHour) {
+          await apiClient.post(refundMoneyUrl, null, {
+            params: {
+              senderId: adminDataId,
+              receiverId: renterId,
+              amount: amount,
+              motorbikeName: motorbikeName,
+              motorbikePlate: motorbikePlate,
+            },
+          });
+        }
+        if (isMoreThanTwoDays) {
+          await apiClient.post(refundMoneyUrl, null, {
+            params: {
+              senderId: adminDataId,
+              receiverId: renterId,
+              amount: amount70,
+              motorbikeName: motorbikeName,
+              motorbikePlate: motorbikePlate,
+            },
+          });
+        }
       }
     } catch (error) {
       console.log(error);
@@ -451,20 +485,20 @@ export default function Widget() {
           );
         }
         const adminData = await apiClient.get("api/user/getAdmin");
-          const adminDataId = adminData.data.id;
-          const renterId = userData.userId; // Replace with actual user ID if different
-          const amount = (booking.totalPrice * 30) / 100; // Replace with actual amount to be subtracted
-          const subtractMoneyUrl = `/api/payment/subtract`;
-          const addMoneyUrl = `/api/payment/add`;
-          await apiClient.post(subtractMoneyUrl, null, {
-            params: {
-              senderId: renterId,
-              receiverId: adminDataId,
-              amount: amount,
-              motorbikeName: motorbikeName,
-              motorbikePlate: motorbikePlate,
-            },
-          });
+        const adminDataId = adminData.data.id;
+        const renterId = userData.userId; // Replace with actual user ID if different
+        const amount = (booking.totalPrice * 30) / 100; // Replace with actual amount to be subtracted
+        const subtractMoneyUrl = `/api/payment/subtract`;
+        const addMoneyUrl = `/api/payment/add`;
+        await apiClient.post(subtractMoneyUrl, null, {
+          params: {
+            senderId: renterId,
+            receiverId: adminDataId,
+            amount: amount,
+            motorbikeName: motorbikeName,
+            motorbikePlate: motorbikePlate,
+          },
+        });
       } else if (status === "DONE") {
         const admin = await apiClient.get("api/user/getAdmin");
         const adminId = admin.data.id;
@@ -525,6 +559,15 @@ export default function Widget() {
   const handleCloseModal = () => {
     setViewMap(false);
   };
+
+  const handleWithinOneHour = () => {
+    console.log("Thực hiện API khi isWithinOneHour là true");
+  };
+
+  const handleMoreThanTwoDays = () => {
+    console.log("Thực hiện API khi isMoreThanTwoDays là true");
+  };
+
   return (
     <div className="relative">
       {loading && (
@@ -633,7 +676,9 @@ export default function Widget() {
                   <div className="w-4/12 p-2 flex items-center justify-center border-r border-gray-300">
                     Khách thuê hủy chuyến
                   </div>
-                  <div className="w-4/12 p-2 flex items-center justify-center">Chủ xe hủy chuyến</div>
+                  <div className="w-4/12 p-2 flex items-center justify-center">
+                    Chủ xe hủy chuyến
+                  </div>
                 </div>
                 <div className="flex border-t border-gray-300">
                   <div className="flex items-center w-4/12 pl-6 font-semibold text-left border-r border-gray-300">
@@ -641,13 +686,35 @@ export default function Widget() {
                   </div>
                   <div className="w-4/12 p-2 flex flex-col justify-center items-center border-r border-gray-300">
                     <i className="fas fa-check text-green-600 text-2xl mb-1"></i>
-                    <svg class="w-6 h-6 mr-1" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.25 2C6.74 2 2.25 6.49 2.25 12C2.25 17.51 6.74 22 12.25 22C17.76 22 22.25 17.51 22.25 12C22.25 6.49 17.76 2 12.25 2ZM15.84 10.59L12.32 14.11C12.17 14.26 11.98 14.33 11.79 14.33C11.6 14.33 11.4 14.26 11.26 14.11L9.5 12.35C9.2 12.06 9.2 11.58 9.5 11.29C9.79 11 10.27 11 10.56 11.29L11.79 12.52L14.78 9.53C15.07 9.24 15.54 9.24 15.84 9.53C16.13 9.82 16.13 10.3 15.84 10.59Z" fill="#12B76A"/></svg>
+                    <svg
+                      class="w-6 h-6 mr-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12.25 2C6.74 2 2.25 6.49 2.25 12C2.25 17.51 6.74 22 12.25 22C17.76 22 22.25 17.51 22.25 12C22.25 6.49 17.76 2 12.25 2ZM15.84 10.59L12.32 14.11C12.17 14.26 11.98 14.33 11.79 14.33C11.6 14.33 11.4 14.26 11.26 14.11L9.5 12.35C9.2 12.06 9.2 11.58 9.5 11.29C9.79 11 10.27 11 10.56 11.29L11.79 12.52L14.78 9.53C15.07 9.24 15.54 9.24 15.84 9.53C16.13 9.82 16.13 10.3 15.84 10.59Z"
+                        fill="#12B76A"
+                      />
+                    </svg>
 
-                    <span className="text-green-500">Hoàn tiền giữ chỗ 100%</span>
+                    <span className="text-green-500">
+                      Hoàn tiền giữ chỗ 100%
+                    </span>
                   </div>
                   <div className="w-4/12 p-4 flex flex-col items-center">
                     <i className="fas fa-check text-green-600 text-2xl mb-1"></i>
-                    <svg class="w-6 h-6 mr-1" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.25 2C6.74 2 2.25 6.49 2.25 12C2.25 17.51 6.74 22 12.25 22C17.76 22 22.25 17.51 22.25 12C22.25 6.49 17.76 2 12.25 2ZM15.84 10.59L12.32 14.11C12.17 14.26 11.98 14.33 11.79 14.33C11.6 14.33 11.4 14.26 11.26 14.11L9.5 12.35C9.2 12.06 9.2 11.58 9.5 11.29C9.79 11 10.27 11 10.56 11.29L11.79 12.52L14.78 9.53C15.07 9.24 15.54 9.24 15.84 9.53C16.13 9.82 16.13 10.3 15.84 10.59Z" fill="#12B76A"/></svg>
+                    <svg
+                      class="w-6 h-6 mr-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12.25 2C6.74 2 2.25 6.49 2.25 12C2.25 17.51 6.74 22 12.25 22C17.76 22 22.25 17.51 22.25 12C22.25 6.49 17.76 2 12.25 2ZM15.84 10.59L12.32 14.11C12.17 14.26 11.98 14.33 11.79 14.33C11.6 14.33 11.4 14.26 11.26 14.11L9.5 12.35C9.2 12.06 9.2 11.58 9.5 11.29C9.79 11 10.27 11 10.56 11.29L11.79 12.52L14.78 9.53C15.07 9.24 15.54 9.24 15.84 9.53C16.13 9.82 16.13 10.3 15.84 10.59Z"
+                        fill="#12B76A"
+                      />
+                    </svg>
                     <span className="text-green-500">Không tốn phí</span>
                     {/* <span className="text-gray-600">
                       (Đánh giá hệ thống 3*)
@@ -656,16 +723,38 @@ export default function Widget() {
                 </div>
                 <div className="flex border-t border-gray-300">
                   <div className="flex items-center w-4/12 pl-6 font-semibold text-left border-r border-gray-300">
-                    Trước chuyến đi &gt;7 ngày
+                    Trước chuyến đi &gt;2 ngày
                   </div>
                   <div className="w-4/12 p-2 flex flex-col justify-center items-center border-r border-gray-300">
                     <i className="fas fa-check text-green-600 text-2xl mb-1"></i>
-                    <svg class="w-6 h-6 mr-1" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.25 2C6.74 2 2.25 6.49 2.25 12C2.25 17.51 6.74 22 12.25 22C17.76 22 22.25 17.51 22.25 12C22.25 6.49 17.76 2 12.25 2ZM15.84 10.59L12.32 14.11C12.17 14.26 11.98 14.33 11.79 14.33C11.6 14.33 11.4 14.26 11.26 14.11L9.5 12.35C9.2 12.06 9.2 11.58 9.5 11.29C9.79 11 10.27 11 10.56 11.29L11.79 12.52L14.78 9.53C15.07 9.24 15.54 9.24 15.84 9.53C16.13 9.82 16.13 10.3 15.84 10.59Z" fill="#12B76A"/></svg>
-                    <span className="text-yellow-600">Hoàn tiền giữ chỗ 70%</span>
+                    <svg
+                      class="w-6 h-6 mr-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12.25 2C6.74 2 2.25 6.49 2.25 12C2.25 17.51 6.74 22 12.25 22C17.76 22 22.25 17.51 22.25 12C22.25 6.49 17.76 2 12.25 2ZM15.84 10.59L12.32 14.11C12.17 14.26 11.98 14.33 11.79 14.33C11.6 14.33 11.4 14.26 11.26 14.11L9.5 12.35C9.2 12.06 9.2 11.58 9.5 11.29C9.79 11 10.27 11 10.56 11.29L11.79 12.52L14.78 9.53C15.07 9.24 15.54 9.24 15.84 9.53C16.13 9.82 16.13 10.3 15.84 10.59Z"
+                        fill="#12B76A"
+                      />
+                    </svg>
+                    <span className="text-yellow-600">
+                      Hoàn tiền giữ chỗ 70%
+                    </span>
                   </div>
                   <div className="w-4/12 p-4 flex flex-col items-center">
                     <i className="fas fa-times text-red-600 text-2xl mb-1"></i>
-                    <svg class="w-6 h-6 mr-1" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.25 2C6.74 2 2.25 6.49 2.25 12C2.25 17.51 6.74 22 12.25 22C17.76 22 22.25 17.51 22.25 12C22.25 6.49 17.76 2 12.25 2ZM15.84 10.59L12.32 14.11C12.17 14.26 11.98 14.33 11.79 14.33C11.6 14.33 11.4 14.26 11.26 14.11L9.5 12.35C9.2 12.06 9.2 11.58 9.5 11.29C9.79 11 10.27 11 10.56 11.29L11.79 12.52L14.78 9.53C15.07 9.24 15.54 9.24 15.84 9.53C16.13 9.82 16.13 10.3 15.84 10.59Z" fill="#12B76A"/></svg>
+                    <svg
+                      class="w-6 h-6 mr-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12.25 2C6.74 2 2.25 6.49 2.25 12C2.25 17.51 6.74 22 12.25 22C17.76 22 22.25 17.51 22.25 12C22.25 6.49 17.76 2 12.25 2ZM15.84 10.59L12.32 14.11C12.17 14.26 11.98 14.33 11.79 14.33C11.6 14.33 11.4 14.26 11.26 14.11L9.5 12.35C9.2 12.06 9.2 11.58 9.5 11.29C9.79 11 10.27 11 10.56 11.29L11.79 12.52L14.78 9.53C15.07 9.24 15.54 9.24 15.84 9.53C16.13 9.82 16.13 10.3 15.84 10.59Z"
+                        fill="#12B76A"
+                      />
+                    </svg>
                     <span className="text-yellow-600">Đền tiền 30%</span>
                     {/* <span className="text-gray-600">
                       (Đánh giá hệ thống 3*)
@@ -674,16 +763,38 @@ export default function Widget() {
                 </div>
                 <div className="flex border-t border-gray-300">
                   <div className="flex items-center w-4/12 pl-6 font-semibold text-left border-r border-gray-300">
-                    Trong vòng 7 ngày trước chuyến đi
+                    Trong vòng 2 ngày trước chuyến đi
                   </div>
                   <div className="w-4/12 p-2 flex flex-col justify-center items-center border-r border-gray-300">
                     <i className="fas fa-times text-red-600 text-2xl mb-1"></i>
-                    <svg class="w-6 h-6 mr-1" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.25 2C6.74 2 2.25 6.49 2.25 12C2.25 17.51 6.74 22 12.25 22C17.76 22 22.25 17.51 22.25 12C22.25 6.49 17.76 2 12.25 2ZM14.67 13.39C14.97 13.69 14.96 14.16 14.67 14.45C14.52 14.59 14.33 14.67 14.14 14.67C13.95 14.67 13.75 14.59 13.61 14.44L12.25 13.07L10.9 14.44C10.75 14.59 10.56 14.67 10.36 14.67C10.17 14.67 9.98 14.59 9.84 14.45C9.54 14.16 9.53999 13.69 9.82999 13.39L11.2 12L9.82999 10.61C9.53999 10.32 9.54 9.84 9.84 9.55C10.13 9.26 10.61 9.26 10.9 9.55L12.25 10.92L13.61 9.55C13.9 9.26 14.38 9.26 14.67 9.55C14.96 9.84 14.96 10.32 14.67 10.61L13.3 12L14.67 13.39Z" fill="#F04438"/></svg>
-                    <span className="text-red-500">Không hoàn tiền giữ chỗ</span>
+                    <svg
+                      class="w-6 h-6 mr-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12.25 2C6.74 2 2.25 6.49 2.25 12C2.25 17.51 6.74 22 12.25 22C17.76 22 22.25 17.51 22.25 12C22.25 6.49 17.76 2 12.25 2ZM14.67 13.39C14.97 13.69 14.96 14.16 14.67 14.45C14.52 14.59 14.33 14.67 14.14 14.67C13.95 14.67 13.75 14.59 13.61 14.44L12.25 13.07L10.9 14.44C10.75 14.59 10.56 14.67 10.36 14.67C10.17 14.67 9.98 14.59 9.84 14.45C9.54 14.16 9.53999 13.69 9.82999 13.39L11.2 12L9.82999 10.61C9.53999 10.32 9.54 9.84 9.84 9.55C10.13 9.26 10.61 9.26 10.9 9.55L12.25 10.92L13.61 9.55C13.9 9.26 14.38 9.26 14.67 9.55C14.96 9.84 14.96 10.32 14.67 10.61L13.3 12L14.67 13.39Z"
+                        fill="#F04438"
+                      />
+                    </svg>
+                    <span className="text-red-500">
+                      Không hoàn tiền giữ chỗ
+                    </span>
                   </div>
                   <div className="w-4/12 p-4 flex flex-col items-center">
                     <i className="fas fa-times text-red-600 text-2xl mb-1"></i>
-                    <svg class="w-6 h-6 mr-1" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.25 2C6.74 2 2.25 6.49 2.25 12C2.25 17.51 6.74 22 12.25 22C17.76 22 22.25 17.51 22.25 12C22.25 6.49 17.76 2 12.25 2ZM14.67 13.39C14.97 13.69 14.96 14.16 14.67 14.45C14.52 14.59 14.33 14.67 14.14 14.67C13.95 14.67 13.75 14.59 13.61 14.44L12.25 13.07L10.9 14.44C10.75 14.59 10.56 14.67 10.36 14.67C10.17 14.67 9.98 14.59 9.84 14.45C9.54 14.16 9.53999 13.69 9.82999 13.39L11.2 12L9.82999 10.61C9.53999 10.32 9.54 9.84 9.84 9.55C10.13 9.26 10.61 9.26 10.9 9.55L12.25 10.92L13.61 9.55C13.9 9.26 14.38 9.26 14.67 9.55C14.96 9.84 14.96 10.32 14.67 10.61L13.3 12L14.67 13.39Z" fill="#F04438"/></svg>
+                    <svg
+                      class="w-6 h-6 mr-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12.25 2C6.74 2 2.25 6.49 2.25 12C2.25 17.51 6.74 22 12.25 22C17.76 22 22.25 17.51 22.25 12C22.25 6.49 17.76 2 12.25 2ZM14.67 13.39C14.97 13.69 14.96 14.16 14.67 14.45C14.52 14.59 14.33 14.67 14.14 14.67C13.95 14.67 13.75 14.59 13.61 14.44L12.25 13.07L10.9 14.44C10.75 14.59 10.56 14.67 10.36 14.67C10.17 14.67 9.98 14.59 9.84 14.45C9.54 14.16 9.53999 13.69 9.82999 13.39L11.2 12L9.82999 10.61C9.53999 10.32 9.54 9.84 9.84 9.55C10.13 9.26 10.61 9.26 10.9 9.55L12.25 10.92L13.61 9.55C13.9 9.26 14.38 9.26 14.67 9.55C14.96 9.84 14.96 10.32 14.67 10.61L13.3 12L14.67 13.39Z"
+                        fill="#F04438"
+                      />
+                    </svg>
                     <span className="text-red-500">Đền tiền 100%</span>
                   </div>
                 </div>
@@ -761,6 +872,7 @@ export default function Widget() {
 
                 <div className="mr-6">
                   <h4 className="font-semibold">{lessorName}</h4>
+                  <h6 className="font-semibold">{lessorPhone}</h6>
                   <p className="text-gray-500">Chủ xe</p>
                 </div>
               </div>
@@ -864,6 +976,10 @@ export default function Widget() {
                 show={showPopUpReason}
                 onHide={() => setShowPopUpReason(false)}
                 onSend={handleSendReason}
+                bookingId={booking.bookingId}
+                bookingTotalPrice={booking.totalPrice}
+                onWithinOneHour={handleWithinOneHour}
+                onMoreThanTwoDays={handleMoreThanTwoDays}
               />
               <FeedbackModal
                 show={showFeedbackModal}
@@ -875,8 +991,11 @@ export default function Widget() {
                 <MapModal
                   isOpen={viewMap}
                   onClose={handleCloseModal}
-                  startLocation={[motorbikeLocation.longitude,motorbikeLocation.latitude]}
-                  endLocation={[booking.longitude,booking.latitude]}
+                  startLocation={[
+                    motorbikeLocation.longitude,
+                    motorbikeLocation.latitude,
+                  ]}
+                  endLocation={[booking.longitude, booking.latitude]}
                 />
               )}
             </div>

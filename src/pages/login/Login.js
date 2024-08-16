@@ -70,7 +70,7 @@ const Login = ({
       }
 
       // if (data.roles && data.roles.includes("ADMIN")) {
-      //   navigate("/menu/dashboard");
+      //   navigate("/menu/dashboardForAdmin");
       // } else if (data.roles && data.roles.includes("USER", "LESSOR")) {
       //   navigate("/homepage");
       // }

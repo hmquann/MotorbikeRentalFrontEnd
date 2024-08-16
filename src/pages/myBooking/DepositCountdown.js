@@ -1,19 +1,44 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import apiClient from "../../axiosConfig";
 
-const DepositCountdown = ({
-  depositTime,
-  onOneHourLeft,
-  onTimeExpired,
-  depositNoti,
-  depositCanceled,
-}) => {
+const DepositCountdown = ({ bookingId, onOneHourLeft, onTimeExpired }) => {
   const [timeRemaining, setTimeRemaining] = useState(null);
+  const [depositTime, setDepositTime] = useState();
+  const [depositNoti, setDepositNoti] = useState();
+  const [depositCanceled, setDepositCanceled] = useState();
+  useEffect(() => {
+    const fetchBookingDeposit = async () => {
+      try {
+        const response = await apiClient.get(
+          `/api/booking/getBookingDepositByBookingId/${bookingId}`,
+          { headers: { "Cache-Control": "no-cache" } }
+        );
+        console.log(response);
+        setDepositTime(response.data.depositTime);
+        setDepositNoti(response.data.depositNoti);
+        setDepositCanceled(response.data.depositCanceled);
+      } catch (error) {
+        console.error("Error fetching booking deposit:", error);
+      }
+    };
+
+    fetchBookingDeposit();
+
+    const intervalId = setInterval(fetchBookingDeposit, 1000); // Call API every second
+
+    return () => clearInterval(intervalId);
+  }, [bookingId]);
   useEffect(() => {
     if (depositTime) {
+      if (!depositCanceled && !depositNoti) {
+        setTimeRemaining(null);
+        return;
+      }
       const depositDate = new Date(depositTime);
       const expirationTime = new Date(
         depositDate.getTime() + 6 * 60 * 60 * 1000
+        //depositDate.getTime() + 1 * 60 * 1000
       );
 
       const updateCountdown = () => {
@@ -29,14 +54,14 @@ const DepositCountdown = ({
           setTimeRemaining({ hours, minutes, seconds });
 
           if (hours < 1 && depositNoti) {
-            if (onOneHourLeft) onOneHourLeft();
+            onOneHourLeft();
+            setDepositNoti(false);
           }
         } else {
           if (depositCanceled) {
             setTimeRemaining(null);
-            if (onTimeExpired) {
-              onTimeExpired();
-            }
+            onTimeExpired();
+            setDepositCanceled(false);
           }
         }
       };
@@ -46,7 +71,14 @@ const DepositCountdown = ({
 
       return () => clearInterval(intervalId);
     }
-  }, [depositTime, onOneHourLeft, onTimeExpired, depositNoti, depositCanceled]);
+  }, [
+    bookingId,
+    onOneHourLeft,
+    onTimeExpired,
+    depositCanceled,
+    depositNoti,
+    depositTime,
+  ]);
 
   return (
     <div>
