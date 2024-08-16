@@ -482,8 +482,11 @@ const Filter = () => {
         }
       );
       console.log("Data sent successfully:", response.data);
+      setTimeout(() =>{
       setListMotor(response.data.content);
       setTotalItems(response.data.totalElements);
+      setLoading(false)
+      }, 200)
     } catch (error) {
       handleRequestError(error);
     } finally {
@@ -739,7 +742,7 @@ const Filter = () => {
 
       <div className="flex justify-center">
         <div style={{ width: "95%" }}>
-          <MotorbikeList listMotor={listMotor} page={page + 1}  totalItems={totalItems} pageSize={pageSize} onPageChange={handlePageChange} searchLongitude={filterList.longitude} searchLatitude={filterList.latitude} showDistance={true}/>
+          <MotorbikeList isLoading={loading} listMotor={listMotor} page={page + 1}  totalItems={totalItems} pageSize={pageSize} onPageChange={handlePageChange} searchLongitude={filterList.longitude} searchLatitude={filterList.latitude} showDistance={true}/>
         </div>
       </div>
       {showBrandPopup && (
