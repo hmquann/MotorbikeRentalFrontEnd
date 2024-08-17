@@ -52,8 +52,8 @@ const Register = ({ show, handleClose, showLogin }) => {
     }
   }, [show]);
   const validateName = (name) => {
-    return /^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂÂÊÔƯa-zA-Z]+$/.test(name);
-  };
+    return /^[\p{L}\s]+$/u.test(name);
+};
   const validatePhoneNumber = (phone) => {
     const phoneRegex = /^[0-9]{10}$/;
     return phoneRegex.test(phone);
