@@ -22,6 +22,7 @@ const TransactionList = ({ transactions }) => {
     WITHDRAW: "Rút tiền",
     SUCCESS: "Thành công",
     FAILED: "Thất bại",
+    PENDING: "Đang xử lý",
     DEPOSIT: "Đặt cọc",
     DEPOSIT_RECEIVE: "Nhận cọc xe",
     REFUND: "Hoàn tiền",
@@ -66,14 +67,14 @@ const TransactionList = ({ transactions }) => {
                   )}
                 </td>
                 <td className="border border-gray-300 p-2">
-                  {amount.startsWith("+")
-                    ? typeMap[transaction.type]
-                    : "Hoàn cọc"}
+                  {typeMap[transaction.type]}
                 </td>
                 <td
                   className={`border border-gray-300 p-2 ${
                     transaction.status === "SUCCESS"
                       ? "text-green-500"
+                      : transaction.status === "PENDING"
+                      ? "text-orange-400"
                       : "text-red-500"
                   }`}
                 >

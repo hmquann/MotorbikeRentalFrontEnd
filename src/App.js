@@ -58,8 +58,10 @@ import GeneralPolicy from "./pages/privacy/GeneralPolicy";
 import Regulations from "./pages/privacy/Regulations";
 import PrivacyPolicy from "./pages/privacy/PrivacyPolicy";
 import Complaints from "./pages/privacy/Complaints";
+import WithdrawRequest from "./pages/dashboard/WithdrawRequest";
 import DashboardForAdmin from "./pages/dashboard/DashboardForAdmin";
 import DashboardForLessor from "./pages/dashboard/DashboardForLessor";
+
 
 function App() {
   const location = useLocation();
@@ -102,6 +104,7 @@ function App() {
           <Route path="/menu/chatting" element={<ChatWithFirebase />} />
           <Route path="/menu/myBooking" element={<MyBooking />} />
           <Route path="/menu/wallet" element={<UserWallet />} />
+          <Route path="/menu/withdrawRequest" element={<WithdrawRequest />} />
           <Route
             path="/menu/approveMotorbike"
             element={<ApproveMotorbikeRegistration />}
