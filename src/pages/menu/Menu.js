@@ -19,6 +19,7 @@ import BlogList from "../blog/BlogList";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faList } from "@fortawesome/free-solid-svg-icons";
 import ChatWithFirebase from "../chatWithFirebase/ChatWithFirebase";
+import WithdrawRequest from "../dashboard/WithdrawRequest";
 
 const Menu = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -195,6 +196,17 @@ const Menu = () => {
                           </li>
                           <li>
                             <NavLink
+                              to="/menu/withdrawRequest"
+                              onClick={handleLinkClick}
+                              className={({ isActive }) =>
+                                isActive ? "active" : ""
+                              }
+                            >
+                              Quản lý yêu cầu rút tiền
+                            </NavLink>
+                          </li>
+                          <li>
+                            <NavLink
                               to="/menu/blogList"
                               onClick={handleLinkClick}
                               className={({ isActive }) =>
@@ -261,6 +273,7 @@ const Menu = () => {
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/approveLicense" element={<ApproveLicense />} />
                   <Route path="/userData" element={<UserData />} />
+                  <Route path="/withdrawRequest" element={<WithdrawRequest />} />
                   <Route path="/blogList" element={<BlogList />} />
                 </>
               )}
