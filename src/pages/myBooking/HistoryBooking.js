@@ -7,23 +7,20 @@ const HistoryBooking = ({ filters }) => {
   const [bookings, setBookings] = useState([]);
   const userDataString = localStorage.getItem("user");
   const userData = JSON.parse(userDataString);
-  const [page, setPage] = useState(1); 
+  const [page, setPage] = useState(1);
   const itemsPerPage = 5;
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const response = await apiClient.post(
-          "/api/booking/filter",
-          {
-            tripType: filters.tripType,
-            userId: filters.userId,
-            status: filters.status,
-            sort: filters.sort,
-            startTime: filters.startTime,
-            endTime: filters.endTime,
-          }
-        );
-        const pastBookings = response.data.filter(booking =>
+        const response = await apiClient.post("/api/booking/filter", {
+          tripType: filters.tripType,
+          userId: filters.userId,
+          status: filters.status,
+          sort: filters.sort,
+          startTime: filters.startTime,
+          endTime: filters.endTime,
+        });
+        const pastBookings = response.data.filter((booking) =>
           ["REJECTED", "DONE", "CANCELED"].includes(booking.status)
         );
         setBookings(pastBookings);
@@ -34,7 +31,6 @@ const HistoryBooking = ({ filters }) => {
 
     fetchBookings();
   }, [filters]);
-
 
   const handlePageChange = (event, value) => {
     setPage(value);
@@ -50,17 +46,23 @@ const HistoryBooking = ({ filters }) => {
       {paginatedBookings.length === 0 ? (
         <NoBooking />
       ) : (
-        paginatedBookings.map((booking) => <BookingCard key={booking.id} booking={booking} />)
+        paginatedBookings.map((booking) => (
+          <BookingCard key={booking.id} booking={booking} />
+        ))
       )}
-      <Stack spacing={2}>
-        <Pagination
-          count={Math.ceil(bookings.length / itemsPerPage)}
-          page={page}
-          onChange={handlePageChange}
-          variant="outlined"
-          color="success"
-        />
-      </Stack>
+      <div
+        style={{ display: "flex", justifyContent: "center", marginTop: "16px" }}
+      >
+        <Stack spacing={2}>
+          <Pagination
+            count={Math.ceil(bookings.length / itemsPerPage)}
+            page={page}
+            onChange={handlePageChange}
+            variant="outlined"
+            color="success"
+          />
+        </Stack>
+      </div>
     </div>
   );
 };

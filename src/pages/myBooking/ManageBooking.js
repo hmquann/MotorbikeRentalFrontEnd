@@ -82,6 +82,7 @@ export default function Widget() {
   const [motorbikeOvertimeFee, setMotorbikeOvertimeFee] = useState();
   const [showPopUpReason, setShowPopUpReason] = useState(false);
   const [lessorId, setLessorId] = useState();
+  const [renterId, setRenterId] = useState();
   const [renterName, setRenterName] = useState();
   const [renterPhone, setRenterPhone] = useState();
   const [pricePerDay, setPricePerDay] = useState();
@@ -138,6 +139,8 @@ export default function Widget() {
         console.log(response2.data);
         setRenterName(response2.data.firstName + " " + response2.data.lastName);
         setRenter(response2.data);
+        setRenterId(response2.data.id);
+        console.log(response2.data.id);
         setRenterPhone(response2.data.phone);
       } catch (error) {
         console.error("Error:", error);
@@ -183,7 +186,11 @@ export default function Widget() {
     }
   };
 
-  const handleSendReason = async (reason) => {
+  const handleSendReason = async (
+    reason,
+    isLessThanTwoDays,
+    isMoreThanTwoDays
+  ) => {
     setShowPopUpReason(false);
     const now = new Date();
     setLoading(true);
@@ -263,21 +270,63 @@ export default function Widget() {
         `/api/booking/changeDepositCanceled/${booking.bookingId}`
       );
 
-      
-
       const admin = await apiClient.get("api/user/getAdmin");
       const adminId = admin.data.id;
       const refundMoneyUrl = `/api/payment/refund`;
-      const amountDone = (booking.totalPrice * 30) / 200;
-      await apiClient.post(refundMoneyUrl, null, {
-        params: {
-          senderId: adminId,
-          receiverId: userId,
-          amount: amountDone,
-          motorbikeName: motorbikeName,
-          motorbikePlate: motorbikePlate,
-        },
-      });
+      const punishMoneyUrl = "/api/payment/punish";
+      const amount = (booking.totalPrice * 30) / 100;
+      const amount30 = (((booking.totalPrice * 30) / 100) * 30) / 100;
+      if (isLessThanTwoDays) {
+        await apiClient.post(refundMoneyUrl, null, {
+          params: {
+            senderId: adminId,
+            receiverId: renterId,
+            amount: amount,
+            motorbikeName: motorbikeName,
+            motorbikePlate: motorbikePlate,
+          },
+        });
+        await apiClient.post(punishMoneyUrl, null, {
+          params: {
+            senderId: lessorId,
+            receiverId: renterId,
+            amount: amount,
+            motorbikeName: motorbikeName,
+            motorbikePlate: motorbikePlate,
+          },
+        });
+      }
+      if (isMoreThanTwoDays) {
+        await apiClient.post(refundMoneyUrl, null, {
+          params: {
+            senderId: adminId,
+            receiverId: renterId,
+            amount: amount,
+            motorbikeName: motorbikeName,
+            motorbikePlate: motorbikePlate,
+          },
+        });
+        await apiClient.post(refundMoneyUrl, null, {
+          params: {
+            senderId: lessorId,
+            receiverId: renterId,
+            amount: amount30,
+            motorbikeName: motorbikeName,
+            motorbikePlate: motorbikePlate,
+          },
+        });
+      }
+      if (!isMoreThanTwoDays && !isLessThanTwoDays) {
+        await apiClient.post(refundMoneyUrl, null, {
+          params: {
+            senderId: adminId,
+            receiverId: renterId,
+            amount: amount,
+            motorbikeName: motorbikeName,
+            motorbikePlate: motorbikePlate,
+          },
+        });
+      }
     } catch (error) {
       console.log(error);
     } finally {
@@ -927,6 +976,8 @@ export default function Widget() {
                 show={showPopUpReason}
                 onHide={() => setShowPopUpReason(false)}
                 onSend={handleSendReason}
+                bookingId={booking.bookingId}
+                bookingTotalPrice={booking.totalPrice}
               />
               {viewMap && (
                 <MapModal

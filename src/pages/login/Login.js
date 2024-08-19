@@ -4,6 +4,7 @@ import { Modal } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLock, faUser } from "@fortawesome/free-solid-svg-icons";
 import apiClient from "../../axiosConfig";
+import { CircularProgress } from "@mui/material";
 
 const Login = ({
   show,
@@ -25,6 +26,7 @@ const Login = ({
     password: "",
   });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -37,6 +39,7 @@ const Login = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const response = await apiClient.post(apiLogin, credentials, {
         headers: {
@@ -90,6 +93,8 @@ const Login = ({
       } else {
         setError("Error setting up the request.");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -102,85 +107,93 @@ const Login = ({
 
   return (
     <Modal show={show} onHide={handleClose}>
-      <div>
+      <div className="relative">
+        {/* Overlay with CircularProgress */}
+        {loading && (
+          <div className="absolute inset-0 flex justify-center items-center bg-white bg-opacity-75 z-10">
+            <CircularProgress color="inherit" />
+          </div>
+        )}
         <div>
           <div>
-            <div className={formClasses}>
-              <h2 className="text-gray-800 text-center text-2xl font-bold">
-                Đăng nhập
-              </h2>
-              <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
-                <div>
-                  <label className="text-gray-800 text-sm font-semibold mb-2 block">
-                    Email/Số điện thoại
-                  </label>
-                  <div className="relative flex items-center">
-                    <input
-                      name="emailOrPhone"
-                      type="text"
-                      required
-                      className={inputClasses}
-                      placeholder="Nhập Email hoặc Số điện thoại"
-                      value={credentials.emailOrPhone}
-                      onChange={handleChange}
-                    />
-                    <FontAwesomeIcon
-                      icon={faUser}
-                      className="w-4 h-4 absolute right-4"
-                    />
+            <div>
+              <div className={formClasses}>
+                <h2 className="text-gray-800 text-center text-2xl font-bold">
+                  Đăng nhập
+                </h2>
+                <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
+                  <div>
+                    <label className="text-gray-800 text-sm font-semibold mb-2 block">
+                      Email/Số điện thoại
+                    </label>
+                    <div className="relative flex items-center">
+                      <input
+                        name="emailOrPhone"
+                        type="text"
+                        required
+                        className={inputClasses}
+                        placeholder="Nhập Email hoặc Số điện thoại"
+                        value={credentials.emailOrPhone}
+                        onChange={handleChange}
+                      />
+                      <FontAwesomeIcon
+                        icon={faUser}
+                        className="w-4 h-4 absolute right-4"
+                      />
+                    </div>
                   </div>
-                </div>
 
-                <div>
-                  <label className="text-gray-800 text-sm font-semibold mb-2 block">
-                    Mật khẩu
-                  </label>
-                  <div className="relative flex items-center">
-                    <input
-                      name="password"
-                      type="password"
-                      required
-                      className={inputClasses}
-                      placeholder="Nhập mật khẩu"
-                      value={credentials.password}
-                      onChange={handleChange}
-                    />
-                    <FontAwesomeIcon
-                      icon={faLock}
-                      className="w-4 h-4 absolute right-4"
-                    />
+                  <div>
+                    <label className="text-gray-800 text-sm font-semibold mb-2 block">
+                      Mật khẩu
+                    </label>
+                    <div className="relative flex items-center">
+                      <input
+                        name="password"
+                        type="password"
+                        required
+                        className={inputClasses}
+                        placeholder="Nhập mật khẩu"
+                        value={credentials.password}
+                        onChange={handleChange}
+                      />
+                      <FontAwesomeIcon
+                        icon={faLock}
+                        className="w-4 h-4 absolute right-4"
+                      />
+                    </div>
                   </div>
-                </div>
 
-                <div className="flex flex-wrap items-center justify-end gap-4">
-                  <div className="text-sm">
-                    <button
-                      type="button"
-                      onClick={showForgotPassword}
-                      className="text-green-500 no-underline hover:underline ml-1 whitespace-nowrap font-semibold"
-                    >
-                      Quên mật khẩu
+                  <div className="flex flex-wrap items-center justify-end gap-4">
+                    <div className="text-sm">
+                      <button
+                        type="button"
+                        onClick={showForgotPassword}
+                        className="text-green-500 no-underline hover:underline ml-1 whitespace-nowrap font-semibold"
+                      >
+                        Quên mật khẩu
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="!mt-8">
+                    <button type="submit" className={buttonClasses}>
+                      Đăng nhập
                     </button>
                   </div>
-                </div>
-
-                <div className="!mt-8">
-                  <button type="submit" className={buttonClasses}>
-                    Đăng nhập
-                  </button>
-                </div>
-                {error && <div className={errorClasses}>{error}</div>}
-                <p className="text-gray-800 text-sm !mt-8 text-center">
-                  Bạn chưa có tài khoản?{" "}
-                  <button
-                    type="button"
-                    onClick={showRegister}
-                    className="text-green-500 no-underline hover:underline ml-1 whitespace-nowrap font-semibold"
-                  >
-                    Đăng ký ở đây
-                  </button>
-                </p>
-              </form>
+                  {error && <div className={errorClasses}>{error}</div>}
+                  <p className="text-gray-800 text-sm !mt-8 text-center">
+                    Bạn chưa có tài khoản?{" "}
+                    <button
+                      type="button"
+                      onClick={showRegister}
+                      className="text-green-500 no-underline hover:underline ml-1 whitespace-nowrap font-semibold"
+                    >
+                      Đăng ký ở đây
+                    </button>
+                  </p>
+                </form>
+              </div>
             </div>
           </div>
         </div>

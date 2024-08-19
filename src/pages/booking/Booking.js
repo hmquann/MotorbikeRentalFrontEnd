@@ -199,7 +199,6 @@ const Booking = () => {
   const [errorTime, setErrorTime] = useState();
   const [calculatedDiscountAmount, setCalculatedDiscountAmount] = useState(0);
 
-
   const handleOpenLoginModal = () => {
     const currentPath = window.location.pathname;
     setRedirectUrl(currentPath);
@@ -366,16 +365,22 @@ const Booking = () => {
     const basePrice = rentalDays * receiveData.price + deliveryFee;
     let calculatedTotalPrice = basePrice;
     let discountAmount = 0;
-  
+
     if (discount) {
-      if (discount.voucherType === "FIXED_MONEY" && typeof discount.discountMoney === "number") {
+      if (
+        discount.voucherType === "FIXED_MONEY" &&
+        typeof discount.discountMoney === "number"
+      ) {
         // Fixed amount discount
         discountAmount = discount.discountMoney;
         calculatedTotalPrice = basePrice - discountAmount;
         if (calculatedTotalPrice < 0) {
           calculatedTotalPrice = 0;
         }
-      } else if (discount.voucherType === "PERCENTAGE" && typeof discount.discountPercent === "number") {
+      } else if (
+        discount.voucherType === "PERCENTAGE" &&
+        typeof discount.discountPercent === "number"
+      ) {
         // Percentage discount
         discountAmount = (basePrice * discount.discountPercent) / 100;
         if (discount.maxDiscountMoney) {
@@ -388,7 +393,7 @@ const Booking = () => {
         }
       }
     }
-  
+
     setTotalPrice(calculatedTotalPrice);
     setCalculatedDiscountAmount(discountAmount);
   }, [rentalDays, deliveryFee, discount, receiveData.price]);
@@ -520,11 +525,6 @@ const Booking = () => {
       setLoading(true);
       setShowConfirmPopup(false);
       e.preventDefault();
-      if (discount) {
-        const deleteDiscount = apiClient.delete(
-          `/api/discounts/deleteDiscountByIdAndUserId/${userId}/${discount.id}`
-        );
-      }
 
       const isOverlap = isDateOverlap(
         startDateTime,
@@ -632,6 +632,11 @@ const Booking = () => {
             userEmail: receiveData.user.email,
             seen: false,
           });
+          if (discount) {
+            const deleteDiscount = await apiClient.delete(
+              `/api/discounts/deleteDiscountByIdAndUserId/${discount.id}/${userId}`
+            );
+          }
 
           // setShowPopupBooking(true); // Hiển thị popup khi thành công
           // setTimeout(() => {
@@ -857,13 +862,14 @@ const Booking = () => {
                             ></FontAwesomeIcon>
                           </span>
                           <span className="font-semibold">
-      {discount.voucherType === "PERCENTAGE" && typeof discount.discountPercent === "number" ? (
-        <>
-          {formatDiscountMoney(calculatedDiscountAmount)}
-        </>
-      ) : (
-        formatDiscountMoney(discount.discountMoney)
-      )}
+                            {discount.voucherType === "PERCENTAGE" &&
+                            typeof discount.discountPercent === "number" ? (
+                              <>
+                                {formatDiscountMoney(calculatedDiscountAmount)}
+                              </>
+                            ) : (
+                              formatDiscountMoney(discount.discountMoney)
+                            )}
                           </span>
                         </div>
                       ) : (
@@ -872,7 +878,7 @@ const Booking = () => {
                           style={{ cursor: "pointer" }}
                           onClick={handleVoucher}
                         >
-                          <span>Mã  mãikhuyến</span>
+                          <span>Mã khuyến mãi</span>
                           <span>
                             <FontAwesomeIcon icon={faArrowRight} />
                           </span>
@@ -951,7 +957,7 @@ const Booking = () => {
                 <div className="flex flex-col my-6">
                   <h2 className="text-xl font-semibold mb-6">Mô tả</h2>
                   <p className="max-h-32 font-thin text-zinc-500">
-                   Xe đi giữ gìn , bảo dưỡng thường xuyên
+                    Xe đi giữ gìn , bảo dưỡng thường xuyên
                     <br />
                     Xe chính chủ, có bảo hiểm đầy đủ
                     <br />

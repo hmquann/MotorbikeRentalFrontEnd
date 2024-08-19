@@ -81,10 +81,11 @@ const RegisterMotorbikeStep2 = (files) => {
       });
   }, []);
   const handleCheckDelivery = (event) => {
-    setCheckDelivery(!event.target.checked);
+    const updatedCheckDelivery = !event.target.checked;
+    setCheckDelivery(updatedCheckDelivery);
     setFormData({
       ...formData,
-      delivery: checkDelivery,
+      delivery: updatedCheckDelivery,
     });
   };
   const handleProvinceChange = (event) => {
