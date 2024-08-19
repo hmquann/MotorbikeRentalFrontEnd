@@ -304,7 +304,13 @@ const Booking = () => {
       address: "",
     },
   ]);
-
+  const handleShowPopUpLocate = () => {
+    if (receiveData.delivery) {
+      setShowPopUp(true);
+    } else {
+      setShowPopUp(false);
+    }
+  };
   const handleChangeLocation = (location) => {
     console.log(location);
     setGettedLocation(location);
@@ -797,10 +803,15 @@ const Booking = () => {
                           className={`w-full overflow-hidden text-ellipsis whitespace-nowrap font-bold cursor-pointer`}
                           value={gettedLocation.place_name}
                           readOnly
-                          onClick={() => setShowPopUp(true)}
+                          onClick={handleShowPopUpLocate}
                         />
                       </div>
                     </div>
+                    {!receiveData.delivery && (
+                      <i className="text-red-500 text-xs relative flex mb-3">
+                        Rất tiếc, xe này chủ xe không hỗ trợ giao xe tận nơi
+                      </i>
+                    )}
                     <div className="w-full border-b border-b-zinc-300"></div>
                     <div className="flex flex-col gap-2 pt-4">
                       <div className="flex justify-between">
