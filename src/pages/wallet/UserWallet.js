@@ -45,9 +45,9 @@ const UserWallet = () => {
     const token = localStorage.getItem("token");
 
     if (token) {
-      setUserRole(roles || "");  
+      setUserRole(roles || "");
     }
-  },[] );
+  }, []);
 
   const isAdmin = userRole && userRole.includes("ADMIN");
 
@@ -112,7 +112,11 @@ const UserWallet = () => {
       if (response.status === 200) {
         const paymentDto = response.data;
         if (paymentDto.status === "OK") {
-          window.location.href = paymentDto.url;
+          const url = paymentDto.url.replace(
+            "http://localhost:8080",
+            "https://rentalmotorbikewebapp.azurewebsites.net"
+          );
+          window.location.href = url;
         } else {
           setError("Payment initiation failed.");
         }
@@ -155,7 +159,9 @@ const UserWallet = () => {
         message: JSON.stringify({
           title:
             '<strong style="color: rgb(34 197 94)">Yêu cầu rút tiền</strong>',
-          content: `Yêu cầu rút số tiền <strong>${amount.toLocaleString()}</strong> từ tài khoản <strong>${user.firstName} ${user.lastName}</strong> vừa được gửi.`,
+          content: `Yêu cầu rút số tiền <strong>${amount.toLocaleString()}</strong> từ tài khoản <strong>${
+            user.firstName
+          } ${user.lastName}</strong> vừa được gửi.`,
         }),
         timestamp: now,
         seen: false,
@@ -308,7 +314,11 @@ const UserWallet = () => {
         <PopupSuccess
           show={showPopupSuccess}
           onHide={handlePopUpSuccess}
-          message={isAdmin ? "Bạn đã rút tiền thành công!" : "Bạn đã gửi yêu cầu rút tiền thành công!"}
+          message={
+            isAdmin
+              ? "Bạn đã rút tiền thành công!"
+              : "Bạn đã gửi yêu cầu rút tiền thành công!"
+          }
         />
       )}
 
