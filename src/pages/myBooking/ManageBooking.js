@@ -273,24 +273,18 @@ export default function Widget() {
       const admin = await apiClient.get("api/user/getAdmin");
       const adminId = admin.data.id;
       const refundMoneyUrl = `/api/payment/refund`;
-      const punishMoneyUrl = "/api/payment/punish";
-      const amount = (booking.totalPrice * 30) / 100;
-      const amount30 = (((booking.totalPrice * 30) / 100) * 30) / 100;
+      const amount = (booking.totalPrice * 50) / 100;
+      const amount65 = (booking.totalPrice * 65) / 100;
+      const amount35 = (booking.totalPrice * 35) / 100;
+      const amount30 = (((booking.totalPrice * 50) / 100) * 30) / 100;
+      const amount130 = (((booking.totalPrice * 50) / 100) * 30) / 100;
+      const amountFull = booking.totalPrice;
       if (isLessThanTwoDays) {
         await apiClient.post(refundMoneyUrl, null, {
           params: {
             senderId: adminId,
             receiverId: renterId,
-            amount: amount,
-            motorbikeName: motorbikeName,
-            motorbikePlate: motorbikePlate,
-          },
-        });
-        await apiClient.post(punishMoneyUrl, null, {
-          params: {
-            senderId: lessorId,
-            receiverId: renterId,
-            amount: amount,
+            amount: amountFull,
             motorbikeName: motorbikeName,
             motorbikePlate: motorbikePlate,
           },
@@ -301,16 +295,16 @@ export default function Widget() {
           params: {
             senderId: adminId,
             receiverId: renterId,
-            amount: amount,
+            amount: amount65,
             motorbikeName: motorbikeName,
             motorbikePlate: motorbikePlate,
           },
         });
         await apiClient.post(refundMoneyUrl, null, {
           params: {
-            senderId: lessorId,
-            receiverId: renterId,
-            amount: amount30,
+            senderId: adminId,
+            receiverId: lessorId,
+            amount: amount35,
             motorbikeName: motorbikeName,
             motorbikePlate: motorbikePlate,
           },
@@ -321,6 +315,15 @@ export default function Widget() {
           params: {
             senderId: adminId,
             receiverId: renterId,
+            amount: amount,
+            motorbikeName: motorbikeName,
+            motorbikePlate: motorbikePlate,
+          },
+        });
+        await apiClient.post(refundMoneyUrl, null, {
+          params: {
+            senderId: adminId,
+            receiverId: lessorId,
             amount: amount,
             motorbikeName: motorbikeName,
             motorbikePlate: motorbikePlate,
@@ -779,7 +782,7 @@ export default function Widget() {
                         fill="#12B76A"
                       />
                     </svg>
-                    <span className="text-yellow-600">Đền tiền 30%</span>
+                    <span className="text-yellow-600">Đền 30% tiền cọc</span>
                     {/* <span className="text-gray-600">
                       (Đánh giá hệ thống 3*)
                     </span> */}
@@ -819,7 +822,7 @@ export default function Widget() {
                         fill="#F04438"
                       />
                     </svg>
-                    <span className="text-red-500">Đền tiền 100%</span>
+                    <span className="text-red-500">Đền 100% tiền cọc</span>
                   </div>
                 </div>
               </div>
@@ -997,10 +1000,12 @@ export default function Widget() {
                 Phụ phí có thể phát sinh
               </h4>
               <ul className="list-none text-gray-700">
-                <li>
-                  Phụ phí giao nhận xe tận nơi:{" "}
-                  <strong>{motorbikeDeliveryFee} đ/km</strong>{" "}
-                </li>
+                {motorbikeDeliveryFee && (
+                  <li>
+                    Phụ phí giao nhận xe tận nơi:{" "}
+                    <strong>{motorbikeDeliveryFee} đ/km</strong>{" "}
+                  </li>
+                )}
                 <li>
                   Phụ phí quá giờ: <strong>{motorbikeOvertimeFee} đ/giờ</strong>
                 </li>
