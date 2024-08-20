@@ -39,6 +39,8 @@ const Header = () => {
       : setUsername("");
     setIsLoggedIn(!!token);
   }, [location]);
+  const roles = localStorage.getItem("roles");
+  const admin = roles.includes("ADMIN");
 
   const handleAccount = () => {
     navigate("/menu/profile");
@@ -139,53 +141,60 @@ const Header = () => {
         </div>
         <nav className="hidden md:flex space-x-4 items-center">
           <Nav className="ml-auto">
-            <Nav.Link
-              as={Link}
-              to=""
-              style={{
-                color: "#000" /* text-black */,
-                fontSize: "0.875rem" /* text-sm */,
-                fontWeight: "700" /* font-bold */,
-                fontFamily: '"Manrope", sans-serif' /* font-manrope */,
-              }}
-            >
-              Về MiMotor
-            </Nav.Link>
+            {!admin && (
+              <Nav.Link
+                as={Link}
+                to=""
+                style={{
+                  color: "#000" /* text-black */,
+                  fontSize: "0.875rem" /* text-sm */,
+                  fontWeight: "700" /* font-bold */,
+                  fontFamily: '"Manrope", sans-serif' /* font-manrope */,
+                }}
+              >
+                Về MiMotor
+              </Nav.Link>
+            )}
+            {!admin && (
+              <Nav.Link
+                as={Link}
+                to="/registermotorbike"
+                style={{
+                  color: "#000" /* text-black */,
+                  fontSize: "0.875rem" /* text-sm */,
+                  fontWeight: "700" /* font-bold */,
+                  fontFamily: '"Manrope", sans-serif' /* font-manrope */,
+                  borderRight: isLoggedIn
+                    ? "none"
+                    : "1px solid #d8dae5" /* border-r-2 */,
+                  height: "34px",
+                }}
+              >
+                Trở thành chủ xe
+              </Nav.Link>
+            )}
 
-            <Nav.Link
-              as={Link}
-              to="/registermotorbike"
-              style={{
-                color: "#000" /* text-black */,
-                fontSize: "0.875rem" /* text-sm */,
-                fontWeight: "700" /* font-bold */,
-                fontFamily: '"Manrope", sans-serif' /* font-manrope */,
-                borderRight: isLoggedIn
-                  ? "none"
-                  : "1px solid #d8dae5" /* border-r-2 */,
-                height: "34px",
-              }}
-            >
-              Trở thành chủ xe
-            </Nav.Link>
             {isLoggedIn ? (
               <>
-                <Nav.Link
-                  as={Link}
-                  to="/menu/myBooking"
-                  style={{
-                    color: "#000" /* text-black */,
-                    fontSize: "0.875rem" /* text-sm */,
-                    fontWeight: "700" /* font-bold */,
-                    fontFamily: '"Manrope", sans-serif' /* font-manrope */,
-                    borderRight: isLoggedIn
-                      ? "1px solid #d8dae5"
-                      : "none" /* border-r-2 */,
-                    height: "34px",
-                  }}
-                >
-                  Chuyến của tôi
-                </Nav.Link>
+                {!admin && (
+                  <Nav.Link
+                    as={Link}
+                    to="/menu/myBooking"
+                    style={{
+                      color: "#000" /* text-black */,
+                      fontSize: "0.875rem" /* text-sm */,
+                      fontWeight: "700" /* font-bold */,
+                      fontFamily: '"Manrope", sans-serif' /* font-manrope */,
+                      borderRight: isLoggedIn
+                        ? "1px solid #d8dae5"
+                        : "none" /* border-r-2 */,
+                      height: "34px",
+                    }}
+                  >
+                    Chuyến của tôi
+                  </Nav.Link>
+                )}
+
                 <NotificationDropdown />
                 <img
                   src="https://n1-cstg.mioto.vn/m/avatars/avatar-0.png"
