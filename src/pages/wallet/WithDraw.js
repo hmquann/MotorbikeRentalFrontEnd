@@ -56,7 +56,7 @@ const Withdraw = ({ balance, onClose, onConfirm, setError }) => {
     }
 
     if (!bankAccount) {
-      setLocalError("Hãy nhập số tài khoản ngân hàng.");
+      setLocalError("Hãy nhập số thẻ ngân hàng.");
       return;
     }
 
@@ -89,9 +89,18 @@ const Withdraw = ({ balance, onClose, onConfirm, setError }) => {
     } else {
       const numberValue = parseFloat(value);
       setFormattedAmount(numberValue.toLocaleString());
+  
+      if (numberValue < 10000) {
+        setLocalError("Số tiền rút tối thiểu là 10,000");
+      } else {
+        setLocalError("");
+      }
     }
+  };
 
-    setLocalError("");
+  const handleBankAccountChange = (e) => {
+    const value = e.target.value.replace(/\D/g, "");
+    setBankAccount(value);
   };
 
   return (
@@ -112,9 +121,9 @@ const Withdraw = ({ balance, onClose, onConfirm, setError }) => {
         <input
           type="text"
           className={`${inputClasses} mt-4`}
-          placeholder="Nhập số tài khoản ngân hàng"
+          placeholder="Nhập số thẻ ngân hàng"
           value={bankAccount}
-          onChange={(e) => setBankAccount(e.target.value)}
+          onChange={handleBankAccountChange}
         />
         <select
           className={`${inputClasses} mt-4`}

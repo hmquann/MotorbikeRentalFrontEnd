@@ -137,7 +137,7 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
               type="text"
               id="price"
               name="price"
-              placeholder="Enter price"
+              // placeholder="Enter price"
               value={updateForm.price}
               readOnly={!isUpdate}
               onChange={handleChange}
@@ -149,7 +149,7 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
               type="text"
               id="overtimeFee"
               name="overtimeFee"
-              placeholder="Enter overtime fee"
+              // placeholder="Enter overtime fee"
               value={updateForm.overtimeFee}
               readOnly={!isUpdate}
               onChange={handleChange}
@@ -161,7 +161,7 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
               type="text"
               id="overtimeLimit"
               name="overtimeLimit"
-              placeholder="Enter overtime limit"
+              // placeholder="Enter overtime limit"
               value={updateForm.overtimeLimit}
               readOnly={!isUpdate}
               onChange={handleChange}
@@ -196,7 +196,7 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
               type="text"
               id="deliveryFee"
               name="deliveryFee"
-              placeholder="Enter delivery fee"
+              // placeholder="Enter delivery fee"
               value={updateForm.deliveryFee}
               readOnly={!isUpdate}
               onChange={handleChange}
@@ -208,7 +208,7 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
               type="text"
               id="constraintMotorbike"
               name="constraintMotorbike"
-              placeholder="Enter motorbike constraints"
+              // placeholder="Enter motorbike constraints"
               value={updateForm.constraintMotorbike}
               readOnly={!isUpdate}
               onChange={handleChange}
@@ -216,11 +216,11 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
           </Form.Group>
           <Form.Group>
             <Form.Label>Địa chỉ xe</Form.Label>
-            <FloatingLabel
+            {/* <FloatingLabel
               controlId="floatingTextarea"
               label="Enter motorbike address"
               className="mb-3"
-            >
+            > */}
               <Form.Control
                 as="textarea"
                 id="motorbikeAddress"
@@ -230,7 +230,7 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
                 readOnly
                 rows={3}
               />
-            </FloatingLabel>
+            {/* </FloatingLabel> */}
           </Form.Group>
           <Form.Group className="col-span-1 sm:col-span-2">
             <Form.Label>Hình ảnh</Form.Label>
