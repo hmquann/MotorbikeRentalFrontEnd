@@ -38,6 +38,8 @@ const DiscountDetailModal = ({
 
   const validate = () => {
     const newErrors = {};
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
     if (!formData.name) {
       newErrors.name = "Hãy điền tên";
@@ -49,6 +51,20 @@ const DiscountDetailModal = ({
 
     if (!formData.voucherType) {
       newErrors.voucherType = "Hãy chọn loại khuyến mãi";
+    }
+
+    const startDate = formData.startDate ? new Date(formData.startDate) : null;
+    const expirationDate = formData.expirationDate ? new Date(formData.expirationDate) : null;
+    if (!startDate) {
+      newErrors.startDate = "Hãy chọn ngày bắt đầu";
+    } else if (startDate < today) {
+      newErrors.startDate = "Ngày bắt đầu phải từ ngày hiện tại trở đi";
+    }
+  
+    if (!expirationDate) {
+      newErrors.expirationDate = "Hãy chọn ngày hết hạn";
+    } else if (expirationDate < today) {
+      newErrors.expirationDate = "Ngày hết hạn phải từ ngày hiện tại trở đi";
     }
 
     if (!formData.startDate) {

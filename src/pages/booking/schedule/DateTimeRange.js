@@ -23,7 +23,10 @@ const DateTimeRange = ({
     time: dayjs().add(1, "day"), // Thêm 1 ngày vào thời gian hiện tại
   });
 
-  const [dateRange, setDateRange] = useState([dayjs(), dayjs().add(1, "day")]);
+  const [dateRange, setDateRange] = useState([
+    dayjs().add(1, "day"),
+    dayjs().add(2, "day"),
+  ]);
   const [minDate, setMinDate] = useState(dayjs().add(1, "day"));
   const [disabledDates, setDisabledDates] = useState([]);
 
@@ -41,10 +44,10 @@ const DateTimeRange = ({
         return [];
       }
     };
-  
+
     const findNextAvailableDates = (disabledDates) => {
       let startDate = dayjs();
-  
+
       while (true) {
         const isStartDateDisabled = disabledDates.some((disabledDate) =>
           startDate.isSame(disabledDate, "day")
@@ -53,37 +56,38 @@ const DateTimeRange = ({
         const isNextDateDisabled = disabledDates.some((disabledDate) =>
           nextDate.isSame(disabledDate, "day")
         );
-  
+
         if (!isStartDateDisabled && !isNextDateDisabled) {
           return [startDate, nextDate];
         }
-  
+
         startDate = startDate.add(1, "day");
       }
     };
-  
+
     const initDates = async () => {
       const bookedDates = await fetchDisabledDates();
-  
-      const [availableNow, availableTomorrow] = findNextAvailableDates(bookedDates);
-  
+
+      const [availableNow, availableTomorrow] =
+        findNextAvailableDates(bookedDates);
+
       const receiveDate = availableNow.format("DD/MM/YYYY");
       const receiveTime = availableNow;
-  
+
       const returnDate = availableTomorrow.format("DD/MM/YYYY");
       const returnTime = availableTomorrow;
-  
+
       setDateTimeReceive({ date: receiveDate, time: receiveTime });
       setDateTimeReturn({ date: returnDate, time: returnTime });
-  
+
       onDateRangeChange([receiveTime, returnTime]);
       onReceiveTimeChange(receiveTime);
       onReturnTimeChange(returnTime);
-  
+
       setDateRange([receiveTime, returnTime]);
       setMinDate(availableNow);
     };
-  
+
     initDates();
   }, []);
 

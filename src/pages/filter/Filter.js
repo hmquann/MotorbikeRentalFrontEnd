@@ -182,6 +182,7 @@ const Filter = () => {
 };
   const [page, setPage] = useState(0);
   const pageSize = 24;
+  const [totalItems, setTotalItems] = useState(0);
   const handleUpdateModelType = (newModelType) => {
     setFilterList({ ...filterList, modelType: newModelType });
   };
@@ -209,6 +210,9 @@ const Filter = () => {
         console.error("Error fetching other entities 1:", error)
       );
   }, []);
+  useEffect(() => {
+    handleSearchMotor();
+  }, [filterList, page]);
 
   const handleButtonClick = (buttonName) => {
     setSelectedButtons((prevSelectedButtons) => {
@@ -478,7 +482,11 @@ const Filter = () => {
         }
       );
       console.log("Data sent successfully:", response.data);
+      setTimeout(() =>{
       setListMotor(response.data.content);
+      setTotalItems(response.data.totalElements);
+      setLoading(false)
+      }, 200)
     } catch (error) {
       handleRequestError(error);
     } finally {
@@ -516,6 +524,14 @@ const Filter = () => {
   useEffect(() => {
     handleSearchMotor(filterList);
   }, [filterList]);
+  const handlePageChange = (event, value) => {
+    setPage(value - 1); 
+  };
+  useEffect(() => {
+    if (listMotor.length === 0 && page !== 0) {
+      setPage(0); 
+    }
+  }, [listMotor]);
   const handleRequestError = (error) => {
     if (error.response) {
       console.error("Error response:", error.response);
@@ -726,7 +742,7 @@ const Filter = () => {
 
       <div className="flex justify-center">
         <div style={{ width: "95%" }}>
-          <MotorbikeList listMotor={listMotor} searchLongitude={filterList.longitude} searchLatitude={filterList.latitude} showDistance={true}/>
+          <MotorbikeList isLoading={loading} listMotor={listMotor} page={page + 1}  totalItems={totalItems} pageSize={pageSize} onPageChange={handlePageChange} searchLongitude={filterList.longitude} searchLatitude={filterList.latitude} showDistance={true}/>
         </div>
       </div>
       {showBrandPopup && (
