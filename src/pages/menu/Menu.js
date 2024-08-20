@@ -29,7 +29,6 @@ import WithdrawRequest from "../dashboard/WithdrawRequest";
 import DashboardForAdmin from "../dashboard/DashboardForAdmin";
 import DashboardForLessor from "../dashboard/DashboardForLessor";
 
-
 const Menu = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [userRole, setUserRole] = useState("");
@@ -115,15 +114,17 @@ const Menu = () => {
                   </NavLink>
                 </li>
               )}
-              <li>
-                <NavLink
-                  to="/menu/myBooking"
-                  onClick={handleLinkClick}
-                  className={({ isActive }) => (isActive ? "active" : "")}
-                >
-                  Chuyến của tôi
-                </NavLink>
-              </li>
+              {!isAdmin && (
+                <li>
+                  <NavLink
+                    to="/menu/myBooking"
+                    onClick={handleLinkClick}
+                    className={({ isActive }) => (isActive ? "active" : "")}
+                  >
+                    Chuyến của tôi
+                  </NavLink>
+                </li>
+              )}
               <li>
                 <NavLink
                   to="/menu/wallet"
@@ -289,7 +290,10 @@ const Menu = () => {
                   />
                   <Route path="/approveLicense" element={<ApproveLicense />} />
                   <Route path="/userData" element={<UserData />} />
-                  <Route path="/withdrawRequest" element={<WithdrawRequest />} />
+                  <Route
+                    path="/withdrawRequest"
+                    element={<WithdrawRequest />}
+                  />
                   <Route path="/blogList" element={<BlogList />} />
                 </>
               )}

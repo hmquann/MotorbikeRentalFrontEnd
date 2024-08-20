@@ -203,7 +203,7 @@ export default function Widget() {
         setUrlImage(response.data.motorbikeImages[0].url);
         setLessorId(response.data.user.id);
         setLessorPhone(response.data.user.phone);
-        console.log(lessorId);
+        console.log(response.data.user.id);
         const response2 = await apiClient.get(`/api/user/${booking.renterId}`);
         console.log(response2.data.firstName + " " + response2.data.lastName);
         setRenterName(response2.data.firstName + " " + response2.data.lastName);
@@ -346,11 +346,23 @@ export default function Widget() {
       const adminData = await apiClient.get("api/user/getAdmin");
       const adminDataId = adminData.data.id;
       const renterId = userData.userId; // Replace with actual user ID if different
-      const amount = (booking.totalPrice * 30) / 100; 
-      const amount70 = booking.totalPrice * 30 / 100 * 70 / 100;
+      const amount = (booking.totalPrice * 50) / 100;
+      const amount30 = (((booking.totalPrice * 50) / 100) * 30) / 100;
+      const amount70 = (((booking.totalPrice * 50) / 100) * 70) / 100;
       const refundMoneyUrl = `/api/payment/refund`;
-      
+
       if (booking.status === "DEPOSIT_MADE") {
+        //hoàn tiền cọc cho chủ xe
+        await apiClient.post(refundMoneyUrl, null, {
+          params: {
+            senderId: adminDataId,
+            receiverId: lessorId,
+            amount: amount,
+            motorbikeName: motorbikeName,
+            motorbikePlate: motorbikePlate,
+          },
+        });
+
         if (isWithinOneHour) {
           await apiClient.post(refundMoneyUrl, null, {
             params: {
@@ -368,6 +380,15 @@ export default function Widget() {
               senderId: adminDataId,
               receiverId: renterId,
               amount: amount70,
+              motorbikeName: motorbikeName,
+              motorbikePlate: motorbikePlate,
+            },
+          });
+          await apiClient.post(refundMoneyUrl, null, {
+            params: {
+              senderId: adminDataId,
+              receiverId: lessorId,
+              amount: amount30,
               motorbikeName: motorbikeName,
               motorbikePlate: motorbikePlate,
             },
@@ -755,7 +776,7 @@ export default function Widget() {
                         fill="#12B76A"
                       />
                     </svg>
-                    <span className="text-yellow-600">Đền tiền 30%</span>
+                    <span className="text-yellow-600">Đền 30% tiền cọc</span>
                     {/* <span className="text-gray-600">
                       (Đánh giá hệ thống 3*)
                     </span> */}
@@ -795,7 +816,7 @@ export default function Widget() {
                         fill="#F04438"
                       />
                     </svg>
-                    <span className="text-red-500">Đền tiền 100%</span>
+                    <span className="text-red-500">Đền 100% tiền cọc</span>
                   </div>
                 </div>
               </div>
@@ -895,7 +916,7 @@ export default function Widget() {
                 <h5 className="text-gray-500">
                   Đặt cọc qua ứng dụng:{" "}
                   <span className="font-bold">
-                    {((booking.totalPrice * 30) / 100).toLocaleString("vi-VN")}đ
+                    {((booking.totalPrice * 50) / 100).toLocaleString("vi-VN")}đ
                   </span>
                 </h5>
               </div>
@@ -903,7 +924,7 @@ export default function Widget() {
                 <h5 className="text-gray-500">
                   Thanh toán khi nhận xe:{" "}
                   <span className="font-bold">
-                    {((booking.totalPrice * 70) / 100).toLocaleString("vi-VN")}đ
+                    {((booking.totalPrice * 50) / 100).toLocaleString("vi-VN")}đ
                   </span>
                 </h5>
               </div>
@@ -1004,10 +1025,12 @@ export default function Widget() {
                 Phụ phí có thể phát sinh
               </h4>
               <ul className="list-none text-gray-700">
-                <li>
-                  Phụ phí giao nhận xe tận nơi:{" "}
-                  <strong>{motorbikeDeliveryFee} đ/km</strong>{" "}
-                </li>
+                {motorbikeDeliveryFee && (
+                  <li>
+                    Phụ phí giao nhận xe tận nơi:{" "}
+                    <strong>{motorbikeDeliveryFee} đ/km</strong>{" "}
+                  </li>
+                )}
                 <li>
                   Phụ phí quá giờ: <strong>{motorbikeOvertimeFee} đ/giờ</strong>
                 </li>

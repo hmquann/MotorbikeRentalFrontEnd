@@ -310,7 +310,14 @@ const BookingCard = ({ booking }) => {
     console.log(renterName);
     switch (actionType) {
       case "accept":
-        setMessageConfirm("Bạn có chắc chắn muốn duyệt chuyến này?");
+        setMessageConfirm(
+          `Bạn phải đặt cọc <strong>${(
+            (booking.totalPrice * 50) /
+            100
+          ).toLocaleString(
+            "vi-VN"
+          )}đ</strong> để duyệt chuyến này. Bạn có chắc chắn muốn duyệt chuyến?`
+        );
         setAction("PENDING_DEPOSIT");
         break;
       case "renting":
@@ -326,10 +333,10 @@ const BookingCard = ({ booking }) => {
         console.log(response2.data.firstName + " " + response2.data.lastName);
         setRenterName(response2.data.firstName + " " + response2.data.lastName);
         setMessageConfirm(
-          `Bạn có chắc chắn muốn thanh toán ${(
-            (booking.totalPrice * 30) /
+          `Bạn có chắc chắn muốn thanh toán <strong>${(
+            (booking.totalPrice * 50) /
             100
-          ).toLocaleString("vi-VN")}đ tiền cọc?`
+          ).toLocaleString("vi-VN")}đ</strong>  tiền cọc?`
         );
         setAction("DEPOSIT_MADE");
         break;
@@ -339,6 +346,25 @@ const BookingCard = ({ booking }) => {
     setShowPopUp(true);
   };
   const checkWallet = async () => {
+    if (action === "PENDING_DEPOSIT") {
+      const userId = JSON.parse(localStorage.getItem("user")).userId;
+      const token = localStorage.getItem("token");
+
+      const response = await apiClient.get(`/api/user/${userId}`);
+      console.log(response);
+      const depositMoney = (booking.totalPrice * 50) / 100;
+      if (response.data.balance < depositMoney) {
+        setShowPopupWallet(true);
+        setBackWallet(true);
+        console.log(balance);
+        console.log(depositMoney);
+      } else {
+        setBackWallet(true);
+        setShowPopupWallet(false);
+      }
+      return;
+    }
+
     if (action !== "DEPOSIT_MADE") {
       setBackWallet(true);
       setShowPopupWallet(false);
@@ -371,13 +397,18 @@ const BookingCard = ({ booking }) => {
 
     try {
       const url = `/api/booking/changeStatus/${booking.bookingId}/${action}`;
-      if (action !== "DEPOSIT_MADE") {
+      if (action !== "DEPOSIT_MADE" && action !== "PENDING_DEPOSIT") {
         await apiClient.put(url);
       }
       const now = new Date();
 
       switch (action) {
         case "PENDING_DEPOSIT":
+          if (showPopupWallet) {
+            console.log(showPopupWallet);
+            return;
+          }
+          await apiClient.put(url);
           const saveDepositRespone = await apiClient.post(
             "/api/booking/saveDepositTime",
             {
@@ -452,6 +483,26 @@ const BookingCard = ({ booking }) => {
               }
             );
           }
+          const adminDataDepositLessor = await apiClient.get(
+            "api/user/getAdmin"
+          );
+          const adminDataIdDepositLessor = adminDataDepositLessor.data.id;
+          const lessorId = userData.userId; // Replace with actual user ID if different
+          const amountForLessor = (booking.totalPrice * 50) / 100; // Replace with actual amount to be subtracted
+          const subtractMoneyUrlForLessor = `/api/payment/subtract`;
+          const subtractForLessor = await apiClient.post(
+            subtractMoneyUrlForLessor,
+            null,
+            {
+              params: {
+                senderId: lessorId,
+                receiverId: adminDataIdDepositLessor,
+                amount: amountForLessor,
+                motorbikeName: motorbikeName,
+                motorbikePlate: motorbikePlate,
+              },
+            }
+          );
           break;
         case "RENTING":
           if (systemNoti) {
@@ -527,8 +578,9 @@ const BookingCard = ({ booking }) => {
           const admin = await apiClient.get("api/user/getAdmin");
           const adminId = admin.data.id;
           const subtractMoneyUrlDone = `/api/payment/subtract`;
-          const addMoneyUrlDone = `/api/payment/add`;
-          const amountDone = (booking.totalPrice * 30) / 200;
+          const refundMoneyUrlDone = `/api/payment/refund`;
+          const amountDone = (booking.totalPrice * 35) / 100 ;
+          const amountDeposit = (booking.totalPrice * 50) / 100 ;
           await apiClient.post(subtractMoneyUrlDone, null, {
             params: {
               senderId: adminId,
@@ -538,6 +590,16 @@ const BookingCard = ({ booking }) => {
               motorbikePlate: motorbikePlate,
             },
           });
+          await apiClient.post(refundMoneyUrlDone, null, {
+            params: {
+              senderId: adminId,
+              receiverId: userId,
+              amount: amountDeposit,
+              motorbikeName: motorbikeName,
+              motorbikePlate: motorbikePlate,
+            },
+          });
+          
           if (systemNoti) {
             await setDoc(doc(collection(db, "notifications")), {
               userId: userId,
@@ -689,7 +751,7 @@ const BookingCard = ({ booking }) => {
           const adminData = await apiClient.get("api/user/getAdmin");
           const adminDataId = adminData.data.id;
           const renterId = userData.userId; // Replace with actual user ID if different
-          const amount = (booking.totalPrice * 30) / 100; // Replace with actual amount to be subtracted
+          const amount = (booking.totalPrice * 50) / 100; // Replace with actual amount to be subtracted
           const subtractMoneyUrl = `/api/payment/subtract`;
           const addMoneyUrl = `/api/payment/add`;
           const subtract = await apiClient.post(subtractMoneyUrl, null, {
@@ -794,19 +856,21 @@ const BookingCard = ({ booking }) => {
                   </span>
                 </div>
                 <div className="flex  mb-2 text-gray-600">
-                  
-                  
-                  {motorbike ? <>
-                    <FontAwesomeIcon icon={faUser} size="lg" />
-                    <span className="ml-2 font-extrabold">
-                      Khách thuê: {renterName}
-                    </span>
-                  </> : <>
-                    <FontAwesomeIcon icon={faUser} size="lg" />
-                    <span className="ml-2 font-extrabold">
-                      Chủ xe: {lessorName}
-                    </span>
-                  </>}
+                  {motorbike ? (
+                    <>
+                      <FontAwesomeIcon icon={faUser} size="lg" />
+                      <span className="ml-2 font-extrabold">
+                        Khách thuê: {renterName}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <FontAwesomeIcon icon={faUser} size="lg" />
+                      <span className="ml-2 font-extrabold">
+                        Chủ xe: {lessorName}
+                      </span>
+                    </>
+                  )}
                 </div>
                 <div className="font-bold text-lg">
                   Tổng chi phí: {booking.totalPrice.toLocaleString("vi-VN")} vnd

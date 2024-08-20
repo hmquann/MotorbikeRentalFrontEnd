@@ -1064,7 +1064,9 @@ const Booking = () => {
                             fill="#12B76A"
                           />
                         </svg>
-                        <span className="text-yellow-600">Đền tiền 30%</span>
+                        <span className="text-yellow-600">
+                          Đền 30% tiền cọc
+                        </span>
                         {/* <span className="text-gray-600">
                       (Đánh giá hệ thống 3*)
                     </span> */}
@@ -1104,7 +1106,7 @@ const Booking = () => {
                             fill="#F04438"
                           />
                         </svg>
-                        <span className="text-red-500">Đền tiền 100%</span>
+                        <span className="text-red-500">Đền 100% tiền cọc</span>
                       </div>
                     </div>
                   </div>
