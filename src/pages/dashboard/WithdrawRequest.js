@@ -292,7 +292,8 @@ const WithdrawRequest = () => {
             )}
           </tbody>
         </table>
-        <div className="px-6 py-3 bg-zinc-50 flex justify-between items-center">
+        </div>
+        <div className="px-6 py-3 bg-zinc-50 flex justify-between items-center min-w-full">
           <div className="text-sm text-zinc-700">
             Đang hiển thị <span className="font-medium">{requests.length}</span>{" "}
             trên <span className="font-medium">{requests.length}</span> bản ghi
@@ -317,7 +318,7 @@ const WithdrawRequest = () => {
             )}
           </div>
         </div>
-      </div>
+
       {isModalOpen && (
         <Modal
           show={isModalOpen}

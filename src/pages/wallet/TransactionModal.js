@@ -29,6 +29,8 @@ const TransactionList = ({ transactions }) => {
     REFUND_RECEIVE: "Nhận tiền hoàn",
     PUNISH: "Phạt tiền",
     PUNISH_RECEIVE: "Nhận tiền phạt từ chủ xe",
+    WITHDRAW_REQUEST : "Yêu cầu rút tiền",
+    REFUND_WITHDRAW : "Hoàn lại tiền rút"
   };
 
   return (
@@ -48,7 +50,8 @@ const TransactionList = ({ transactions }) => {
         <tbody>
           {displayedTransactions.map((transaction) => {
             const isWithdrawalOrDeposit =
-              transaction.type === "WITHDRAW" || transaction.type === "DEPOSIT" || transaction.type === "REFUND" ||  transaction.type === "PUNISH"  ;
+              transaction.type === "WITHDRAW" || transaction.type === "DEPOSIT" || transaction.type === "REFUND" ||  transaction.type === "PUNISH"   || 
+              transaction.type === "REFUND_WITHDRAW" ;
 
             const amount = isWithdrawalOrDeposit
               ? `- ${transaction.amount.toLocaleString()} VND`
