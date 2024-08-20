@@ -34,7 +34,7 @@ const Footer = () => {
           </div>
 
           {/* Các mục chính và mục con */}
-          <div className="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-4 mt-6">
+          <div className="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-2 mt-6">
             <div>
               <h2 className="mb-6 text-lg font-semibold text-gray-900 uppercase dark:text-white">
                 Chính sách
@@ -110,86 +110,6 @@ const Footer = () => {
                     className="text-gray-500 no-underline hover:underline"
                   >
                     Câu hỏi thường gặp
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h2 className="mb-6 text-lg font-semibold text-gray-900 uppercase dark:text-white">
-                Đối tác
-              </h2>
-              <ul className="text-gray-600 dark:text-gray-400 list-none p-0">
-                <li className="mb-4">
-                  <a
-                    href="#"
-                    className="text-gray-500 no-underline hover:underline"
-                  >
-                    Đối tác 1
-                  </a>
-                </li>
-                <li className="mb-4">
-                  <a
-                    href="#"
-                    className="text-gray-500 no-underline hover:underline"
-                  >
-                    Đối tác 2
-                  </a>
-                </li>
-                <li className="mb-4">
-                  <a
-                    href="#"
-                    className="text-gray-500 no-underline hover:underline"
-                  >
-                    Đối tác 3
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-500 no-underline hover:underline"
-                  >
-                    Đối tác 4
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h2 className="mb-6 text-lg font-semibold text-gray-900 uppercase dark:text-white">
-                Liên hệ
-              </h2>
-              <ul className="text-gray-600 dark:text-gray-400 list-none p-0">
-                <li className="mb-4">
-                  <a
-                    href="#"
-                    className="text-gray-500 no-underline hover:underline"
-                  >
-                    Liên hệ 1
-                  </a>
-                </li>
-                <li className="mb-4">
-                  <a
-                    href="#"
-                    className="text-gray-500 no-underline hover:underline"
-                  >
-                    Liên hệ 2
-                  </a>
-                </li>
-                <li className="mb-4">
-                  <a
-                    href="#"
-                    className="text-gray-500 no-underline hover:underline"
-                  >
-                    Liên hệ 3
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-500 no-underline hover:underline"
-                  >
-                    Liên hệ 4
                   </a>
                 </li>
               </ul>

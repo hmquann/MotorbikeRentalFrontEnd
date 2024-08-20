@@ -81,12 +81,14 @@ const RegisterMotorbikeStep2 = (files) => {
       });
   }, []);
   const handleCheckDelivery = (event) => {
-    setCheckDelivery(!event.target.checked);
+    const newCheckDelivery = event.target.checked;
+    console.log(newCheckDelivery);
+    setCheckDelivery(newCheckDelivery);
     setFormData({
-      ...formData,
-      delivery: checkDelivery,
+        ...formData,
+        delivery: newCheckDelivery,
     });
-  };
+};
   const handleProvinceChange = (event) => {
     const provinceId = event.target.value;
     const selectedProvince = provinces.find(
@@ -546,7 +548,7 @@ const RegisterMotorbikeStep2 = (files) => {
                   name="freeshipLimit"
                   className="w-2/3 p-2 border rounded mr-2 focus:outline-none focus:ring-2 focus:ring-green-500"
                   value={formData.freeshipLimit}
-                  disabled={checkDelivery}
+                  disabled={!checkDelivery}
                   onChange={handleChange}
                 />
 
@@ -567,7 +569,7 @@ const RegisterMotorbikeStep2 = (files) => {
                   name="deliveryFee"
                   className="w-2/3 p-2 border rounded mr-2 focus:outline-none focus:ring-2 focus:ring-green-500"
                   value={formData.deliveryFee}
-                  disabled={checkDelivery}
+                  disabled={!checkDelivery}
                   onChange={handleChange}
                 />
                 <span className="text-sm text-zinc-700">VND/km</span>

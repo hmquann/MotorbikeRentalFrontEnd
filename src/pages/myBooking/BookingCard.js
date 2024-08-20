@@ -66,6 +66,8 @@ const BookingCard = ({ booking }) => {
   const systemNoti = userData ? userData.systemNoti : null;
   const minimizeNoti = userData ? userData.minimizeNoti : null;
 
+  console.log(booking);
+
   const statusDetails = {
     PENDING: { text: "Chờ duyệt", icon: faClock, color: "text-orange-500" },
     PENDING_DEPOSIT: {
@@ -108,42 +110,49 @@ const BookingCard = ({ booking }) => {
   };
 
   const [motorbike, setMotorbike] = useState();
+
+  const fetcMotorbike = async () => {
+    try {
+      const response = await apiClient.get(
+        `/api/motorbike/${booking.motorbikeId}`
+      );
+      setMotorbikeName(
+        `${response.data.model.modelName} ${response.data.yearOfManufacture}`
+      );
+      setLessorName(
+        `${response.data.user.firstName} ${response.data.user.lastName}`
+      );
+      setLessor(response.data.user);
+      setMotorbikePlate(`${response.data.motorbikePlate}`);
+      setLessorId(response.data.userId);
+      setUrlImage(response.data.motorbikeImages[0].url);
+      console.log(lessorId);
+      const response1 = await apiClient.get(
+        `/api/motorbike/existMotorbikeByUserId/${booking.motorbikeId}/${userData.userId}`
+      );
+      setMotorbike(response.data);
+
+      const response2 = await apiClient.get(`/api/user/${booking.renterId}`);
+      console.log(response2);
+      setRenterIdNoti(booking.renterId);
+      setRenterName(`${response2.data.firstName} ${response2.data.lastName}`);
+      setRenterSystemNoti(response2.data.systemNoti);
+      setRenter(response2.data);
+      console.log(response2);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetcMotorbike = async () => {
-      try {
-        const response = await apiClient.get(
-          `/api/motorbike/${booking.motorbikeId}`
-        );
-        setMotorbikeName(
-          `${response.data.model.modelName} ${response.data.yearOfManufacture}`
-        );
-        setLessorName(
-          `${response.data.user.firstName} ${response.data.user.lastName}`
-        );
-        setLessor(response.data.user);
-        setMotorbikePlate(`${response.data.motorbikePlate}`);
-        setLessorId(response.data.user.id);
-        setUrlImage(response.data.motorbikeImages[0].url);
-        console.log(lessorId);
-        const response1 = await apiClient.get(
-          `/api/motorbike/existMotorbikeByUserId/${booking.motorbikeId}/${userData.userId}`
-        );
-        setMotorbike(response1.data);
-
-        const response2 = await apiClient.get(`/api/user/${booking.renterId}`);
-        console.log(response2);
-        setRenterIdNoti(booking.renterId);
-        setRenterName(`${response2.data.firstName} ${response2.data.lastName}`);
-        setRenterSystemNoti(response2.data.systemNoti);
-        setRenter(response2.data);
-        console.log(response2);
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
-
     fetcMotorbike();
-  }, [booking.motorbikeId, userData.userId, booking.id]);
+  }, [
+    booking.motorbikeId,
+    userData.userId,
+    booking.id,
+    booking.renterId,
+    lessorId,
+  ]);
 
   const openBookingDetail = () => {
     localStorage.setItem("booking", JSON.stringify(booking));
@@ -156,6 +165,8 @@ const BookingCard = ({ booking }) => {
   };
 
   const handleOneHourLeft = async () => {
+    fetcMotorbike();
+    console.log(renter);
     console.log(booking.depositNoti);
     if (booking.depositNoti) {
       const now = new Date();
@@ -170,15 +181,14 @@ const BookingCard = ({ booking }) => {
         `/api/booking/changeDepositNotification/${booking.bookingId}`
       );
       // mail
-      if (renter.emailNoti) {
+      if (renter && renter.emailNoti) {
         const response5 = await apiClient.post(
           "/api/booking/sendEmailDepositNotification",
           {
             renterName: renterName,
             renterEmail: renter.email,
-            motorbikeName:
-              motorbike.model.modelName + " " + motorbike.yearOfManufacture,
-            motorbikePlate: motorbike.motorbikePlate,
+            motorbikeName: motorbikeName,
+            motorbikePlate: motorbikePlate,
             bookingTime: dayjs(booking.bookingTime).format(
               "YYYY-MM-DDTHH:mm:ss"
             ),
@@ -190,7 +200,7 @@ const BookingCard = ({ booking }) => {
         );
       }
       // system
-      if (renter.systemNoti) {
+      if (renter && renter.systemNoti) {
         await setDoc(doc(collection(db, "notifications")), {
           userId: renterIdNoti,
           message: JSON.stringify({
@@ -203,9 +213,14 @@ const BookingCard = ({ booking }) => {
         });
       }
     }
+    return false;
   };
 
   const handleTimeExpired = async () => {
+    fetcMotorbike();
+    console.log(renter);
+    console.log(lessor);
+    console.log(motorbike);
     console.log(booking.depositCanceled);
     if (booking.depositCanceled) {
       const now = new Date();
@@ -224,15 +239,14 @@ const BookingCard = ({ booking }) => {
       const url = `/api/booking/changeStatus/${booking.bookingId}/${newStatus}`;
       await apiClient.put(url);
 
-      if (renter.emailNoti) {
-        const response3 = apiClient.post(
+      if (renter && renter.emailNoti) {
+        const responsea = await apiClient.post(
           "/api/booking/sendEmailCancelBooking",
           {
-            renterName: userName,
-            renterEmail: userEmail,
-            motorbikeName:
-              motorbike.model.modelName + " " + motorbike.yearOfManufacture,
-            motorbikePlate: motorbike.motorbikePlate,
+            renterName: renterName,
+            renterEmail: renter.email,
+            motorbikeName: motorbikeName,
+            motorbikePlate: motorbikePlate,
             bookingTime: dayjs(booking.bookingTime).format(
               "YYYY-MM-DDTHH:mm:ss"
             ),
@@ -244,16 +258,15 @@ const BookingCard = ({ booking }) => {
           }
         );
       }
-      if (lessor.emailNoti) {
-        const response5 = apiClient.post(
+      if (lessor && lessor.emailNoti) {
+        const responseb = await apiClient.post(
           "/api/booking/sendEmailCancelBookingForLessor",
           {
-            lessorName: lessor.firstName + " " + lessor.lastName,
+            lessorName: lessorName,
             lessorEmail: lessor.email,
-            renterName: userName,
-            motorbikeName:
-              motorbike.model.modelName + " " + motorbike.yearOfManufacture,
-            motorbikePlate: motorbike.motorbikePlate,
+            renterName: renterName,
+            motorbikeName: motorbikeName,
+            motorbikePlate: motorbikePlate,
             bookingTime: dayjs(booking.bookingTime).format(
               "YYYY-MM-DDTHH:mm:ss"
             ),
@@ -265,29 +278,30 @@ const BookingCard = ({ booking }) => {
           }
         );
       }
-      if (renter.systemNoti) {
+      if (renter && renter.systemNoti) {
         await setDoc(doc(collection(db, "notifications")), {
-          userId: userId,
+          userId: renter.id,
           message: JSON.stringify({
             title: '<strong style="color: rgb(197 34 34)">Hủy thuê xe</strong>',
-            content: `Bạn đã hủy thuê xe <strong>${motorbike.model.modelName} ${motorbike.yearOfManufacture}</strong>, biển số <strong>${motorbike.motorbikePlate}</strong> với lí do <strong>Hết hạn đặt cọc chuyến</strong>.`,
+            content: `Bạn đã hủy thuê xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong> với lí do <strong>Hết hạn đặt cọc chuyến</strong>.`,
           }),
           timestamp: now,
           seen: false,
         });
       }
-      if (lessor.systemNoti) {
+      if (lessor && lessor.systemNoti && renterName) {
         await setDoc(doc(collection(db, "notifications")), {
           userId: lessor.id,
           message: JSON.stringify({
             title: '<strong style="color: rgb(197 34 34)">Hủy thuê xe</strong>',
-            content: `<strong>${userName}</strong> đã hủy thuê xe <strong>${motorbike.model.modelName} ${motorbike.yearOfManufacture}</strong>, biển số <strong>${motorbike.motorbikePlate}</strong> của bạn với lí do <strong>Hết hạn đặt cọc chuyến</strong>.`,
+            content: `<strong>${renterName}</strong> đã hủy thuê xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong> của bạn với lí do <strong>Hết hạn đặt cọc chuyến</strong>.`,
           }),
           timestamp: now,
           seen: false,
         });
       }
     }
+    return false;
   };
 
   const handleAction = async (actionType) => {
@@ -296,7 +310,14 @@ const BookingCard = ({ booking }) => {
     console.log(renterName);
     switch (actionType) {
       case "accept":
-        setMessageConfirm("Bạn có chắc chắn muốn duyệt chuyến này?");
+        setMessageConfirm(
+          `Bạn phải đặt cọc <strong>${(
+            (booking.totalPrice * 50) /
+            100
+          ).toLocaleString(
+            "vi-VN"
+          )}đ</strong> để duyệt chuyến này. Bạn có chắc chắn muốn duyệt chuyến?`
+        );
         setAction("PENDING_DEPOSIT");
         break;
       case "renting":
@@ -312,10 +333,10 @@ const BookingCard = ({ booking }) => {
         console.log(response2.data.firstName + " " + response2.data.lastName);
         setRenterName(response2.data.firstName + " " + response2.data.lastName);
         setMessageConfirm(
-          `Bạn có chắc chắn muốn thanh toán ${(
-            (booking.totalPrice * 30) /
+          `Bạn có chắc chắn muốn thanh toán <strong>${(
+            (booking.totalPrice * 50) /
             100
-          ).toLocaleString("vi-VN")}đ tiền cọc?`
+          ).toLocaleString("vi-VN")}đ</strong>  tiền cọc?`
         );
         setAction("DEPOSIT_MADE");
         break;
@@ -325,6 +346,30 @@ const BookingCard = ({ booking }) => {
     setShowPopUp(true);
   };
   const checkWallet = async () => {
+    if (action === "PENDING_DEPOSIT") {
+      const userId = JSON.parse(localStorage.getItem("user")).userId;
+      const token = localStorage.getItem("token");
+
+      const response = await apiClient.get(`/api/user/${userId}`);
+      console.log(response);
+      const depositMoney = (booking.totalPrice * 50) / 100;
+      if (response.data.balance < depositMoney) {
+        setShowPopupWallet(true);
+        setBackWallet(true);
+        console.log(balance);
+        console.log(depositMoney);
+      } else {
+        setBackWallet(true);
+        setShowPopupWallet(false);
+      }
+      return;
+    }
+
+    if (action !== "DEPOSIT_MADE") {
+      setBackWallet(true);
+      setShowPopupWallet(false);
+      return;
+    }
     const userId = JSON.parse(localStorage.getItem("user")).userId;
     const token = localStorage.getItem("token");
 
@@ -337,6 +382,7 @@ const BookingCard = ({ booking }) => {
       console.log(balance);
       console.log(depositMoney);
     } else {
+      setBackWallet(true);
       setShowPopupWallet(false);
     }
   };
@@ -351,13 +397,18 @@ const BookingCard = ({ booking }) => {
 
     try {
       const url = `/api/booking/changeStatus/${booking.bookingId}/${action}`;
-      if (action !== "DEPOSIT_MADE") {
+      if (action !== "DEPOSIT_MADE" && action !== "PENDING_DEPOSIT") {
         await apiClient.put(url);
       }
       const now = new Date();
 
       switch (action) {
         case "PENDING_DEPOSIT":
+          if (showPopupWallet) {
+            console.log(showPopupWallet);
+            return;
+          }
+          await apiClient.put(url);
           const saveDepositRespone = await apiClient.post(
             "/api/booking/saveDepositTime",
             {
@@ -432,6 +483,26 @@ const BookingCard = ({ booking }) => {
               }
             );
           }
+          const adminDataDepositLessor = await apiClient.get(
+            "api/user/getAdmin"
+          );
+          const adminDataIdDepositLessor = adminDataDepositLessor.data.id;
+          const lessorId = userData.userId; // Replace with actual user ID if different
+          const amountForLessor = (booking.totalPrice * 50) / 100; // Replace with actual amount to be subtracted
+          const subtractMoneyUrlForLessor = `/api/payment/subtract`;
+          const subtractForLessor = await apiClient.post(
+            subtractMoneyUrlForLessor,
+            null,
+            {
+              params: {
+                senderId: lessorId,
+                receiverId: adminDataIdDepositLessor,
+                amount: amountForLessor,
+                motorbikeName: motorbikeName,
+                motorbikePlate: motorbikePlate,
+              },
+            }
+          );
           break;
         case "RENTING":
           if (systemNoti) {
@@ -458,14 +529,58 @@ const BookingCard = ({ booking }) => {
               seen: false,
             });
           }
+          if (emailNoti) {
+            const response3 = apiClient.post(
+              "/api/booking/sendEmailRentingBookingForLessor",
+              {
+                lessorName: userName,
+                lessorEmail: userEmail,
+                renterName: renterName,
+                motorbikeName:
+                  motorbike.model.modelName + " " + motorbike.yearOfManufacture,
+                motorbikePlate: motorbike.motorbikePlate,
+                bookingTime: dayjs(booking.bookingTime).format(
+                  "YYYY-MM-DDTHH:mm:ss"
+                ),
+                startDate: dayjs(booking.startDate).format(
+                  "YYYY-MM-DDTHH:mm:ss"
+                ),
+                endDate: dayjs(booking.endDate).format("YYYY-MM-DDTHH:mm:ss"),
+                totalPrice: booking.totalPrice,
+                receiveLocation: booking.receiveLocation,
+              }
+            );
+          }
+          if (renter.emailNoti) {
+            const response5 = apiClient.post(
+              "/api/booking/sendEmailRentingBooking",
+              {
+                renterName: renterName,
+                renterEmail: renter.email,
+                motorbikeName:
+                  motorbike.model.modelName + " " + motorbike.yearOfManufacture,
+                motorbikePlate: motorbike.motorbikePlate,
+                bookingTime: dayjs(booking.bookingTime).format(
+                  "YYYY-MM-DDTHH:mm:ss"
+                ),
+                startDate: dayjs(booking.startDate).format(
+                  "YYYY-MM-DDTHH:mm:ss"
+                ),
+                endDate: dayjs(booking.endDate).format("YYYY-MM-DDTHH:mm:ss"),
+                totalPrice: booking.totalPrice,
+                receiveLocation: booking.receiveLocation,
+              }
+            );
+          }
 
           break;
         case "DONE":
           const admin = await apiClient.get("api/user/getAdmin");
           const adminId = admin.data.id;
           const subtractMoneyUrlDone = `/api/payment/subtract`;
-          const addMoneyUrlDone = `/api/payment/add`;
-          const amountDone = (booking.totalPrice * 30) / 200;
+          const refundMoneyUrlDone = `/api/payment/refund`;
+          const amountDone = (booking.totalPrice * 35) / 100 ;
+          const amountDeposit = (booking.totalPrice * 50) / 100 ;
           await apiClient.post(subtractMoneyUrlDone, null, {
             params: {
               senderId: adminId,
@@ -475,6 +590,16 @@ const BookingCard = ({ booking }) => {
               motorbikePlate: motorbikePlate,
             },
           });
+          await apiClient.post(refundMoneyUrlDone, null, {
+            params: {
+              senderId: adminId,
+              receiverId: userId,
+              amount: amountDeposit,
+              motorbikeName: motorbikeName,
+              motorbikePlate: motorbikePlate,
+            },
+          });
+          
           if (systemNoti) {
             await setDoc(doc(collection(db, "notifications")), {
               userId: userId,
@@ -580,14 +705,13 @@ const BookingCard = ({ booking }) => {
           });
 
           if (emailNoti) {
-            const response3 = apiClient.post(
+            const response3 = await apiClient.post(
               "/api/booking/sendEmailDepositMadeBooking",
               {
                 renterName: userName,
                 renterEmail: userEmail,
-                motorbikeName:
-                  motorbike.model.modelName + " " + motorbike.yearOfManufacture,
-                motorbikePlate: motorbike.motorbikePlate,
+                motorbikeName: motorbikeName,
+                motorbikePlate: motorbikePlate,
                 bookingTime: dayjs(booking.bookingTime).format(
                   "YYYY-MM-DDTHH:mm:ss"
                 ),
@@ -599,17 +723,17 @@ const BookingCard = ({ booking }) => {
                 receiveLocation: booking.receiveLocation,
               }
             );
+            console.log(response3);
           }
           if (lessor.emailNoti) {
-            const response5 = apiClient.post(
+            const response5 = await apiClient.post(
               "/api/booking/sendEmailDepositMadeBookingForLessor",
               {
                 lessorName: lessor.firstName + " " + lessor.lastName,
                 lessorEmail: lessor.email,
                 renterName: userName,
-                motorbikeName:
-                  motorbike.model.modelName + " " + motorbike.yearOfManufacture,
-                motorbikePlate: motorbike.motorbikePlate,
+                motorbikeName: motorbikeName,
+                motorbikePlate: motorbikePlate,
                 bookingTime: dayjs(booking.bookingTime).format(
                   "YYYY-MM-DDTHH:mm:ss"
                 ),
@@ -621,15 +745,16 @@ const BookingCard = ({ booking }) => {
                 receiveLocation: booking.receiveLocation,
               }
             );
+            console.log(response5);
           }
 
           const adminData = await apiClient.get("api/user/getAdmin");
           const adminDataId = adminData.data.id;
           const renterId = userData.userId; // Replace with actual user ID if different
-          const amount = (booking.totalPrice * 30) / 100; // Replace with actual amount to be subtracted
+          const amount = (booking.totalPrice * 50) / 100; // Replace with actual amount to be subtracted
           const subtractMoneyUrl = `/api/payment/subtract`;
           const addMoneyUrl = `/api/payment/add`;
-          await apiClient.post(subtractMoneyUrl, null, {
+          const subtract = await apiClient.post(subtractMoneyUrl, null, {
             params: {
               senderId: renterId,
               receiverId: adminDataId,
@@ -638,6 +763,7 @@ const BookingCard = ({ booking }) => {
               motorbikePlate: motorbikePlate,
             },
           });
+          console.log(subtract);
           // await apiClient.post(addMoneyUrl, null, {
           //   params: { id: lessorId, amount: amount, motorbikeName : motorbikeName, motorbikePlate : motorbikePlate },
           // });
@@ -730,21 +856,30 @@ const BookingCard = ({ booking }) => {
                   </span>
                 </div>
                 <div className="flex  mb-2 text-gray-600">
-                  <FontAwesomeIcon icon={faUser} size="lg" />
-                  <span className="ml-2 font-extrabold">
-                    Chủ xe: {lessorName}
-                  </span>
+                  {motorbike ? (
+                    <>
+                      <FontAwesomeIcon icon={faUser} size="lg" />
+                      <span className="ml-2 font-extrabold">
+                        Khách thuê: {renterName}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <FontAwesomeIcon icon={faUser} size="lg" />
+                      <span className="ml-2 font-extrabold">
+                        Chủ xe: {lessorName}
+                      </span>
+                    </>
+                  )}
                 </div>
                 <div className="font-bold text-lg">
                   Tổng chi phí: {booking.totalPrice.toLocaleString("vi-VN")} vnd
                 </div>
                 {booking.depositTime && (
                   <DepositCountdown
-                    depositTime={booking.depositTime}
+                    bookingId={booking.bookingId}
                     onOneHourLeft={handleOneHourLeft}
                     onTimeExpired={handleTimeExpired}
-                    depositNoti={booking.depositNoti}
-                    depositCanceled={booking.depositCanceled}
                   ></DepositCountdown>
                 )}
               </div>

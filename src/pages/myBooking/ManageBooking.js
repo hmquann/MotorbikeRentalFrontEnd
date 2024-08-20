@@ -19,6 +19,10 @@ import PopUpSuccess from "./PopUpSuccess";
 import apiClient from "../../axiosConfig";
 import { CircularProgress } from "@mui/material";
 import PopUpReasonManage from "./PopUpReasonManage";
+import { FaMotorcycle } from "react-icons/fa";
+import { faMessage } from "@fortawesome/free-regular-svg-icons";
+import FeedbackList from "../booking/FeedbackList";
+import MapModal from "./MapModal";
 
 const statusTranslations = {
   PENDING: "Chờ duyệt",
@@ -78,7 +82,9 @@ export default function Widget() {
   const [motorbikeOvertimeFee, setMotorbikeOvertimeFee] = useState();
   const [showPopUpReason, setShowPopUpReason] = useState(false);
   const [lessorId, setLessorId] = useState();
+  const [renterId, setRenterId] = useState();
   const [renterName, setRenterName] = useState();
+  const [renterPhone, setRenterPhone] = useState();
   const [pricePerDay, setPricePerDay] = useState();
   const [showPopup, setShowPopup] = useState(false);
   const [popupContent, setPopupContent] = useState("");
@@ -99,6 +105,9 @@ export default function Widget() {
   const systemNoti = userData ? userData.systemNoti : null;
   const minimizeNoti = userData ? userData.minimizeNoti : null;
   const navigate = useNavigate();
+  const [motorbikeLocation, setMotorbikeLocation] = useState();
+  const [motorbikeOvertimeLimit, setMotorbikeOvertimeLimit] = useState();
+  const [viewMap, setViewMap] = useState(false);
   useEffect(() => {
     const fetchMotorbike = async () => {
       try {
@@ -112,11 +121,16 @@ export default function Widget() {
         setMotorbike(response.data);
         setMotorbikeDeliveryFee(`${response.data.deliveryFee}`);
         setMotorbikeOvertimeFee(`${response.data.overtimeFee}`);
+        setMotorbikeOvertimeLimit(`${response.data.overtimeLimit}`);
         console.log(motorbikeOvertimeFee);
         setMotorbikePlate(`${response.data.motorbikePlate}`);
         setLessorName(
           `${response.data.user.firstName} ${response.data.user.lastName}`
         );
+        setMotorbikeLocation({
+          longitude: response.data.longitude,
+          latitude: response.data.latitude,
+        });
         setLessor(response.data.user);
         setUrlImage(response.data.motorbikeImages[0].url);
         setLessorId(response.data.user.userId);
@@ -125,15 +139,34 @@ export default function Widget() {
         console.log(response2.data);
         setRenterName(response2.data.firstName + " " + response2.data.lastName);
         setRenter(response2.data);
+        setRenterId(response2.data.id);
+        console.log(response2.data.id);
+        setRenterPhone(response2.data.phone);
       } catch (error) {
         console.error("Error:", error);
       }
     };
 
     fetchMotorbike();
-  }, [booking.motorbikeId]);
+  }, [booking.motorbikeId, booking.renterId]);
 
   const statusStyle = statusStyles[booking.status];
+
+  const handleChatting = () => {
+    try {
+      const response4 = apiClient.post("/api/chatting/create", {
+        emailUser1: lessor.email,
+        emailUser2: renter.email,
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      navigate("/menu/chatting");
+    }
+  };
+  const handleClick = (userId) => {
+    navigate(`/userCard/${userId}`);
+  };
 
   const handleAction = (actionType) => {
     if (actionType === "reject") {
@@ -153,7 +186,11 @@ export default function Widget() {
     }
   };
 
-  const handleSendReason = async (reason) => {
+  const handleSendReason = async (
+    reason,
+    isLessThanTwoDays,
+    isMoreThanTwoDays
+  ) => {
     setShowPopUpReason(false);
     const now = new Date();
     setLoading(true);
@@ -236,17 +273,63 @@ export default function Widget() {
       const admin = await apiClient.get("api/user/getAdmin");
       const adminId = admin.data.id;
       const refundMoneyUrl = `/api/payment/refund`;
-      const amountDone = (booking.totalPrice * 30) / 200;
-      await apiClient.post(refundMoneyUrl, null, {
-        params: {
-          senderId: adminId,
-          receiverId: userId,
-          amount: amountDone,
-          motorbikeName: motorbikeName,
-          motorbikePlate: motorbikePlate,
-        },
-      });
-
+      const amount = (booking.totalPrice * 50) / 100;
+      const amount65 = (booking.totalPrice * 65) / 100;
+      const amount35 = (booking.totalPrice * 35) / 100;
+      const amount30 = (((booking.totalPrice * 50) / 100) * 30) / 100;
+      const amount130 = (((booking.totalPrice * 50) / 100) * 30) / 100;
+      const amountFull = booking.totalPrice;
+      if (isLessThanTwoDays) {
+        await apiClient.post(refundMoneyUrl, null, {
+          params: {
+            senderId: adminId,
+            receiverId: renterId,
+            amount: amountFull,
+            motorbikeName: motorbikeName,
+            motorbikePlate: motorbikePlate,
+          },
+        });
+      }
+      if (isMoreThanTwoDays) {
+        await apiClient.post(refundMoneyUrl, null, {
+          params: {
+            senderId: adminId,
+            receiverId: renterId,
+            amount: amount65,
+            motorbikeName: motorbikeName,
+            motorbikePlate: motorbikePlate,
+          },
+        });
+        await apiClient.post(refundMoneyUrl, null, {
+          params: {
+            senderId: adminId,
+            receiverId: lessorId,
+            amount: amount35,
+            motorbikeName: motorbikeName,
+            motorbikePlate: motorbikePlate,
+          },
+        });
+      }
+      if (!isMoreThanTwoDays && !isLessThanTwoDays) {
+        await apiClient.post(refundMoneyUrl, null, {
+          params: {
+            senderId: adminId,
+            receiverId: renterId,
+            amount: amount,
+            motorbikeName: motorbikeName,
+            motorbikePlate: motorbikePlate,
+          },
+        });
+        await apiClient.post(refundMoneyUrl, null, {
+          params: {
+            senderId: adminId,
+            receiverId: lessorId,
+            amount: amount,
+            motorbikeName: motorbikeName,
+            motorbikePlate: motorbikePlate,
+          },
+        });
+      }
     } catch (error) {
       console.log(error);
     } finally {
@@ -503,6 +586,14 @@ export default function Widget() {
     navigate("/menu/myBooking");
   };
 
+  const handleViewMap = (e) => {
+    e.preventDefault();
+    setViewMap(true);
+  };
+  const handleCloseModal = () => {
+    setViewMap(false);
+  };
+
   return (
     <div className="relative">
       {loading && (
@@ -534,7 +625,11 @@ export default function Widget() {
               />
               <div>
                 <h2 className="text-2xl font-bold">{motorbikeName}</h2>
-                <a href="#" className="text-blue-500 underline">
+                <a
+                  href="#"
+                  className="text-blue-500 underline"
+                  onClick={handleViewMap}
+                >
                   Xem lộ trình
                 </a>
                 <p className="text-gray-600">{booking.receiveLocation}</p>
@@ -572,14 +667,6 @@ export default function Widget() {
                 </div>
               </div>
             </div>
-            <RentalDocument></RentalDocument>
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold">Tài sản thế chấp</h3>
-              <p className="text-gray-700">
-                15 triệu (tiền mặt/chuyển khoản cho chủ xe khi nhận xe) hoặc Xe
-                máy (kèm cà vẹt gốc) giá trị 15 triệu
-              </p>
-            </div>
             <div className="mb-6">
               <h3 className="text-lg font-semibold">Điều khoản</h3>
               <ul className="list-disc list-inside text-gray-700">
@@ -603,59 +690,199 @@ export default function Widget() {
                 </li>
               </ul>
             </div>
-            <div>
-              <h3 className="text-lg font-bold">Chính sách huỷ chuyến</h3>
-              <table className="w-full border border-muted-foreground text-sm">
-                <thead>
-                  <tr>
-                    <th className="border border-muted-foreground p-2">
-                      Thời Gian Hủy Chuyến
-                    </th>
-                    <th className="border border-muted-foreground p-2">
-                      Khách Thuê Hủy Chuyến
-                    </th>
-                    <th className="border border-muted-foreground p-2">
-                      Chủ Xe Hủy Chuyến
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className="border border-muted-foreground p-2">
-                      Trong Vòng 1h Từ Lúc Đặt Cọc
-                    </td>
-                    <td className="border border-muted-foreground p-2 text-green-600">
-                      Hoàn tiền cọc 100%
-                    </td>
-                    <td className="border border-muted-foreground p-2 text-green-600">
-                      Không mất phí
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="border border-muted-foreground p-2">
-                      Trước Chuyến Đi 2 Ngày
-                    </td>
-                    <td className="border border-muted-foreground p-2 text-yellow-600">
-                      Hoàn tiền cọc 70%
-                    </td>
-                    <td className="border border-muted-foreground p-2 text-yellow-600">
-                      Đền tiền 30%
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="border border-muted-foreground p-2">
-                      Trong Vòng 2 Ngày Trước Chuyến Đi
-                    </td>
-                    <td className="border border-muted-foreground p-2 text-red-600">
-                      Không hoàn tiền
-                    </td>
-                    <td className="border border-muted-foreground p-2 text-red-600">
-                      Đền tiền 100%
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+            <hr className="my-3 border-gray-800"></hr>
+            <div className="font-manrope">
+              <h6 className="text-2xl font-semibold mb-4">
+                Chính sách huỷ chuyến
+              </h6>
+              <div className="flex flex-col border border-gray-300 rounded-t-lg overflow-hidden">
+                <div className="flex font-semibold border-b border-gray-100">
+                  <div className="w-4/12 pl-6 items-center py-3 flex text-left border-r border-gray-300">
+                    Thời điểm hủy chuyến
+                  </div>
+                  <div className="w-4/12 p-2 flex items-center justify-center border-r border-gray-300">
+                    Khách thuê hủy chuyến
+                  </div>
+                  <div className="w-4/12 p-2 flex items-center justify-center">
+                    Chủ xe hủy chuyến
+                  </div>
+                </div>
+                <div className="flex border-t border-gray-300">
+                  <div className="flex items-center w-4/12 pl-6 font-semibold text-left border-r border-gray-300">
+                    Trong vòng 1h sau giữ chỗ
+                  </div>
+                  <div className="w-4/12 p-2 flex flex-col justify-center items-center border-r border-gray-300">
+                    <i className="fas fa-check text-green-600 text-2xl mb-1"></i>
+                    <svg
+                      class="w-6 h-6 mr-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12.25 2C6.74 2 2.25 6.49 2.25 12C2.25 17.51 6.74 22 12.25 22C17.76 22 22.25 17.51 22.25 12C22.25 6.49 17.76 2 12.25 2ZM15.84 10.59L12.32 14.11C12.17 14.26 11.98 14.33 11.79 14.33C11.6 14.33 11.4 14.26 11.26 14.11L9.5 12.35C9.2 12.06 9.2 11.58 9.5 11.29C9.79 11 10.27 11 10.56 11.29L11.79 12.52L14.78 9.53C15.07 9.24 15.54 9.24 15.84 9.53C16.13 9.82 16.13 10.3 15.84 10.59Z"
+                        fill="#12B76A"
+                      />
+                    </svg>
+
+                    <span className="text-green-500">
+                      Hoàn tiền giữ chỗ 100%
+                    </span>
+                  </div>
+                  <div className="w-4/12 p-4 flex flex-col items-center">
+                    <i className="fas fa-check text-green-600 text-2xl mb-1"></i>
+                    <svg
+                      class="w-6 h-6 mr-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12.25 2C6.74 2 2.25 6.49 2.25 12C2.25 17.51 6.74 22 12.25 22C17.76 22 22.25 17.51 22.25 12C22.25 6.49 17.76 2 12.25 2ZM15.84 10.59L12.32 14.11C12.17 14.26 11.98 14.33 11.79 14.33C11.6 14.33 11.4 14.26 11.26 14.11L9.5 12.35C9.2 12.06 9.2 11.58 9.5 11.29C9.79 11 10.27 11 10.56 11.29L11.79 12.52L14.78 9.53C15.07 9.24 15.54 9.24 15.84 9.53C16.13 9.82 16.13 10.3 15.84 10.59Z"
+                        fill="#12B76A"
+                      />
+                    </svg>
+                    <span className="text-green-500">Không tốn phí</span>
+                    {/* <span className="text-gray-600">
+                      (Đánh giá hệ thống 3*)
+                    </span> */}
+                  </div>
+                </div>
+                <div className="flex border-t border-gray-300">
+                  <div className="flex items-center w-4/12 pl-6 font-semibold text-left border-r border-gray-300">
+                    Trước chuyến đi &gt;2 ngày
+                  </div>
+                  <div className="w-4/12 p-2 flex flex-col justify-center items-center border-r border-gray-300">
+                    <i className="fas fa-check text-green-600 text-2xl mb-1"></i>
+                    <svg
+                      class="w-6 h-6 mr-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12.25 2C6.74 2 2.25 6.49 2.25 12C2.25 17.51 6.74 22 12.25 22C17.76 22 22.25 17.51 22.25 12C22.25 6.49 17.76 2 12.25 2ZM15.84 10.59L12.32 14.11C12.17 14.26 11.98 14.33 11.79 14.33C11.6 14.33 11.4 14.26 11.26 14.11L9.5 12.35C9.2 12.06 9.2 11.58 9.5 11.29C9.79 11 10.27 11 10.56 11.29L11.79 12.52L14.78 9.53C15.07 9.24 15.54 9.24 15.84 9.53C16.13 9.82 16.13 10.3 15.84 10.59Z"
+                        fill="#12B76A"
+                      />
+                    </svg>
+                    <span className="text-yellow-600">
+                      Hoàn tiền giữ chỗ 70%
+                    </span>
+                  </div>
+                  <div className="w-4/12 p-4 flex flex-col items-center">
+                    <i className="fas fa-times text-red-600 text-2xl mb-1"></i>
+                    <svg
+                      class="w-6 h-6 mr-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12.25 2C6.74 2 2.25 6.49 2.25 12C2.25 17.51 6.74 22 12.25 22C17.76 22 22.25 17.51 22.25 12C22.25 6.49 17.76 2 12.25 2ZM15.84 10.59L12.32 14.11C12.17 14.26 11.98 14.33 11.79 14.33C11.6 14.33 11.4 14.26 11.26 14.11L9.5 12.35C9.2 12.06 9.2 11.58 9.5 11.29C9.79 11 10.27 11 10.56 11.29L11.79 12.52L14.78 9.53C15.07 9.24 15.54 9.24 15.84 9.53C16.13 9.82 16.13 10.3 15.84 10.59Z"
+                        fill="#12B76A"
+                      />
+                    </svg>
+                    <span className="text-yellow-600">Đền 30% tiền cọc</span>
+                    {/* <span className="text-gray-600">
+                      (Đánh giá hệ thống 3*)
+                    </span> */}
+                  </div>
+                </div>
+                <div className="flex border-t border-gray-300">
+                  <div className="flex items-center w-4/12 pl-6 font-semibold text-left border-r border-gray-300">
+                    Trong vòng 2 ngày trước chuyến đi
+                  </div>
+                  <div className="w-4/12 p-2 flex flex-col justify-center items-center border-r border-gray-300">
+                    <i className="fas fa-times text-red-600 text-2xl mb-1"></i>
+                    <svg
+                      class="w-6 h-6 mr-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12.25 2C6.74 2 2.25 6.49 2.25 12C2.25 17.51 6.74 22 12.25 22C17.76 22 22.25 17.51 22.25 12C22.25 6.49 17.76 2 12.25 2ZM14.67 13.39C14.97 13.69 14.96 14.16 14.67 14.45C14.52 14.59 14.33 14.67 14.14 14.67C13.95 14.67 13.75 14.59 13.61 14.44L12.25 13.07L10.9 14.44C10.75 14.59 10.56 14.67 10.36 14.67C10.17 14.67 9.98 14.59 9.84 14.45C9.54 14.16 9.53999 13.69 9.82999 13.39L11.2 12L9.82999 10.61C9.53999 10.32 9.54 9.84 9.84 9.55C10.13 9.26 10.61 9.26 10.9 9.55L12.25 10.92L13.61 9.55C13.9 9.26 14.38 9.26 14.67 9.55C14.96 9.84 14.96 10.32 14.67 10.61L13.3 12L14.67 13.39Z"
+                        fill="#F04438"
+                      />
+                    </svg>
+                    <span className="text-red-500">
+                      Không hoàn tiền giữ chỗ
+                    </span>
+                  </div>
+                  <div className="w-4/12 p-4 flex flex-col items-center">
+                    <i className="fas fa-times text-red-600 text-2xl mb-1"></i>
+                    <svg
+                      class="w-6 h-6 mr-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12.25 2C6.74 2 2.25 6.49 2.25 12C2.25 17.51 6.74 22 12.25 22C17.76 22 22.25 17.51 22.25 12C22.25 6.49 17.76 2 12.25 2ZM14.67 13.39C14.97 13.69 14.96 14.16 14.67 14.45C14.52 14.59 14.33 14.67 14.14 14.67C13.95 14.67 13.75 14.59 13.61 14.44L12.25 13.07L10.9 14.44C10.75 14.59 10.56 14.67 10.36 14.67C10.17 14.67 9.98 14.59 9.84 14.45C9.54 14.16 9.53999 13.69 9.82999 13.39L11.2 12L9.82999 10.61C9.53999 10.32 9.54 9.84 9.84 9.55C10.13 9.26 10.61 9.26 10.9 9.55L12.25 10.92L13.61 9.55C13.9 9.26 14.38 9.26 14.67 9.55C14.96 9.84 14.96 10.32 14.67 10.61L13.3 12L14.67 13.39Z"
+                        fill="#F04438"
+                      />
+                    </svg>
+                    <span className="text-red-500">Đền 100% tiền cọc</span>
+                  </div>
+                </div>
+              </div>
             </div>
+            <div className="p-4 bg-white dark:bg-zinc-800 flex items-center space-x-4 mt-5">
+              <div
+                className="flex flex-col items-center cursor-pointer"
+                onClick={() => handleClick(booking.renterId)}
+              >
+                <h2 className="text-sm font-semibold mb-2">Khách thuê</h2>
+                <img
+                  src="https://n1-cstg.mioto.vn/m/avatars/avatar-2.png"
+                  alt="User profile picture"
+                  className="w-16 h-16 rounded-full"
+                />
+              </div>
+              <div className="flex-1">
+                <div
+                  className="flex items-center justify-between rounded-lg"
+                  onClick={handleChatting}
+                >
+                  <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                    {renterName}
+                    &nbsp;&nbsp;&nbsp;
+                    <span
+                      style={{
+                        border: "1px solid #ee4d2d",
+                        padding: "2px 5px",
+                        borderRadius: "10px",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        cursor: "pointer",
+                        color: "#ee4d2d",
+                        fontSize: "0.875rem",
+                      }}
+                    >
+                      <FontAwesomeIcon
+                        icon={faMessage}
+                        color="#ee4d2d"
+                        style={{ marginRight: "5px", fontSize: "0.875rem" }}
+                      />
+                      Liên hệ
+                    </span>
+                  </h2>
+                </div>
+                <div className="flex items-center space-x-2 text-zinc-600 dark:text-zinc-400">
+                  <span className="flex items-center">
+                    {/* <FaMotorcycle className="w-6 h-6" /> */}
+                    <span className="ml-2">
+                      {/* {renter.totalTripCount > 0
+                        ? renter.totalTripCount
+                        : "Chưa có"}{" "}
+                      chuyến */}
+                    </span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* <FeedbackList motorbikeId={booking.motorbikeId} /> */}
           </div>
           <div className="col-span-1">
             <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
@@ -667,6 +894,7 @@ export default function Widget() {
                 />
                 <div>
                   <h4 className="font-semibold">{renterName}</h4>
+                  <h6 className="font-semibold">{renterPhone}</h6>
                   <p className="text-gray-500">Khách thuê</p>
                 </div>
               </div>
@@ -675,9 +903,6 @@ export default function Widget() {
                   <FontAwesomeIcon icon={faMapPin} /> Địa điểm giao nhận xe
                 </h4>
                 <p className="text-gray-700">{booking.receiveLocation}</p>
-                <a href="#" className="text-blue-500 underline">
-                  Xem bản đồ
-                </a>
               </div>
               <div className="mb-6">
                 <h4 className="text-gray-500">
@@ -754,19 +979,40 @@ export default function Widget() {
                 show={showPopUpReason}
                 onHide={() => setShowPopUpReason(false)}
                 onSend={handleSendReason}
+                bookingId={booking.bookingId}
+                bookingTotalPrice={booking.totalPrice}
               />
+              {viewMap && (
+                <MapModal
+                  isOpen={viewMap}
+                  onClose={handleCloseModal}
+                  startLocation={[
+                    motorbikeLocation.longitude,
+                    motorbikeLocation.latitude,
+                  ]}
+                  endLocation={[booking.longitude, booking.latitude]}
+                />
+              )}
             </div>
+
             <div className="bg-white p-6 rounded-lg shadow-lg">
               <h4 className="text-lg font-semibold mb-4">
                 Phụ phí có thể phát sinh
               </h4>
               <ul className="list-none text-gray-700">
+                {motorbikeDeliveryFee && (
+                  <li>
+                    Phụ phí giao nhận xe tận nơi:{" "}
+                    <strong>{motorbikeDeliveryFee} đ/km</strong>{" "}
+                  </li>
+                )}
                 <li>
-                  Phụ phí giao nhận xe tận nơi:{" "}
-                  <strong>{motorbikeDeliveryFee}vnd/km</strong>{" "}
+                  Phụ phí quá giờ: <strong>{motorbikeOvertimeFee} đ/giờ</strong>
                 </li>
                 <li>
-                  Phụ phí quá giờ: <strong>{motorbikeOvertimeFee}vnd/km</strong>
+                  Giới hạn quá giờ:{" "}
+                  <strong>{motorbikeOvertimeLimit} giờ</strong>(sẽ tính thêm 1
+                  ngày thuê mới nếu quá giới hạn này)
                 </li>
               </ul>
             </div>

@@ -10,7 +10,9 @@ const PopUpConfirm = ({ show, message, onConfirm, onCancel }) => {
         <Modal.Header closeButton>
           <Modal.Title>Xác nhận</Modal.Title>
         </Modal.Header>
-        <Modal.Body>{message}</Modal.Body>
+        <Modal.Body>
+          <div dangerouslySetInnerHTML={{ __html: message }} />
+        </Modal.Body>
         <Modal.Footer>
           <Button
             variant="secondary"
