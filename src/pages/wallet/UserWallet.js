@@ -27,6 +27,7 @@ const UserWallet = () => {
   const [selectedTransactions, setSelectedTransactions] = useState([]);
   const [showTransactions, setShowTransactions] = useState(false);
   const [showPopupSuccess, setShowPopupSuccess] = useState(false);
+  const [userRole, setUserRole] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,6 +39,17 @@ const UserWallet = () => {
       fetchTransactions();
     }
   }, []);
+
+  useEffect(() => {
+    const roles = localStorage.getItem("roles");
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      setUserRole(roles || "");  
+    }
+  },[] );
+
+  const isAdmin = userRole && userRole.includes("ADMIN");
 
   const fetchUserBalance = async () => {
     const userId = JSON.parse(localStorage.getItem("user")).userId;
@@ -296,7 +308,7 @@ const UserWallet = () => {
         <PopupSuccess
           show={showPopupSuccess}
           onHide={handlePopUpSuccess}
-          message="Bạn đã gửi yêu cầu rút tiền thành công!"
+          message={isAdmin ? "Bạn đã rút tiền thành công!" : "Bạn đã gửi yêu cầu rút tiền thành công!"}
         />
       )}
 

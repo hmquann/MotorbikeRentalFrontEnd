@@ -26,6 +26,8 @@ const TransactionList = ({ transactions }) => {
     DEPOSIT: "Đặt cọc",
     DEPOSIT_RECEIVE: "Nhận cọc xe",
     REFUND: "Hoàn tiền",
+    WITHDRAW_REQUEST : "Yêu cầu rút tiền",
+    REFUND_WITHDRAW : "Hoàn lại tiền rút"
   };
 
   return (
@@ -45,7 +47,8 @@ const TransactionList = ({ transactions }) => {
         <tbody>
           {displayedTransactions.map((transaction) => {
             const isWithdrawalOrDeposit =
-              transaction.type === "WITHDRAW" || transaction.type === "DEPOSIT";
+              transaction.type === "WITHDRAW" || transaction.type === "DEPOSIT" || 
+              transaction.type === "REFUND_WITHDRAW" ;
 
             const amount = isWithdrawalOrDeposit
               ? `- ${transaction.amount.toLocaleString()} VND`
