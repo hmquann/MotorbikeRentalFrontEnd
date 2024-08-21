@@ -15,6 +15,7 @@ import { useNotification } from "../../NotificationContext";
 import Login from "../login/Login";
 import Register from "../register/Register";
 import Forgotpassword from "../forgotpassword/Forgotpassword";
+import logo from "../../assets/images/Logo.png";
 
 const Header = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -131,12 +132,7 @@ const Header = () => {
       <header className="flex align-baseline justify-between lg:mx-28 items-center p-4 ">
         <div className="flex items-center">
           <Nav.Link as={Link} to="/homepage">
-            <img
-              className="w-24"
-              src="/image/logo.png
-            "
-              alt="Logo"
-            />
+            <img className="w-24" src={logo} alt="Logo" />
           </Nav.Link>
         </div>
         <nav className="hidden md:flex space-x-4 items-center">
