@@ -125,6 +125,11 @@ const MotorbikeSchedulePopUp = ({ isOpen, onClose, onSubmit }) => {
   const dayClassName = (date) => {
     return isDateDisabled(date) ? 'disabled-day' : undefined;
   };
+  //chỉnh giờ địa phương
+  const convertToUTC = (localDate) => {
+    const date = new Date(localDate);
+    return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString();
+  };
   const handleSubmit = () => {
     if (!endDate) {
       setEndDate(startDate);
@@ -144,7 +149,10 @@ const MotorbikeSchedulePopUp = ({ isOpen, onClose, onSubmit }) => {
       return;
     }
     
-    onSubmit({ startDateTime, endDateTime })
+    const utcStartDateTime = convertToUTC(startDateTime);
+    const utcEndDateTime = convertToUTC(endDateTime);
+
+    onSubmit({ startDateTime: utcStartDateTime, endDateTime: utcEndDateTime });
     setTimeError(""); // Clear any existing errors
     // Handle valid form submission logic here
     // Close the pop-up after successful submission
