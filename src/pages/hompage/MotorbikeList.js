@@ -3,22 +3,14 @@ import axios from "axios";
 import Filter from "../filter/Filter";
 import { useNavigate } from "react-router";
 import apiClient from "../../axiosConfig";
+import image from "../../assets/images/2.png";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faLocationDot,
-  faCalendarDays,
   faStar,
-  faSuitcase,
 } from "@fortawesome/free-solid-svg-icons";
-import { Pagination } from "@mui/material";
-// Define CSS classes
-const cardClasses =
-  "max-w-lg mx-auto bg-white dark:bg-zinc-800 rounded-xl shadow-md overflow-hidden";
-const badgeClasses =
-  "bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded";
-const buttonClasses = "bg-white bg-opacity-50 p-1 rounded-full";
-const avatarClasses = "w-10 h-10 rounded-full border-2 border-yellow-400";
+import { Box, CircularProgress, Pagination } from "@mui/material";
 const fixedNumber=(number)=>{
   return (number / 1000).toFixed(1);
 }
@@ -27,29 +19,37 @@ const displayAddress=(str)=>{
   const result = parts.slice(-2).join(",");
 return result;
 }
-const MotorbikeList = ({ listMotor, showDistance, searchLongitude, searchLatitude }) => {
+const MotorbikeList = ({ listMotor, showDistance, searchLongitude, searchLatitude,totalItems, page, pageSize, onPageChange, isLoading }) => {
   console.log(listMotor)
   const navigate = useNavigate();
   const [motorbikeList, setMotorbikeList] = useState([]);
   const [locaList, setLocaList] = useState([]);
   const [selectedMotorbike, setSelectedMotorbike] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 2;
+  const itemsPerPage = 3;
   const [distanceList, setDistanceList] = useState([]);
+  const [totalPages, setTotalPages] = useState(0);
   const accessToken = "pk.eyJ1Ijoibmd1eWVua2llbjAyIiwiYSI6ImNseDNpem83bjByM3cyaXF4NTZqOWFhZWIifQ.pVT0I74tSdI290kImTlphQ";
 
   useEffect(() => {
     if (listMotor) {
-      const updatedMotorbikeList = listMotor;
-      setMotorbikeList(updatedMotorbikeList);
+      // const updatedMotorbikeList = listMotor;
+      setMotorbikeList(listMotor);
 
-      if (Array.isArray(updatedMotorbikeList) && updatedMotorbikeList.length !== 0) {
-        const newLocaList = updatedMotorbikeList.map(motor => [motor.longitude, motor.latitude]);
+      if (Array.isArray(listMotor) && listMotor.length !== 0) {
+        const newLocaList = listMotor.map(motor => [motor.longitude, motor.latitude]);
         setLocaList(newLocaList);
       }
     }
   }, [listMotor]);
 
+  // useEffect(() => {
+  //   if (motorbikeList.length > 0) {
+  //     const newLocaList = motorbikeList.map(motor => [motor.longitude, motor.latitude]);
+  //     setLocaList(newLocaList);
+  //   }
+  // }, [motorbikeList]);
+  
   useEffect(() => {
     if (locaList.length > 0) {
       fetchDistances();
@@ -78,7 +78,6 @@ const MotorbikeList = ({ listMotor, showDistance, searchLongitude, searchLatitud
       console.error('Lỗi khi thực hiện yêu cầu Axios:', error);
     }
   };
-
   const formatNumber = (numberString) => {
     const number = parseInt(numberString, 10);
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -111,33 +110,28 @@ const MotorbikeList = ({ listMotor, showDistance, searchLongitude, searchLatitud
     'XeDien': 'Xe Điện',
     'XeGanMay' : 'Xe Gắn Máy'
   };
-  const handlePageChange = (event, value) => {
-    setCurrentPage(value);
-  };
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  let motorbikeArray = [];
-  if (Array.isArray(motorbikeList)) {
-      motorbikeArray = motorbikeList;
-  } else if (motorbikeList && Array.isArray(motorbikeList.items)) {
-      motorbikeArray = motorbikeList.items;
-  } else {
-      console.error("motorbikeList không phải là một mảng hoặc không chứa mảng items");
-  }
-  const currentMotorbikes = motorbikeArray.slice(indexOfFirstItem, indexOfLastItem);
-
   return (
     <div>
       <div className="p-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      
+        {isLoading ? ( 
+               <div className="flex justify-center items-center min-h-screen">
+               <Box sx={{ display: 'flex' }}>
+      <CircularProgress />
+    </Box>
+               </div>
+            ):(
+              
+              <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {Array.isArray(motorbikeList) && motorbikeList.length === 0 ? (
-            <div className="col-span-full text-center text-zinc-500 dark:text-zinc-400">
-              Không tìm thấy xe phù hợp.
+            <div className="col-span-full flex justify-center flex-col items-center text-zinc-500 ">
+             <p className="font-bold">Không tìm thấy xe phù hợp</p> 
+              <img src={image} alt="No cars found" className="w-64 h-64 ml-10" />
             </div>
           ) : (
             Array.isArray(motorbikeList) &&
-            currentMotorbikes.map((motorbike,index) => (
+            motorbikeList.map((motorbike,index) => (
               <div className="relative flex items-center">
             <div className="grid gap-4 w-full h-full cursor-pointer overflow-hidden ">
                   <div 
@@ -167,11 +161,12 @@ const MotorbikeList = ({ listMotor, showDistance, searchLongitude, searchLatitud
                           <span className="float-right">~{fixedNumber(distanceList[index+1])} km</span>
                         </div>
                         <hr />
-                        <div className='flex justify-between'>
+                        <div className='flex justify-between text-sm'>
                           <div className="flex items-center text-gray-500 dark:text-gray-400 mb-2">
                             {motorbike.tripCount > 0 ? (
                               <>
                               <FontAwesomeIcon icon={faStar} style={{color :"#FFD43B"}} />
+                              <span className="ml-1">{motorbike.avgRate}</span>
                               <span className="px-2">•</span>
                               <div class="text-green-600">
                     <svg
@@ -211,9 +206,9 @@ const MotorbikeList = ({ listMotor, showDistance, searchLongitude, searchLatitud
                             )                         
                             : "Chưa có chuyến"}
                           </div>
-                          <div className='flex'>
-                            <div className="text-lg text-right font-semibold text-green-500 mb-2">{motorbike.price.toLocaleString()}</div>
-                            <span className='text-lg'>đ/ ngày</span>
+                          <div className='flex '>
+                            <div className="text-base text-right font-semibold text-green-500 ">{motorbike.price.toLocaleString()}</div>
+                            <span className='text-base'> đ/ ngày</span>
                           </div>
                         </div>
                       </div>
@@ -223,16 +218,22 @@ const MotorbikeList = ({ listMotor, showDistance, searchLongitude, searchLatitud
             </div>
             ))
           )}
-        </div>
+          </div>
+          </>
+        )}
+        {/* </div> */}
       </div>
-      <div className="flex justify-center mt-4">
+      {Array.isArray(motorbikeList) && motorbikeList.length > 0 && (
+      <div className="flex justify-center mt-4 mb-2">
         <Pagination
-          count={Math.ceil(motorbikeList.length / itemsPerPage)}
-          page={currentPage}
-          onChange={handlePageChange}
-          color="primary"
+          count={Math.ceil(totalItems / pageSize)}
+          page={page}
+          onChange={onPageChange}
+          color="success"
+          variant="outlined"
         />
       </div>
+    )}
     </div>
   );
 };

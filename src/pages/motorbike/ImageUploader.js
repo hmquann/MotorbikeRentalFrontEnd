@@ -20,7 +20,7 @@ function ImageUploader({ sendDataToParent }) {
 
     return (
         <div className="p-6 bg-white dark:bg-zinc-800 rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Hỉnh ảnh</h2>
+            <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Hình ảnh</h2>
             <p className="text-zinc-600 dark:text-zinc-300 mt-2">
             Đăng 4 hình ở các góc độ khác nhau để tăng thông tin cho xe của bạn.
             </p>

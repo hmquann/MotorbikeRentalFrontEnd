@@ -113,7 +113,7 @@ const NotificationDropdown = () => {
   const id = open ? "notification-popover" : undefined;
 
   return (
-    <div>
+    <div className="font-manrope">
       <NotificationButton aria-describedby={id} onClick={handleClick}>
         <NotificationsIcon />
         {notificationCount > 0 && (
@@ -151,17 +151,19 @@ const NotificationDropdown = () => {
                 <CardContent>
                   <Typography
                     variant="h6"
+                    style={{ fontFamily: "Manrope" }}
                     dangerouslySetInnerHTML={{
                       __html: notification.message.title,
                     }}
                   />
                   <Typography
                     variant="body2"
+                    style={{ fontFamily: "Manrope" }}
                     dangerouslySetInnerHTML={{
                       __html: notification.message.content,
                     }}
                   />
-                  <Typography color="textSecondary" variant="caption">
+                  <Typography color="textSecondary" style={{ fontFamily: "Manrope", }} variant="caption">
                     {dayjs(notification.timestamp).fromNow()}
                   </Typography>
                 </CardContent>

@@ -339,12 +339,15 @@ const handleSubmit = async (e) => {
   // Kiểm tra lỗi cơ bản
   if (!formData.motorbikePlate.trim()) {
       setMotorbikePlateError("Hãy điền biển số xe");
+      return
   } 
   if (!selectedModel) {
       setMotorbikeModelError("Hãy chọn mẫu xe");
+      return
   } 
   if (!formData.yearOfManufacture.trim()) {
       setManufactureYearError("Hãy điền năm sản xuất");
+      return
   }
   // Kiểm tra xem có lỗi nào không
 

@@ -8,6 +8,9 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import apiClient from "../../axiosConfig";
 import TransactionList from "./TransactionModal";
+import PopupSuccess from "../myBooking/PopUpSuccess";
+import { collection, doc, setDoc } from "firebase/firestore";
+import { db } from "../../firebase";
 
 const UserWallet = () => {
   const [balance, setBalance] = useState(0);
@@ -23,6 +26,7 @@ const UserWallet = () => {
   const [hasSearched, setHasSearched] = useState(false);
   const [selectedTransactions, setSelectedTransactions] = useState([]);
   const [showTransactions, setShowTransactions] = useState(false);
+  const [showPopupSuccess, setShowPopupSuccess] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,15 +44,12 @@ const UserWallet = () => {
     const token = localStorage.getItem("token");
 
     try {
-      const response = await apiClient.get(
-        `/api/user/${userId}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await apiClient.get(`/api/user/${userId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (response.status === 200) {
         const user = response.data;
         setBalance(user.balance);
@@ -65,16 +66,14 @@ const UserWallet = () => {
     const token = localStorage.getItem("token");
 
     try {
-      const response = await apiClient.get(
-        `/api/transaction/${userId}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await apiClient.get(`/api/transaction/${userId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (response.status === 200) {
+        console.log(response.data);
         setTransactions(response.data);
       } else {
         console.error("Failed to fetch transactions");
@@ -115,35 +114,50 @@ const UserWallet = () => {
     }
   };
 
-  const handleWithdraw = async (amount) => {
+  const handleWithdraw = async (amount, bankAccount, bankName) => {
     const token = localStorage.getItem("token");
-    const userId = JSON.parse(localStorage.getItem("user")).userId;
+    const user = JSON.parse(localStorage.getItem("user"));
+    const userId = user?.userId;
     try {
-      const response = await apiClient.post(
-        `/api/payment/withdraw`,
-        null,
-        {
-          params: {
-            id: userId,
-            amount: amount,
-          },
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await apiClient.post(`/api/payment/withdraw`, null, {
+        params: {
+          id: userId,
+          amount: amount,
+          accountNumber: bankAccount,
+          bankName: bankName,
+        },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (response.status !== 200) {
         throw new Error("Failed to withdraw");
       }
-
-      const data = response.data;
-      setBalance((prevBalance) => prevBalance - parseFloat(amount));
+      const now = new Date();
+      const admin = await apiClient.get("api/user/getAdmin");
+      const adminId = admin.data.id;
+      await setDoc(doc(collection(db, "notifications")), {
+        userId: adminId,
+        message: JSON.stringify({
+          title:
+            '<strong style="color: rgb(34 197 94)">Yêu cầu rút tiền</strong>',
+          content: `Yêu cầu rút số tiền <strong>${amount.toLocaleString()}</strong> từ tài khoản <strong>${user.firstName} ${user.lastName}</strong> vừa được gửi.`,
+        }),
+        timestamp: now,
+        seen: false,
+      });
       fetchTransactions();
+      await fetchUserBalance();
+      setShowPopupSuccess(true);
     } catch (error) {
       console.error("Error during withdrawal:", error);
     }
+  };
+
+  const handlePopUpSuccess = () => {
+    setShowPopupSuccess(false);
   };
 
   const handleDepositClick = () => {
@@ -167,25 +181,25 @@ const UserWallet = () => {
       setShowTransactions(false);
       setSelectedTransactions([]);
     } else {
-    const fromDateObj = new Date(fromDate);
-    const toDateObj = new Date(toDate);
-    toDateObj.setHours(23, 59, 59, 999);
+      const fromDateObj = new Date(fromDate);
+      const toDateObj = new Date(toDate);
+      toDateObj.setHours(23, 59, 59, 999);
 
-    const filtered = transactions.filter((transaction) => {
-      const transactionDate = new Date(transaction.transactionDate);
-      return transactionDate >= fromDateObj && transactionDate <= toDateObj;
-    });
-    if (filtered.length === 0) {
-      setError("Không tìm thấy giao dịch nào");
-    } else {
-      setShowTransactions(true)
-      setFilteredTransactions(filtered);
-      setPage(0);
-      setHasSearched(true);
-      setSelectedTransactions(filtered);
-      setError("");
+      const filtered = transactions.filter((transaction) => {
+        const transactionDate = new Date(transaction.transactionDate);
+        return transactionDate >= fromDateObj && transactionDate <= toDateObj;
+      });
+      if (filtered.length === 0) {
+        setError("Không tìm thấy giao dịch nào");
+      } else {
+        setShowTransactions(true);
+        setFilteredTransactions(filtered);
+        setPage(0);
+        setHasSearched(true);
+        setSelectedTransactions(filtered);
+        setError("");
+      }
     }
-  }
   };
 
   const handleModalClose = () => {
@@ -244,7 +258,7 @@ const UserWallet = () => {
           className={`bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded`}
           onClick={handleSearch}
         >
-         {showTransactions ? "Ẩn giao dịch" : "Tìm"}
+          {showTransactions ? "Ẩn giao dịch" : "Tìm"}
         </button>
       </div>
       {showTransactions && (
@@ -261,8 +275,8 @@ const UserWallet = () => {
           <WithDraw
             balance={balance}
             onClose={() => setShowWithdrawModal(false)}
-            onConfirm={(amount) => {
-              handleWithdraw(amount);
+            onConfirm={(amount, bankAccount, bankName) => {
+              handleWithdraw(amount, bankAccount, bankName);
               setShowWithdrawModal(false);
             }}
             setError={setError}
@@ -278,6 +292,13 @@ const UserWallet = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+      {showPopupSuccess && (
+        <PopupSuccess
+          show={showPopupSuccess}
+          onHide={handlePopUpSuccess}
+          message="Bạn đã gửi yêu cầu rút tiền thành công!"
+        />
+      )}
 
       <Modal show={showTopUpModal} onHide={() => setShowTopUpModal(false)}>
         <Modal.Header closeButton>
@@ -294,7 +315,11 @@ const UserWallet = () => {
           />
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" className="transition hover:scale-105" onClick={() => setShowTopUpModal(false)}>
+          <Button
+            variant="secondary"
+            className="transition hover:scale-105"
+            onClick={() => setShowTopUpModal(false)}
+          >
             Đóng
           </Button>
         </Modal.Footer>

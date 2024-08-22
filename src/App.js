@@ -9,8 +9,6 @@ import {
   useLocation,
 } from "react-router-dom";
 import NoMatch from "./pages/noMatch/NoMatch";
-import PostUser from "./pages/employee/PostUser";
-import UpdateUser from "./pages/employee/UpdateUser";
 import Login from "./pages/login/Login";
 import Forgotpassword from "./pages/forgotpassword/Forgotpassword";
 import Register from "./pages/register/Register";
@@ -52,15 +50,18 @@ import BlogDetail from "./pages/blog/BlogDetail";
 import Filter from "./pages/filter/Filter";
 import FeedbackModal from "./pages/booking/FeedbackModal";
 import Footer from "./pages/footer/Footer";
-import UserCard from "./pages/booking/UserCard"
+import UserCard from "./pages/booking/UserCard";
 import ChatWithFirebase from "./pages/chatWithFirebase/ChatWithFirebase";
-
 
 import MapboxSearchPopUp from "./pages/filter/MapboxSearchPopUp";
 import GeneralPolicy from "./pages/privacy/GeneralPolicy";
 import Regulations from "./pages/privacy/Regulations";
 import PrivacyPolicy from "./pages/privacy/PrivacyPolicy";
 import Complaints from "./pages/privacy/Complaints";
+import WithdrawRequest from "./pages/dashboard/WithdrawRequest";
+import DashboardForAdmin from "./pages/dashboard/DashboardForAdmin";
+import DashboardForLessor from "./pages/dashboard/DashboardForLessor";
+
 
 function App() {
   const location = useLocation();
@@ -69,9 +70,8 @@ function App() {
   return (
     <>
       <Header />
-      <Routes><Route path="/userCard/:userId" element={<UserCard />} />
-        <Route path="/employee" element={<PostUser />} />
-        <Route path="/employee/:id" element={<UpdateUser />} />
+      <Routes>
+        <Route path="/userCard/:userId" element={<UserCard />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgotpassword" element={<Forgotpassword />} />
         <Route
@@ -104,6 +104,7 @@ function App() {
           <Route path="/menu/chatting" element={<ChatWithFirebase />} />
           <Route path="/menu/myBooking" element={<MyBooking />} />
           <Route path="/menu/wallet" element={<UserWallet />} />
+          <Route path="/menu/withdrawRequest" element={<WithdrawRequest />} />
           <Route
             path="/menu/approveMotorbike"
             element={<ApproveMotorbikeRegistration />}
@@ -115,7 +116,14 @@ function App() {
           <Route path="/menu/profile" element={<Profile />} />
           <Route path="/menu/approveLicense" element={<ApproveLicense />} />
           <Route path="/menu/userData" element={<UserData />} />
-          <Route path="/menu/dashboard" element={<Dashboard />} />
+          <Route
+            path="/menu/dashboardForAdmin"
+            element={<DashboardForAdmin />}
+          />
+          <Route
+            path="/menu/dashboardForLessor"
+            element={<DashboardForLessor />}
+          />
         </Route>
 
         <Route path="/booking" element={<Booking />} />

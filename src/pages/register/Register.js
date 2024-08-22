@@ -1,12 +1,12 @@
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Modal } from "react-bootstrap";
 import apiClient from "../../axiosConfig";
+import { CircularProgress } from "@mui/material";
 
-
-const inputClasses = "w-full text-gray-800 font-semibold text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600"
+const inputClasses =
+  "w-full text-gray-800 font-semibold text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600";
 const Register = ({ show, handleClose, showLogin }) => {
   const [formData, setFormData] = useState({
     firstname: "",
@@ -31,6 +31,7 @@ const Register = ({ show, handleClose, showLogin }) => {
   const navigate = useNavigate();
   const [showPopup, setShowPopup] = useState(false);
   const [showForm, setShowForm] = useState(true);
+  const [progress, setProgress] = useState(false);
 
   useEffect(() => {
     if (show) {
@@ -135,267 +136,282 @@ const Register = ({ show, handleClose, showLogin }) => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setProgress(true);
 
-    if (
-      firstNameError ||
-      lastNameError ||
-      phoneError ||
-      emailError ||
-      repasswordError ||
-      passwordError
-    ) {
-      setError("Please correct the errors before submitting.");
-      setLoading(false);
-      return;
-    }
-
-    for (let key in formData) {
-      if (formData[key] === "") {
-        setError("Please fill all fields before submitting.");
+    try {
+      if (
+        firstNameError ||
+        lastNameError ||
+        phoneError ||
+        emailError ||
+        repasswordError ||
+        passwordError
+      ) {
+        setError("Please correct the errors before submitting.");
         setLoading(false);
         return;
       }
-    }
-    apiClient
-      .post(
-        "/api/auth/signup",
-        formData,
-        {
+  
+      for (let key in formData) {
+        if (formData[key] === "") {
+          setError("Please fill all fields before submitting.");
+          setLoading(false);
+          return;
+        }
+      }
+      await apiClient
+        .post("/api/auth/signup", formData, {
           headers: {
             "Content-Type": "application/json",
           },
-        }
-      )
-
-      .then((response) => {
-        console.log("Data sent successfully:", response.data);
-        setShowPopup(true);
-        setShowForm(false);
-        setTimeout(() => {
-          setShowPopup(false);
-          handleClose();
-          navigate("/homepage");
-        }, 3000);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.log(formData);
-        if (error.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
-          console.error("Error response:", error.response);
-          console.error("Status code:", error.response.status);
-          console.error("Data:", error.response.data);
-
-          if (error.response.status === 404) {
+        })
+  
+        .then((response) => {
+          console.log("Data sent successfully:", response.data);
+          setShowPopup(true);
+          setShowForm(false);
+          setTimeout(() => {
+            setShowPopup(false);
+            handleClose();
+            navigate("/homepage");
+          }, 3000);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.log(formData);
+          if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            console.error("Error response:", error.response);
+            console.error("Status code:", error.response.status);
+            console.error("Data:", error.response.data);
+  
+            if (error.response.status === 404) {
+              setError(
+                "Error 404: Not Found. The requested resource could not be found."
+              );
+            } else if (error.response.status === 409) {
+              const translateErrorMessage = (message) => {
+                switch (message) {
+                  case "Email existed":
+                    return "Email đã tồn tại";
+                  case "Phone existed":
+                    return "Số điện thoại đã tồn tại";
+                  default:
+                    return "Đã xảy ra lỗi. Vui lòng thử lại.";
+                }
+              };
+              const translatedMessage = translateErrorMessage(
+                error.response.data
+              );
+              setError(translatedMessage);
+            } else {
+            }
+          } else if (error.request) {
+            // The request was made but no response was received
+            console.error("Error request:", error.request);
             setError(
-              "Error 404: Not Found. The requested resource could not be found."
+              "No response received. Please check your network connection."
             );
-          } else if (error.response.status === 409) {
-            const translateErrorMessage = (message) => {
-              switch (message) {
-                case "Email existed":
-                  return "Email đã tồn tại";
-                case "Phone existed":
-                  return "Số điện thoại đã tồn tại";
-                default:
-                  return "Đã xảy ra lỗi. Vui lòng thử lại.";
-              }
-            };
-            const translatedMessage = translateErrorMessage(
-              error.response.data
-            );
-            setError(translatedMessage);
-          } else {
           }
-        } else if (error.request) {
-          // The request was made but no response was received
-          console.error("Error request:", error.request);
-          setError(
-            "No response received. Please check your network connection."
-          );
-        }
-        setLoading(false);
-      });
+          setLoading(false);
+        });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setProgress(false);
+    }
   };
 
   return (
     <Modal show={show} onHide={handleClose} centered>
-      <div className="p-8 rounded bg-gray-50 font-manrope">
-        {showForm && (
-          <>
-            <h2 className="text-gray-800 text-center text-2xl font-bold">
-              Đăng ký
-            </h2>
-            <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
-              <div>
-                <label className="text-gray-800 text-sm font-semibold mb-2 block">
-                  Họ
-                </label>
-                <input
-                  name="firstname"
-                  type="text"
-                  required
-                  className={inputClasses}
-                  placeholder="Nhập họ"
-                  value={formData.firstname}
-                  onChange={handleChange}
-                />
-                {firstNameError && (
-                  <div className="text-red-500">{firstNameError}</div>
-                )}
-              </div>
-              <div>
-                <label className="text-gray-800 text-sm font-semibold mb-2 block">
-                  Tên
-                </label>
-                <input
-                  name="lastname"
-                  type="text"
-                  required
-                  className={inputClasses}
-                  placeholder="Nhập tên"
-                  value={formData.lastname}
-                  onChange={handleChange}
-                />
-                {lastNameError && (
-                  <div className="text-red-500">{lastNameError}</div>
-                )}
-              </div>
-              <div>
-                <label className="text-gray-800 text-sm font-semibold mb-2 block">
-                  Số điện thoại
-                </label>
-                <input
-                  name="phone"
-                  type="tel"
-                  required
-                  className={inputClasses}
-                  placeholder="Nhập số điện thoại"
-                  value={formData.phone}
-                  onChange={handleChange}
-                />
-                {phoneError && <div className="text-red-500">{phoneError}</div>}
-              </div>
-              <div>
-                <label className="text-gray-800 text-sm font-semibold mb-2 block">
-                  Email
-                </label>
-                <input
-                  name="email"
-                  type="email"
-                  required
-                  className={inputClasses}
-                  placeholder="Nhập email"
-                  value={formData.email}
-                  onChange={handleChange}
-                />
-                {emailError && <div className="text-red-500">{emailError}</div>}
-              </div>
-              <div>
-                <label className="text-gray-800 text-sm font-semibold mb-2 block">
-                  Giới tính
-                </label>
-                <select
-                  name="gender"
-                  required
-                  className={inputClasses}
-                  value={formData.gender}
-                  onChange={handleChange}
-                >
-                  <option value="">Chọn giới tính</option>
-                  <option value="true">Nam</option>
-                  <option value="false">Nữ</option>
-                </select>
-              </div>
-              <div>
-                <label className="text-gray-800 text-sm font-semibold mb-2 block">
-                  Mật khẩu
-                </label>
-                <input
-                  name="password"
-                  type="password"
-                  required
-                  className={inputClasses}
-                  placeholder="Nhập mật khẩu"
-                  value={formData.password}
-                  onChange={handleChange}
-                />
-                {passwordError && (
-                  <div className="text-red-500">{passwordError}</div>
-                )}
-              </div>
-              <div>
-                <label className="text-gray-800 text-sm font-semibold mb-2 block">
-                  Nhập lại mật khẩu
-                </label>
-                <input
-                  name="repassword"
-                  type="password"
-                  required
-                  className={inputClasses}
-                  placeholder="Nhập lại mật khẩu"
-                  value={repassword}
-                  onChange={handleChange}
-                />
-                {repasswordError && (
-                  <div className="text-red-500">{repasswordError}</div>
-                )}
-              </div>
-              <div className="!mt-8">
-                <button
-                  type="submit"
-                  className="w-full py-3 px-4 text-sm tracking-wide rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none transition hover:scale-105"
-                >
-                  Đăng ký
-                </button>
-              </div>
-              {error && (
-                <div className="text-red-500 font-bold text-center">
-                  {error}
-                </div>
-              )}
-              <p className="text-gray-800 text-sm !mt-8 text-center">
-                Đã có tài khoản?{" "}
-                <button
-                  type="button"
-                  onClick={showLogin}
-                  className="text-green-500 no-underline hover:underline ml-1 whitespace-nowrap font-semibold"
-                >
-                  Đăng nhập tại đây
-                </button>
-              </p>
-            </form>
-          </>
+      <div className="relative">
+        {/* Overlay with CircularProgress */}
+        {progress && (
+          <div className="absolute inset-0 flex justify-center items-center bg-white bg-opacity-75 z-10">
+            <CircularProgress color="inherit" />
+          </div>
         )}
-        {showPopup && (
-          <Modal show={showPopup} onHide={() => setShowPopup(false)} centered>
-            <div className="p-8 rounded bg-gray-50 font-[sans-serif]">
+        <div className="p-8 rounded bg-gray-50 font-manrope">
+          {showForm && (
+            <>
               <h2 className="text-gray-800 text-center text-2xl font-bold">
-                Đăng ký thành công!
+                Đăng ký
               </h2>
-              <p className="text-gray-800 text-sm mt-4 text-center">
-                Hãy kiểm tra Email của bạn để xác thực tài khoản
-              </p>
-              <div className="text-center mt-8">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowPopup(false);
-                    handleClose();
-                  }}
-                  className="py-2 px-4 text-sm tracking-wide rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none"
-                >
-                  OK
-                </button>
+              <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
+                <div>
+                  <label className="text-gray-800 text-sm font-semibold mb-2 block">
+                    Họ
+                  </label>
+                  <input
+                    name="firstname"
+                    type="text"
+                    required
+                    className={inputClasses}
+                    placeholder="Nhập họ"
+                    value={formData.firstname}
+                    onChange={handleChange}
+                  />
+                  {firstNameError && (
+                    <div className="text-red-500">{firstNameError}</div>
+                  )}
+                </div>
+                <div>
+                  <label className="text-gray-800 text-sm font-semibold mb-2 block">
+                    Tên
+                  </label>
+                  <input
+                    name="lastname"
+                    type="text"
+                    required
+                    className={inputClasses}
+                    placeholder="Nhập tên"
+                    value={formData.lastname}
+                    onChange={handleChange}
+                  />
+                  {lastNameError && (
+                    <div className="text-red-500">{lastNameError}</div>
+                  )}
+                </div>
+                <div>
+                  <label className="text-gray-800 text-sm font-semibold mb-2 block">
+                    Số điện thoại
+                  </label>
+                  <input
+                    name="phone"
+                    type="tel"
+                    required
+                    className={inputClasses}
+                    placeholder="Nhập số điện thoại"
+                    value={formData.phone}
+                    onChange={handleChange}
+                  />
+                  {phoneError && (
+                    <div className="text-red-500">{phoneError}</div>
+                  )}
+                </div>
+                <div>
+                  <label className="text-gray-800 text-sm font-semibold mb-2 block">
+                    Email
+                  </label>
+                  <input
+                    name="email"
+                    type="email"
+                    required
+                    className={inputClasses}
+                    placeholder="Nhập email"
+                    value={formData.email}
+                    onChange={handleChange}
+                  />
+                  {emailError && (
+                    <div className="text-red-500">{emailError}</div>
+                  )}
+                </div>
+                <div>
+                  <label className="text-gray-800 text-sm font-semibold mb-2 block">
+                    Giới tính
+                  </label>
+                  <select
+                    name="gender"
+                    required
+                    className={inputClasses}
+                    value={formData.gender}
+                    onChange={handleChange}
+                  >
+                    <option value="">Chọn giới tính</option>
+                    <option value="true">Nam</option>
+                    <option value="false">Nữ</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-gray-800 text-sm font-semibold mb-2 block">
+                    Mật khẩu
+                  </label>
+                  <input
+                    name="password"
+                    type="password"
+                    required
+                    className={inputClasses}
+                    placeholder="Nhập mật khẩu"
+                    value={formData.password}
+                    onChange={handleChange}
+                  />
+                  {passwordError && (
+                    <div className="text-red-500">{passwordError}</div>
+                  )}
+                </div>
+                <div>
+                  <label className="text-gray-800 text-sm font-semibold mb-2 block">
+                    Nhập lại mật khẩu
+                  </label>
+                  <input
+                    name="repassword"
+                    type="password"
+                    required
+                    className={inputClasses}
+                    placeholder="Nhập lại mật khẩu"
+                    value={repassword}
+                    onChange={handleChange}
+                  />
+                  {repasswordError && (
+                    <div className="text-red-500">{repasswordError}</div>
+                  )}
+                </div>
+                <div className="!mt-8">
+                  <button
+                    type="submit"
+                    className="w-full py-3 px-4 text-sm tracking-wide rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none transition hover:scale-105"
+                  >
+                    Đăng ký
+                  </button>
+                </div>
+                {error && (
+                  <div className="text-red-500 font-bold text-center">
+                    {error}
+                  </div>
+                )}
+                <p className="text-gray-800 text-sm !mt-8 text-center">
+                  Đã có tài khoản?{" "}
+                  <button
+                    type="button"
+                    onClick={showLogin}
+                    className="text-green-500 no-underline hover:underline ml-1 whitespace-nowrap font-semibold"
+                  >
+                    Đăng nhập tại đây
+                  </button>
+                </p>
+              </form>
+            </>
+          )}
+          {showPopup && (
+            <Modal show={showPopup} onHide={() => setShowPopup(false)} centered>
+              <div className="p-8 rounded bg-gray-50 font-[sans-serif]">
+                <h2 className="text-gray-800 text-center text-2xl font-bold">
+                  Đăng ký thành công!
+                </h2>
+                <p className="text-gray-800 text-sm mt-4 text-center">
+                  Hãy kiểm tra Email của bạn để xác thực tài khoản
+                </p>
+                <div className="text-center mt-8">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowPopup(false);
+                      handleClose();
+                    }}
+                    className="py-2 px-4 text-sm tracking-wide rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none"
+                  >
+                    OK
+                  </button>
+                </div>
               </div>
-            </div>
-          </Modal>
-        )}
+            </Modal>
+          )}
+        </div>
       </div>
     </Modal>
   );

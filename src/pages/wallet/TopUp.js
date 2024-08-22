@@ -8,7 +8,7 @@ const textClasses = "text-center text-zinc-700 dark:text-zinc-300 mt-2";
 const inputClasses = "w-full p-2 border border-zinc-300 dark:border-zinc-700 rounded-md";
 const buttonContainerClasses = "flex mt-4 border border-zinc-300 dark:border-zinc-700 rounded-md";
 const buttonClasses = "w-1/2 p-2 border-r border-zinc-300 dark:border-zinc-700 transition hover:scale-105";
-const buttonLastClasses = "w-1/2 p-2 transition hover:scale-105";
+const buttonLastClasses = "w-full p-2 transition hover:scale-105";
 
 const TopUp = ({ onClose, onConfirm, setError }) => {
   const [amount, setAmount] = useState("");
@@ -62,7 +62,7 @@ const TopUp = ({ onClose, onConfirm, setError }) => {
 
   return (
     <div className={containerClasses}>
-      <h2 className={titleClasses}>Nạp tiền</h2>
+      {/* <h2 className={titleClasses}>Nạp tiền</h2> */}
       <p className={textClasses}>
         Hãy nhập số tiền bạn muốn nạp.
       </p>
@@ -77,12 +77,12 @@ const TopUp = ({ onClose, onConfirm, setError }) => {
       </div>
       {localError && <div className="text-red-500 mt-2">{localError}</div>}
       <div className={buttonContainerClasses}>
-        <button
+        {/* <button
           className={`${buttonClasses} hover:bg-red-500 text-zinc-700 dark:text-zinc-300`}
           onClick={onClose}
         >
           Hủy
-        </button>
+        </button> */}
         <button
           className={`${buttonLastClasses} hover:bg-green-500 text-blue-600 dark:text-blue-400`}
           onClick={handleConfirm}
