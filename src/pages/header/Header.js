@@ -40,7 +40,7 @@ const Header = () => {
     setIsLoggedIn(!!token);
   }, [location]);
   const roles = localStorage.getItem("roles");
-  const admin = roles.includes("ADMIN");
+  const admin = roles && roles.includes("ADMIN");
 
   const handleAccount = () => {
     navigate("/menu/profile");
