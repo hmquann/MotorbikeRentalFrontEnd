@@ -39,20 +39,25 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
     delivery: '',
     freeShipLimit: '',
     deliveryFee: '',
-    constraintMotorbike: ''
+    constraintMotorbike: '',
+    motorbikeAddress:'',
+    longitude:'',
+    latitude:''
   });
 
   useEffect(() => {
     if (motorbike) {
-      setUpdateForm({
+      setUpdateForm(prevForm => ({
+        ...prevForm,
         price: motorbike.price,
         overtimeFee: motorbike.overtimeFee,
         overtimeLimit: motorbike.overtimeLimit,
         delivery: motorbike.delivery,
         freeShipLimit: motorbike.freeShipLimit,
         deliveryFee: motorbike.deliveryFee,
-        constraintMotorbike: motorbike.constraintMotorbike
-      });
+        constraintMotorbike: motorbike.constraintMotorbike,
+        motorbikeAddress: motorbike.motorbikeAddress
+      }));
     }
   }, [motorbike]);
 
@@ -65,14 +70,52 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
     });
   };
 
-  const handleSubmit = async () => {
+  useEffect(() => {
+    if (updateForm.longitude && updateForm.latitude) {
+      submitUpdatedForm();
+    }
+  }, [updateForm.longitude, updateForm.latitude]);
+  
+  const submitUpdatedForm = async () => {
     try {
       const response = await apiClient.post(`/api/motorbike/updateMotorbike/${motorbike.id}`, updateForm);
       console.log('Data sent successfully', response.data);
-      // You can handle success actions here
+      onClose();
     } catch (error) {
       console.error('Error sending data', error);
-      // You can handle error actions here
+    }
+  };
+  
+  const handleSubmit = async () => {
+    if (motorbike.motorbikeAddress !== updateForm.motorbikeAddress) {
+      try {
+        const response = await axios.get(
+          `https://api.mapbox.com/search/geocode/v6/forward?q=${encodeURIComponent(
+            updateForm.motorbikeAddress
+          )}&access_token=pk.eyJ1Ijoibmd1eWVua2llbjAyIiwiYSI6ImNseDNpem83bjByM3cyaXF4NTZqOWFhZWIifQ.pVT0I74tSdI290kImTlphQ`
+        );
+  
+        if (
+          response.status === 200 &&
+          response.data &&
+          response.data.features.length > 0
+        ) {
+          const coordinates = response.data.features[0].geometry.coordinates;
+          console.log(coordinates);
+  
+          setUpdateForm((prevForm) => ({
+            ...prevForm,
+            longitude: coordinates[0],
+            latitude: coordinates[1],
+          }));
+        } else {
+          console.error("Error: Invalid response status or data.");
+        }
+      } catch (error) {
+        console.error("Error making Axios request:", error);
+      }
+    } else {
+      submitUpdatedForm(); // Nếu không cần cập nhật tọa độ, gửi form ngay lập tức
     }
   };
 
@@ -226,8 +269,9 @@ const MotorbikeDetails = ({ motorbike, onClose }) => {
                 id="motorbikeAddress"
                 name="motorbikeAddress"
                 placeholder="Enter motorbike address"
-                value={motorbike.motorbikeAddress}
-                readOnly
+                value={updateForm.motorbikeAddress}
+                readOnly={!isUpdate}
+                onChange={handleChange}
                 rows={3}
               />
             </FloatingLabel>
