@@ -154,7 +154,7 @@ const MotorbikeList = ({ listMotor, showDistance, searchLongitude, searchLatitud
                             {motorbike.delivery ? "Giao xe tận nơi" : ""}
                           </button>
                         </div>
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{motorbike.model.modelName}</h3>
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{motorbike.model.modelName+" "+motorbike.yearOfManufacture}</h3>
                         <div className="text-gray-500 text-xs">
                           <FontAwesomeIcon icon={faLocationDot} className='mr-2' />
                           <span className="">{motorbike.motorbikeAddress?displayAddress(motorbike.motorbikeAddress):" "}</span>
