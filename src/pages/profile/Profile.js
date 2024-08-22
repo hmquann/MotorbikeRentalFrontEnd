@@ -88,9 +88,9 @@ const Profile = () => {
           <div className="ml-6 flex flex-col justify-center">
             <div className={`text-lg font-semibold ${textClasses}`}>
               {(!user.gender ? "Anh " : "Chị ") +
-                user.lastName +
+                user.firstName +
                 " " +
-                user.firstName}
+                user.lastName}
             </div>
           </div>
           <div className="flex-shrink-0 text-center ml-auto">

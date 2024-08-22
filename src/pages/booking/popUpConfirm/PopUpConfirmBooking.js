@@ -32,6 +32,9 @@ const PopUpConfirmBooking = ({
                   motorbikeDetails.yearOfManufacture}
               </strong>
             </p>
+            <p className="mb-1">
+              <strong>Biển số: </strong> {motorbikeDetails.motorbikePlate}
+            </p>
             <p className="mb-2">
               <strong>Ngày giờ bắt đầu:</strong>{" "}
               {dayjs(bookingDetails.startDate).format("HH:mm, DD/MM/YYYY ")}

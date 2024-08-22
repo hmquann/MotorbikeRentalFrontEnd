@@ -45,9 +45,9 @@ const UserWallet = () => {
     const token = localStorage.getItem("token");
 
     if (token) {
-      setUserRole(roles || "");  
+      setUserRole(roles || "");
     }
-  },[] );
+  }, []);
 
   const isAdmin = userRole && userRole.includes("ADMIN");
 
@@ -150,16 +150,20 @@ const UserWallet = () => {
       const now = new Date();
       const admin = await apiClient.get("api/user/getAdmin");
       const adminId = admin.data.id;
-      await setDoc(doc(collection(db, "notifications")), {
-        userId: adminId,
-        message: JSON.stringify({
-          title:
-            '<strong style="color: rgb(34 197 94)">Yêu cầu rút tiền</strong>',
-          content: `Yêu cầu rút số tiền <strong>${amount.toLocaleString()}</strong> từ tài khoản <strong>${user.firstName} ${user.lastName}</strong> vừa được gửi.`,
-        }),
-        timestamp: now,
-        seen: false,
-      });
+      if (!isAdmin) {
+        await setDoc(doc(collection(db, "notifications")), {
+          userId: adminId,
+          message: JSON.stringify({
+            title:
+              '<strong style="color: rgb(34 197 94)">Yêu cầu rút tiền</strong>',
+            content: `Yêu cầu rút số tiền <strong>${amount.toLocaleString()}</strong> từ tài khoản <strong>${
+              user.firstName
+            } ${user.lastName}</strong> vừa được gửi.`,
+          }),
+          timestamp: now,
+          seen: false,
+        });
+      }
       fetchTransactions();
       await fetchUserBalance();
       setShowPopupSuccess(true);
@@ -308,7 +312,11 @@ const UserWallet = () => {
         <PopupSuccess
           show={showPopupSuccess}
           onHide={handlePopUpSuccess}
-          message={isAdmin ? "Bạn đã rút tiền thành công!" : "Bạn đã gửi yêu cầu rút tiền thành công!"}
+          message={
+            isAdmin
+              ? "Bạn đã rút tiền thành công!"
+              : "Bạn đã gửi yêu cầu rút tiền thành công!"
+          }
         />
       )}
 

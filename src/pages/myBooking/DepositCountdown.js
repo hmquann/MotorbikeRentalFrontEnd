@@ -38,9 +38,11 @@ const DepositCountdown = ({ bookingId, onOneHourLeft, onTimeExpired }) => {
       const depositDate = new Date(depositTime);
       const expirationTime = new Date(
         depositDate.getTime() + 6 * 60 * 60 * 1000
-        //depositDate.getTime() + 1 * 60 * 1000
+        //depositDate.getTime() + 5 * 60 * 1000
       );
-
+      // 5' đếm ngược
+      // 2' là thông báo
+      // hết giờ là hủy chuyến
       const updateCountdown = () => {
         const now = new Date();
         const timeDiff = expirationTime - now;
@@ -53,6 +55,7 @@ const DepositCountdown = ({ bookingId, onOneHourLeft, onTimeExpired }) => {
           const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
           setTimeRemaining({ hours, minutes, seconds });
 
+          //if (minutes < 2 && depositNoti) {
           if (hours < 1 && depositNoti) {
             onOneHourLeft();
             setDepositNoti(false);
