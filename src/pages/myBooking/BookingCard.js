@@ -239,6 +239,24 @@ const BookingCard = ({ booking }) => {
       const url = `/api/booking/changeStatus/${booking.bookingId}/${newStatus}`;
       await apiClient.put(url);
 
+      const adminData1 = await apiClient.get("api/user/getAdmin");
+      const adminData1Id = adminData1.data.id;
+      const amountForLessor = (booking.totalPrice * 50) / 100;
+      const refundMoneyUrlForLessor = `/api/payment/refund`;
+      const refundForLessor = await apiClient.post(
+        refundMoneyUrlForLessor,
+        null,
+        {
+          params: {
+            senderId: adminData1Id,
+            receiverId: lessorId,
+            amount: amountForLessor,
+            motorbikeName: motorbikeName,
+            motorbikePlate: motorbikePlate,
+          },
+        }
+      );
+
       if (renter && renter.emailNoti) {
         const responsea = await apiClient.post(
           "/api/booking/sendEmailCancelBooking",
@@ -579,8 +597,8 @@ const BookingCard = ({ booking }) => {
           const adminId = admin.data.id;
           const subtractMoneyUrlDone = `/api/payment/subtract`;
           const refundMoneyUrlDone = `/api/payment/refund`;
-          const amountDone = (booking.totalPrice * 35) / 100 ;
-          const amountDeposit = (booking.totalPrice * 50) / 100 ;
+          const amountDone = (booking.totalPrice * 35) / 100;
+          const amountDeposit = (booking.totalPrice * 50) / 100;
           await apiClient.post(subtractMoneyUrlDone, null, {
             params: {
               senderId: adminId,
@@ -599,7 +617,7 @@ const BookingCard = ({ booking }) => {
               motorbikePlate: motorbikePlate,
             },
           });
-          
+
           if (systemNoti) {
             await setDoc(doc(collection(db, "notifications")), {
               userId: userId,

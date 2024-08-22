@@ -64,14 +64,15 @@ const License = () => {
   const [previewImage, setPreviewImage] = useState();
   const [license, setLicense] = useState();
   const [error, setError] = useState("");
-  const[sizeImageError,setSizeImageError]=useState("");
+  const [sizeImageError, setSizeImageError] = useState("");
   const [licenseNumberError, setLicenseNumberError] = useState("");
   const [birthDateError, setBirthOfDateError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPopupSuccess, setShowPopupSuccess] = useState(false);
 
-  const[sizeNotification,setSizeNotification]=useState("Dung lượng ảnh tải lên dưới 2 MB");
-
+  const [sizeNotification, setSizeNotification] = useState(
+    "Dung lượng ảnh tải lên dưới 2 MB"
+  );
 
   const userDataString = localStorage.getItem("user");
   const userData = JSON.parse(userDataString);
@@ -91,10 +92,10 @@ const License = () => {
       .catch((error) => console.error("Error fetching motorbikes:", error));
   }, []);
   const [formLicenseData, setFormLicenseData] = useState({
-    licenseNumber: license?license.licenseNumber:"",
-    birthOfDate: license?license.birthOfDate:"",
-    licenseImageFile: license?license.licenseImageFile:"",
-    licenseType: license?license.licenseType:"",
+    licenseNumber: license ? license.licenseNumber : "",
+    birthOfDate: license ? license.birthOfDate : "",
+    licenseImageFile: license ? license.licenseImageFile : "",
+    licenseType: license ? license.licenseType : "",
   });
   const handleSubmit = async () => {
     if (
@@ -105,26 +106,31 @@ const License = () => {
       !formLicenseData.licenseNumber
     ) {
       setError("Hãy kiểm tra thông tin bạn nhập vào");
-    }
-    else {
-    setLoading(true);
-    const now = new Date();
-    const admin = await apiClient.get("api/user/getAdmin");
-    const adminId = admin.data.id;
-    const adminSystemNoti = admin.data.systemNoti;
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    try {
-      const formData = new FormData();
-      formData.append("licenseNumber", formLicenseData.licenseNumber);
-      formData.append("birthOfDate", formLicenseData.birthOfDate);
-      formData.append("licenseImageFile", formLicenseData.licenseImageFile);
-      formData.append("licenseType", formLicenseData.licenseType); 
+    } else {
+      setLoading(true);
+      const now = new Date();
+      const admin = await apiClient.get("api/user/getAdmin");
+      const adminId = admin.data.id;
+      const adminSystemNoti = admin.data.systemNoti;
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      try {
+        const formData = new FormData();
+        formData.append("licenseNumber", formLicenseData.licenseNumber);
+        formData.append("birthOfDate", formLicenseData.birthOfDate);
+        formData.append("licenseImageFile", formLicenseData.licenseImageFile);
+        formData.append("licenseType", formLicenseData.licenseType);
         apiClient
-          .post(license?"/api/license/updateLicense":"/api/license/uploadLicense", formData, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          })
+          .post(
+            license
+              ? "/api/license/updateLicense"
+              : "/api/license/uploadLicense",
+            formData,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          )
           .then((response) => {
             console.log("Data sent successfully:", response.data);
             setChangeLicense(false);
@@ -161,40 +167,40 @@ const License = () => {
             setChangeLicense(false);
           });
 
-      if (adminSystemNoti) {
-        await setDoc(doc(collection(db, "notifications")), {
-          userId: adminId,
-          message: JSON.stringify({
-            title:
-              '<strong style="color: rgb(90 92 95)">Kiểm duyệt GPLX</strong>',
-            content: `Người dùng <strong>${userName}</strong>  đã gửi yêu cầu phê duyệt GPLX.`,
-          }),
-          timestamp: now,
-          seen: false,
-        });
-      }
+        if (adminSystemNoti) {
+          await setDoc(doc(collection(db, "notifications")), {
+            userId: adminId,
+            message: JSON.stringify({
+              title:
+                '<strong style="color: rgb(90 92 95)">Kiểm duyệt GPLX</strong>',
+              content: `Người dùng <strong>${userName}</strong>  đã gửi yêu cầu phê duyệt GPLX.`,
+            }),
+            timestamp: now,
+            seen: false,
+          });
+        }
 
-      // Send notification to lessor if required
-      if (systemNoti) {
-        await setDoc(doc(collection(db, "notifications")), {
-          userId: userId,
-          message: JSON.stringify({
-            title:
-              '<strong style="color: rgb(90 92 95)">Kiểm duyệt GPLX</strong>',
-            content: `Bạn đã gửi yêu cầu phê duyệt <strong>GPLX</strong> thành công.`,
-          }),
-          timestamp: now,
-          seen: false,
-        });
+        // Send notification to lessor if required
+        if (systemNoti) {
+          await setDoc(doc(collection(db, "notifications")), {
+            userId: userId,
+            message: JSON.stringify({
+              title:
+                '<strong style="color: rgb(90 92 95)">Kiểm duyệt GPLX</strong>',
+              content: `Bạn đã gửi yêu cầu phê duyệt <strong>GPLX</strong> thành công.`,
+            }),
+            timestamp: now,
+            seen: false,
+          });
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+        setShowPopupSuccess(true);
       }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-      setShowPopupSuccess(true);
     }
   };
-}
 
   const handlePopUpSuccess = () => {
     setShowPopupSuccess(false);
@@ -208,21 +214,20 @@ const License = () => {
       const fileSizeMB = file.size / 1024 / 1024;
 
       if (fileSizeMB > 2) {
-        setSizeImageError('Tệp quá lớn. Kích thước tối đa là 2MB.');
-      } 
-      else{
-        setSizeImageError('');
-        setSizeNotification('')
-      reader.onloadend = () => {
-        setFormLicenseData((prevState) => ({
-          ...prevState,
-          licenseImageFile: file,
-        }));
-        setPreviewImage(reader.result);
-      };
-      reader.readAsDataURL(file);
+        setSizeImageError("Tệp quá lớn. Kích thước tối đa là 2MB.");
+      } else {
+        setSizeImageError("");
+        setSizeNotification("");
+        reader.onloadend = () => {
+          setFormLicenseData((prevState) => ({
+            ...prevState,
+            licenseImageFile: file,
+          }));
+          setPreviewImage(reader.result);
+        };
+        reader.readAsDataURL(file);
+      }
     }
-  }
   };
 
   const handleChangeLicense = () => {
@@ -337,8 +342,18 @@ const License = () => {
                       className={sharedClasses.imagePreview}
                     />
                   )}
-                  {changeLicense?sizeImageError?"":<p style={{ color: 'red' }}>{sizeNotification}</p>:""}
-                  {sizeImageError && <p style={{ color: 'red' }}>{sizeImageError}</p>}
+                  {changeLicense ? (
+                    sizeImageError ? (
+                      ""
+                    ) : (
+                      <p style={{ color: "red" }}>{sizeNotification}</p>
+                    )
+                  ) : (
+                    ""
+                  )}
+                  {sizeImageError && (
+                    <p style={{ color: "red" }}>{sizeImageError}</p>
+                  )}
                 </>
               ) : (
                 <img
@@ -413,8 +428,8 @@ const License = () => {
                       className={sharedClasses.content}
                     >
                       <option value="">Chọn loại bằng lái xe</option>
-                      <option value="A">A</option>
                       <option value="A1">A1</option>
+                      <option value="A2">A2</option>
                     </select>
                   ) : (
                     <div>
@@ -427,9 +442,7 @@ const License = () => {
 
                 <div>
                   <label className={sharedClasses.label}>Họ và tên</label>
-                  <div className={sharedClasses.content}>
-                    {fullName}
-                  </div>
+                  <div className={sharedClasses.content}>{fullName}</div>
                 </div>
               </div>
               {error && <div className="text-red-500">{error}</div>}
@@ -447,7 +460,7 @@ const License = () => {
                       onClick={handleSubmit}
                       className=" py-3 px-5 mr-3 text-sm w-full tracking-wide rounded-lg text-white bg-green-500 hover:bg-green-600 transition hover:scale-110"
                     >
-                     {license?"Chỉnh sửa":"Đăng ký"} 
+                      {license ? "Chỉnh sửa" : "Đăng ký"}
                     </button>
                     <button
                       onClick={() => {
@@ -468,7 +481,7 @@ const License = () => {
               show={showPopupSuccess}
               onHide={handlePopUpSuccess}
               message="Bạn đã cập nhật thành công GPLX.
-              Vui lòng đợi hệ thống duyệt hoặc liên hệ hotline: 1900-1009 !"
+              Vui lòng đợi hệ thống duyệt hoặc liên hệ qua motorrentalservice@gmail.com !"
             />
           )}
         </div>

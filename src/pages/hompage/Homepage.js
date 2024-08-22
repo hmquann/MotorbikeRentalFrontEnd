@@ -71,7 +71,7 @@ const Homepage = () => {
       </div>
       <Benefit />
       <Construction />
-      <MotorRentalAd />
+      <MotorRentalAd />;
       <Box mt={8} px={12} mb={10}>
         <Typography variant="h4" className="text-center font-manrope mb-4">
           MiMotor Blogs
@@ -79,20 +79,29 @@ const Homepage = () => {
         <Swiper
           modules={[Navigation, Autoplay]}
           spaceBetween={30}
-          slidesPerView={3}
+          slidesPerView={3} // Số lượng slide hiển thị mặc định
+          breakpoints={{
+            640: { slidesPerView: 1, spaceBetween: 10 }, // Khi màn hình nhỏ hơn 640px, hiển thị 1 slide
+            768: { slidesPerView: 2, spaceBetween: 20 }, // Khi màn hình nhỏ hơn 768px, hiển thị 2 slide
+            1024: { slidesPerView: 3, spaceBetween: 30 }, // Khi màn hình lớn hơn 1024px, hiển thị 3 slide
+          }}
           navigation={{
             nextEl: ".swiper-button-next",
             prevEl: ".swiper-button-prev",
           }}
-          autoplay={{ delay: 7000 }}
+          autoplay={{ delay: 7000, disableOnInteraction: false }}
           loop
         >
           {blogs.map((blog) => (
             <SwiperSlide key={blog.id}>
               <Card
                 onClick={() => goToBlogDetail(blog.id)}
-                className="cursor-pointer flex flex-col items-center justify-center p-4    hover:shadow-xl transition-shadow duration-300 ease-in-out"
-                style={{ height: "100%", width: "100%" }} // Điều chỉnh chiều cao cố định
+                className="cursor-pointer flex flex-col items-center justify-center p-4 transition-shadow duration-300 ease-in-out"
+                style={{
+                  height: "100%",
+                  width: "100%",
+                  border: "1px solid rgba(0, 0, 0, 0.1)",
+                }}
               >
                 {extractFirstImage(blog.content) ? (
                   <CardMedia
@@ -100,7 +109,7 @@ const Homepage = () => {
                     image={extractFirstImage(blog.content)}
                     alt={blog.title}
                     className="w-full h-48 object-cover mb-4"
-                    style={{ height: "250px" }} // Cố định chiều cao ảnh
+                    style={{ height: "250px" }}
                   />
                 ) : (
                   <div className="w-full h-48 flex items-center justify-center bg-gray-200 mb-4 rounded-lg">
@@ -118,7 +127,9 @@ const Homepage = () => {
                     component="h2"
                     className="text-justify"
                   >
-                    {blog.title}
+                    {blog.title.length > 75
+                      ? `${blog.title.slice(0, 75)}...`
+                      : blog.title}
                   </Typography>
                 </CardContent>
               </Card>

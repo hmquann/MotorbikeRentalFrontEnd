@@ -1,5 +1,5 @@
 import React from "react";
-
+import logo from "../../assets/images/Logo.png";
 const Footer = () => {
   return (
     <footer className="p-6 bg-white font-manrope border-t border-t-gray-200 dark:bg-neutral-900">
@@ -8,11 +8,7 @@ const Footer = () => {
           {/* Logo và Tên MiMotor */}
           <div className="mb-6 md:mb-0">
             <div className="flex items-center">
-              <img
-                className="w-32 h-auto mr-4"
-                src="/image/logo.png"
-                alt="Logo"
-              />
+              <img className="w-32 h-auto mr-4" src={logo} alt="Logo" />
               <span className="text-4xl font-bold text-black dark:text-white">
                 MiMotor
               </span>
@@ -25,7 +21,7 @@ const Footer = () => {
                 Tổng đài hỗ trợ: 7AM - 10PM
               </p>
               <p className="text-lg text-black dark:text-white">
-                contact@mimotor.vn
+                motorrentalservice@gmail.com
               </p>
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Gửi mail cho MiMotor
@@ -133,7 +129,10 @@ const Footer = () => {
             . All Rights Reserved.
           </span>
           <div className="flex mt-4 space-x-6">
-            <a href="#" className="text-gray-500 hover:text-gray-900 dark:hover:text-white">
+            <a
+              href="#"
+              className="text-gray-500 hover:text-gray-900 dark:hover:text-white"
+            >
               <svg
                 className="w-5 h-5"
                 fill="currentColor"
@@ -143,7 +142,10 @@ const Footer = () => {
                 {/* Biểu tượng mạng xã hội 1 */}
               </svg>
             </a>
-            <a href="#" className="text-gray-500 hover:text-gray-900 dark:hover:text-white">
+            <a
+              href="#"
+              className="text-gray-500 hover:text-gray-900 dark:hover:text-white"
+            >
               <svg
                 className="w-5 h-5"
                 fill="currentColor"
@@ -153,7 +155,10 @@ const Footer = () => {
                 {/* Biểu tượng mạng xã hội 2 */}
               </svg>
             </a>
-            <a href="#" className="text-gray-500 hover:text-gray-900 dark:hover:text-white">
+            <a
+              href="#"
+              className="text-gray-500 hover:text-gray-900 dark:hover:text-white"
+            >
               <svg
                 className="w-5 h-5"
                 fill="currentColor"

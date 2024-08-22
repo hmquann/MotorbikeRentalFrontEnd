@@ -1,5 +1,5 @@
 import { faCircleExclamation } from "@fortawesome/free-solid-svg-icons";
-import { faCircle } from '@fortawesome/free-regular-svg-icons'; 
+import { faCircle } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import { useNavigate } from "react-router-dom";
@@ -30,9 +30,9 @@ const PopUpLicense = ({
   console.log(buttonLicense);
 
   return (
-    <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-50">
+    <div className="fixed top-0 left-0 z-50 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-50">
       <div
-        className="popup-location-form bg-white rounded-lg p-8 shadow-lg mb-4"
+        className="relative popup-location-form bg-white rounded-lg p-8 shadow-lg mb-4"
         style={{
           display: "flex",
           flexDirection: "column",
@@ -40,6 +40,12 @@ const PopUpLicense = ({
           border: "1px solid #ccc",
         }}
       >
+        <button
+          onClick={onClose}
+          className="absolute top-2 right-5 text-zinc-500 text-4xl hover:text-zinc-700 dark:hover:text-zinc-300"
+        >
+          &times;
+        </button>
         <FontAwesomeIcon
           icon={faCircleExclamation}
           style={{ color: "red", fontSize: "48px", marginBottom: "16px" }}

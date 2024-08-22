@@ -451,12 +451,12 @@ const Booking = () => {
       } else {
         // Kiểm tra xem giấy phép lái xe có hợp lệ hay không
         if (
-          response1.data.licenseType === "A" &&
-          receiveData.model.cylinderCapacity > 150
+          response1.data.licenseType === "A1" &&
+          receiveData.model.cylinderCapacity >= 175
         ) {
           setShowPopUpLicense(true);
           setMessageLicense(
-            "Xe này yêu cầu bằng A1. Bạn vui lòng cập nhật GPLX để có thể đặt xe."
+            "Xe này yêu cầu bằng A2. Bạn vui lòng cập nhật GPLX để có thể đặt xe."
           );
           setButtonLicense("Cập nhật");
         } else {
@@ -745,6 +745,9 @@ const Booking = () => {
                         " " +
                         receiveData.yearOfManufacture}
                     </h1>
+                    <h6 className="font-light text-xl md:text-xl">
+                      {"Biển số: " + receiveData.motorbikePlate}
+                    </h6>
                     <div className="flex items-center flex-wrap">
                       <FontAwesomeIcon icon={faMotorcycle} />
                       <span className="ml-2">
