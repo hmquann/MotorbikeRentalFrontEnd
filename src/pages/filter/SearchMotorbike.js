@@ -152,6 +152,13 @@ const SearchMotorbike = () => {
     setOpenMapBoxSearch(false);
   };
 
+  const convertFromUTC = (utcDate) => {
+    const date = new Date(utcDate);
+    return new Date(date.getTime() + date.getTimezoneOffset() * 60000);
+  };
+  const startDate = convertFromUTC(rentalStartTime);
+  const endDate = convertFromUTC(rentalEndTime);
+
   return (
     <div  className="bg-white relative pt-4 px-3 rounded-2xl mx-auto bottom-16 shadow-md max-w-full lg:max-w-5xl">
       <div className="flex flex-col md:flex-row justify-evenly">
@@ -292,8 +299,8 @@ const SearchMotorbike = () => {
             <div onClick={() => setSchedulePopUp(true)}>
             <div className="flex items-center ml-10 font-bold cursor-pointer">
               <span className="text-black dark:text-white">
-                {format(rentalStartTime, "HH:mm, dd/MM/yyyy")} -{" "}
-                {format(rentalEndTime, "HH:mm, dd/MM/yyyy")}
+                {format(startDate, "HH:mm, dd/MM/yyyy")} -{" "}
+                {format(endDate, "HH:mm, dd/MM/yyyy")}
               </span>
             </div>
           </div>

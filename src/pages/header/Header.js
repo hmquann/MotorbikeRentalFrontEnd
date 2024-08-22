@@ -43,6 +43,7 @@ const Header = () => {
   const roles = localStorage.getItem("roles");
   const admin = roles ? roles.includes("ADMIN") : false;
 
+
   const handleAccount = () => {
     navigate("/menu/profile");
     setIsMenuOpen(false);

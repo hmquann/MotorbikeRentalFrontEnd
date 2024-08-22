@@ -147,7 +147,7 @@ const BlogEditor = ({ onSave }) => {
         />
       </EditorWrapper>
       {contentError && <ErrorText>{contentError}</ErrorText>}
-      <SaveButton onClick={handleSave}>Lưu Blogs</SaveButton>
+      <SaveButton onClick={handleSave}>Lưu Blog</SaveButton>
     </BlogEditorWrapper>
   );
 };

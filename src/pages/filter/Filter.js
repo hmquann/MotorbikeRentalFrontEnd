@@ -564,6 +564,12 @@ const Filter = () => {
     setAddress(location.place_name);
     setOpenMapBoxSearch(false);
   };
+  const convertFromUTC = (utcDate) => {
+    const date = new Date(utcDate);
+    return new Date(date.getTime() + date.getTimezoneOffset() * 60000);
+  };
+  const startDate = convertFromUTC(filterList.startDate);
+  const endDate = convertFromUTC(filterList.endDate);
   return (
     <div className="bg-zinc-100 mx-auto w-full font-manrope">
       <div className="w-full top-20 bg-white cursor-pointer border-t border-t-zinc-300">
@@ -687,16 +693,10 @@ const Filter = () => {
                   </svg>
                 </div>
                 <span>
-                  {filterList.startDate && filterList.endDate
-                    ? `${format(
-                        new Date(filterList.startDate),
-                        "HH:mm, dd/MM/yyyy"
-                      )} - ${format(
-                        new Date(filterList.endDate),
-                        "HH:mm, dd/MM/yyyy"
-                      )}`
-                    : "Thời gian không hợp lệ"}
-                </span>
+              {startDate && endDate
+                  ? `${format(startDate, "HH:mm, dd/MM/yyyy")} - ${format(endDate, "HH:mm, dd/MM/yyyy")}`
+                   : "Thời gian không hợp lệ"}
+             </span>
               </div>
             </div>
           </div>

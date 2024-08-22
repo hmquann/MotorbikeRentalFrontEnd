@@ -349,12 +349,8 @@ const handleSubmit = async (e) => {
       setManufactureYearError("Hãy điền năm sản xuất");
       return
   }
-
   // Kiểm tra xem có lỗi nào không
-  if (motorbikePlateError || motorbikeModelError || motorbikeBrandError || manufactureYearError) {
-      setError("Thông tin xe không đầy đủ hoặc không hợp lệ");
-      return;
-  }
+
   setLoading(true);
   navigate("/registermotorbike/step2", { state: { formData, modelName } });
 };
