@@ -38,14 +38,14 @@ const DashboardForAdmin = () => {
         setLocationPercentage(locationPercentageResponse.data);
 
         // Dummy data cho top models (dữ liệu mẫu)
-        const dummyTopModels = [
-          { modelName: "SH350i", bookingCount: 50 },
-          { modelName: "Wave", bookingCount: 30 },
-          { modelName: "Vision", bookingCount: 60 },
-          { modelName: "AirBlade", bookingCount: 20 },
-          { modelName: "Vespa", bookingCount: 80 },
-        ];
-        setTopModels(dummyTopModels);
+        // const dummyTopModels = [
+        //   { modelName: "SH350i", bookingCount: 50 },
+        //   { modelName: "Wave", bookingCount: 30 },
+        //   { modelName: "Vision", bookingCount: 60 },
+        //   { modelName: "AirBlade", bookingCount: 20 },
+        //   { modelName: "Vespa", bookingCount: 80 },
+        // ];
+        // setTopModels(dummyTopModels);
       } catch (error) {
         console.error("Error fetching data:", error);
       }

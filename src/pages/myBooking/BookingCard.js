@@ -393,7 +393,7 @@ const BookingCard = ({ booking }) => {
 
     const response = await apiClient.get(`/api/user/${userId}`);
     console.log(response);
-    const depositMoney = (booking.totalPrice * 30) / 100;
+    const depositMoney = (booking.totalPrice * 50) / 100;
     if (response.data.balance < depositMoney) {
       setShowPopupWallet(true);
       setBackWallet(true);
@@ -692,6 +692,21 @@ const BookingCard = ({ booking }) => {
             console.log(showPopupWallet);
             return;
           }
+          const adminForDepositRenter = await apiClient.get(
+            "api/user/getAdmin"
+          );
+          const adminIdForDepositRenter = adminForDepositRenter.data.id;
+          const subtractMoneyUrlForDepositRenter = `/api/payment/subtract`;
+          const amountDepositForDepositRenter = (booking.totalPrice * 50) / 100;
+          await apiClient.post(subtractMoneyUrlForDepositRenter, null, {
+            params: {
+              senderId: userId,
+              receiverId: adminIdForDepositRenter,
+              amount: amountDepositForDepositRenter,
+              motorbikeName: motorbikeName,
+              motorbikePlate: motorbikePlate,
+            },
+          });
           await apiClient.put(url);
           const changeNoti = await apiClient.post(
             `/api/booking/changeDepositNotification/${booking.bookingId}`
@@ -699,9 +714,6 @@ const BookingCard = ({ booking }) => {
           const changeCanceled = await apiClient.post(
             `/api/booking/changeDepositCanceled/${booking.bookingId}`
           );
-
-          console.log(renterName);
-          console.log(lessorId);
 
           await setDoc(doc(collection(db, "notifications")), {
             userId: userId,
@@ -766,22 +778,6 @@ const BookingCard = ({ booking }) => {
             console.log(response5);
           }
 
-          const adminData = await apiClient.get("api/user/getAdmin");
-          const adminDataId = adminData.data.id;
-          const renterId = userData.userId; // Replace with actual user ID if different
-          const amount = (booking.totalPrice * 50) / 100; // Replace with actual amount to be subtracted
-          const subtractMoneyUrl = `/api/payment/subtract`;
-          const addMoneyUrl = `/api/payment/add`;
-          const subtract = await apiClient.post(subtractMoneyUrl, null, {
-            params: {
-              senderId: renterId,
-              receiverId: adminDataId,
-              amount: amount,
-              motorbikeName: motorbikeName,
-              motorbikePlate: motorbikePlate,
-            },
-          });
-          console.log(subtract);
           // await apiClient.post(addMoneyUrl, null, {
           //   params: { id: lessorId, amount: amount, motorbikeName : motorbikeName, motorbikePlate : motorbikePlate },
           // });

@@ -158,7 +158,7 @@ const MotorbikeList = ({ listMotor, showDistance, searchLongitude, searchLatitud
                         <div className="text-gray-500 text-xs">
                           <FontAwesomeIcon icon={faLocationDot} className='mr-2' />
                           <span className="">{motorbike.motorbikeAddress?displayAddress(motorbike.motorbikeAddress):" "}</span>
-                          <span className="float-right">~{fixedNumber(distanceList[index+1])} km</span>
+                          <span className="float-right">{fixedNumber(distanceList[index + 1]) !== 0 && `~${fixedNumber(distanceList[index + 1])} km`}</span>
                         </div>
                         <hr />
                         <div className='flex justify-between text-sm'>
