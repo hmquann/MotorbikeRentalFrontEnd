@@ -154,11 +154,11 @@ const MotorbikeList = ({ listMotor, showDistance, searchLongitude, searchLatitud
                             {motorbike.delivery ? "Giao xe tận nơi" : ""}
                           </button>
                         </div>
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{motorbike.model.modelName}</h3>
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{motorbike.model.modelName+" "+motorbike.yearOfManufacture}</h3>
                         <div className="text-gray-500 text-xs">
                           <FontAwesomeIcon icon={faLocationDot} className='mr-2' />
                           <span className="">{motorbike.motorbikeAddress?displayAddress(motorbike.motorbikeAddress):" "}</span>
-                          <span className="float-right">~{fixedNumber(distanceList[index+1])} km</span>
+                          <span className="float-right">{fixedNumber(distanceList[index + 1]) !== 0 && `~${fixedNumber(distanceList[index + 1])} km`}</span>
                         </div>
                         <hr />
                         <div className='flex justify-between text-sm'>
@@ -166,7 +166,7 @@ const MotorbikeList = ({ listMotor, showDistance, searchLongitude, searchLatitud
                             {motorbike.tripCount > 0 ? (
                               <>
                               <FontAwesomeIcon icon={faStar} style={{color :"#FFD43B"}} />
-                              <span className="ml-1">{motorbike.avgRate}</span>
+                              <span className="ml-1">{motorbike.avgRate.toFixed(1)}</span>
                               <span className="px-2">•</span>
                               <div class="text-green-600">
                     <svg

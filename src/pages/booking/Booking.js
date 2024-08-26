@@ -42,6 +42,7 @@ import apiClient from "../../axiosConfig";
 import { useNotification } from "../../NotificationContext";
 import { CircularProgress } from "@mui/material";
 import PopUpCheckOverlap from "./popUpCheckOverlap/PopUpCheckOverlap";
+import moment from "moment/moment";
 const sharedClasses = {
   rounded: "rounded",
   flex: "flex",
@@ -240,11 +241,15 @@ const Booking = () => {
     setShowPopUpPricePerDay(false);
   };
 
-  const handleChatting = () => {
+  const handleChatting = async () => {
     try {
-      const response4 = apiClient.post("/api/chatting/create", {
-        emailUser1: receiveData.user.email,
-        emailUser2: userEmail,
+      const roomId = getRoomId(userEmail, receiveData.user.email);
+      await addDoc(collection(db, `rooms/${roomId}/messages`), {
+        createdAt: new Date(),
+        content:
+          "Cảm ơn bạn đã đặt xe, chúng tôi sẽ liên hệ lại với bạn trong thời gian sớm nhất!",
+        userEmail: userEmail,
+        seen: false,
       });
     } catch (error) {
       console.log(error);
@@ -406,9 +411,18 @@ const Booking = () => {
 
   useEffect(() => {
     if (endDateTime && startDateTime) {
+      console.log(startDateTime);
+      const now = dayjs();
+      console.log(now);
+      const sixHoursLater = now.add(6, "hour");
+      console.log(sixHoursLater);
       if (endDateTime.diff(startDateTime, "hour") < 2) {
         setErrorTime(
           "*Thời gian trả xe phải lớn hơn thời gian nhận xe tối thiểu 2 tiếng"
+        );
+      } else if (startDateTime.isBefore(sixHoursLater)) {
+        setErrorTime(
+          "*Thời gian nhận xe phải ít nhất lớn hơn thời gian hiện tại 6 tiếng"
         );
       } else {
         setErrorTime();
@@ -745,9 +759,6 @@ const Booking = () => {
                         " " +
                         receiveData.yearOfManufacture}
                     </h1>
-                    <h6 className="font-light text-xl md:text-xl">
-                      {"Biển số: " + receiveData.motorbikePlate}
-                    </h6>
                     <div className="flex items-center flex-wrap">
                       <FontAwesomeIcon icon={faMotorcycle} />
                       <span className="ml-2">

@@ -15,7 +15,7 @@ const PrivacyPolicy = () => {
           </h2>
           <p>
             <span style={{ fontSize: "11pt" }}>
-              Chào mừng bạn đến với nền tảng MiMOTOR. &nbsp;MiMOTOR thông báo
+              Chào mừng bạn đến với nền tảng Motorbike Rental Service. &nbsp;Motorbike Rental Service thông báo
               đến bạn và cần sự đồng ý và cho phép của bạn để xử lý, thu thập và
               lưu trữ dữ liệu của bạn nhằm mục đích cung cấp các dịch vụ cho bạn
               trong suốt quá trình sử dụng Website và Ứng dụng di động. Chúng
@@ -26,7 +26,7 @@ const PrivacyPolicy = () => {
           </p>
           <p>
             <span style={{ fontSize: "11pt" }}>
-              MiMOTOR là một sàn giao dịch thương mại điện tử (“Sàn TMĐT”) đã
+            Motorbike Rental Service là một sàn giao dịch thương mại điện tử (“Sàn TMĐT”) đã
               được đăng ký với Bộ Công Thương. Người dùng trên sàn bao gồm người
               bán (chủ xe), người mua (khách thuê) và các bên khác sử dụng dịch
               vụ của chúng tôi.
@@ -103,7 +103,7 @@ const PrivacyPolicy = () => {
           <h2>
             <strong>
               <span style={{ fontSize: "17pt" }}>
-                2. Khi nào MiMOTOR sẽ thu thập dữ liệu cá nhân?
+                2. Khi nào Motorbike Rental Service sẽ thu thập dữ liệu cá nhân?
               </span>
             </strong>
           </h2>
@@ -163,7 +163,7 @@ const PrivacyPolicy = () => {
             <li style={{ listStyleType: "disc", fontSize: "11pt" }}>
               <p>
                 <span style={{ fontSize: "11pt" }}>
-                  Khi bạn liên kết tài khoản MiMOTOR với tài khoản mạng xã hội
+                  Khi bạn liên kết tài khoản Motorbike Rental Service với tài khoản mạng xã hội
                   của bạn hoặc các tài khoản bên ngoài khác hoặc sử dụng các
                   tính năng mạng xã hội khác, phù hợp với các chính sách của nhà
                   cung cấp;
@@ -259,7 +259,7 @@ const PrivacyPolicy = () => {
               Các thành viên sẽ tự chịu trách nhiệm về bảo mật và lưu giữ mọi
               hoạt động sử dụng dịch vụ dưới tên đăng ký, mật khẩu và hộp thư
               điện tử của mình. Ngoài ra, thành viên có trách nhiệm thông báo
-              kịp thời cho MiMOTOR về những hành vi sử dụng trái phép, lạm dụng,
+              kịp thời cho Motorbike Rental Service về những hành vi sử dụng trái phép, lạm dụng,
               vi phạm bảo mật, lưu giữ tên đăng ký và mật khẩu của bên thứ ba để
               có biện pháp giải quyết phù hợp.
             </span>
@@ -294,7 +294,7 @@ const PrivacyPolicy = () => {
           </h3>
           <p>
             <span style={{ fontSize: "11pt" }}>
-              MiMOTOR thu thập thông tin thành viên để:
+            Motorbike Rental Service thu thập thông tin thành viên để:
             </span>
           </p>
           <ul>
@@ -339,7 +339,7 @@ const PrivacyPolicy = () => {
               <p>
                 <span style={{ fontSize: "11pt" }}>
                   Gửi các thông báo về các hoạt động trao đổi thông tin giữa
-                  thành viên và MiMOTOR bao gồm nhưng không giới hạn: chương
+                  thành viên và Motorbike Rental Service bao gồm nhưng không giới hạn: chương
                   trình khuyến mại, khảo sát ý kiến, tiếp thị và quảng cáo sản
                   phẩm;
                 </span>
@@ -410,7 +410,7 @@ const PrivacyPolicy = () => {
             <li style={{ listStyleType: "disc", fontSize: "11pt" }}>
               <p>
                 <span style={{ fontSize: "11pt" }}>
-                  Trong trường hợp có yêu cầu của pháp luật: MiMOTOR có trách
+                  Trong trường hợp có yêu cầu của pháp luật: Motorbike Rental Service có trách
                   nhiệm hợp tác cung cấp thông tin cá nhân thành viên khi có yêu
                   cầu từ cơ quan tư pháp bao gồm: Viện kiểm sát, tòa án, cơ quan
                   thuế, cơ quan công an điều tra liên quan đến hành vi vi phạm
@@ -429,9 +429,9 @@ const PrivacyPolicy = () => {
           </h2>
           <p>
             <span style={{ fontSize: "11pt" }}>
-              MiMOTOR sẽ không tiết lộ thông tin của khách hàng cho các bên thứ
+            Motorbike Rental Service sẽ không tiết lộ thông tin của khách hàng cho các bên thứ
               ba vì mục đích kinh doanh hoặc tiếp thị độc lập của riêng họ mà
-              không có sự đồng ý của bạn. Tuy nhiên, MiMOTOR có thể tiết lộ
+              không có sự đồng ý của bạn. Tuy nhiên, Motorbike Rental Service có thể tiết lộ
               thông tin của khách hàng cho các đối tượng sau:
             </span>
           </p>
@@ -444,7 +444,7 @@ const PrivacyPolicy = () => {
                   </span>
                 </strong>
                 <span style={{ fontSize: "11pt" }}>
-                  &nbsp;MiMOTOR sẽ cung cấp thông tin cá nhân của khách hàng
+                  &nbsp;Motorbike Rental Service sẽ cung cấp thông tin cá nhân của khách hàng
                   theo yêu cầu của các cơ quan này.
                 </span>
               </p>
@@ -453,7 +453,7 @@ const PrivacyPolicy = () => {
               <p>
                 <strong>
                   <span style={{ fontSize: "11pt" }}>
-                    Ban quản trị MiMOTOR, Bộ phận kinh doanh, Bộ phận Chăm sóc
+                    Ban quản trị Motorbike Rental Service, Bộ phận kinh doanh, Bộ phận Chăm sóc
                     khách hàng và các cá nhân được phân công thực hiện các công
                     việc có liên quan:
                   </span>
@@ -461,7 +461,7 @@ const PrivacyPolicy = () => {
                 <span style={{ fontSize: "11pt" }}>
                   &nbsp;Việc tiếp cận thông tin của các đối tượng này nhằm cung
                   cấp dịch vụ cũng như hỗ trợ khách hàng trong quá trình sử dụng
-                  các dịch vụ được cung cấp bởi MiMOTOR.
+                  các dịch vụ được cung cấp bởi Motorbike Rental Service.
                 </span>
               </p>
             </li>
@@ -475,7 +475,7 @@ const PrivacyPolicy = () => {
                 </strong>
                 <span style={{ fontSize: "11pt" }}>
                   &nbsp;Ngoài các tiết lộ như được mô tả trong Chính sách bảo
-                  mật thông tin cá nhân này, MiMOTOR có thể chia sẻ thông tin cá
+                  mật thông tin cá nhân này, Motorbike Rental Service có thể chia sẻ thông tin cá
                   nhân của khách hàng với các bên thứ ba khi khách hàng đồng ý
                   hoặc yêu cầu việc chia sẻ như vậy.
                 </span>
@@ -485,7 +485,7 @@ const PrivacyPolicy = () => {
           <h2>
             <strong>
               <span style={{ fontSize: "17pt" }}>
-                5. MiMOTOR có tiết lộ thông tin của người dùng không?
+                5. Motorbike Rental Service có tiết lộ thông tin của người dùng không?
               </span>
             </strong>
           </h2>
@@ -537,22 +537,22 @@ const PrivacyPolicy = () => {
           <p>
             <span style={{ fontSize: "11pt" }}>
               Bất kể quy định nào được quy định tại đây, tất cả người dùng và
-              bên thứ ba/người được phép truy cập dữ liệu cá nhân từ MiMOTOR,
+              bên thứ ba/người được phép truy cập dữ liệu cá nhân từ Motorbike Rental Service,
               (i) không được cho phép sử dụng các dữ liệu cá nhân trừ khi có lý
               do chính đáng cần thiết để phản hồi và để thực hiện việc trả lời,
               xử lý, giải quyết hoặc hoàn thành các giao dịch mà không có sự cho
-              phép trước bằng văn bản của người dùng và MiMOTOR; (ii) phải ngưng
+              phép trước bằng văn bản của người dùng và Motorbike Rental Service; (ii) phải ngưng
               việc liên lạc với người mua sử dụng các thông tin này bên ngoài
-              nền tảng MiMOTOR; (iii) không được cho phép tiết lộ các dữ liệu cá
+              nền tảng Motorbike Rental Service; (iii) không được cho phép tiết lộ các dữ liệu cá
               nhân đến bất cứ bên thứ ba không được phép nào mà không có sự cho
-              phép trước bằng văn bản của người dùng đó và MiMOTOR; (iv) phải
+              phép trước bằng văn bản của người dùng đó và Motorbike Rental Service; (iv) phải
               thực hiện các biện pháp an ninh thích hợp để bảo vệ từng dữ liệu
-              cá nhân người dùng của MiMOTOR mà họ đang sở hữu, chỉ lưu giữ dữ
+              cá nhân người dùng của Motorbike Rental Service mà họ đang sở hữu, chỉ lưu giữ dữ
               liệu này chừng nào vẫn còn cần thiết cho các mục đích ở trên và
               phù hợp với quy định của pháp luật bảo vệ dữ liệu cá nhân, và xóa
-              hoặc hoàn trả các dữ liệu này cho MiMOTOR theo yêu cầu từ MiMOTOR
+              hoặc hoàn trả các dữ liệu này cho Motorbike Rental Service theo yêu cầu từ Motorbike Rental Service
               hoặc trong thời gian sớm nhất có thể khi hoàn thành giao dịch; và
-              (v) thông báo cho MiMOTOR tại contact@mimotor.vn trong trường hợp
+              (v) thông báo cho Motorbike Rental Service tại motorrentalservice@gmail.com trong trường hợp
               có khả năng vi phạm dữ liệu hoặc mất dữ liệu khác của người dùng
               này.
             </span>
@@ -560,7 +560,7 @@ const PrivacyPolicy = () => {
           <h2>
             <strong>
               <span style={{ fontSize: "17pt" }}>
-                6. Cách MiMOTOR lưu trữ, bảo vệ thông tin người dùng và những
+                6. Cách Motorbike Rental Service lưu trữ, bảo vệ thông tin người dùng và những
                 cảnh báo rủi ro
               </span>
             </strong>
@@ -600,18 +600,18 @@ const PrivacyPolicy = () => {
           <p>
             <span style={{ fontSize: "11pt" }}>
               Trong trường hợp máy chủ lưu trữ thông tin bị hacker tấn công dẫn
-              đến mất mát dữ liệu cá nhân thành viên, MiMOTOR sẽ có trách nhiệm
+              đến mất mát dữ liệu cá nhân thành viên, Motorbike Rental Service sẽ có trách nhiệm
               thông báo vụ việc cho cơ quan chức năng điều tra xử lý kịp thời và
               thông báo cho thành viên được biết.
             </span>
           </p>
           <p>
             <span style={{ fontSize: "11pt" }}>
-              MiMOTOR yêu cầu các cá nhân khi đăng ký là thành viên, phải cung
+            Motorbike Rental Service yêu cầu các cá nhân khi đăng ký là thành viên, phải cung
               cấp đầy đủ thông tin cá nhân có liên quan như: Họ và tên, địa chỉ
               liên lạc, email, chứng minh nhân dân/căn cước công dân, giấy phép
               lái xe máy, điện thoại, số tài khoản, số thẻ thanh toán… và chịu
-              trách nhiệm về tính pháp lý của những thông tin trên. MiMOTOR
+              trách nhiệm về tính pháp lý của những thông tin trên. Motorbike Rental Service
               không chịu trách nhiệm cũng như không giải quyết mọi khiếu nại có
               liên quan đến quyền lợi của thành viên đó nếu xét thấy tất cả
               thông tin cá nhân của thành viên đó cung cấp khi đăng ký ban đầu
@@ -628,7 +628,7 @@ const PrivacyPolicy = () => {
               &nbsp;Dữ liệu cá nhân của thành viên sẽ được lưu trữ cho đến khi
               có yêu cầu hủy bỏ hoặc tự thành viên đăng nhập và thực hiện hủy
               bỏ, còn lại trong mọi trường hợp thông tin cá nhân thành viên sẽ
-              được bảo mật trên máy chủ của MiMOTOR.vn.
+              được bảo mật trên máy chủ của Motorbike Rental Service.
             </span>
           </p>
           <h2>
@@ -643,20 +643,20 @@ const PrivacyPolicy = () => {
             <span style={{ fontSize: "11pt" }}>
               Người dùng có quyền tự kiểm tra, cập nhật, điều chỉnh hoặc hủy bỏ
               thông tin cá nhân của mình bằng cách đăng nhập vào tài khoản và
-              chỉnh sửa thông tin cá nhân hoặc yêu cầu MiMOTOR thực hiện việc
+              chỉnh sửa thông tin cá nhân hoặc yêu cầu Motorbike Rental Service thực hiện việc
               này.
             </span>
           </p>
           <p>
             <span style={{ fontSize: "11pt" }}>
               Thành viên có quyền gửi khiếu nại về việc lộ thông tin các nhân
-              cho bên thứ ba đến MiMOTOR. Khi tiếp nhận những phản hồi này,
-              MiMOTOR sẽ xác nhận lại thông tin, có trách nhiệm trả lời lý do và
+              cho bên thứ ba đến Motorbike Rental Service. Khi tiếp nhận những phản hồi này,
+              Motorbike Rental Service sẽ xác nhận lại thông tin, có trách nhiệm trả lời lý do và
               hướng dẫn thành viên khôi phục và bảo mật lại thông tin.
             </span>
           </p>
           <p>
-            <span style={{ fontSize: "11pt" }}>Email: contact@mimotor.vn</span>
+            <span style={{ fontSize: "11pt" }}>Email: motorrentalservice@gmail.com</span>
           </p>
           <h2>
             <strong>
@@ -769,9 +769,9 @@ const PrivacyPolicy = () => {
               cũng không dành cho trẻ em dưới 18 tuổi. Bố/mẹ hoặc người giám hộ
               của trẻ em dưới 18 tuổi vui lòng giám sát và đảm bảo thông tin cá
               nhân của trẻ dưới 18 tuổi mà mình đang giám hộ không đăng tải
-              thông tin cá nhân cho MiMOTOR. Trong trường hợp thông tin cá nhân
+              thông tin cá nhân cho Motorbike Rental Service. Trong trường hợp thông tin cá nhân
               của trẻ em dưới 18 tuổi do quý phụ huynh giám hộ được cung cấp cho
-              MiMOTOR, bố/mẹ hoặc người giám hộ theo đồng ý với việc xử lý thông
+              Motorbike Rental Service, bố/mẹ hoặc người giám hộ theo đồng ý với việc xử lý thông
               tin của trẻ em dưới 18 tuổi có liên quan, và đồng ý chịu sự điều
               chỉnh của chính sách này thay mặt cho người được giám hộ. Chúng
               tôi sẽ khóa bất kỳ tài khoản nào được sử dụng bởi đối tượng trẻ em
@@ -848,8 +848,8 @@ const PrivacyPolicy = () => {
           <p>
             <span style={{ fontSize: "11pt" }}>
               Người dùng có quyền gửi khiếu nại liên quan đến việc thực hiện
-              chính sách bảo mật thông tin đến MiMOTOR. Khi tiếp nhận những phản
-              hồi này, MiMOTOR sẽ xác nhận lại thông tin, và có trách nhiệm phản
+              chính sách bảo mật thông tin đến Motorbike Rental Service. Khi tiếp nhận những phản
+              hồi này, Motorbike Rental Service sẽ xác nhận lại thông tin, và có trách nhiệm phản
               hồi lý do và hướng dẫn thành viên khôi phục và bảo mật lại thông
               tin. Các bước thực hiện như sau:
             </span>
@@ -863,9 +863,9 @@ const PrivacyPolicy = () => {
           </h3>
           <p>
             <span style={{ fontSize: "11pt" }}>
-              Khách hàng gửi khiếu nại cho MiMOTOR theo các kênh như email, điện
-              thoại hoặc gửi văn bản trực tiếp đến địa chỉ của MiMOTOR. Bộ phận
-              CSKH của MiMOTOR có trách nhiệm tiếp nhận và yêu cầu khách hàng
+              Khách hàng gửi khiếu nại cho Motorbike Rental Service theo các kênh như email, điện
+              thoại hoặc gửi văn bản trực tiếp đến địa chỉ của Motorbike Rental Service. Bộ phận
+              CSKH của Motorbike Rental Service có trách nhiệm tiếp nhận và yêu cầu khách hàng
               nêu rõ nội dung khiếu nại và cung cấp các thông tin, tài liệu có
               liên quan.
             </span>
@@ -895,7 +895,7 @@ const PrivacyPolicy = () => {
           </h3>
           <p>
             <span style={{ fontSize: "11pt" }}>
-              Bằng cách sử dụng các dịch vụ của MiMOTOR, bạn đã chấp nhận các
+              Bằng cách sử dụng các dịch vụ của Motorbike Rental Service, bạn đã chấp nhận các
               điều khoản và điều kiện của Chính sách bảo mật này.
             </span>
           </p>

@@ -82,7 +82,7 @@ const RentalDocument = () => (
     </InfoSection>
     <InfoSection
       title="Tài sản thế chấp"
-      infoText="Không yêu cầu khách thuê thế chấp Tiền mặt hoặc Xe máy"
+      infoText="Không yêu cầu khách thuê thế chấp tiền mặt"
     />
   </div>
 );

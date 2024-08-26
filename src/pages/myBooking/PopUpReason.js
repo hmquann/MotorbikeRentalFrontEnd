@@ -24,7 +24,7 @@ const PopUpReason = ({
   bookingId,
   bookingTotalPrice,
   onWithinOneHour,
-  onMoreThanTwoDays
+  onMoreThanTwoDays,
 }) => {
   const [selectedReason, setSelectedReason] = useState("");
   const [otherReason, setOtherReason] = useState("");
@@ -35,7 +35,8 @@ const PopUpReason = ({
   const [message, setMessage] = useState();
   const [isWithinOneHour, setIsWithinOneHour] = useState(false);
   const [isMoreThanTwoDays, setIsMoreThanTwoDays] = useState(false);
-
+  const [isLessThanTwoDays, setIsLessThanTwoDays] = useState(false);
+  const [bookingStatus, setBookingStatus] = useState();
   useEffect(() => {
     if (show) {
       const fetchData = async () => {
@@ -44,6 +45,7 @@ const PopUpReason = ({
             `/api/booking/getBookingDepositByBookingId/${bookingId}`,
             { headers: { "Cache-Control": "no-cache" } }
           );
+          setBookingStatus(response.data.bookingStatus);
           const respone2 = await apiClient.get(
             `/api/booking/getStartDateTimeByBookingId/${bookingId}`
           );
@@ -59,7 +61,12 @@ const PopUpReason = ({
   }, [show, bookingId]);
 
   useEffect(() => {
-    if (show && depositTime) {
+
+    if (bookingStatus === "PENDING_DEPOSIT") {
+      setMessage(
+        "Tính đến thời điểm hiện tại chuyến đang là đặt cọc đơn phương nên bạn sẽ được hoàn toàn bộ tiền cọc theo <a href='/privacy/general' target='_blank'>Điều khoản và chính sách</a> của chúng tôi."
+      );
+    } else if (show && depositTime) {
       const depositDate = new Date(depositTime);
       console.log(depositDate);
       const now = new Date();
@@ -69,7 +76,7 @@ const PopUpReason = ({
       // Kiểm tra nếu thời gian chênh lệch <= 1 giờ
       if (timeDiff <= 1 * 60 * 60 * 1000) {
         setIsWithinOneHour(true);
-        const bookingDeposit100 = (bookingTotalPrice * 30) / 100;
+        const bookingDeposit100 = (bookingTotalPrice * 50) / 100;
         setMessage(
           "Tính đến thời điểm hiện tại là chưa quá 1 giờ so với thời gian đặt cọc nên bạn sẽ được hoàn lại " +
             bookingDeposit100.toLocaleString("vi-VN") +
@@ -82,7 +89,7 @@ const PopUpReason = ({
         console.log(startDate);
         console.log(now);
         console.log(timeDiff2);
-        const bookingDeposit70 = (((bookingTotalPrice * 30) / 100) * 70) / 100;
+        const bookingDeposit70 = (((bookingTotalPrice * 50) / 100) * 70) / 100;
         if (timeDiff2 > 2 * 24 * 60 * 60 * 1000) {
           setIsMoreThanTwoDays(true);
           setMessage(
@@ -92,6 +99,7 @@ const PopUpReason = ({
           );
         } else {
           setIsMoreThanTwoDays(false);
+          setIsLessThanTwoDays(true);
           setMessage(
             "Tính đến thời điểm hiện tại thời gian là trong vòng 2 ngày trước chuyến đi nên bạn sẽ không được hoàn lại tiền cọc theo <a href='/privacy/general' target='_blank'>Điều khoản và chính sách</a> của chúng tôi."
           );
@@ -131,7 +139,8 @@ const PopUpReason = ({
     onSend(
       selectedReason === "Khác" ? otherReason : selectedReason,
       isWithinOneHour,
-      isMoreThanTwoDays
+      isMoreThanTwoDays,
+      isLessThanTwoDays
     );
     onHide();
   };

@@ -33,6 +33,7 @@ const PopUpReasonManage = ({
   const [message, setMessage] = useState();
   const [isLessThanTwoDays, setIsLessThanTwoDays] = useState(false);
   const [isMoreThanTwoDays, setIsMoreThanTwoDays] = useState(false);
+  const [bookingStatus, setBookingStatus] = useState();
 
   useEffect(() => {
     if (show) {
@@ -42,6 +43,7 @@ const PopUpReasonManage = ({
             `/api/booking/getBookingDepositByBookingId/${bookingId}`,
             { headers: { "Cache-Control": "no-cache" } }
           );
+          setBookingStatus(response.data.bookingStatus);
           const respone2 = await apiClient.get(
             `/api/booking/getStartDateTimeByBookingId/${bookingId}`
           );
@@ -57,7 +59,11 @@ const PopUpReasonManage = ({
   }, [show, bookingId]);
 
   useEffect(() => {
-    if (show && depositTime) {
+    if (bookingStatus === "PENDING_DEPOSIT") {
+      setMessage(
+        "Tính đến thời điểm hiện tại chuyến đang là đặt cọc đơn phương nên bạn sẽ được hoàn toàn bộ tiền cọc theo <a href='/privacy/general' target='_blank'>Điều khoản và chính sách</a> của chúng tôi."
+      );
+    } else if (show && depositTime) {
       const depositDate = new Date(depositTime);
       console.log(depositDate);
       const now = new Date();
@@ -76,8 +82,8 @@ const PopUpReasonManage = ({
         console.log(startDate);
         console.log(now);
         console.log(timeDiff2);
-        const bookingDeposit100 = (bookingTotalPrice * 30) / 100;
-        const bookingDeposit30 = (((bookingTotalPrice * 30) / 100) * 30) / 100;
+        const bookingDeposit100 = (bookingTotalPrice * 50) / 100;
+        const bookingDeposit30 = (((bookingTotalPrice * 50) / 100) * 30) / 100;
         if (timeDiff2 > 2 * 24 * 60 * 60 * 1000) {
           setIsMoreThanTwoDays(true);
           setIsLessThanTwoDays(false);

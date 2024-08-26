@@ -23,6 +23,8 @@ import { FaMotorcycle } from "react-icons/fa";
 import { faMessage } from "@fortawesome/free-regular-svg-icons";
 import FeedbackList from "../booking/FeedbackList";
 import MapModal from "./MapModal";
+import PopupWallet from "./PopUpWallet";
+import PopUpDateRenting from "./PopUpDateRenting";
 
 const statusTranslations = {
   PENDING: "Chờ duyệt",
@@ -90,6 +92,9 @@ export default function Widget() {
   const [popupContent, setPopupContent] = useState("");
   const [action, setAction] = useState("");
   const [showPopupSuccess, setShowPopupSuccess] = useState(false);
+  const [popUpDateRenting, setPopUpDateRenting] = useState(false);
+  const [showPopupWallet, setShowPopupWallet] = useState(false);
+  const [backWallet, setBackWallet] = useState(false);
   const [loading, setLoading] = useState(false);
   const [renter, setRenter] = useState();
   const [lessor, setLessor] = useState();
@@ -174,7 +179,12 @@ export default function Widget() {
     } else {
       setPopupContent(
         actionType === "accept"
-          ? "Bạn có chắc chắn muốn duyệt chuyến này?"
+          ? `Bạn phải đặt cọc <strong>${(
+              (booking.totalPrice * 50) /
+              100
+            ).toLocaleString(
+              "vi-VN"
+            )}đ</strong> để duyệt chuyến này. Bạn có chắc chắn muốn duyệt chuyến?`
           : actionType === "reject"
           ? "Bạn có chắc chắn muốn từ chối chuyến này?"
           : actionType === "deliver"
@@ -183,6 +193,43 @@ export default function Widget() {
       );
       setAction(actionType);
       setShowPopup(true);
+    }
+  };
+
+  const checkWallet = async () => {
+    if (action === "accept") {
+      const userId = JSON.parse(localStorage.getItem("user")).userId;
+      const token = localStorage.getItem("token");
+
+      const response = await apiClient.get(`/api/user/${userId}`);
+      console.log(response);
+      const depositMoney = (booking.totalPrice * 50) / 100;
+      if (response.data.balance < depositMoney) {
+        setShowPopupWallet(true);
+        setBackWallet(true);
+        console.log(depositMoney);
+      } else {
+        setBackWallet(true);
+        setShowPopupWallet(false);
+      }
+      return;
+    }
+
+    //accept , reject, deliver, complete
+    if (true) {
+      const currentDateToCompare = dayjs().format("YYYY-MM-DD");
+      const bookingDateToComPare = dayjs(booking.startDate).format(
+        "YYYY-MM-DD"
+      );
+      if (
+        action === "deliver" &&
+        currentDateToCompare !== bookingDateToComPare
+      ) {
+        setPopUpDateRenting(true);
+      }
+      setBackWallet(true);
+      setShowPopupWallet(false);
+      return;
     }
   };
 
@@ -260,6 +307,7 @@ export default function Widget() {
           seen: false,
         });
       }
+
       let status = "REJECTED";
       const url = `/api/booking/changeStatus/${booking.bookingId}/${status}`;
       await apiClient.put(url);
@@ -279,56 +327,75 @@ export default function Widget() {
       const amount30 = (((booking.totalPrice * 50) / 100) * 30) / 100;
       const amount130 = (((booking.totalPrice * 50) / 100) * 30) / 100;
       const amountFull = booking.totalPrice;
-      if (isLessThanTwoDays) {
+
+      if (booking.status === "PENDING") {
+        //ko lam gi
+      } else if (booking.status === "PENDING_DEPOSIT") {
+        console.log(adminId);
+        console.log(lessorId);
         await apiClient.post(refundMoneyUrl, null, {
           params: {
             senderId: adminId,
-            receiverId: renterId,
-            amount: amountFull,
-            motorbikeName: motorbikeName,
-            motorbikePlate: motorbikePlate,
-          },
-        });
-      }
-      if (isMoreThanTwoDays) {
-        await apiClient.post(refundMoneyUrl, null, {
-          params: {
-            senderId: adminId,
-            receiverId: renterId,
-            amount: amount65,
-            motorbikeName: motorbikeName,
-            motorbikePlate: motorbikePlate,
-          },
-        });
-        await apiClient.post(refundMoneyUrl, null, {
-          params: {
-            senderId: adminId,
-            receiverId: lessorId,
-            amount: amount35,
-            motorbikeName: motorbikeName,
-            motorbikePlate: motorbikePlate,
-          },
-        });
-      }
-      if (!isMoreThanTwoDays && !isLessThanTwoDays) {
-        await apiClient.post(refundMoneyUrl, null, {
-          params: {
-            senderId: adminId,
-            receiverId: renterId,
+            receiverId: userId,
             amount: amount,
             motorbikeName: motorbikeName,
             motorbikePlate: motorbikePlate,
           },
         });
-        await apiClient.post(refundMoneyUrl, null, {
-          params: {
-            senderId: adminId,
-            receiverId: lessorId,
-            amount: amount,
-            motorbikeName: motorbikeName,
-            motorbikePlate: motorbikePlate,
-          },
-        });
+      } else if (booking.status === "DEPOSIT_MADE") {
+        if (isLessThanTwoDays) {
+          //nho hon 2 ngay (startDateTime), mat hon tien coc, boi hoan 100%
+          await apiClient.post(refundMoneyUrl, null, {
+            params: {
+              senderId: adminId,
+              receiverId: renterId,
+              amount: amountFull,
+              motorbikeName: motorbikeName,
+              motorbikePlate: motorbikePlate,
+            },
+          });
+        }
+        if (isMoreThanTwoDays) {
+          await apiClient.post(refundMoneyUrl, null, {
+            params: {
+              senderId: adminId,
+              receiverId: renterId,
+              amount: amount65,
+              motorbikeName: motorbikeName,
+              motorbikePlate: motorbikePlate,
+            },
+          });
+          await apiClient.post(refundMoneyUrl, null, {
+            params: {
+              senderId: adminId,
+              receiverId: userId,
+              amount: amount35,
+              motorbikeName: motorbikeName,
+              motorbikePlate: motorbikePlate,
+            },
+          });
+        }
+        if (!isMoreThanTwoDays && !isLessThanTwoDays) {
+          //trong vong 1h
+          await apiClient.post(refundMoneyUrl, null, {
+            params: {
+              senderId: adminId,
+              receiverId: renterId,
+              amount: amount,
+              motorbikeName: motorbikeName,
+              motorbikePlate: motorbikePlate,
+            },
+          });
+          await apiClient.post(refundMoneyUrl, null, {
+            params: {
+              senderId: adminId,
+              receiverId: userId,
+              amount: amount,
+              motorbikeName: motorbikeName,
+              motorbikePlate: motorbikePlate,
+            },
+          });
+        }
       }
     } catch (error) {
       console.log(error);
@@ -337,6 +404,11 @@ export default function Widget() {
       setShowPopupSuccess(true);
     }
   };
+  useEffect(() => {
+    if (backWallet && !popUpDateRenting) {
+      handleConfirm();
+    }
+  }, [showPopupWallet, backWallet]);
   const handleConfirm = async () => {
     setShowPopup(false);
     setLoading(true);
@@ -358,29 +430,43 @@ export default function Widget() {
         status = "DONE";
       }
       const url = `/api/booking/changeStatus/${booking.bookingId}/${status}`;
-      await apiClient.put(url);
+      if (
+        status !== "DEPOSIT_MADE" &&
+        status !== "PENDING_DEPOSIT" &&
+        status !== "RENTING"
+      ) {
+        await apiClient.put(url);
+      }
 
       if (status === "REJECTED") {
         setShowPopUpReason(true);
-        // await setDoc(doc(collection(db, "notifications")), {
-        //   userId: userId,
-        //   message: JSON.stringify({
-        //     title: '<strong style="color: red">Từ chối cho thuê</strong>',
-        //     content: `Bạn đã từ chối việc đặt xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong>.`,
-        //   }),
-        //   timestamp: now,
-        //   seen: false,
-        // });
-        // await setDoc(doc(collection(db, "notifications")), {
-        //   userId: booking.renterId,
-        //   message: JSON.stringify({
-        //     title: '<strong style="color: red">Từ chối cho thuê</strong>',
-        //     content: `Chủ xe <strong>${userName}</strong> đã từ chối việc đặt xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong>.`,
-        //   }),
-        //   timestamp: now,
-        //   seen: false,
-        // });
       } else if (status === "PENDING_DEPOSIT") {
+        await apiClient.put(url);
+        const saveDepositRespone = await apiClient.post(
+          "/api/booking/saveDepositTime",
+          {
+            bookingId: booking.bookingId,
+            depositTime: dayjs(now).format("YYYY-MM-DDTHH:mm:ss"),
+          }
+        );
+        const adminDataDepositLessor = await apiClient.get("api/user/getAdmin");
+        const adminDataIdDepositLessor = adminDataDepositLessor.data.id;
+        const lessorId = userData.userId; // Replace with actual user ID if different
+        const amountForLessor = (booking.totalPrice * 50) / 100; // Replace with actual amount to be subtracted
+        const subtractMoneyUrlForLessor = `/api/payment/subtract`;
+        const subtractForLessor = await apiClient.post(
+          subtractMoneyUrlForLessor,
+          null,
+          {
+            params: {
+              senderId: lessorId,
+              receiverId: adminDataIdDepositLessor,
+              amount: amountForLessor,
+              motorbikeName: motorbikeName,
+              motorbikePlate: motorbikePlate,
+            },
+          }
+        );
         if (systemNoti) {
           await setDoc(doc(collection(db, "notifications")), {
             userId: userId,
@@ -443,6 +529,11 @@ export default function Widget() {
           );
         }
       } else if (status === "RENTING") {
+        if (showPopupWallet) {
+          console.log(showPopupWallet);
+          return;
+        }
+        await apiClient.put(url);
         if (systemNoti) {
           await setDoc(doc(collection(db, "notifications")), {
             userId: userId,
@@ -505,6 +596,35 @@ export default function Widget() {
           );
         }
       } else if (status === "DONE") {
+        const adminDataDepositLessor = await apiClient.get("api/user/getAdmin");
+        const adminDataIdDepositLessor = adminDataDepositLessor.data.id;
+        const lessorId = userData.userId; // Replace with actual user ID if different
+        const amountForLessor = (booking.totalPrice * 50) / 100;
+        const amountForLessorDone =
+          (((booking.totalPrice * 50) / 100) * 35) / 100;
+        const refundMoneyUrlForLessor = `/api/payment/refund`;
+        const refundForLessor = await apiClient.post(
+          refundMoneyUrlForLessor,
+          null,
+          {
+            params: {
+              senderId: adminDataIdDepositLessor,
+              receiverId: userId,
+              amount: amountForLessor,
+              motorbikeName: motorbikeName,
+              motorbikePlate: motorbikePlate,
+            },
+          }
+        );
+        await apiClient.post(refundMoneyUrlForLessor, null, {
+          params: {
+            senderId: adminDataIdDepositLessor,
+            receiverId: userId,
+            amount: amountForLessorDone,
+            motorbikeName: motorbikeName,
+            motorbikePlate: motorbikePlate,
+          },
+        });
         if (systemNoti) {
           await setDoc(doc(collection(db, "notifications")), {
             userId: userId,
@@ -584,6 +704,14 @@ export default function Widget() {
   const handlePopUpSuccess = () => {
     setShowPopupSuccess(false);
     navigate("/menu/myBooking");
+  };
+
+  const handlePopUpWallet = () => {
+    setShowPopupWallet(false);
+    navigate("/menu/wallet");
+  };
+  const handlePopUpDateRenting = () => {
+    setPopUpDateRenting(false);
   };
 
   const handleViewMap = (e) => {
@@ -670,20 +798,9 @@ export default function Widget() {
             <div className="mb-6">
               <h3 className="text-lg font-semibold">Điều khoản</h3>
               <ul className="list-disc list-inside text-gray-700">
-                <li>Quy định khác:</li>
                 <li>Không sử dụng xe vào mục đích phi pháp, trái pháp luật.</li>
-                <li>
-                  Không sử dụng xe thuê vào mục đích phi pháp, trái pháp luật.
-                </li>
                 <li>Không sử dụng xe thuê để cầm cố, thế chấp.</li>
-                <li>Không chở hàng cấm, hàng hóa có mùi trong xe.</li>
                 <li>Không chở hàng quá cước hoặc quá tải.</li>
-                <li>Không hút thuốc trong xe.</li>
-                <li>
-                  Không chở hàng cấm, hàng hóa có mùi trong xe, khách hàng vi
-                  phạm sẽ bị phạt vệ sinh xe sạch sẽ hoặc gửi phụ thu phí vệ
-                  sinh xe.
-                </li>
                 <li>
                   Trân trọng cảm ơn, chúc quý khách hàng có những chuyến đi
                   tuyệt vời!
@@ -964,7 +1081,7 @@ export default function Widget() {
                 <PopUpConfirm
                   show={showPopup}
                   message={popupContent}
-                  onConfirm={handleConfirm}
+                  onConfirm={checkWallet}
                   onCancel={() => setShowPopup(false)}
                 />
               )}
@@ -973,6 +1090,20 @@ export default function Widget() {
                   show={showPopupSuccess}
                   onHide={handlePopUpSuccess}
                   message="Bạn đã cập nhật thành công trạng thái chuyến !"
+                />
+              )}
+              {showPopupWallet && (
+                <PopupWallet
+                  show={showPopupWallet}
+                  onHide={handlePopUpWallet}
+                  message="Số dư ví của bạn chưa đủ. Bạn vui lòng nạp thêm để thanh toán tiền cọc!"
+                />
+              )}
+              {popUpDateRenting && (
+                <PopUpDateRenting
+                  show={popUpDateRenting}
+                  onHide={handlePopUpDateRenting}
+                  message="Chưa đến ngày giao xe, vui lòng đợi !"
                 />
               )}
               <PopUpReasonManage

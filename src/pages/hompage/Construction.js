@@ -8,7 +8,7 @@ import hdan4 from "../../assets/images/hdan4.png"
 const steps = [
   {
     image: hdan1,
-    title: 'Đặt xe trên website MiMotor',
+    title: 'Đặt xe trên website Motorbike Rental',
   },
   {
     image: hdan2,
@@ -32,7 +32,7 @@ const CarRentalSteps = () => {
         Hướng Dẫn Thuê Xe
       </div>
       <h5  className='text-xl mb-10 text-center mx-auto max-w-2xl'>
-        Chỉ với 4 bước đơn giản để trải nghiệm thuê xe MiMotor một cách nhanh chóng
+        Chỉ với 4 bước đơn giản để trải nghiệm thuê xe Motorbike Rental một cách nhanh chóng
       </h5>
       <Grid container spacing={4}>
         {steps.map((step, index) => (

@@ -15,7 +15,7 @@ import { useNotification } from "../../NotificationContext";
 import Login from "../login/Login";
 import Register from "../register/Register";
 import Forgotpassword from "../forgotpassword/Forgotpassword";
-import logo from "../../assets/images/Logo.png";
+import logo from "../../assets/images/Logo_Final.png";
 
 const Header = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -149,7 +149,7 @@ const Header = () => {
                   fontFamily: '"Manrope", sans-serif' /* font-manrope */,
                 }}
               >
-                Về MiMotor
+                Về chúng tôi
               </Nav.Link>
             )}
             {!admin && (

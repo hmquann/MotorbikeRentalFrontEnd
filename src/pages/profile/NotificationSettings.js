@@ -159,34 +159,6 @@ const NotificationSettings = ({ show, handleClose, onSuccess }) => {
                     </span>
                   </div>
                 </Form.Group>
-
-                <Form.Group
-                  controlId="formPopupNotifications"
-                  className={switchWrapperClasses}
-                >
-                  <Form.Label className="text-base font-medium text-gray-700">
-                    Thông báo cửa sổ nhỏ
-                  </Form.Label>
-                  <div
-                    className={switchClasses}
-                    onClick={() => handleToggle("minimizeNoti")}
-                  >
-                    <span
-                      className={`${sliderClasses} ${
-                        notifications.minimizeNoti ? sliderCheckedClasses : ""
-                      }`}
-                    >
-                      <span
-                        className={`${sliderBeforeClasses} ${
-                          notifications.minimizeNoti
-                            ? sliderBeforeCheckedClasses
-                            : ""
-                        }`}
-                      ></span>
-                    </span>
-                  </div>
-                </Form.Group>
-
                 <div className="flex justify-center mt-4">
                   <button onClick={handleSave} className={applyButtonClasses}>
                     Áp dụng

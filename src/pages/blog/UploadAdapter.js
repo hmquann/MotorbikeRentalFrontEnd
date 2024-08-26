@@ -1,7 +1,9 @@
+import apiClient from "../../axiosConfig";
+
 class UploadAdapter {
   constructor(loader) {
     this.loader = loader;
-    this.url = "https://rentalmotorbikewebapp.azurewebsites.net/api/uploads"; // Ensure this is your correct upload URL
+    this.url = this.url = `${apiClient.defaults.baseURL}/api/uploads`;
   }
 
   upload() {

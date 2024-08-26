@@ -29,6 +29,7 @@ import apiClient from "../../axiosConfig";
 import { CircularProgress, LinearProgress } from "@mui/material";
 import DepositCountdown from "./DepositCountdown";
 import PopupWallet from "./PopUpWallet";
+import PopUpDateRenting from "./PopUpDateRenting";
 
 const BookingCard = ({ booking }) => {
   const [motorbikeName, setMotorbikeName] = useState();
@@ -55,6 +56,7 @@ const BookingCard = ({ booking }) => {
   const [timeRemaining, setTimeRemaining] = useState(null);
   const [feedbackSent, setFeedbackSent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [popUpDateRenting, setPopUpDateRenting] = useState(false);
   const userDataString = localStorage.getItem("user");
   const userData = JSON.parse(userDataString);
   const userId = userData ? userData.userId : null;
@@ -384,6 +386,16 @@ const BookingCard = ({ booking }) => {
     }
 
     if (action !== "DEPOSIT_MADE") {
+      const currentDateToCompare = dayjs().format("YYYY-MM-DD");
+      const bookingDateToComPare = dayjs(booking.startDate).format(
+        "YYYY-MM-DD"
+      );
+      if (
+        action === "RENTING" &&
+        currentDateToCompare !== bookingDateToComPare
+      ) {
+        setPopUpDateRenting(true);
+      }
       setBackWallet(true);
       setShowPopupWallet(false);
       return;
@@ -393,7 +405,7 @@ const BookingCard = ({ booking }) => {
 
     const response = await apiClient.get(`/api/user/${userId}`);
     console.log(response);
-    const depositMoney = (booking.totalPrice * 30) / 100;
+    const depositMoney = (booking.totalPrice * 50) / 100;
     if (response.data.balance < depositMoney) {
       setShowPopupWallet(true);
       setBackWallet(true);
@@ -415,7 +427,11 @@ const BookingCard = ({ booking }) => {
 
     try {
       const url = `/api/booking/changeStatus/${booking.bookingId}/${action}`;
-      if (action !== "DEPOSIT_MADE" && action !== "PENDING_DEPOSIT") {
+      if (
+        action !== "DEPOSIT_MADE" &&
+        action !== "PENDING_DEPOSIT" &&
+        action !== "RENTING"
+      ) {
         await apiClient.put(url);
       }
       const now = new Date();
@@ -523,6 +539,11 @@ const BookingCard = ({ booking }) => {
           );
           break;
         case "RENTING":
+          if (showPopupWallet) {
+            console.log(showPopupWallet);
+            return;
+          }
+          await apiClient.put(url);
           if (systemNoti) {
             await setDoc(doc(collection(db, "notifications")), {
               userId: userId,
@@ -599,7 +620,7 @@ const BookingCard = ({ booking }) => {
           const refundMoneyUrlDone = `/api/payment/refund`;
           const amountDone = (booking.totalPrice * 35) / 100;
           const amountDeposit = (booking.totalPrice * 50) / 100;
-          await apiClient.post(subtractMoneyUrlDone, null, {
+          await apiClient.post(refundMoneyUrlDone, null, {
             params: {
               senderId: adminId,
               receiverId: userId,
@@ -692,6 +713,21 @@ const BookingCard = ({ booking }) => {
             console.log(showPopupWallet);
             return;
           }
+          const adminForDepositRenter = await apiClient.get(
+            "api/user/getAdmin"
+          );
+          const adminIdForDepositRenter = adminForDepositRenter.data.id;
+          const subtractMoneyUrlForDepositRenter = `/api/payment/subtract`;
+          const amountDepositForDepositRenter = (booking.totalPrice * 50) / 100;
+          await apiClient.post(subtractMoneyUrlForDepositRenter, null, {
+            params: {
+              senderId: userId,
+              receiverId: adminIdForDepositRenter,
+              amount: amountDepositForDepositRenter,
+              motorbikeName: motorbikeName,
+              motorbikePlate: motorbikePlate,
+            },
+          });
           await apiClient.put(url);
           const changeNoti = await apiClient.post(
             `/api/booking/changeDepositNotification/${booking.bookingId}`
@@ -699,9 +735,6 @@ const BookingCard = ({ booking }) => {
           const changeCanceled = await apiClient.post(
             `/api/booking/changeDepositCanceled/${booking.bookingId}`
           );
-
-          console.log(renterName);
-          console.log(lessorId);
 
           await setDoc(doc(collection(db, "notifications")), {
             userId: userId,
@@ -766,22 +799,6 @@ const BookingCard = ({ booking }) => {
             console.log(response5);
           }
 
-          const adminData = await apiClient.get("api/user/getAdmin");
-          const adminDataId = adminData.data.id;
-          const renterId = userData.userId; // Replace with actual user ID if different
-          const amount = (booking.totalPrice * 50) / 100; // Replace with actual amount to be subtracted
-          const subtractMoneyUrl = `/api/payment/subtract`;
-          const addMoneyUrl = `/api/payment/add`;
-          const subtract = await apiClient.post(subtractMoneyUrl, null, {
-            params: {
-              senderId: renterId,
-              receiverId: adminDataId,
-              amount: amount,
-              motorbikeName: motorbikeName,
-              motorbikePlate: motorbikePlate,
-            },
-          });
-          console.log(subtract);
           // await apiClient.post(addMoneyUrl, null, {
           //   params: { id: lessorId, amount: amount, motorbikeName : motorbikeName, motorbikePlate : motorbikePlate },
           // });
@@ -808,7 +825,7 @@ const BookingCard = ({ booking }) => {
   };
 
   useEffect(() => {
-    if (backWallet) {
+    if (backWallet && !popUpDateRenting) {
       handleConfirm();
     }
   }, [showPopupWallet, backWallet]);
@@ -820,6 +837,9 @@ const BookingCard = ({ booking }) => {
   const handlePopUpWallet = () => {
     setShowPopupWallet(false);
     navigate("/menu/wallet");
+  };
+  const handlePopUpDateRenting = () => {
+    setPopUpDateRenting(false);
   };
 
   const { text, icon, color } = statusDetails[booking.status] || {};
@@ -852,7 +872,8 @@ const BookingCard = ({ booking }) => {
                 alt="Motorbike"
               />
               <div className="pl-4 w-full md:w-1/2">
-                <h2 className="text-xl font-bold mb-2">{motorbikeName}</h2>
+                <h2 className="text-xl font-bold mb-0">{motorbikeName}</h2>
+                <h4 className="text-base font-bold mb-2">{motorbikePlate}</h4>
                 <div className="flex items-center mb-2 text-gray-600">
                   <FontAwesomeIcon
                     icon={faCalendarDays}
@@ -992,6 +1013,13 @@ const BookingCard = ({ booking }) => {
             show={showPopupWallet}
             onHide={handlePopUpWallet}
             message="Số dư ví của bạn chưa đủ. Bạn vui lòng nạp thêm để thanh toán tiền cọc!"
+          />
+        )}
+        {popUpDateRenting && (
+          <PopUpDateRenting
+            show={popUpDateRenting}
+            onHide={handlePopUpDateRenting}
+            message="Chưa đến ngày giao xe, vui lòng đợi !"
           />
         )}
       </div>

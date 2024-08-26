@@ -1,113 +1,72 @@
 import React from "react";
-import logo from "../../assets/images/Logo.png";
+import logo from "../../assets/images/Logo_Final.png";
 const Footer = () => {
   return (
     <footer className="p-6 bg-white font-manrope border-t border-t-gray-200 dark:bg-neutral-900">
       <div className="mx-auto max-w-screen-xl">
-        <div className="md:flex md:justify-between">
+        <div className="md:flex md:justify-between flex items-center">
           {/* Logo và Tên MiMotor */}
           <div className="mb-6 md:mb-0">
             <div className="flex items-center">
               <img className="w-32 h-auto mr-4" src={logo} alt="Logo" />
               <span className="text-4xl font-bold text-black dark:text-white">
-                MiMotor
+                Motorbike Rental Service
+                <div className="text-left mt-4 flex">
+                  <div>
+                    <p className="text-lg text-black dark:text-white">
+                      motorrentalservice@gmail.com
+                    </p>
+                  </div>
+                </div>
               </span>
             </div>
 
             {/* Thông tin liên hệ */}
-            <div className="text-left mt-4">
-              <p className="text-lg text-black dark:text-white">1900 9217</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Tổng đài hỗ trợ: 7AM - 10PM
-              </p>
-              <p className="text-lg text-black dark:text-white">
-                motorrentalservice@gmail.com
-              </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Gửi mail cho MiMotor
-              </p>
-            </div>
           </div>
 
           {/* Các mục chính và mục con */}
-          <div className="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-2 mt-6">
+          <div className=" grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-2 mt-6 justify-stretch">
             <div>
               <h2 className="mb-6 text-lg font-semibold text-gray-900 uppercase dark:text-white">
                 Chính sách
               </h2>
-              <ul className="text-gray-600 dark:text-gray-400 list-none p-0">
-                <li className="mb-4">
-                  <a
-                    href="/privacy/general"
-                    className="text-gray-500 no-underline hover:underline"
-                  >
-                    Chính sách và quy định
-                  </a>
-                </li>
-                <li className="mb-4">
-                  <a
-                    href="/privacy/regulations"
-                    className="text-gray-500 no-underline hover:underline"
-                  >
-                    Nguyên tắc chung
-                  </a>
-                </li>
-                <li className="mb-4">
-                  <a
-                    href="#"
-                    className="text-gray-500 no-underline hover:underline"
-                  >
-                    Chính sách bảo mật
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-500 no-underline hover:underline"
-                  >
-                    Điều khoản sử dụng
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h2 className="mb-6 text-lg font-semibold text-gray-900 uppercase dark:text-white">
-                Tìm hiểu thêm
-              </h2>
-              <ul className="text-gray-600 dark:text-gray-400 list-none p-0">
-                <li className="mb-4">
-                  <a
-                    href="#"
-                    className="text-gray-500 no-underline hover:underline"
-                  >
-                    Về chúng tôi
-                  </a>
-                </li>
-                <li className="mb-4">
-                  <a
-                    href="#"
-                    className="text-gray-500 no-underline hover:underline"
-                  >
-                    Tin tức
-                  </a>
-                </li>
-                <li className="mb-4">
-                  <a
-                    href="#"
-                    className="text-gray-500 no-underline hover:underline"
-                  >
-                    Hướng dẫn sử dụng
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-500 no-underline hover:underline"
-                  >
-                    Câu hỏi thường gặp
-                  </a>
-                </li>
+              <ul className="text-gray-600 dark:text-gray-400 list-none p-0 flex">
+                <div>
+                  <li className="mb-4">
+                    <a
+                      href="/privacy/general"
+                      className="text-gray-500 no-underline hover:underline"
+                    >
+                      Chính sách và quy định
+                    </a>
+                  </li>
+                  <li className="mb-4">
+                    <a
+                      href="/privacy/regulations"
+                      className="text-gray-500 no-underline hover:underline"
+                    >
+                      Nguyên tắc chung
+                    </a>
+                  </li>
+                </div>
+                <div>
+                  <li className="mb-4">
+                    <a
+                      href="#"
+                      className="text-gray-500 no-underline hover:underline ml-3"
+                    >
+                      Chính sách bảo mật
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      className="text-gray-500 no-underline hover:underline ml-3"
+                    >
+                      Điều khoản sử dụng
+                    </a>
+                  </li>
+                </div>
               </ul>
             </div>
           </div>
