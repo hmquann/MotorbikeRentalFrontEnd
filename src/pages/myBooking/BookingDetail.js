@@ -272,7 +272,8 @@ export default function Widget() {
   const handleSendReason = async (
     reason,
     isWithinOneHour,
-    isMoreThanTwoDays
+    isMoreThanTwoDays,
+    isLessThanTwoDays
   ) => {
     setShowPopUpReason(false);
     setSelectedReason(reason);
@@ -360,7 +361,26 @@ export default function Widget() {
       const amount70 = (((booking.totalPrice * 50) / 100) * 70) / 100;
       const refundMoneyUrl = `/api/payment/refund`;
 
-      if (booking.status === "DEPOSIT_MADE") {
+      //pending (ko lam sao ca 2)
+      //pending_deposit (renter ko mat gi, lessor co tien)
+      //pending_made (dua vao thoi gian)
+      if (booking.status === "PENDING") {
+        //
+      } else if (booking.status === "PENDING_DEPOSIT") {
+        await apiClient.post(refundMoneyUrl, null, {
+          params: {
+            senderId: adminDataId,
+            receiverId: lessorId,
+            amount: amount,
+            motorbikeName: motorbikeName,
+            motorbikePlate: motorbikePlate,
+          },
+        });
+      } else if (booking.status === "DEPOSIT_MADE") {
+        // 1h    hoan tien chu xe + hoan tien ca ban than
+        // >2ngay hoan tien chu xe + (hoan chu xe 30% cua coc, 15% cua chuyen ) , (hoan ban than 70% coc, 35% chuyen)
+        // <2ngay hoan tien chu xe + 100% tien coc, nghia la 50% chuyen
+
         //hoàn tiền cọc cho chủ xe
         await apiClient.post(refundMoneyUrl, null, {
           params: {
@@ -382,8 +402,7 @@ export default function Widget() {
               motorbikePlate: motorbikePlate,
             },
           });
-        }
-        if (isMoreThanTwoDays) {
+        } else if (isMoreThanTwoDays) {
           await apiClient.post(refundMoneyUrl, null, {
             params: {
               senderId: adminDataId,
@@ -398,6 +417,16 @@ export default function Widget() {
               senderId: adminDataId,
               receiverId: lessorId,
               amount: amount30,
+              motorbikeName: motorbikeName,
+              motorbikePlate: motorbikePlate,
+            },
+          });
+        } else if (isLessThanTwoDays) {
+          await apiClient.post(refundMoneyUrl, null, {
+            params: {
+              senderId: adminDataId,
+              receiverId: lessorId,
+              amount: amount,
               motorbikeName: motorbikeName,
               motorbikePlate: motorbikePlate,
             },
@@ -457,6 +486,12 @@ export default function Widget() {
     }
   };
 
+  useEffect(() => {
+    if (backWallet && !popUpDateRenting) {
+      handleConfirm();
+    }
+  }, [showPopupWallet, backWallet]);
+
   const handlePopUpWallet = () => {
     setShowPopupWallet(false);
     navigate("/menu/wallet");
@@ -476,7 +511,13 @@ export default function Widget() {
         status = "DONE";
       }
       const url = `/api/booking/changeStatus/${booking.bookingId}/${status}`;
-      await apiClient.put(url);
+      if (
+        action !== "DEPOSIT_MADE" &&
+        action !== "PENDING_DEPOSIT" &&
+        action !== "RENTING"
+      ) {
+        await apiClient.put(url);
+      }
       if (status === "CANCELED" && booking.status === "DEPOSIT_PENDING") {
         // await setDoc(doc(collection(db, "notifications")), {
         //   userId: userId,
@@ -501,6 +542,7 @@ export default function Widget() {
           console.log(showPopupWallet);
           return;
         }
+        await apiClient.put(url);
         const changeNoti = await apiClient.post(
           `/api/booking/changeDepositNotification/${booking.bookingId}`
         );
@@ -571,7 +613,7 @@ export default function Widget() {
         const adminData = await apiClient.get("api/user/getAdmin");
         const adminDataId = adminData.data.id;
         const renterId = userData.userId; // Replace with actual user ID if different
-        const amount = (booking.totalPrice * 30) / 100; // Replace with actual amount to be subtracted
+        const amount = (booking.totalPrice * 50) / 100; // Replace with actual amount to be subtracted
         const subtractMoneyUrl = `/api/payment/subtract`;
         const addMoneyUrl = `/api/payment/add`;
         await apiClient.post(subtractMoneyUrl, null, {
@@ -728,20 +770,9 @@ export default function Widget() {
             <div className="mb-6">
               <h3 className="text-lg font-semibold">Điều khoản</h3>
               <ul className="list-disc list-inside text-gray-700">
-                <li>Quy định khác:</li>
                 <li>Không sử dụng xe vào mục đích phi pháp, trái pháp luật.</li>
-                <li>
-                  Không sử dụng xe thuê vào mục đích phi pháp, trái pháp luật.
-                </li>
                 <li>Không sử dụng xe thuê để cầm cố, thế chấp.</li>
-                <li>Không chở hàng cấm, hàng hóa có mùi trong xe.</li>
                 <li>Không chở hàng quá cước hoặc quá tải.</li>
-                <li>Không hút thuốc trong xe.</li>
-                <li>
-                  Không chở hàng cấm, hàng hóa có mùi trong xe, khách hàng vi
-                  phạm sẽ bị phạt vệ sinh xe sạch sẽ hoặc gửi phụ thu phí vệ
-                  sinh xe.
-                </li>
                 <li>
                   Trân trọng cảm ơn, chúc quý khách hàng có những chuyến đi
                   tuyệt vời!

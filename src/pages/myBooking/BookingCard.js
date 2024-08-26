@@ -386,7 +386,14 @@ const BookingCard = ({ booking }) => {
     }
 
     if (action !== "DEPOSIT_MADE") {
-      if (action === "RENTING") {
+      const currentDateToCompare = dayjs().format("YYYY-MM-DD");
+      const bookingDateToComPare = dayjs(booking.startDate).format(
+        "YYYY-MM-DD"
+      );
+      if (
+        action === "RENTING" &&
+        currentDateToCompare !== bookingDateToComPare
+      ) {
         setPopUpDateRenting(true);
       }
       setBackWallet(true);
@@ -536,14 +543,7 @@ const BookingCard = ({ booking }) => {
             console.log(showPopupWallet);
             return;
           }
-          const currentDateToCompare = dayjs().format("YYYY-MM-DD");
-          const bookingDateToComPare = dayjs(booking.startDate).format(
-            "YYYY-MM-DD"
-          );
-          if (currentDateToCompare !== bookingDateToComPare) {
-            setPopUpDateRenting(true);
-            return;
-          }
+          await apiClient.put(url);
           if (systemNoti) {
             await setDoc(doc(collection(db, "notifications")), {
               userId: userId,
