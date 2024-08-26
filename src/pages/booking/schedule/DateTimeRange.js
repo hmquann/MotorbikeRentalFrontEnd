@@ -20,7 +20,7 @@ const DateTimeRange = ({
 
   const [dateTimeReturn, setDateTimeReturn] = useState({
     date: "",
-    time: dayjs().add(1, "day"), // Thêm 1 ngày vào thời gian hiện tại
+    time: dayjs().add(1, "day"),
   });
 
   const [dateRange, setDateRange] = useState([
@@ -46,7 +46,10 @@ const DateTimeRange = ({
     };
 
     const findNextAvailableDates = (disabledDates) => {
-      let startDate = dayjs();
+      const minReceiveTime = dayjs().add(7, "hours"); // Thời gian nhận tối thiểu là 6 tiếng sau hiện tại
+      let startDate = minReceiveTime.isAfter(dayjs())
+        ? minReceiveTime
+        : dayjs(); // Kiểm tra điều kiện 6 tiếng
 
       while (true) {
         const isStartDateDisabled = disabledDates.some((disabledDate) =>
@@ -121,7 +124,7 @@ const DateTimeRange = ({
           onChange={handleDateRangeChange}
           localeText={{ start: "Ngày nhận", end: "Ngày trả" }}
           minDate={minDate}
-          shouldDisableDate={disableWeekends} // Vô hiệu hóa cuối tuần
+          shouldDisableDate={disableWeekends}
         />
         <div style={{ display: "flex", gap: "16px" }}>
           <TimePicker

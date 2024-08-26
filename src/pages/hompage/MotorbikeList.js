@@ -166,7 +166,7 @@ const MotorbikeList = ({ listMotor, showDistance, searchLongitude, searchLatitud
                             {motorbike.tripCount > 0 ? (
                               <>
                               <FontAwesomeIcon icon={faStar} style={{color :"#FFD43B"}} />
-                              <span className="ml-1">{motorbike.avgRate}</span>
+                              <span className="ml-1">{motorbike.avgRate.toFixed(1)}</span>
                               <span className="px-2">•</span>
                               <div class="text-green-600">
                     <svg

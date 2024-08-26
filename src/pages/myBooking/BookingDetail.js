@@ -26,6 +26,8 @@ import FeedbackModal from "../booking/FeedbackModal";
 import PopUpReason from "./PopUpReason";
 import FeedbackList from "../booking/FeedbackList";
 import MapModal from "./MapModal";
+import PopupWallet from "./PopUpWallet";
+import PopUpDateRenting from "./PopUpDateRenting";
 
 const statusTranslations = {
   PENDING: "Chờ duyệt",
@@ -149,6 +151,7 @@ export default function Widget() {
   const [action, setAction] = useState("");
   const [lessor, setLessor] = useState("");
   const [showPopupSuccess, setShowPopupSuccess] = useState(false);
+  const [popUpDateRenting, setPopUpDateRenting] = useState(false);
   const [showPopUpReason, setShowPopUpReason] = useState(false);
   const [selectedReason, setSelectedReason] = useState("");
   const [reason, setReason] = useState("");
@@ -167,6 +170,9 @@ export default function Widget() {
   const [feedbackSent, setFeedbackSent] = useState(false);
   const [viewMap, setViewMap] = useState(false);
   const navigate = useNavigate();
+  const [showPopupWallet, setShowPopupWallet] = useState(false);
+  const [balance, setBalance] = useState(0);
+  const [backWallet, setBackWallet] = useState(false);
 
   const CustomLinearProgress = styled(LinearProgress)(
     ({ bgColor, barColor }) => ({
@@ -227,7 +233,7 @@ export default function Widget() {
           ? "Bạn có chắc chắn muốn duyệt chuyến này?"
           : actionType === "deposit_made"
           ? `Bạn có chắc chắn muốn thanh toán ${(
-              (booking.totalPrice * 30) /
+              (booking.totalPrice * 50) /
               100
             ).toLocaleString("vi-VN")}đ tiền cọc?`
           : ""
@@ -258,6 +264,9 @@ export default function Widget() {
 
   const closeFeedback = () => {
     setShowFeedbackModal(false);
+  };
+  const handlePopUpDateRenting = () => {
+    setPopUpDateRenting(false);
   };
 
   const handleSendReason = async (
@@ -403,6 +412,56 @@ export default function Widget() {
     }
   };
 
+  const checkWallet = async () => {
+    if (action === "PENDING_DEPOSIT") {
+      const userId = JSON.parse(localStorage.getItem("user")).userId;
+      const token = localStorage.getItem("token");
+
+      const response = await apiClient.get(`/api/user/${userId}`);
+      console.log(response);
+      const depositMoney = (booking.totalPrice * 50) / 100;
+      if (response.data.balance < depositMoney) {
+        setShowPopupWallet(true);
+        setBackWallet(true);
+        console.log(balance);
+        console.log(depositMoney);
+      } else {
+        setBackWallet(true);
+        setShowPopupWallet(false);
+      }
+      return;
+    }
+
+    if (action !== "DEPOSIT_MADE") {
+      if (action === "RENTING") {
+        setPopUpDateRenting(true);
+      }
+      setBackWallet(true);
+      setShowPopupWallet(false);
+      return;
+    }
+    const userId = JSON.parse(localStorage.getItem("user")).userId;
+    const token = localStorage.getItem("token");
+
+    const response = await apiClient.get(`/api/user/${userId}`);
+    console.log(response);
+    const depositMoney = (booking.totalPrice * 50) / 100;
+    if (response.data.balance < depositMoney) {
+      setShowPopupWallet(true);
+      setBackWallet(true);
+      console.log(balance);
+      console.log(depositMoney);
+    } else {
+      setBackWallet(true);
+      setShowPopupWallet(false);
+    }
+  };
+
+  const handlePopUpWallet = () => {
+    setShowPopupWallet(false);
+    navigate("/menu/wallet");
+  };
+
   const handleConfirm = async () => {
     setShowPopup(false);
     setLoading(true);
@@ -438,6 +497,10 @@ export default function Widget() {
         //   seen: false,
         // });
       } else if (status === "DEPOSIT_MADE") {
+        if (showPopupWallet) {
+          console.log(showPopupWallet);
+          return;
+        }
         const changeNoti = await apiClient.post(
           `/api/booking/changeDepositNotification/${booking.bookingId}`
         );
@@ -621,6 +684,7 @@ export default function Widget() {
               />
               <div>
                 <h2 className="text-2xl font-bold">{motorbikeName}</h2>
+                <h2 className="text-base font-bold">{motorbikePlate}</h2>
                 <a href="#" className="text-blue-500 " onClick={handleViewMap}>
                   Xem lộ trình
                 </a>
@@ -981,7 +1045,7 @@ export default function Widget() {
                 <PopUpConfirm
                   show={showPopup}
                   message={popupContent}
-                  onConfirm={handleConfirm}
+                  onConfirm={checkWallet}
                   onCancel={() => setShowPopup(false)}
                   onLoading={true}
                 />
@@ -991,6 +1055,20 @@ export default function Widget() {
                   show={showPopupSuccess}
                   onHide={handlePopUpSuccess}
                   message="Bạn đã cập nhật thành công trạng thái chuyến !"
+                />
+              )}
+              {showPopupWallet && (
+                <PopupWallet
+                  show={showPopupWallet}
+                  onHide={handlePopUpWallet}
+                  message="Số dư ví của bạn chưa đủ. Bạn vui lòng nạp thêm để thanh toán tiền cọc!"
+                />
+              )}
+              {popUpDateRenting && (
+                <PopUpDateRenting
+                  show={popUpDateRenting}
+                  onHide={handlePopUpDateRenting}
+                  message="Chưa đến ngày giao xe, vui lòng đợi !"
                 />
               )}
               <PopUpReason

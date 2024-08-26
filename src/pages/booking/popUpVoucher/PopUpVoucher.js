@@ -2,7 +2,12 @@ import { faExclamationCircle, faTag } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 
-const PopUpVoucher = ({ onCloseVoucher, discounts, discountValue, bookingAmount }) => {
+const PopUpVoucher = ({
+  onCloseVoucher,
+  discounts,
+  discountValue,
+  bookingAmount,
+}) => {
   const [value, setValue] = useState();
   const calculateDaysLeft = (expirationDate) => {
     const today = new Date();
@@ -21,7 +26,10 @@ const PopUpVoucher = ({ onCloseVoucher, discounts, discountValue, bookingAmount 
   const handleValue = (discount) => {
     if (discount.type === "PERCENTAGE") {
       const maxDiscountAmount = discount.maxDiscountAmount || Infinity;
-      const calculatedDiscount = Math.min((bookingAmount * discount.discountPercent) / 100, maxDiscountAmount);
+      const calculatedDiscount = Math.min(
+        (bookingAmount * discount.discountPercent) / 100,
+        maxDiscountAmount
+      );
       discount.calculatedDiscount = calculatedDiscount;
     } else if (discount.type === "FIXED_AMOUNT") {
       discount.calculatedDiscount = discount.discountMoney;
@@ -50,16 +58,20 @@ const PopUpVoucher = ({ onCloseVoucher, discounts, discountValue, bookingAmount 
           placeholder="Nhập mã khuyến mãi"
           className="border border-zinc-300 dark:border-zinc-600 rounded-md p-2 w-full mb-4"
         />
-        {discounts ? discounts.filter((discount) => calculateDaysLeft(discount.expirationDate) > 0)
-          .map((discount) => (
-            <div key={discount.id} className="mb-1">
-              <div className="flex justify-between p-2">
-                <div>
-                  <span className="text-zinc-800 dark:text-white font-semibold">
-                    {discount.name}
-                  </span>
-                  <br />
-                  {discount.voucherType === "PERCENTAGE" ? (
+        {discounts
+          ? discounts
+              .filter(
+                (discount) => calculateDaysLeft(discount.expirationDate) > 0
+              )
+              .map((discount) => (
+                <div key={discount.id} className="mb-1">
+                  <div className="flex justify-between p-2">
+                    <div>
+                      <span className="text-zinc-800 dark:text-white font-semibold">
+                        {discount.code}
+                      </span>
+                      <br />
+                      {discount.voucherType === "PERCENTAGE" ? (
                         <span className="text-zinc-800 dark:text-white text-xs">
                           Giảm {discount.discountPercent}% (tối đa{" "}
                           {formatDiscountMoney(discount.maxDiscountMoney)})
@@ -69,27 +81,27 @@ const PopUpVoucher = ({ onCloseVoucher, discounts, discountValue, bookingAmount 
                           Giảm {formatDiscountMoney(discount.discountMoney)}
                         </span>
                       )}
-                  <p className="text-orange-500 dark:text-zinc-500 text-sm ">
-                    <FontAwesomeIcon
-                      icon={faExclamationCircle}
-                      className="mr-1"
-                    ></FontAwesomeIcon>{" "}
-                    Hết hạn sau {calculateDaysLeft(discount.expirationDate)}{" "}
-                    ngày
-                  </p>
+                      <p className="text-orange-500 dark:text-zinc-500 text-sm ">
+                        <FontAwesomeIcon
+                          icon={faExclamationCircle}
+                          className="mr-1"
+                        ></FontAwesomeIcon>{" "}
+                        Hết hạn sau {calculateDaysLeft(discount.expirationDate)}{" "}
+                        ngày
+                      </p>
+                    </div>
+                    <div>
+                      <button
+                        className="bg-green-500 hover:bg-green-600 text-white rounded-md px-3 py-2"
+                        onClick={() => handleValue(discount)}
+                      >
+                        Áp dụng
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <button
-                    className="bg-green-500 hover:bg-green-600 text-white rounded-md px-3 py-2"
-                    onClick={() => handleValue(discount)}
-                  >
-                    Áp dụng
-                  </button>
-                </div>
-              </div>
-            </div>
-          )) : "Bạn không"}
-        
+              ))
+          : "Bạn không"}
       </div>
     </div>
   );

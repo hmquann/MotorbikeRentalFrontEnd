@@ -11,7 +11,7 @@ const Complaints = () => {
           <h1>
             <strong>
               <span style={{ fontSize: "23pt" }}>
-                Quy trình giải quyết khiếu nại của MiMOTOR
+                Quy trình giải quyết khiếu nại của Motorbike Rental Service
               </span>
             </strong>
           </h1>
@@ -40,7 +40,7 @@ const Complaints = () => {
             <span style={{ fontSize: "11pt" }}>
               Khách hàng khiếu nại về dịch vụ qua số điện thoại 1900….. hoặc gửi
               mail cho Bộ phận Chăm sóc Khách hàng tại địa chỉ
-              support@mimotor.vn. Thời gian để Công ty tiếp nhận khiếu nại là 3
+              motorrentalservice@gmail.com. Thời gian để Công ty tiếp nhận khiếu nại là 3
               ngày kể từ ngày sử dụng dịch vụ hoặc từ ngày phát sinh sự việc.
             </span>
           </p>
@@ -113,7 +113,7 @@ const Complaints = () => {
           <p>
             <span style={{ fontSize: "11pt" }}>
               Trong thời hạn 3 ngày làm việc kể từ khi tiếp nhận thông báo về
-              khiếu nại, Chủ xe có trách nhiệm phối hợp với MiMOTOR để giải
+              khiếu nại, Chủ xe có trách nhiệm phối hợp với Motorbike Rental Service để giải
               quyết, xử lý khiếu nại. Chủ xe sẽ thông báo cho Khách hàng biện
               pháp xử lý hoặc ủy quyền thông báo cho Công ty.
             </span>

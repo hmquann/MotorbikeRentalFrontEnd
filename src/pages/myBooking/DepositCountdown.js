@@ -7,6 +7,7 @@ const DepositCountdown = ({ bookingId, onOneHourLeft, onTimeExpired }) => {
   const [depositTime, setDepositTime] = useState();
   const [depositNoti, setDepositNoti] = useState();
   const [depositCanceled, setDepositCanceled] = useState();
+  const [bookingStatus, setBookingStatus] = useState();
   useEffect(() => {
     const fetchBookingDeposit = async () => {
       try {
@@ -38,10 +39,10 @@ const DepositCountdown = ({ bookingId, onOneHourLeft, onTimeExpired }) => {
       const depositDate = new Date(depositTime);
       const expirationTime = new Date(
         depositDate.getTime() + 6 * 60 * 60 * 1000
-        //depositDate.getTime() + 5 * 60 * 1000
+        //depositDate.getTime() + 3 * 60 * 1000
       );
-      // 5' đếm ngược
-      // 2' là thông báo
+      // 3' đếm ngược
+      // 1' là thông báo
       // hết giờ là hủy chuyến
       const updateCountdown = () => {
         const now = new Date();
@@ -55,8 +56,8 @@ const DepositCountdown = ({ bookingId, onOneHourLeft, onTimeExpired }) => {
           const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
           setTimeRemaining({ hours, minutes, seconds });
 
-          //if (minutes < 2 && depositNoti) {
-          if (hours < 1 && depositNoti) {
+          //if (minutes < 1 && depositNoti) {
+            if (hours < 1 && depositNoti) {
             onOneHourLeft();
             setDepositNoti(false);
           }

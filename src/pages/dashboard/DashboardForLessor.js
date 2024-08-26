@@ -109,9 +109,15 @@ const DashboardForAdmin = () => {
         const dayIndex = Math.floor(
           (transactionDate - pastDate) / (1000 * 60 * 60 * 24)
         );
-        if (transaction.type === "DEPOSIT_RECEIVE") {
+        if (
+          transaction.type === "DEPOSIT_RECEIVE" ||
+          transaction.type === "REFUND_RECEIVE"
+        ) {
           revenuePerDay[dayIndex] += transaction.amount;
-        } else if (transaction.type === "DEPOSIT") {
+        } else if (
+          transaction.type === "DEPOSIT" ||
+          transaction.type === "REFUND"
+        ) {
           revenuePerDay[dayIndex] -= transaction.amount;
         }
       }

@@ -54,7 +54,7 @@ const Homepage = () => {
         />
         <div className="absolute mt-20 inset-0 flex flex-col justify-center items-center text-center text-white rounded-2xl font-normal">
           <h1 className="text-xl md:text-6xl font-black text-center max-w-xl">
-            MiMotor - Cùng Bạn Đến Mọi Hành Trình
+            Cùng Bạn Đến Mọi Hành Trình
           </h1>
           <div className="w-32 md:w-72 bg-white h-px mx-auto mt-4 md:mt-6"></div>
           <p className="mt-4 md:mt-8 text-lg md:text-xl text-center font-bold">

@@ -23,6 +23,8 @@ import { FaMotorcycle } from "react-icons/fa";
 import { faMessage } from "@fortawesome/free-regular-svg-icons";
 import FeedbackList from "../booking/FeedbackList";
 import MapModal from "./MapModal";
+import PopupWallet from "./PopUpWallet";
+import PopUpDateRenting from "./PopUpDateRenting";
 
 const statusTranslations = {
   PENDING: "Chờ duyệt",
@@ -90,6 +92,9 @@ export default function Widget() {
   const [popupContent, setPopupContent] = useState("");
   const [action, setAction] = useState("");
   const [showPopupSuccess, setShowPopupSuccess] = useState(false);
+  const [popUpDateRenting, setPopUpDateRenting] = useState(false);
+  const [showPopupWallet, setShowPopupWallet] = useState(false);
+  const [backWallet, setBackWallet] = useState(false);
   const [loading, setLoading] = useState(false);
   const [renter, setRenter] = useState();
   const [lessor, setLessor] = useState();
@@ -183,6 +188,49 @@ export default function Widget() {
       );
       setAction(actionType);
       setShowPopup(true);
+    }
+  };
+
+  const checkWallet = async () => {
+    if (action === "PENDING_DEPOSIT") {
+      const userId = JSON.parse(localStorage.getItem("user")).userId;
+      const token = localStorage.getItem("token");
+
+      const response = await apiClient.get(`/api/user/${userId}`);
+      console.log(response);
+      const depositMoney = (booking.totalPrice * 50) / 100;
+      if (response.data.balance < depositMoney) {
+        setShowPopupWallet(true);
+        setBackWallet(true);
+        console.log(depositMoney);
+      } else {
+        setBackWallet(true);
+        setShowPopupWallet(false);
+      }
+      return;
+    }
+
+    if (action !== "DEPOSIT_MADE") {
+      if (action === "RENTING") {
+        setPopUpDateRenting(true);
+      }
+      setBackWallet(true);
+      setShowPopupWallet(false);
+      return;
+    }
+    const userId = JSON.parse(localStorage.getItem("user")).userId;
+    const token = localStorage.getItem("token");
+
+    const response = await apiClient.get(`/api/user/${userId}`);
+    console.log(response);
+    const depositMoney = (booking.totalPrice * 50) / 100;
+    if (response.data.balance < depositMoney) {
+      setShowPopupWallet(true);
+      setBackWallet(true);
+      console.log(depositMoney);
+    } else {
+      setBackWallet(true);
+      setShowPopupWallet(false);
     }
   };
 
@@ -362,24 +410,6 @@ export default function Widget() {
 
       if (status === "REJECTED") {
         setShowPopUpReason(true);
-        // await setDoc(doc(collection(db, "notifications")), {
-        //   userId: userId,
-        //   message: JSON.stringify({
-        //     title: '<strong style="color: red">Từ chối cho thuê</strong>',
-        //     content: `Bạn đã từ chối việc đặt xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong>.`,
-        //   }),
-        //   timestamp: now,
-        //   seen: false,
-        // });
-        // await setDoc(doc(collection(db, "notifications")), {
-        //   userId: booking.renterId,
-        //   message: JSON.stringify({
-        //     title: '<strong style="color: red">Từ chối cho thuê</strong>',
-        //     content: `Chủ xe <strong>${userName}</strong> đã từ chối việc đặt xe <strong>${motorbikeName}</strong>, biển số <strong>${motorbikePlate}</strong>.`,
-        //   }),
-        //   timestamp: now,
-        //   seen: false,
-        // });
       } else if (status === "PENDING_DEPOSIT") {
         if (systemNoti) {
           await setDoc(doc(collection(db, "notifications")), {
@@ -443,6 +473,10 @@ export default function Widget() {
           );
         }
       } else if (status === "RENTING") {
+        if (showPopupWallet) {
+          console.log(showPopupWallet);
+          return;
+        }
         if (systemNoti) {
           await setDoc(doc(collection(db, "notifications")), {
             userId: userId,
@@ -584,6 +618,14 @@ export default function Widget() {
   const handlePopUpSuccess = () => {
     setShowPopupSuccess(false);
     navigate("/menu/myBooking");
+  };
+
+  const handlePopUpWallet = () => {
+    setShowPopupWallet(false);
+    navigate("/menu/wallet");
+  };
+  const handlePopUpDateRenting = () => {
+    setPopUpDateRenting(false);
   };
 
   const handleViewMap = (e) => {
@@ -964,7 +1006,7 @@ export default function Widget() {
                 <PopUpConfirm
                   show={showPopup}
                   message={popupContent}
-                  onConfirm={handleConfirm}
+                  onConfirm={checkWallet}
                   onCancel={() => setShowPopup(false)}
                 />
               )}
@@ -973,6 +1015,20 @@ export default function Widget() {
                   show={showPopupSuccess}
                   onHide={handlePopUpSuccess}
                   message="Bạn đã cập nhật thành công trạng thái chuyến !"
+                />
+              )}
+              {showPopupWallet && (
+                <PopupWallet
+                  show={showPopupWallet}
+                  onHide={handlePopUpWallet}
+                  message="Số dư ví của bạn chưa đủ. Bạn vui lòng nạp thêm để thanh toán tiền cọc!"
+                />
+              )}
+              {popUpDateRenting && (
+                <PopUpDateRenting
+                  show={popUpDateRenting}
+                  onHide={handlePopUpDateRenting}
+                  message="Chưa đến ngày giao xe, vui lòng đợi !"
                 />
               )}
               <PopUpReasonManage

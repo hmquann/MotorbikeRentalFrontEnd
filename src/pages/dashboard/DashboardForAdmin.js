@@ -37,15 +37,14 @@ const DashboardForAdmin = () => {
         );
         setLocationPercentage(locationPercentageResponse.data);
 
-        // Dummy data cho top models (dữ liệu mẫu)
-        // const dummyTopModels = [
-        //   { modelName: "SH350i", bookingCount: 50 },
-        //   { modelName: "Wave", bookingCount: 30 },
-        //   { modelName: "Vision", bookingCount: 60 },
-        //   { modelName: "AirBlade", bookingCount: 20 },
-        //   { modelName: "Vespa", bookingCount: 80 },
-        // ];
-        // setTopModels(dummyTopModels);
+        const topModelsResponse = await apiClient.get("/dashboard/topModels");
+        const topModelsArray = Object.entries(topModelsResponse.data).map(
+          ([modelName, bookingCount]) => ({
+            modelName,
+            bookingCount,
+          })
+        );
+        setTopModels(topModelsArray);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -242,29 +241,29 @@ const DashboardForAdmin = () => {
     },
     title: {
       text: "Top 5 Mẫu Xe Được Thuê Nhiều Nhất Tháng",
-      left: "center", // Center the title horizontally
-      top: "top", // Keep the title at the top
+      left: "center",
+      top: "top",
       textStyle: { fontFamily: "manrope" },
     },
     legend: {
-      orient: "horizontal", // Ensure the legend is horizontal
-      top: "84%", // Push the legend further down
-      left: "center", // Center the legend horizontally
-      itemGap: 10, // Increase spacing between legend items
-      itemWidth: 20, // Adjust the icon width of each legend item
-      width: "85%", // Make the legend width wider to fit all items in one row
+      orient: "horizontal",
+      top: "84%",
+      left: "center",
+      itemGap: 10,
+      itemWidth: 20,
+      width: "85%",
       margin: "auto",
       textStyle: {
         fontFamily: "manrope",
-        overflow: "truncate", // Truncate long legend text
+        overflow: "truncate",
       },
     },
     series: [
       {
         name: "Top 5 Mẫu Xe Được Thuê Nhiều Nhất Tháng",
         type: "pie",
-        radius: ["40%", "65%"], // Circular pie chart style
-        center: ["50%", "45%"], // Move the chart up to make room for the legend
+        radius: ["40%", "65%"],
+        center: ["50%", "45%"],
         avoidLabelOverlap: false,
         itemStyle: {
           borderRadius: 10,
@@ -272,7 +271,7 @@ const DashboardForAdmin = () => {
           borderWidth: 2,
         },
         label: {
-          show: false, // Hide labels within the chart
+          show: false,
           position: "center",
         },
         emphasis: {
@@ -285,7 +284,7 @@ const DashboardForAdmin = () => {
           },
         },
         labelLine: {
-          show: false, // Hide label lines
+          show: false,
         },
         data: topModels.map((model) => ({
           name: model.modelName,

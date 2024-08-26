@@ -33,10 +33,10 @@ const Benefit = () => {
     <div className='py-20'>
     <Container className='font-manrope'>
       <h2 className='text-center mb-3 text-5xl font-extrabold'>
-        Ưu Điểm Của MiMotor
+        Ưu Điểm Của Motorbike Rental
       </h2>
       <h5 className='text-xl mb-10 text-center mx-auto max-w-2xl'>
-        Những tính năng giúp bạn dễ dàng hơn khi thuê xe trên MiMotor.
+        Những tính năng giúp bạn dễ dàng hơn khi thuê xe trên Motorbike Rental.
       </h5>
       <Grid container spacing={10}>
         {benefits.map((benefit, index) => (
